@@ -345,18 +345,14 @@ async fn spawn_terminal(
     // Ensure npm-global bins are visible to the child (and to cmd.exe /K lookup).
     cmd.env("PATH", &child_path);
 
-    // GUI apps on macOS launch with an empty TERM, so CLI tools (Claude Code,
-    // agy, etc.) think they are not attached to a real terminal and disable
-    // ANSI colours / bold text, showing only black-and-white output.
+    // Explicitly enforce UTF-8 locale and rich terminal capabilities so TUIs and
+    // CLIs render full Unicode box-drawing, emojis, and mascot characters cleanly.
+    cmd.env("LANG", "en_US.UTF-8");
+    cmd.env("LC_ALL", "en_US.UTF-8");
+    cmd.env("LC_CTYPE", "en_US.UTF-8");
     cmd.env("TERM", "xterm-256color");
     cmd.env("COLORTERM", "truecolor");
-    // default. Interactive TUIs (Claude Code, Codex CLI, OpenCode, ...) query
-    // the terminal size once at startup and lay out their splash screen for
-    // it; real terminals don't reflow already-drawn content when a later
-    // resize (SIGWINCH) arrives. Spawning at 24x80 and resizing a moment
-    // later — which is what a xterm.js pane inside a large CSS-grid card
-    // actually needs — left the CLI's UI drawn for a tiny terminal, stranded
-    // in the corner of a much bigger pane (the "big empty gap" bug).
+
     let pty_pair = pty_system
         .openpty(PtySize {
             rows: rows.unwrap_or(24),
@@ -383,32 +379,65 @@ async fn spawn_terminal(
         .try_clone_reader()
         .map_err(|e| e.to_string())?;
 
-    // Background thread drains the pty and pushes each chunk to the frontend as
-    // a `pty-output` event (portable-pty readers are blocking, so this can't run
-    // on the async command handler). Replaces the old shared-buffer + 50ms poll:
-    // with several agent panes open the poll added dozens of Tauri IPC
-    // round-trips/sec on one channel, which is what caused multi-pane lag.
+    // Background thread drains the pty and pushes UTF-8 clean chunks to frontend.
+    // Handles multi-byte boundary splitting so UTF-8 characters are never mangled into ''.
     let pane_id_clone = pane_id.clone();
     let app_handle = app.clone();
     std::thread::spawn(move || {
         let mut reader = reader;
         let mut buffer = [0u8; 4096];
-        let start_time = std::time::Instant::now();
+        let mut leftover = Vec::new();
         loop {
             match reader.read(&mut buffer) {
                 Ok(0) => {
+                    if !leftover.is_empty() {
+                        let text = String::from_utf8_lossy(&leftover).into_owned();
+                        let _ = app_handle.emit(
+                            "pty-output",
+                            serde_json::json!({ "paneId": pane_id_clone, "data": text }),
+                        );
+                    }
                     println!("[Rust PTY Reader - {}] EOF reached", pane_id_clone);
                     break;
                 }
                 Ok(n) => {
-                    let text = String::from_utf8_lossy(&buffer[..n]).into_owned();
-                    if start_time.elapsed().as_secs() < 5 {
-                        println!("[Rust PTY Reader Debug - {}] read {} bytes: {:?}", pane_id_clone, n, text);
+                    let mut combined = if leftover.is_empty() {
+                        buffer[..n].to_vec()
+                    } else {
+                        let mut v = std::mem::take(&mut leftover);
+                        v.extend_from_slice(&buffer[..n]);
+                        v
+                    };
+
+                    match std::str::from_utf8(&combined) {
+                        Ok(valid_str) => {
+                            let text = valid_str.to_string();
+                            let _ = app_handle.emit(
+                                "pty-output",
+                                serde_json::json!({ "paneId": pane_id_clone, "data": text }),
+                            );
+                        }
+                        Err(e) => {
+                            let valid_up_to = e.valid_up_to();
+                            if valid_up_to > 0 {
+                                if let Ok(valid_part) = std::str::from_utf8(&combined[..valid_up_to]) {
+                                    let text = valid_part.to_string();
+                                    let _ = app_handle.emit(
+                                        "pty-output",
+                                        serde_json::json!({ "paneId": pane_id_clone, "data": text }),
+                                    );
+                                }
+                            }
+                            if let Some(error_len) = e.error_len() {
+                                // Genuinely invalid byte sequence: skip bad segment
+                                let bad_end = valid_up_to + error_len;
+                                leftover = combined[bad_end..].to_vec();
+                            } else {
+                                // Incomplete UTF-8 sequence at chunk boundary: buffer for next read
+                                leftover = combined[valid_up_to..].to_vec();
+                            }
+                        }
                     }
-                    let _ = app_handle.emit(
-                        "pty-output",
-                        serde_json::json!({ "paneId": pane_id_clone, "data": text }),
-                    );
                 }
                 Err(e) => {
                     println!("[Rust PTY Reader - {}] read error: {:?}", pane_id_clone, e);

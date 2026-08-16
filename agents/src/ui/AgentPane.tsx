@@ -300,6 +300,40 @@ export default function AgentPane({
   const [currentModel, setCurrentModel] = useState(agent.model || "claude-fable-5");
   const [currentEffort, setCurrentEffort] = useState(agent.effort || "Max");
 
+  const modelMenuRef = useRef<HTMLDivElement>(null);
+  const effortMenuRef = useRef<HTMLDivElement>(null);
+  const settingsMenuRef = useRef<HTMLDivElement>(null);
+
+  // Auto-close dropdowns when clicking anywhere outside or pressing Escape
+  useEffect(() => {
+    if (!modelMenuOpen && !effortMenuOpen && !settingsMenuOpen) return;
+    const onDown = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (modelMenuOpen && !modelMenuRef.current?.contains(target)) {
+        setModelMenuOpen(false);
+      }
+      if (effortMenuOpen && !effortMenuRef.current?.contains(target)) {
+        setEffortMenuOpen(false);
+      }
+      if (settingsMenuOpen && !settingsMenuRef.current?.contains(target)) {
+        setSettingsMenuOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setModelMenuOpen(false);
+        setEffortMenuOpen(false);
+        setSettingsMenuOpen(false);
+      }
+    };
+    window.addEventListener("mousedown", onDown);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("mousedown", onDown);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [modelMenuOpen, effortMenuOpen, settingsMenuOpen]);
+
   const sendTerminal = (data: string) => {
     invoke("write_to_terminal", { paneId, data }).catch(console.error);
     terminalInstance.current?.focus();
@@ -953,20 +987,15 @@ export default function AgentPane({
           cursorBlink: true,
           cursorStyle: "block",
           fontSize: getFontSize(),
-          fontFamily: '"Geist Mono", Cascadia Code, Consolas, monospace',
+          fontFamily: '"Geist Mono", "JetBrains Mono", Menlo, Monaco, Consolas, "Courier New", monospace, "Apple Color Emoji"',
           fontWeight: "400",
           fontWeightBold: "700",
-          // 1 (xterm's own default), but increased to 1.4 to prevent fonts
-          // like Geist Mono from overflowing their cell and overlapping with
-          // box-drawing characters or adjacent lines. xterm customGlyphs (default)
-          // handles box-drawing gaps.
-          lineHeight: 1.4,
+          customGlyphs: true,
+          lineHeight: 1.35,
           theme: paneXtermTheme(),
-          // Opaque on purpose — see paneXtermTheme. Transparency here forced
-          // xterm onto its alpha-blending path and locked out the GPU renderer.
           allowTransparency: false,
           rightClickSelectsWord: true,
-          scrollback: 2000,
+          scrollback: 5000,
         };
 
         terminal = new XTerm(options);
@@ -1451,7 +1480,7 @@ export default function AgentPane({
                 {/* Bottom Controls Row: Model Selector, Effort Selector, Usage Check */}
                 <div className="flex items-center gap-3 pt-0.5">
                   {/* Anthropic Star Dropdown */}
-                  <div className="relative">
+                  <div ref={modelMenuRef} className="relative">
                     <button
                       onClick={() => { setModelMenuOpen(!modelMenuOpen); setEffortMenuOpen(false); setSettingsMenuOpen(false); }}
                       className="flex items-center gap-1 text-swarm-textMuted hover:text-swarm-text transition-colors"
@@ -1490,7 +1519,7 @@ export default function AgentPane({
                   </div>
 
                   {/* Effort Selector Dropdown */}
-                  <div className="relative">
+                  <div ref={effortMenuRef} className="relative">
                     <button
                       onClick={() => { setEffortMenuOpen(!effortMenuOpen); setModelMenuOpen(false); setSettingsMenuOpen(false); }}
                       className="flex items-center gap-1 text-xs text-swarm-textDim hover:text-swarm-text transition-colors font-medium"
@@ -1505,13 +1534,13 @@ export default function AgentPane({
                         <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase">
                           Effort Level
                         </div>
-                        {["Low", "Medium", "High", "Max"].map((eff) => (
+                        {["UltraCode", "Max", "High", "Medium", "Low"].map((eff) => (
                           <button
                             key={eff}
                             onClick={() => handleSelectEffort(eff)}
                             className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-xs text-left text-swarm-textDim hover:bg-white/[0.08] hover:text-swarm-text transition-colors"
                           >
-                            <span>{eff}</span>
+                            <span className={eff === "UltraCode" ? "font-bold text-swarm-goldHi" : ""}>{eff}</span>
                             {currentEffort === eff && <Check size={12} className="text-swarm-gold" />}
                           </button>
                         ))}
@@ -1543,7 +1572,7 @@ export default function AgentPane({
                 </button>
 
                 {/* Bottom Settings Button */}
-                <div className="relative">
+                <div ref={settingsMenuRef} className="relative">
                   <button
                     onClick={() => { setSettingsMenuOpen(!settingsMenuOpen); setModelMenuOpen(false); setEffortMenuOpen(false); }}
                     className="flex size-7.5 items-center justify-center rounded-xl bg-white/[0.03] border border-white/[0.08] text-swarm-textMuted hover:text-swarm-text hover:bg-white/[0.08] transition-colors"
