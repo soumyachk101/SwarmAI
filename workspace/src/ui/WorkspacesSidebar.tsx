@@ -521,6 +521,8 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
   const cancelDeleteWorkspace = useWorkspaceStore((s) => s.cancelDeleteWorkspace);
   const renamingWorkspaceId = useWorkspaceStore((s) => s.renamingWorkspaceId);
   const setRenamingWorkspaceId = useWorkspaceStore((s) => s.setRenamingWorkspaceId);
+  const boardOpen = useWorkspaceStore((s) => s.boardOpen);
+  const setBoardOpen = useWorkspaceStore((s) => s.setBoardOpen);
   const agentStatuses = useAgentsStore((s) => s.agentStatuses);
 
   // Read once on mount: a resize the user made is theirs, and snapping back to
@@ -858,11 +860,21 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
                   <span className="tracking-widest">ISSUES & PRS</span>
                 </button>
                 <button
-                  onClick={() => {}}
-                  className="flex h-8 items-center gap-2.5 rounded-lg px-2 text-xs font-semibold tracking-wider text-swarm-textMuted hover:bg-white/[0.04] hover:text-swarm-text transition-colors"
+                  onClick={() => setBoardOpen(!boardOpen)}
+                  className={`flex h-8 items-center gap-2.5 rounded-lg px-2 text-xs font-semibold tracking-wider transition-colors ${
+                    boardOpen
+                      ? "bg-swarm-gold/15 text-swarm-gold border border-swarm-gold/30"
+                      : "text-swarm-textMuted hover:bg-white/[0.04] hover:text-swarm-text"
+                  }`}
+                  title="Toggle TaskComb Pipeline Board"
                 >
-                  <Network size={14} className="text-swarm-textMuted/80" />
+                  <Network size={14} className={boardOpen ? "text-swarm-gold" : "text-swarm-textMuted/80"} />
                   <span className="tracking-widest">TASKCOMB</span>
+                  {activeWorkspace?.taskCards && activeWorkspace.taskCards.length > 0 && (
+                    <span className="ml-auto rounded-full bg-white/[0.08] px-1.5 py-0.5 text-[10px] text-swarm-textDim font-mono">
+                      {activeWorkspace.taskCards.length}
+                    </span>
+                  )}
                 </button>
               </div>
 

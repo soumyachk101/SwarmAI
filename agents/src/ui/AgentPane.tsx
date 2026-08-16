@@ -1,6 +1,4 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { Terminal as XTerm, ITerminalOptions } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 import { SearchAddon } from "xterm-addon-search";
@@ -244,6 +242,111 @@ function flattenForStdin(text: string): string {
   return stripTerminalNoise(text.replace(/\r?\n+/g, " "));
 }
 
+interface ModelOption {
+  id: string;
+  label: string;
+}
+
+interface CliModelPreset {
+  brandName: string;
+  brandColor: string;
+  switchCommand: string;
+  defaultModel: string;
+  models: ModelOption[];
+}
+
+function getCliModelPresets(cli: string): CliModelPreset {
+  const c = (cli || "").toLowerCase();
+  if (c === "claude" || c === "claude-code") {
+    return {
+      brandName: "Claude Code Models",
+      brandColor: "#D97757",
+      switchCommand: "/model",
+      defaultModel: "Claude Fable 5",
+      models: [
+        { id: "claude-fable-5", label: "Claude Fable 5" },
+        { id: "claude-opus-5", label: "Claude Opus 5" },
+        { id: "claude-sonnet-5", label: "Claude Sonnet 5" },
+        { id: "claude-haiku-4-5", label: "Claude Haiku 4.5" },
+      ],
+    };
+  }
+  if (c === "agy" || c === "antigravity") {
+    return {
+      brandName: "Antigravity Models",
+      brandColor: "#4285F4",
+      switchCommand: "/model",
+      defaultModel: "Gemini 3.7 Flash",
+      models: [
+        { id: "gemini-3.7-flash", label: "Gemini 3.7 Flash" },
+        { id: "gemini-3.6-flash", label: "Gemini 3.6 Flash" },
+        { id: "gemini-3.5-flash", label: "Gemini 3.5 Flash" },
+        { id: "gemini-3.1-pro", label: "Gemini 3.1 Pro" },
+        { id: "claude-sonnet-4.6-thinking", label: "Claude Sonnet 4.6 (Thinking)" },
+        { id: "claude-opus-4.6-thinking", label: "Claude Opus 4.6 (Thinking)" },
+        { id: "gpt-oss-120b", label: "GPT-OSS 120B (Medium)" },
+      ],
+    };
+  }
+  if (c === "codex" || c === "openai") {
+    return {
+      brandName: "OpenAI Codex Models",
+      brandColor: "#10A37F",
+      switchCommand: "/model",
+      defaultModel: "GPT-4o",
+      models: [
+        { id: "gpt-4o", label: "GPT-4o" },
+        { id: "o3-mini", label: "o3-mini" },
+        { id: "o1", label: "o1" },
+        { id: "gpt-4.5-preview", label: "GPT-4.5 Preview" },
+        { id: "o1-mini", label: "o1-mini" },
+      ],
+    };
+  }
+  if (c === "opencode") {
+    return {
+      brandName: "OpenCode Models",
+      brandColor: "#A855F7",
+      switchCommand: "/model",
+      defaultModel: "Claude 3.7 Sonnet",
+      models: [
+        { id: "anthropic/claude-3-7-sonnet", label: "Claude 3.7 Sonnet" },
+        { id: "openai/gpt-4o", label: "GPT-4o" },
+        { id: "deepseek/deepseek-r1", label: "DeepSeek R1" },
+        { id: "google/gemini-2.5-pro", label: "Gemini 2.5 Pro" },
+        { id: "anthropic/claude-3-5-sonnet", label: "Claude 3.5 Sonnet" },
+      ],
+    };
+  }
+  if (c === "aider") {
+    return {
+      brandName: "Aider Models",
+      brandColor: "#14B8A6",
+      switchCommand: "/model",
+      defaultModel: "Claude 3.7 Sonnet",
+      models: [
+        { id: "sonnet", label: "Claude 3.7 Sonnet" },
+        { id: "gpt-4o", label: "GPT-4o" },
+        { id: "deepseek/deepseek-reasoner", label: "DeepSeek R1" },
+        { id: "gemini/gemini-2.5-pro", label: "Gemini 2.5 Pro" },
+        { id: "o3-mini", label: "o3-mini" },
+      ],
+    };
+  }
+  return {
+    brandName: "CLI Models",
+    brandColor: "#E5A93C",
+    switchCommand: "/model",
+    defaultModel: "Claude 3.7 Sonnet",
+    models: [
+      { id: "claude-3-7-sonnet", label: "Claude 3.7 Sonnet" },
+      { id: "gpt-4o", label: "GPT-4o" },
+      { id: "deepseek-r1", label: "DeepSeek R1" },
+      { id: "gemini-2.5-pro", label: "Gemini 2.5 Pro" },
+    ],
+  };
+}
+
 export default function AgentPane({
   paneId,
   workingDir,
@@ -273,10 +376,12 @@ export default function AgentPane({
   const fitAddonRef = useRef<FitAddon | null>(null);
   // Held outside the terminal effect so the live-theme listener can tell
   // whether the GPU renderer is still the one painting.
+  const gpuActiveRef = useRef(false);
   const webglRef = useRef<WebglAddon | null>(null);
   const [spawnState, setSpawnState] = useState<"connecting" | "running" | "error" | "notFound">("connecting");
   const [stalled, setStalled] = useState(false);
-  // Keys come from the host (the app owns settings); the CLI-to-env mapping
+
+  // Settings / API Keys stored centrally on the host. Which key to pull
   // is this package's own business — see cli-configs/env.
   const apiKeys = agentsHost().apiKeys();
 
@@ -292,12 +397,14 @@ export default function AgentPane({
   const compactHeader = paneWidth > 0 && paneWidth < COMPACT_HEADER_WIDTH;
   const refitCount = useAgentsStore((s) => s.refitCount);
 
+  const cliPreset = useMemo(() => getCliModelPresets(agent.cli), [agent.cli]);
+
   // Prompt bar & Model / Effort / Usage controls (Matches Screenshot 2)
   const [promptInput, setPromptInput] = useState("");
   const [modelMenuOpen, setModelMenuOpen] = useState(false);
   const [effortMenuOpen, setEffortMenuOpen] = useState(false);
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
-  const [currentModel, setCurrentModel] = useState(agent.model || "claude-fable-5");
+  const [currentModel, setCurrentModel] = useState(agent.model || cliPreset.defaultModel);
   const [currentEffort, setCurrentEffort] = useState(agent.effort || "Max");
 
   const modelMenuRef = useRef<HTMLDivElement>(null);
@@ -1479,32 +1586,27 @@ export default function AgentPane({
 
                 {/* Bottom Controls Row: Model Selector, Effort Selector, Usage Check */}
                 <div className="flex items-center gap-3 pt-0.5">
-                  {/* Anthropic Star Dropdown */}
+                  {/* CLI Specific Star / Glyph Dropdown */}
                   <div ref={modelMenuRef} className="relative">
                     <button
                       onClick={() => { setModelMenuOpen(!modelMenuOpen); setEffortMenuOpen(false); setSettingsMenuOpen(false); }}
                       className="flex items-center gap-1 text-swarm-textMuted hover:text-swarm-text transition-colors"
-                      title="Model Selector"
+                      title={`${cliPreset.brandName} Selector`}
                     >
-                      {/* Anthropic Coral Star Glyph */}
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D97757" strokeWidth="2.8" strokeLinecap="round" className="shrink-0">
+                      {/* Dynamic Brand Glyph */}
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={cliPreset.brandColor} strokeWidth="2.8" strokeLinecap="round" className="shrink-0">
                         <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07l14.14-14.14" />
                       </svg>
                       <ChevronDown size={13} className="text-swarm-textMuted/70" />
                     </button>
 
                     {modelMenuOpen && (
-                      <div className="absolute bottom-full left-0 mb-2 min-w-[220px] rounded-xl border border-white/[0.12] bg-[#141720] p-1.5 shadow-2xl z-50 animate-fade-in">
+                      <div className="absolute bottom-full left-0 mb-2 min-w-[230px] rounded-xl border border-white/[0.12] bg-[#141720] p-1.5 shadow-2xl z-50 animate-fade-in">
                         <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase flex items-center justify-between">
-                          <span>Models</span>
-                          <span className="text-[9px] font-mono text-swarm-gold">/model</span>
+                          <span style={{ color: cliPreset.brandColor }}>{cliPreset.brandName}</span>
+                          <span className="text-[9px] font-mono text-swarm-gold">{cliPreset.switchCommand}</span>
                         </div>
-                        {[
-                          { id: "claude-fable-5", label: "Claude Fable 5" },
-                          { id: "claude-opus-5", label: "Claude Opus 5" },
-                          { id: "claude-sonnet-5", label: "Claude Sonnet 5" },
-                          { id: "claude-haiku-4-5", label: "Claude Haiku 4.5" },
-                        ].map((m) => (
+                        {cliPreset.models.map((m) => (
                           <button
                             key={m.id}
                             onClick={() => handleSelectModel(m.id, m.label)}

@@ -1,8 +1,6 @@
 <!-- @dsCard group="Brand" -->
-<!-- @dsCard group="Brand" -->
 <div align="center">
 
-<!-- 🎨 Premium Swarm Logo / Brand Mark -->
 <img src="https://img.shields.io/badge/Swarm-AI-FF6B00?style=for-the-badge&logo=bug&logoColor=white" alt="Swarm AI" />
 
 <br />
@@ -12,7 +10,7 @@
 ### *Project intelligence lives in the project — not in a chat session.*
 
 <p align="center">
- <strong>A local-first, AI-native desktop development environment</strong><br />
+ <strong>A local-first, AI-native desktop environment</strong><br />
  where multiple coding agents build together, share memory, and never lose context.
 </p>
 
@@ -28,7 +26,7 @@
  <img src="https://img.shields.io/badge/Rust-2021%20Edition-000000?style=flat-square&logo=rust&logoColor=white" alt="Rust" />
  </a>
  <a href="https://react.dev">
- <img src="https://img.shields.io/badge/React-18+-61DAFB?style=flat-square&logo=react&logoColor=white" alt="React" />
+ <img src="https://img.shields.io/badge/React-18%2B-61DAFB?style=flat-square&logo=react&logoColor=white" alt="React" />
  </a>
  <a href="https://www.typescriptlang.org">
  <img src="https://img.shields.io/badge/TypeScript-5.6-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
@@ -47,10 +45,22 @@
 
 ---
 
+## The Problem
+
+Every AI coding tool has the same flaw: **context dies when you switch.**
+
+You spend 20 minutes teaching Claude Code your architecture. You pivot to fix a CSS bug with Cursor. You want to run a security audit with Codex CLI. Each one starts from zero. Your project's intelligence — the decisions, conventions, bug fixes, patterns — lives in a chat session that disappears at close.
+
+The other problem: **only one agent works at a time.** Real projects need parallel effort. Architects, implementers, reviewers, testers — each focused on a different slice of the codebase. But orchestrating multiple agents manually is chaos: merge conflicts, overwritten files, no shared memory.
+
+**Swarm AI solves both.**
+
+---
+
 ## Table of Contents
 
 1. [What is Swarm AI?](#what-is-swarm-ai)
-2. [Why Swarm AI?](#why-swarm-ai)
+2. [The Swarm Difference](#the-swarm-difference)
 3. [Architecture Overview](#architecture-overview)
 4. [Core Concepts](#core-concepts)
 5. [Features Deep Dive](#features-deep-dive)
@@ -61,32 +71,32 @@
 10. [Building from Source](#building-from-source)
 11. [Project Structure](#project-structure)
 12. [Package Reference](#package-reference)
-13. [License](#license)
+13. [Supported CLI Agents](#supported-cli-agents)
+14. [License](#license)
+15. [Links](#links)
 
 ---
 
 ## What is Swarm AI?
 
-**Swarm AI** is a local-first, AI-native desktop development environment built on **Tauri v2** (Rust + React). It lets you run **any CLI coding agent** — Claude Code, Codex CLI, OpenCode, Aider, Cursor, , and more — inside live terminal panes. Every agent reads and writes a **shared, project-scoped memory store** called *Pheromone*, so switching tools or agents never loses context.
+**Swarm AI** is a local-first, AI-native desktop development environment built on **Tauri v2** (Rust + React). It lets you run **any CLI coding agent** — Claude Code, Codex CLI, OpenCode, Aider, Cursor, and more — inside live terminal panes. Every agent reads and writes a **shared, project-scoped memory store** called *Pheromone*, so switching tools or agents never loses context.
 
 Hand a goal to **Lead**, and a team of agents builds it in parallel — each in its own **git worktree**, coordinated by **file-ownership locks** and an **orchestration engine** called *SwarmMind*.
 
+Swarm AI ships as a native desktop application (macOS, Windows, Linux) — **not a web app, not a VS Code extension**. It owns the full stack: PTY management, filesystem access, git operations, SQLite memory, CDP browser control, and voice input — all from a single binary.
+
 ---
 
-## Why Swarm AI?
-
-<div align="center">
+## The Swarm Difference
 
 | Traditional Workflow | With Swarm AI |
 |---|---|
 | One agent, one session — context lost when you switch | Shared project memory — every agent sees the same context |
 | Sequential coding — one change at a time | Parallel worktrees — multiple agents building simultaneously |
-| Manually coordinating agents | Lead planner + SwarmMind orchestration — automated dispatch & merge |
-| No memory between sessions | Pheromone persists architecture decisions, patterns, bugs |
+| Manually coordinating agents | Lead planner + SwarmMind — automated dispatch, merge, and tracking |
+| No memory between sessions | Pheromone persists decisions, patterns, bugs across sessions |
 | Cloud-dependent AI | Local-first — whisper.cpp voice, SQLite memory, no mandatory API calls |
-| Scattered tooling | One surface — Agents, Terminal, Browser, Emulator, Voice |
-
-</div>
+| Scattered tooling | One surface — Agents, Terminal, Browser, Emulator, Voice, Board, Flow |
 
 ---
 
@@ -95,31 +105,54 @@ Hand a goal to **Lead**, and a team of agents builds it in parallel — each in 
 Swarm follows a **ports-and-adapters** architecture with a strict **purity boundary**:
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│ USER INTERACTION │
+┌─────────────────────────────────────────────────────────────────────┐
+│ USER INTERACTION LAYER │
 │ Goal → Lead (planner) → SwarmMind (orchestrator) → Agents │
-├─────────────────────────────────────────────────────────────────┤
+├─────────────────────────────────────────────────────────────────────┤
 │ FRONTEND (React + Zustand) │
-│ Panes │ Board │ Flow Canvas │ Dock │ Settings │ Voice │
-├──────────┼────────┼───────────────┼────────┼────────────┼────────┤
-│ TAURI IPC (typed ports) │
-├──────────┼────────┼───────────────┼────────┼────────────┼────────┤
+│ Panes │ Board │ Flow Canvas │ Dock │ Settings │ Voice │ Themes │
+├────────────┬────────────┬──────────────────┬────────┬───────────────┤
+│ TAURI IPC │ │ (typed ports) │ │ │
+├────────────┴────────────┴──────────────────┴────────┴───────────────┤
 │ RUST BACKEND (lib.rs) │
-│ PTY │ FS │ Git/Worktree │ Pheromone │ CDP Browser │ Whisper │
-├──────────┼────────┼───────────────┼────────┼────────────┼────────┤
+│ PTY │ FS │ Git/Worktree │ Pheromone │ CDP Browser │ Whisper │ Emulator│
+├─────────────────────────────────────────────────────────────────────┤
 │ SHARED MEMORY (Pheromone) │
-│ SQLite + FTS5 │ Hybrid Vector+Keyword │ Injection Pipeline │
-└─────────────────────────────────────────────────────────────────┘
+│ SQLite + FTS5 │ Hybrid Vector+Keyword │ RRF Merge │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Key Architectural Principles
 
 | Principle | Implementation |
 |-----------|---------------|
-| **Purity First** | Core orchestration logic (SwarmMind) is pure — zero `node:` imports. Enforced by automated purity tests. |
+| **Purity First** | Core packages (`swarmmind`, `voice`, `board`, `tasks`, `flow`) have zero `node:` imports — safe to bundle in the Tauri renderer. Enforced by automated tests. |
 | **Ports & Adapters** | Side effects go through typed interfaces (`WorktreeOps`, `HandoffFs`). Node and Tauri supply their own implementations. |
-| **Borrow, Never Re-implement** | Each package is standalone. Swarm composes them, never duplicates them. |
-| **Self-Enforcing Boundaries** | Tests scan source files for architectural violations (e.g., Node imports in the renderer). |
+| **Dual Entry Points** | `@swarm/mind`, `@swarm/voice`, and `@swarm/pheromone` each export a pure `/core` subpath and a platform `/tauri` subpath — consumers import only what they need. |
+| **Borrow, Never Re-implement** | Each package is standalone. Swarm composes them, never duplicates. |
+| **Self-Enforcing Boundaries** | Tests scan source files for architectural violations. |
+
+### Monorepo Topology
+
+The project is organized as **13 packages** in a pnpm workspace, orchestrated by Turborepo (`pnpm-workspace.yaml` lists 14 entries but `landing-page` is a stale entry with no on-disk directory):
+
+```
+swarm-ai/
+├── swarm/ # 🖥️ Desktop app (Tauri shell + React frontend)
+├── pheromone/ # 🧠 Project memory engine (SQLite, FTS5, embeddings, RRF)
+│ └── pheromone-mcp/ # MCP stdio server exposing pheromone_query
+├── swarmmind/ # ⚡ Orchestration engine (pure core + Tauri adapter)
+├── lead/ # 🎯 AI planner (goal → task decomposition + modes)
+├── tasks/ # 📋 Task board & pipeline state
+├── agents/ # 🤖 Agent launcher & 10+ CLI adapters
+├── voice/ # 🎙️ Local dictation (whisper.cpp)
+├── board/ # 📊 Board primitives & accessibility
+├── flow/ # 🎨 Infinite canvas editor
+├── workspace/ # 🗂️ Multi-workspace coordination
+├── swarmplugins/ # 🔌 Internal plugin registry
+├── swarmextension/ # 🧩 VS Code extension (Open VSX)
+└── design-system/ # 🎨 Design tokens & components
+```
 
 ---
 
@@ -156,7 +189,7 @@ graph LR
 - `patterns.md` — Design patterns used
 - `bugs.md` — Known bugs and fixes
 - `knowledge.md` — General project knowledge
-- `agents/sessions/` — Per-session logs (excluded from retrieval to prevent self-pollution)
+- `agents/sessions/` — Per-session logs (excluded from retrieval)
 - `agents/handoffs.md` — Agent handoff transcripts
 - `tasks/` — Mission task state
 
@@ -187,11 +220,14 @@ SwarmMind is the engine that makes parallel agent work safe:
 ```
 Goal → Breakdown → Plan (lock check) → Dispatch → Worktree → Agent
  ↓
- Complete → Review
+ Complete
  ↓
- Approve → Merge + Release Locks
- ↓
- Reject → Retry
+ Review
+ / \
+ Approve Reject
+ ↓ ↓
+ Merge + Retry
+ Release Locks
 ```
 
 **Roles** understood by the orchestrator:
@@ -322,7 +358,7 @@ An **infinite canvas editor** for visual planning:
 | **OpenCode** | Open-source coding assistant |
 | **Aider** | AI pair programming |
 | **Cursor CLI** | Cursor editor AI |
-| ** Code, Cline, Kiro, Kilo, Antigravity CLI** | Additional supported CLIs |
+| ** Cline, Kiro, Kilo, Antigravity CLI** | Additional supported CLIs |
 
 ### Memory & Search
 
@@ -438,7 +474,7 @@ After each session:
 
 ## Code Quality & Testing
 
-Swarm maintains **34 test files** across **9 packages** with a rigorous testing philosophy:
+Swarm maintains a rigorous testing philosophy with **34 test files** across **9 packages**:
 
 ### Testing Patterns
 
@@ -460,12 +496,11 @@ agents/ 8 test files — CLI integration, security, UI state, spawn lifecycle
 board/ 2 test files — Accessibility, brand consistency
 flow/ 2 test files — Canvas geometry, camera math
 lead/ 2 test files — Task decomposition, mode-based permissions
-pheromone/ 2 test files — Search algorithms, plan persistence
+pheromone/2 test files — Search algorithms, plan persistence
 swarm/ 4 test files — CDP browser, AVD config, migrations, WCAG contrast
-swarmmind/ 5 test files — Orchestration, handoffs, purity guards, messages, dispatch
+swarmmind/5 test files — Orchestration, handoffs, purity guards, messages, dispatch
 tasks/ 3 test files — Board ops, card immutability, pipeline construction
-voice/ 5 test files — STT engine, voice processor, purity, cleanup
-workspace/ 2 test files — Multi-workspace state, MCP configuration
+voice/ 5 test files — STT engine, voice processor, purity, cleanup, types
 ```
 
 ### Regression Protection
@@ -490,7 +525,17 @@ Every bug fix gets a regression test. Code comments reference specific issues:
 | **CLI Agent** | Any | At least one coding agent on PATH |
 | **Android SDK** | Optional | Emulator plane (`emulator` + `platform-tools`) |
 
-> **API Keys**: Provider keys are entered in the in-app Settings panel and stored locally. There are no `.env` files.
+> **API Keys**: Provider keys are entered in the in-app Settings panel and stored locally. No `.env` files are required for the core application — `swarm/.env.example` contains GlassChat legacy variables that are only needed if you enable the GlassChat integration plugin.
+
+### Platform Prerequisites
+
+Tauri v2 requires native dependencies on each platform:
+
+| Platform | Required |
+|----------|----------|
+| **macOS** | Xcode Command Line Tools (`xcode-select --install`) |
+| **Windows** | WebView2 runtime (preinstalled on Win 10/11), Visual Studio C++ build tools |
+| **Linux** | `webkit2gtk`, `libssl-dev`, `build-essential`, `libayatana-appindicator3-dev`, `librsvg2-dev` |
 
 ### Install & Run
 
@@ -498,7 +543,7 @@ Every bug fix gets a regression test. Code comments reference specific issues:
 # Install dependencies
 pnpm install
 
-# Build all packages
+# Build all workspace packages first (required before tauri:build)
 pnpm turbo build
 
 # Run the desktop app in development mode
@@ -507,6 +552,18 @@ cd swarm && pnpm tauri:dev
 # Run all tests
 pnpm turbo test
 ```
+
+> **Build order matters**: `tauri:build` expects prebuilt `dist/` artifacts from the workspace packages. Always run `pnpm turbo build` at the root first. The `swarm/package.json` `build` script chains `build:deps` (builds all `@swarm/*` packages) → `tsc` → `vite build`.
+
+### MCP Server Registration
+
+When you open a project folder in Swarm, Pheromone MCP is auto-registered into each CLI agent's configuration:
+
+1. `get_pheromone_mcp_path` resolves the compiled MCP server binary path
+2. Per-CLI config builders inject the stdio server entry (path + command) into the agent's MCP config
+3. Workspace toolbox tracks MCP servers per project — existing servers are preserved, not overwritten
+
+The MCP server exposes a single tool: `pheromone_query`, which agents call to retrieve project context from Pheromone's hybrid search.
 
 ---
 
@@ -527,8 +584,8 @@ cd swarm && pnpm tauri:build
 
 | Platform | Format | Path |
 |----------|--------|------|
-| **Windows** | NSIS Setup | `swarm/src-tauri/target/release/bundle/nsis/Swarm AI_<version>_x64-setup.exe` |
-| **Windows** | MSI | `swarm/src-tauri/target/release/bundle/msi/Swarm AI_<version>_x64_en-US.msi` |
+| **Windows** | NSIS Setup | `swarm/src-tauri/target/release/bundle/nsis/` |
+| **Windows** | MSI | `swarm/src-tauri/target/release/bundle/msi/` |
 | **macOS** | DMG / App | `swarm/src-tauri/target/release/bundle/dmg/` / `bundle/macos/` |
 | **Linux** | AppImage / Deb | `swarm/src-tauri/target/release/bundle/` |
 
@@ -543,14 +600,14 @@ swarm-ai/
 │ ├── src/
 │ │ ├── app/ # HomePage shell (title bar, planes, docks)
 │ │ ├── features/ # One folder per feature domain
-│ │ │ ├── panes/ # └─ Plane host + switcher (multi-pane CSS grid)
-│ │ │ ├── browser/ # └─ CDP browser pane (launch, screenshot, navigate)
-│ │ │ ├── emulator/ # └─ Android AVD build + boot panes
-│ │ │ │ └── android/ # └─ AVD spec validation, config.ini generation
-│ │ │ ├── settings/ # └─ Models, providers, settings UI
-│ │ │ └── dock/ # └─ Right dock (Lead chat, task board)
+│ │ │ ├── panes/ # Plane host + switcher (multi-pane CSS grid)
+│ │ │ ├── browser/ # CDP browser pane (launch, screenshot, navigate)
+│ │ │ ├── emulator/ # Android AVD build + boot panes
+│ │ │ │ └── android/ # AVD spec validation, config.ini generation
+│ │ │ ├── settings/ # Models, providers, settings UI
+│ │ │ └── dock/ # Right dock (Lead chat, task board)
 │ │ └── shared/ # Cross-feature: Tauri bindings, Zustand stores, logo, themes
-│ └── src-tauri/ # Rust backend
+│ └── src-tauri/
 │ └── src/
 │ └── lib.rs # PTY, FS, Git/Worktree, Pheromone, CDP, Browser, Emulator
 │
@@ -582,7 +639,7 @@ swarm-ai/
 │ │ ├── breakdown.ts # Goal → task decomposition
 │ │ ├── assignment.ts # CLI + role assignment strategy
 │ │ ├── review-routing.ts # Approve/Reassign/Retry routing
-│ │ ├── modes.ts # Steward / Forager / Stinger 
+│ │ ├── modes.ts # Steward / Forager / Stinger
 │ │ ├── tools.ts # Tool definitions with mode-based permissions
 │ │ └── types.ts # LeadTask, BreakdownResult, Assignment types
 │ └── tests/ # Breakdown, tools (mode security) tests
@@ -659,8 +716,7 @@ swarm-ai/
 │ └── extensionStore.ts # Extension state management
 │
 ├── design-system/ # 🎨 Design tokens & components
-│
-├── pnpm-workspace.yaml # Workspace configuration
+├── pnpm-workspace.yaml # Workspace configuration (13 actual packages; `landing-page` is a stale entry)
 ├── turbo.json # Build pipeline configuration
 ├── package.json # Root monorepo config
 └── LICENSE # Personal, non-commercial license
@@ -670,20 +726,23 @@ swarm-ai/
 
 ## Package Reference
 
-All packages are consumed via `workspace:*` protocol:
+All packages are consumed via `workspace:*` protocol. Several use a **dual-entry-point pattern** — a pure subpath and a platform subpath — so consumers import only what they need:
 
-| Package | Path | Key Exports | Node-only? |
-|---------|------|-------------|-----------|
-| `@swarm/pheromone` | `pheromone/` | `Pheromone`, `SearchEngine`, `InjectionPipeline`, `PheromoneDatabase` | No (pure core) |
-| `@swarm/pheromone-mcp` | `pheromone/pheromone-mcp/` | `buildCliConfig`, `runPheromoneQuery`, `PHEROMONE_QUERY_TOOL` | Yes (stdio MCP server) |
-| `@swarm/mind` | `swarmmind/` | `Orchestrator`, `AgentRegistry`, `LockRegistry`, `RoleManager`, `WorktreeOps`, `HandoffManager`, `MessageBus` | No (`/core` path) |
-| `@swarm/lead` | `lead/` | `breakdown`, `DefaultAssignmentStrategy`, `ReviewRouter`, `MODE_SYSTEM_PROMPTS`, `TOOLS` | Yes (LLM-dependent) |
-| `@swarm/tasks` | `tasks/` | `Board`, `addCard`, `moveCard`, `removeCard`, `updateCard`, `buildPipeline` | No (pure core) |
-| `@swarm/agents` | `agents/` | `AgentLauncher`, `CLI_METADATA`, `buildCliConfig`, `withPermissionBypass` | Yes (process spawning) |
-| `@swarm/voice` | `voice/` | `Voice`, `STTEngine`, `AudioRecorder`, `WhisperCppEngine`, `EngineStub` | No (`/core` path) |
-| `@swarm/board` | `board/` | Board primitives, pipeline state, theme definitions | No |
-| `@swarm/workspace` | `workspace/` | Workspace coordination, store, toolbox I/O, MCP merge | Yes (FS I/O) |
-| `@swarm/flow` | `flow/` | `FlowCanvas`, `CanvasNode`, `CanvasControls`, `useCanvasStore`, camera utilities | No |
+| Package | Path | Key Exports | Pure Core? | Private? |
+|---------|------|-------------|------------|----------|
+| `@swarm/pheromone` | `pheromone/` | `.` (core + Tauri adapter), `./tauri`, `./ui` (React SessionHistory) | Yes | No |
+| `@swarm/pheromone-mcp` | `pheromone/pheromone-mcp/` | `.` (MCP stdio server), `./tools/pheromone-query`, `./cli-configs` | No (Node.js CLI) | No |
+| `@swarm/mind` | `swarmmind/` | `.` (main), `./core` (pure orchestration), `./tauri` | Yes (`/core`) | No |
+| `@swarm/lead` | `lead/` | `.` (main), `./ui` (React components) | No (LLM-dependent) | No |
+| `@swarm/tasks` | `tasks/` | `Board`, `addCard`, `moveCard`, `removeCard`, `updateCard`, `buildPipeline` | Yes | No |
+| `@swarm/agents` | `agents/` | `.`, `./cli-configs`, `./ui` (xterm), `./storage` (zustand) | No (process spawn) | No |
+| `@swarm/voice` | `voice/` | `.`, `./core` (pure STT), `./ui` (React overlay) | Yes (`/core`) | No |
+| `@swarm/board` | `board/` | Board primitives, pipeline state, theme definitions | Yes | No |
+| `@swarm/workspace` | `workspace/` | `.`, `./ui` (sidebar, toolbox) | No (FS I/O) | No |
+| `@swarm/flow` | `flow/` | `FlowCanvas`, `CanvasNode`, `CanvasControls`, camera utilities | Yes | No |
+| `@swarm/extension` | `swarmextension/` | VS Code extension with Open VSX marketplace | No | **Yes** |
+| `@swarm/plugins` | `swarmplugins/` | Internal plugin registry | No | **Yes** |
+| `@swarm/app` | `swarm/` | Tauri desktop application (consumes everything) | No | No |
 
 ---
 
@@ -698,7 +757,6 @@ Swarm integrates with **10+ CLI coding agents** out of the box:
 | **Aider** | `aider` | `pip install aider-chat` | [aider.chat](https://aider.chat/docs/install.html) |
 | **Antigravity CLI** | `agy` | `npm install -g @google/antigravity-cli` | [antigravity.google](https://antigravity.google) |
 | **OpenCode** | `opencode` | `npm install -g opencode-ai` | [opencode.ai](https://opencode.ai) |
-| ** Code** | `kimi` | `pip install ` | [kimi..cn]() |
 | **Cline** | `cline` | `npm install -g cline` | [github.com/cline/cline](https://github.com/cline/cline) |
 | **Cursor CLI** | `cursor` | Cursor IDE (CLI ships with the app) | [cursor.com](https://cursor.com/downloads) |
 | **Kiro CLI** | `kiro` | `npm install -g kiro-cli` | [kiro.dev](https://kiro.dev) |
@@ -716,7 +774,7 @@ Each agent gets:
 
 ### Hybrid Retrieval (Pheromone Search)
 
-The search pipeline in `lib.rs` (Rust) and mirrored in JS:
+The search pipeline in the Rust backend (lib.rs) and mirrored in JavaScript:
 
 1. **Sanitize** query — strip FTS5 metacharacters (`"`, `(`, `)`, `*`, leading `-`)
 2. **Keyword search** — FTS5 BM25 over all memory chunks
@@ -760,6 +818,19 @@ augmented_path_env = process PATH
 ```
 
 Timeout: 3 seconds for login shell probe — never blocks pane spawn.
+
+### Architecture Purity Enforcement
+
+SwarmMind's core is a **pure TypeScript module** with zero Node.js runtime dependencies. This is enforced by automated tests that scan every source file:
+
+```
+grep "require('node:" → must return zero hits in swarmmind/src/core/
+```
+
+This means the orchestration logic can be:
+- Tested without mocks or I/O stubs
+- Ported to any runtime (Tauri IPC, HTTP API, CLI)
+- Used as a library without pulling in Node.js
 
 ---
 
