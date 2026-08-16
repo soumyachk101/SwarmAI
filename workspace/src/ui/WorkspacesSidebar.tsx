@@ -773,14 +773,18 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
             </div>
 
             {/* The list is capped at half the rail so the active workspace's live
-                detail below always has room: with two workspaces the old layout
-                left ~800px of the sidebar doing nothing. */}
+                detail below always has room */}
             <div className="flex min-h-0 flex-1 flex-col">
-              <SectionLabel label="Workspaces" count={visibleWorkspaces.length} />
-              {/* Height comes from its content and is capped, rather than
-                  flex-1'd: a `flex-1 min-h-0` child of an auto-height flex
-                  column resolves to zero and the list disappears entirely. */}
-                <div className="max-h-[52%] shrink overflow-y-auto overflow-x-hidden scrollbar-sleek pb-1">
+              <CollapsibleSection
+                label="Workspaces"
+                count={visibleWorkspaces.length}
+                activeCount={visibleWorkspaces.filter((ws) => hasActiveAgent(ws, agentStatuses)).length}
+                collapsed={workspacesCollapsed}
+                onToggle={() => setWorkspacesCollapsed(!workspacesCollapsed)}
+              />
+
+              {!workspacesCollapsed && (
+                <div className="max-h-[52%] shrink overflow-y-auto overflow-x-hidden scrollbar-sleek pb-1 flex flex-col gap-0.5">
                   {visibleWorkspaces.length === 0 ? (
                     searchQuery ? (
                       <EmptyNote
@@ -821,11 +825,6 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
                           onStartRename={() => startRename(ws.id, ws.name)}
                         />
 
-                        {/* Covers the whole group, rows included: a scrim inset to
-                            the old card left the tree rows below it live and
-                            clickable while the workspace was being deleted. The
-                            label truncates — at the 220px minimum width the pill
-                            used to push its buttons out of the rail. */}
                         {ws.isDeleting && (
                           <div className="absolute inset-0 z-10 flex items-center justify-center rounded-md bg-swarm-canvasHi/90">
                             <div className="inline-flex max-w-full items-center gap-1.5 rounded-full glass-hi border border-swarm-border/60 px-2.5 py-1 text-mini font-medium text-swarm-text shadow-sm">
@@ -841,8 +840,6 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
                               </button>
                               <button
                                 onClick={(e) => { e.stopPropagation(); commitDeleteWorkspace(ws.id); }}
-                                // was hover:text-red-300 — a raw Tailwind colour that
-                                // stays the same red in all eight themes.
                                 className="shrink-0 font-semibold text-swarm-err transition-colors hover:opacity-80"
                               >
                                 Confirm
@@ -854,6 +851,7 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
                     ))
                   )}
                 </div>
+              )}
 
               <ActiveWorkspaceDetail ws={activeWorkspace} onOpenFile={setViewer} />
             </div>
@@ -866,7 +864,7 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
         <>
           <div className="fixed inset-0 z-[200]" onClick={() => setContextMenu(null)} />
           <div
-            className="fixed z-[201] min-w-40 py-1 rounded-lg glass-hi animate-fade-in"
+            className="fixed z-[201] min-w-40 py-1 rounded-lg glass-hi animate-fade-in shadow-lg border border-swarm-border/40"
             style={{ left: contextMenu.x, top: contextMenu.y }}
             onClick={() => setContextMenu(null)}
           >
@@ -899,9 +897,7 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
         document.body,
       )}
 
-      {/* Resize handle. It only overhangs the neighbour by 4px (was 8): the grab
-          strip sits on top of whatever pane is next door, and a terminal that
-          swallows clicks along its whole left edge feels broken, not draggable. */}
+      {/* Resize handle */}
       <div
         className="absolute -right-1 top-0 z-40 flex h-full w-3 cursor-col-resize items-stretch justify-center group select-none"
         onMouseDown={handleResizeStart}
@@ -917,6 +913,60 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
         open={createDialogOpen}
         onClose={() => setCreateDialogOpen(false)}
       />
+    </div>
+  );
+}
+
+/* ── Collapsible Section Header with badge counts ────────────────── */
+function CollapsibleSection({
+  label,
+  count,
+  activeCount,
+  collapsed,
+  onToggle,
+  action,
+}: {
+  label: string;
+  count?: number;
+  activeCount?: number;
+  collapsed?: boolean;
+  onToggle?: () => void;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div
+      onClick={onToggle}
+      className={`group flex h-7 shrink-0 items-center justify-between px-2 text-[10px] font-semibold tracking-wider text-swarm-textMuted select-none transition-colors ${
+        onToggle ? "cursor-pointer hover:text-swarm-text" : ""
+      }`}
+    >
+      <div className="flex items-center gap-1.5 min-w-0">
+        {onToggle && (
+          <ChevronRight
+            size={12}
+            className={`transition-transform duration-200 text-swarm-textMuted/70 group-hover:text-swarm-gold ${
+              collapsed ? "" : "rotate-90"
+            }`}
+          />
+        )}
+        <span className="uppercase tracking-[0.08em] font-bold text-swarm-textMuted/90">{label}</span>
+        {count !== undefined && (
+          <span className="rounded-full bg-swarm-border/40 px-1.5 py-0.2 text-[9px] font-medium text-swarm-textMuted tabular-nums">
+            {count}
+          </span>
+        )}
+        {activeCount !== undefined && activeCount > 0 && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-swarm-ok/15 border border-swarm-ok/30 px-1.5 py-0.2 text-[9px] font-semibold text-swarm-ok leading-none">
+            <span className="size-1.5 rounded-full bg-swarm-ok animate-pulse" />
+            {activeCount} active
+          </span>
+        )}
+      </div>
+      {action && (
+        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+          {action}
+        </div>
+      )}
     </div>
   );
 }
@@ -952,13 +1002,10 @@ function ProjectGroup({
   const [missing, setMissing] = useState(false);
 
   const trees = ws.worktrees ?? [];
+  const totalBranches = 1 + trees.length;
   const noRepo = !ws.boundProjectPath;
   const repoName = ws.boundProjectPath ? ws.boundProjectPath.split(/[\\/]/).filter(Boolean).pop() : null;
 
-  // A workspace whose folder has been moved or deleted still renders a full set
-  // of rows, and every action on it then fails with a raw backend error. Checked
-  // only for the workspace in front of the user, so switching workspaces costs
-  // one listing rather than one per row.
   useEffect(() => {
     if (!isActive || !ws.boundProjectPath) { setMissing(false); return; }
     let cancelled = false;
@@ -968,15 +1015,12 @@ function ProjectGroup({
     return () => { cancelled = true; };
   }, [isActive, ws.boundProjectPath]);
 
-  // Bind a git repo folder to this project so trees can be created against it.
   const bindRepo = async () => {
     setError(null);
     try {
       const apis = { invoke, open: openDialog };
       const folder = await apis.open?.({ directory: true, multiple: false, title: "Select a git repository" });
       if (typeof folder === "string") {
-        // bindFolder keeps one folder to one agent — if another already
-        // owns it, we switch there instead of splitting its Pheromone brain.
         const boundTo = useWorkspaceStore.getState().bindFolder(ws.id, folder);
         activateAndSync(boundTo);
       }
@@ -993,8 +1037,6 @@ function ProjectGroup({
     finally { setBusy(false); }
   };
   const remove = async (id: string) => {
-    // Removing a worktree deletes its checkout — uncommitted work in it is gone.
-    // The button is a 20px icon one pixel from Merge, so it gets a confirm.
     const tree = trees.find((t) => t.id === id);
     if (!confirm(`Remove tree "${tree?.name ?? id}"? Uncommitted changes in it will be lost.`)) return;
     setPendingId(id); setError(null);
@@ -1010,19 +1052,13 @@ function ProjectGroup({
   };
 
   return (
-    // A flat group of 28px rows, not a card: the card's border + padding spent
-    // ~20px of vertical space per workspace framing what the selected row
-    // already says, and made the sidebar read as a gallery next to the
-    // 26px chips everywhere else in the app.
-    <div className="pb-0.5">
-      {/* Workspace row — clicking anywhere on it selects the workspace. The
-          left rail marks selection with an inset shadow rather than a border,
-          so a row never changes size between states. */}
+    <div className="pb-1 px-1.5">
+      {/* Workspace row */}
       <div
-        className={`group flex h-7 cursor-pointer items-center gap-1.5 pl-1 pr-1 text-xs transition-colors ${
+        className={`group relative flex h-7.5 cursor-pointer items-center gap-1.5 rounded-lg px-2 text-xs transition-all ${
           isActive
-            ? "bg-swarm-gold/[0.10] text-swarm-goldHi shadow-[inset_2px_0_0_rgb(var(--swarm-gold))]"
-            : "text-swarm-textDim hover:bg-swarm-border/25 hover:text-swarm-text"
+            ? "bg-swarm-gold/[0.12] text-swarm-goldHi font-medium border border-swarm-gold/30 shadow-sm"
+            : "text-swarm-textDim hover:bg-swarm-border/30 hover:text-swarm-text border border-transparent"
         }`}
         onClick={() => { if (!isRenaming) onActivate(); }}
         {...activatable(() => { if (!isRenaming) onActivate(); }, `Workspace ${ws.name}`)}
@@ -1030,17 +1066,24 @@ function ProjectGroup({
       >
         <button
           onClick={(e) => { e.stopPropagation(); setCollapsed((v) => !v); }}
-          className="flex size-4 shrink-0 items-center justify-center rounded text-swarm-textMuted hover:text-swarm-text"
+          className="flex size-4 shrink-0 items-center justify-center rounded text-swarm-textMuted hover:text-swarm-text transition-colors"
           title={collapsed ? "Expand" : "Collapse"}
           aria-label={collapsed ? `Expand ${ws.name}` : `Collapse ${ws.name}`}
           aria-expanded={!collapsed}
         >
-          {collapsed ? <ChevronRight className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+          <ChevronRight
+            className={`size-3.5 transition-transform duration-200 ${collapsed ? "" : "rotate-90"}`}
+          />
         </button>
 
-        {/* The workspace's own colour is the one saturated thing on the row —
-            it is how you tell two similarly-named folders apart at a glance. */}
-        <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: ws.color }} />
+        {/* Workspace Color Indicator with glow when active */}
+        <span
+          className={`size-2 shrink-0 rounded-full transition-all ${hasActive ? "animate-pulse ring-2 ring-swarm-ok/40" : ""}`}
+          style={{
+            backgroundColor: ws.color,
+            boxShadow: isActive ? `0 0 6px ${ws.color}80` : undefined,
+          }}
+        />
 
         {isRenaming ? (
           <input
@@ -1054,51 +1097,51 @@ function ProjectGroup({
           />
         ) : (
           <span
-            className={`min-w-0 shrink truncate text-xs font-medium ${isActive ? "text-swarm-goldHi" : "text-swarm-text"}`}
+            className={`min-w-0 shrink truncate text-xs font-semibold ${isActive ? "text-swarm-goldHi" : "text-swarm-text"}`}
             onDoubleClick={onStartRename}
-            // Both name and path are unbounded user data and both get truncated,
-            // so the tooltip has to carry both — the path alone left an
-            // ellipsised name with no way to read it.
             title={`${ws.name}${ws.boundProjectPath ? `\n${ws.boundProjectPath}` : "\nNo folder bound"}\nDouble-click to rename`}
           >
             {ws.name}
           </span>
         )}
 
-        {/* The folder is a muted suffix on the same row: it used to be a second
-            line under every workspace, which is where half the sidebar's height
-            was going. */}
+        {/* Folder tag */}
         {!isRenaming && (
           <span
-            className="min-w-0 flex-1 truncate text-micro text-swarm-textMuted"
+            className="min-w-0 flex-1 truncate text-[11px] text-swarm-textMuted/70"
             title={ws.boundProjectPath || "No folder bound"}
           >
             {repoName ?? "no folder"}
           </span>
         )}
 
-        {/* focus-within keeps these reachable when tabbing: hover-gated row
-            actions are invisible and unusable without a pointer. */}
+        {/* Collapsed branch count badge */}
+        {collapsed && totalBranches > 0 && (
+          <span className="shrink-0 rounded-full bg-swarm-border/40 px-1.5 py-0.2 text-[9px] font-medium text-swarm-textMuted">
+            {totalBranches} {totalBranches === 1 ? "branch" : "branches"}
+          </span>
+        )}
+
+        {/* Action buttons */}
         <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
-          <button onClick={(e) => { e.stopPropagation(); onMenu(e); }} className="flex size-5 items-center justify-center rounded text-swarm-textMuted hover:bg-swarm-border/40 hover:text-swarm-text" title="Workspace menu" aria-label={`Menu for ${ws.name}`}>
+          <button onClick={(e) => { e.stopPropagation(); onMenu(e); }} className="flex size-5 items-center justify-center rounded text-swarm-textMuted hover:bg-swarm-border/50 hover:text-swarm-text" title="Workspace menu" aria-label={`Menu for ${ws.name}`}>
             <MoreHorizontal className="size-3.5" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); if (noRepo) { bindRepo(); return; } setAdding((v) => !v); setError(null); }}
             title={noRepo ? "Bind a git repo to this workspace" : "New tree (git worktree)"}
             aria-label={noRepo ? `Bind a folder to ${ws.name}` : `New tree in ${ws.name}`}
-            className="flex size-5 items-center justify-center rounded text-swarm-textMuted hover:bg-swarm-gold/15 hover:text-swarm-goldHi"
+            className="flex size-5 items-center justify-center rounded text-swarm-textMuted hover:bg-swarm-gold/20 hover:text-swarm-goldHi"
           >
             {noRepo ? <FolderPlus className="size-3.5" /> : <Plus className="size-3.5" />}
           </button>
         </div>
       </div>
 
-      {/* A bound folder that is gone from disk: every tree action against it
-          fails with a raw git error, so say so and offer the one fix. */}
+      {/* Missing folder banner */}
       {missing && (
-        <div className="mx-1.5 mt-0.5 flex h-6 items-center gap-1.5 rounded-md border border-swarm-err/30 bg-swarm-err/10 px-1.5 text-micro text-swarm-err">
-          <span className="min-w-0 flex-1 truncate" title={ws.boundProjectPath}>Folder is missing from disk</span>
+        <div className="mx-2 mt-1 flex h-6 items-center gap-1.5 rounded-md border border-swarm-err/30 bg-swarm-err/10 px-2 text-[11px] text-swarm-err">
+          <span className="min-w-0 flex-1 truncate" title={ws.boundProjectPath}>Folder missing from disk</span>
           <button
             onClick={(e) => { e.stopPropagation(); bindRepo(); }}
             className="shrink-0 font-medium underline-offset-2 hover:underline"
@@ -1109,9 +1152,9 @@ function ProjectGroup({
         </div>
       )}
 
-      {/* New-tree inline input */}
+      {/* New tree inline input */}
       {adding && (
-        <div className="mx-1.5 mt-0.5 flex items-center gap-1">
+        <div className="ml-4 mr-1 mt-1 flex items-center gap-1">
           <input
             autoFocus
             value={name}
@@ -1130,11 +1173,11 @@ function ProjectGroup({
         </div>
       )}
 
-      {error && <div className="mx-2 mt-0.5 break-words text-micro text-swarm-err">{error}</div>}
+      {error && <div className="mx-3 mt-1 break-words text-[11px] text-swarm-err">{error}</div>}
 
-      {/* Rows: primary (main repo) + worktrees */}
+      {/* Hierarchical tree rows with guide line */}
       {!collapsed && (
-        <div className="flex flex-col">
+        <div className="relative ml-3.5 pl-2.5 mt-0.5 border-l border-swarm-border/35 flex flex-col gap-0.5">
           <TreeRow
             dot={hasActive ? STATUS_DOT_CLASS.running : "bg-swarm-textMuted/40"}
             name={repoName || "No folder"}
@@ -1170,7 +1213,6 @@ function TreeRow({
   name: string;
   badge?: string;
   branch: string;
-  /** Everything the row truncates, for the tooltip. */
   fullTitle: string;
   active?: boolean;
   onClick?: () => void;
@@ -1184,23 +1226,21 @@ function TreeRow({
       {...(onClick ? activatable(onClick, `${name}, branch ${branch}`) : {})}
       aria-current={active ? "true" : undefined}
       title={fullTitle}
-      // Branch as a muted suffix, not a second line: the two-line row cost 40px
-      // each and the branch is a glance, not a paragraph.
-      className={`group/row flex h-7 cursor-pointer items-center gap-1.5 pl-[26px] pr-1 text-xs transition-colors ${
-        active ? "bg-swarm-gold/[0.10] text-swarm-goldHi" : "text-swarm-textDim hover:bg-swarm-border/25 hover:text-swarm-text"
+      className={`group/row flex h-6.5 cursor-pointer items-center gap-1.5 rounded-md px-1.5 text-xs transition-colors ${
+        active
+          ? "bg-swarm-gold/[0.10] text-swarm-goldHi font-medium"
+          : "text-swarm-textDim hover:bg-swarm-border/25 hover:text-swarm-text"
       }`}
     >
       <span className={`size-1.5 shrink-0 rounded-full ${dot}`} />
-      <GitBranch className="size-3.5 shrink-0 text-swarm-textMuted" />
-      <span className="min-w-0 shrink truncate font-medium">{name}</span>
+      <GitBranch className="size-3 shrink-0 text-swarm-textMuted/70 group-hover/row:text-swarm-gold transition-colors" />
+      <span className="min-w-0 shrink truncate text-[11px] font-medium">{name}</span>
       {badge && (
-        <span className="shrink-0 rounded-sm bg-swarm-border/30 px-1 text-micro font-medium text-swarm-textMuted">
+        <span className="shrink-0 rounded-full bg-swarm-gold/15 border border-swarm-gold/25 px-1.5 py-0.2 text-[9px] font-semibold text-swarm-goldHi leading-none">
           {badge}
         </span>
       )}
-      <span className="min-w-0 flex-1 truncate text-micro text-swarm-textMuted">{branch}</span>
-      {/* focus-within: the merge/remove pair was hover-only, so neither was
-          reachable from the keyboard at all. */}
+      <span className="min-w-0 flex-1 truncate text-[10px] text-swarm-textMuted/70">{branch}</span>
       {(onMerge || onRemove) && (
         <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity focus-within:opacity-100 group-hover/row:opacity-100">
           {pending ? (
@@ -1210,7 +1250,7 @@ function TreeRow({
               {onMerge && (
                 <button
                   onClick={(e) => { e.stopPropagation(); onMerge(); }}
-                  className="flex size-5 items-center justify-center rounded text-swarm-textMuted hover:bg-swarm-gold/15 hover:text-swarm-goldHi"
+                  className="flex size-4.5 items-center justify-center rounded text-swarm-textMuted hover:bg-swarm-gold/15 hover:text-swarm-goldHi transition-colors"
                   title="Merge branch into main + remove tree"
                   aria-label={`Merge ${name} into main`}
                 >
@@ -1220,7 +1260,7 @@ function TreeRow({
               {onRemove && (
                 <button
                   onClick={(e) => { e.stopPropagation(); onRemove(); }}
-                  className="flex size-5 items-center justify-center rounded text-swarm-textMuted hover:bg-swarm-err/15 hover:text-swarm-err"
+                  className="flex size-4.5 items-center justify-center rounded text-swarm-textMuted hover:bg-swarm-err/15 hover:text-swarm-err transition-colors"
                   title="Remove tree (discard)"
                   aria-label={`Remove tree ${name}`}
                 >
@@ -1235,19 +1275,7 @@ function TreeRow({
   );
 }
 
-/* ── shared sidebar furniture ───────────────────────────────────── */
-
-/** 10px uppercase heading — the one section label style in this rail. */
-function SectionLabel({ label, count }: { label: string; count?: number }) {
-  return (
-    <div className="flex h-6 shrink-0 items-center gap-1.5 px-2 text-micro font-medium uppercase tracking-[0.06em] text-swarm-textMuted">
-      <span className="truncate">{label}</span>
-      {count !== undefined && <span className="tabular-nums text-swarm-textMuted/60">{count}</span>}
-    </div>
-  );
-}
-
-/** An empty region has to say what happened and offer the way out of it. */
+/* ── An empty region has to say what happened and offer the way out of it. ── */
 function EmptyNote({
   text, hint, actionLabel, onAction,
 }: {
@@ -1273,15 +1301,11 @@ function EmptyNote({
   );
 }
 
-// Stable empty array: `openFiles[path] ?? []` produces a new reference on every
-// read, which useSyncExternalStore treats as a changed snapshot and re-renders
-// on a loop.
 const NO_FILES: string[] = [];
 
 /**
  * The lower half of the rail: what the active workspace actually contains right
- * now — its agents and the files opened out of it. Both come from stores the app
- * already keeps; nothing here is new state.
+ * now — its agents and the files opened out of it.
  */
 function ActiveWorkspaceDetail({
   ws, onOpenFile,
@@ -1293,6 +1317,9 @@ function ActiveWorkspaceDetail({
   const statuses = useAgentsStore((s) => s.agentStatuses);
   const openFiles = useProjectStore((s) => s.openFiles);
 
+  const [agentsCollapsed, setAgentsCollapsed] = useState(false);
+  const [filesCollapsed, setFilesCollapsed] = useState(false);
+
   if (!ws) {
     return (
       <div className="flex min-h-0 flex-1 flex-col justify-center border-t border-swarm-border/40">
@@ -1302,62 +1329,108 @@ function ActiveWorkspaceDetail({
   }
 
   const mine = agents.filter((a) => a.workspaceId === ws.id);
+  const runningCount = mine.filter((a) => statuses[a.id] === "running" || statuses[a.id] === "launching").length;
   const recent = (ws.boundProjectPath ? openFiles[ws.boundProjectPath] : undefined) ?? NO_FILES;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col border-t border-swarm-border/40">
-      <SectionLabel label="Agents" count={mine.length} />
-      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden scrollbar-sleek pb-1">
-        {mine.length === 0 ? (
-          <p className="px-2 py-1 text-micro text-swarm-textMuted/70">
-            No agents in {ws.name} yet — add one from the board.
-          </p>
-        ) : (
-          mine.map((a) => {
-            const status = statuses[a.id] ?? "idle";
-            const label = a.customName || a.cliName;
-            return (
-              <div
-                key={a.id}
-                className="flex h-7 items-center gap-1.5 px-2 text-xs text-swarm-textDim"
-                title={`${label}\n${a.cliName}${a.model ? ` · ${a.model}` : ""}\n${status}`}
-              >
-                <span className={`size-1.5 shrink-0 rounded-full ${STATUS_DOT_CLASS[status]}`} />
-                <span className="min-w-0 shrink truncate">{label}</span>
-                {a.isLead && (
-                  <span className="shrink-0 rounded-sm bg-swarm-gold/15 px-1 text-micro font-medium text-swarm-goldHi">lead</span>
-                )}
-                <span className="ml-auto shrink-0 text-micro text-swarm-textMuted/70">{status}</span>
-              </div>
-            );
-          })
-        )}
+    <div className="flex min-h-0 flex-1 flex-col border-t border-swarm-border/30">
+      {/* Collapsible Agents Section */}
+      <CollapsibleSection
+        label="Agents"
+        count={mine.length}
+        activeCount={runningCount}
+        collapsed={agentsCollapsed}
+        onToggle={() => setAgentsCollapsed(!agentsCollapsed)}
+      />
 
-        {recent.length > 0 && (
-          <>
-            <SectionLabel label="Recent files" count={recent.length} />
-            {/* Capped: this is a glance at what you last looked at, and the
-                store keeps up to 40. */}
-            {recent.slice(0, 12).map((path) => {
-              const fileName = path.split(/[\\/]/).pop() || path;
-              const { Icon, className } = getFileIcon(fileName);
-              const open = () => onOpenFile({ path, projectPath: ws.boundProjectPath });
+      {!agentsCollapsed && (
+        <div className="min-h-0 shrink overflow-y-auto overflow-x-hidden scrollbar-sleek px-1.5 pb-2 flex flex-col gap-1 max-h-[48%]">
+          {mine.length === 0 ? (
+            <p className="px-2 py-1.5 text-[11px] text-swarm-textMuted/70 italic">
+              No agents in {ws.name} yet — add one from the top bar.
+            </p>
+          ) : (
+            mine.map((a) => {
+              const status = statuses[a.id] ?? "idle";
+              const label = a.customName || a.cliName;
+              const brand = cliBrand(a.cli);
               return (
                 <div
-                  key={path}
-                  onClick={open}
-                  {...activatable(open, `Open ${fileName}`)}
-                  title={path}
-                  className="flex h-7 cursor-pointer items-center gap-1.5 px-2 text-xs text-swarm-textDim transition-colors hover:bg-swarm-border/25 hover:text-swarm-text"
+                  key={a.id}
+                  className="group flex h-7.5 items-center gap-2 rounded-lg px-2 text-xs text-swarm-textDim transition-colors hover:bg-swarm-border/25 hover:text-swarm-text"
+                  title={`${label}\n${a.cliName}${a.model ? ` · ${a.model}` : ""}\n${status}`}
                 >
-                  <Icon className={`size-3.5 shrink-0 ${className}`} />
-                  <span className="min-w-0 truncate">{fileName}</span>
+                  <span className={`size-2 shrink-0 rounded-full transition-all ${STATUS_DOT_CLASS[status]} ${status === "running" ? "animate-pulse ring-2 ring-swarm-ok/30" : ""}`} />
+                  {brand ? (
+                    <BrandGlyph brand={brand} size={13} className="shrink-0 opacity-85 group-hover:opacity-100" />
+                  ) : (
+                    <AgentMark size={13} className="shrink-0 text-swarm-textMuted" />
+                  )}
+                  <span className="min-w-0 shrink truncate font-medium text-swarm-text">{label}</span>
+                  {a.isLead && (
+                    <span className="inline-flex items-center gap-1 rounded-sm bg-swarm-gold/15 border border-swarm-gold/30 px-1 text-[9px] font-semibold text-swarm-goldHi">
+                      <LeadCrown size={9} />
+                      lead
+                    </span>
+                  )}
+                  {a.model && (
+                    <span className="shrink-0 rounded bg-swarm-border/30 px-1 text-[9px] text-swarm-textMuted font-mono">
+                      {a.model}
+                    </span>
+                  )}
+                  <span className={`ml-auto shrink-0 rounded-full px-1.5 py-0.2 text-[9px] font-semibold capitalize ${
+                    status === "running"
+                      ? "bg-swarm-ok/15 text-swarm-ok border border-swarm-ok/30"
+                      : status === "launching"
+                      ? "bg-swarm-warn/15 text-swarm-warn border border-swarm-warn/30"
+                      : status === "error"
+                      ? "bg-swarm-err/15 text-swarm-err border border-swarm-err/30"
+                      : "bg-swarm-border/30 text-swarm-textMuted/70"
+                  }`}>
+                    {status}
+                  </span>
                 </div>
               );
-            })}
-          </>
-        )}
-      </div>
+            })
+          )}
+        </div>
+      )}
+
+      {/* Collapsible Recent files Section */}
+      {recent.length > 0 && (
+        <>
+          <div className="border-t border-swarm-border/20 mt-1 pt-0.5">
+            <CollapsibleSection
+              label="Recent files"
+              count={recent.length}
+              collapsed={filesCollapsed}
+              onToggle={() => setFilesCollapsed(!filesCollapsed)}
+            />
+          </div>
+          {!filesCollapsed && (
+            <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden scrollbar-sleek px-1.5 pb-2 flex flex-col gap-0.5">
+              {recent.slice(0, 16).map((path) => {
+                const fileName = path.split(/[\\/]/).pop() || path;
+                const { Icon, className } = getFileIcon(fileName);
+                const open = () => onOpenFile({ path, projectPath: ws.boundProjectPath });
+                return (
+                  <div
+                    key={path}
+                    onClick={open}
+                    {...activatable(open, `Open ${fileName}`)}
+                    title={path}
+                    className="flex h-6.5 cursor-pointer items-center gap-1.5 rounded-md px-2 text-xs text-swarm-textDim transition-colors hover:bg-swarm-border/25 hover:text-swarm-text"
+                  >
+                    <Icon className={`size-3.5 shrink-0 ${className}`} />
+                    <span className="min-w-0 truncate text-[11px]">{fileName}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
+
