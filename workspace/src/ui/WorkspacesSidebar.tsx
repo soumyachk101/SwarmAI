@@ -936,29 +936,29 @@ function CollapsibleSection({
   return (
     <div
       onClick={onToggle}
-      className={`group flex h-7 shrink-0 items-center justify-between px-2 text-[10px] font-semibold tracking-wider text-swarm-textMuted select-none transition-colors ${
-        onToggle ? "cursor-pointer hover:text-swarm-text" : ""
+      className={`group flex h-6.5 shrink-0 items-center justify-between px-2.5 text-[10px] font-semibold tracking-wider text-swarm-textMuted/70 select-none transition-colors ${
+        onToggle ? "cursor-pointer hover:text-swarm-textDim" : ""
       }`}
     >
       <div className="flex items-center gap-1.5 min-w-0">
         {onToggle && (
           <ChevronRight
-            size={12}
-            className={`transition-transform duration-200 text-swarm-textMuted/70 group-hover:text-swarm-gold ${
+            size={11}
+            className={`transition-transform duration-150 text-swarm-textMuted/60 group-hover:text-swarm-gold ${
               collapsed ? "" : "rotate-90"
             }`}
           />
         )}
-        <span className="uppercase tracking-[0.08em] font-bold text-swarm-textMuted/90">{label}</span>
+        <span className="uppercase tracking-[0.06em] font-medium">{label}</span>
         {count !== undefined && (
-          <span className="rounded-full bg-swarm-border/40 px-1.5 py-0.2 text-[9px] font-medium text-swarm-textMuted tabular-nums">
+          <span className="text-[10px] text-swarm-textMuted/50 tabular-nums">
             {count}
           </span>
         )}
         {activeCount !== undefined && activeCount > 0 && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-swarm-ok/15 border border-swarm-ok/30 px-1.5 py-0.2 text-[9px] font-semibold text-swarm-ok leading-none">
+          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-swarm-ok leading-none">
             <span className="size-1.5 rounded-full bg-swarm-ok animate-pulse" />
-            {activeCount} active
+            {activeCount}
           </span>
         )}
       </div>
@@ -971,7 +971,7 @@ function CollapsibleSection({
   );
 }
 
-/* ── swarm project group: collapsible header + tree rows ───── */
+/* ── Clean Zed / Cursor style Project Item + Tree Rows ──────────── */
 function ProjectGroup({
   ws, isActive, hasActive, onActivate, onMenu,
   isRenaming, editValue, onEditChange, onCommitRename, onCancelRename, onStartRename,
@@ -1002,9 +1002,8 @@ function ProjectGroup({
   const [missing, setMissing] = useState(false);
 
   const trees = ws.worktrees ?? [];
-  const totalBranches = 1 + trees.length;
+  const hasTrees = trees.length > 0;
   const noRepo = !ws.boundProjectPath;
-  const repoName = ws.boundProjectPath ? ws.boundProjectPath.split(/[\\/]/).filter(Boolean).pop() : null;
 
   useEffect(() => {
     if (!isActive || !ws.boundProjectPath) { setMissing(false); return; }
@@ -1052,39 +1051,46 @@ function ProjectGroup({
   };
 
   return (
-    <div className="pb-1 px-1.5">
-      {/* Workspace row */}
+    <div className="px-1">
+      {/* Clean Single Workspace Row */}
       <div
-        className={`group relative flex h-7.5 cursor-pointer items-center gap-1.5 rounded-lg px-2 text-xs transition-all ${
+        className={`group relative flex h-7 cursor-pointer items-center gap-2 rounded-[5px] px-2 text-xs transition-colors ${
           isActive
-            ? "bg-swarm-gold/[0.12] text-swarm-goldHi font-medium border border-swarm-gold/30 shadow-sm"
-            : "text-swarm-textDim hover:bg-swarm-border/30 hover:text-swarm-text border border-transparent"
+            ? "bg-swarm-gold/[0.10] text-swarm-goldHi font-medium"
+            : "text-swarm-textDim hover:bg-white/[0.04] hover:text-swarm-text"
         }`}
         onClick={() => { if (!isRenaming) onActivate(); }}
         {...activatable(() => { if (!isRenaming) onActivate(); }, `Workspace ${ws.name}`)}
         aria-current={isActive ? "true" : undefined}
       >
-        <button
-          onClick={(e) => { e.stopPropagation(); setCollapsed((v) => !v); }}
-          className="flex size-4 shrink-0 items-center justify-center rounded text-swarm-textMuted hover:text-swarm-text transition-colors"
-          title={collapsed ? "Expand" : "Collapse"}
-          aria-label={collapsed ? `Expand ${ws.name}` : `Collapse ${ws.name}`}
-          aria-expanded={!collapsed}
-        >
-          <ChevronRight
-            className={`size-3.5 transition-transform duration-200 ${collapsed ? "" : "rotate-90"}`}
-          />
-        </button>
+        {/* Toggle chevron (only if has sub-trees) */}
+        {hasTrees ? (
+          <button
+            onClick={(e) => { e.stopPropagation(); setCollapsed((v) => !v); }}
+            className="flex size-3.5 shrink-0 items-center justify-center rounded text-swarm-textMuted hover:text-swarm-text transition-colors -ml-0.5"
+            title={collapsed ? "Expand" : "Collapse"}
+            aria-label={collapsed ? `Expand ${ws.name}` : `Collapse ${ws.name}`}
+            aria-expanded={!collapsed}
+          >
+            <ChevronRight
+              className={`size-3 transition-transform duration-150 ${collapsed ? "" : "rotate-90"}`}
+            />
+          </button>
+        ) : (
+          <span className="w-2 shrink-0" />
+        )}
 
-        {/* Workspace Color Indicator with glow when active */}
+        {/* Status Dot with color */}
         <span
-          className={`size-2 shrink-0 rounded-full transition-all ${hasActive ? "animate-pulse ring-2 ring-swarm-ok/40" : ""}`}
+          className={`size-1.5 shrink-0 rounded-full transition-all ${
+            hasActive ? "bg-swarm-ok animate-pulse" : ""
+          }`}
           style={{
-            backgroundColor: ws.color,
-            boxShadow: isActive ? `0 0 6px ${ws.color}80` : undefined,
+            backgroundColor: hasActive ? undefined : ws.color,
           }}
         />
 
+        {/* Name */}
         {isRenaming ? (
           <input
             autoFocus
@@ -1097,7 +1103,7 @@ function ProjectGroup({
           />
         ) : (
           <span
-            className={`min-w-0 shrink truncate text-xs font-semibold ${isActive ? "text-swarm-goldHi" : "text-swarm-text"}`}
+            className={`min-w-0 flex-1 truncate text-xs ${isActive ? "text-swarm-goldHi font-medium" : "text-swarm-text"}`}
             onDoubleClick={onStartRename}
             title={`${ws.name}${ws.boundProjectPath ? `\n${ws.boundProjectPath}` : "\nNo folder bound"}\nDouble-click to rename`}
           >
@@ -1105,46 +1111,43 @@ function ProjectGroup({
           </span>
         )}
 
-        {/* Folder tag */}
-        {!isRenaming && (
-          <span
-            className="min-w-0 flex-1 truncate text-[11px] text-swarm-textMuted/70"
-            title={ws.boundProjectPath || "No folder bound"}
-          >
-            {repoName ?? "no folder"}
+        {/* Minimalist branch tag on the row if no extra trees */}
+        {!hasTrees && (
+          <span className="shrink-0 text-[11px] text-swarm-textMuted/60 font-mono">
+            {noRepo ? "no repo" : "main"}
           </span>
         )}
 
-        {/* Collapsed branch count badge */}
-        {collapsed && totalBranches > 0 && (
-          <span className="shrink-0 rounded-full bg-swarm-border/40 px-1.5 py-0.2 text-[9px] font-medium text-swarm-textMuted">
-            {totalBranches} {totalBranches === 1 ? "branch" : "branches"}
+        {/* Worktree count badge if collapsed */}
+        {hasTrees && collapsed && (
+          <span className="shrink-0 text-[10px] text-swarm-textMuted/50 tabular-nums">
+            {trees.length + 1}
           </span>
         )}
 
-        {/* Action buttons */}
+        {/* Hover Action Buttons */}
         <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
-          <button onClick={(e) => { e.stopPropagation(); onMenu(e); }} className="flex size-5 items-center justify-center rounded text-swarm-textMuted hover:bg-swarm-border/50 hover:text-swarm-text" title="Workspace menu" aria-label={`Menu for ${ws.name}`}>
-            <MoreHorizontal className="size-3.5" />
+          <button onClick={(e) => { e.stopPropagation(); onMenu(e); }} className="flex size-4.5 items-center justify-center rounded text-swarm-textMuted hover:bg-white/[0.08] hover:text-swarm-text" title="Workspace menu" aria-label={`Menu for ${ws.name}`}>
+            <MoreHorizontal className="size-3" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); if (noRepo) { bindRepo(); return; } setAdding((v) => !v); setError(null); }}
-            title={noRepo ? "Bind a git repo to this workspace" : "New tree (git worktree)"}
-            aria-label={noRepo ? `Bind a folder to ${ws.name}` : `New tree in ${ws.name}`}
-            className="flex size-5 items-center justify-center rounded text-swarm-textMuted hover:bg-swarm-gold/20 hover:text-swarm-goldHi"
+            title={noRepo ? "Bind folder" : "New branch / worktree"}
+            aria-label={noRepo ? `Bind folder to ${ws.name}` : `New worktree in ${ws.name}`}
+            className="flex size-4.5 items-center justify-center rounded text-swarm-textMuted hover:bg-white/[0.08] hover:text-swarm-goldHi"
           >
-            {noRepo ? <FolderPlus className="size-3.5" /> : <Plus className="size-3.5" />}
+            {noRepo ? <FolderPlus className="size-3" /> : <Plus className="size-3" />}
           </button>
         </div>
       </div>
 
-      {/* Missing folder banner */}
+      {/* Missing folder notice */}
       {missing && (
-        <div className="mx-2 mt-1 flex h-6 items-center gap-1.5 rounded-md border border-swarm-err/30 bg-swarm-err/10 px-2 text-[11px] text-swarm-err">
+        <div className="ml-5 mr-1 my-0.5 flex h-5.5 items-center gap-1.5 rounded bg-swarm-err/10 px-2 text-[10px] text-swarm-err">
           <span className="min-w-0 flex-1 truncate" title={ws.boundProjectPath}>Folder missing from disk</span>
           <button
             onClick={(e) => { e.stopPropagation(); bindRepo(); }}
-            className="shrink-0 font-medium underline-offset-2 hover:underline"
+            className="shrink-0 font-medium underline underline-offset-2 hover:opacity-80"
             title={`Pick a new folder for ${ws.name}`}
           >
             Relocate
@@ -1154,44 +1157,42 @@ function ProjectGroup({
 
       {/* New tree inline input */}
       {adding && (
-        <div className="ml-4 mr-1 mt-1 flex items-center gap-1">
+        <div className="ml-5 mr-1 my-1 flex items-center gap-1">
           <input
             autoFocus
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") submit(); if (e.key === "Escape") { setAdding(false); setName(""); } }}
-            placeholder="tree name (e.g. feature-x)"
-            aria-label="New tree name"
-            className="h-[26px] min-w-0 flex-1 rounded-md border border-swarm-border/60 glass-inset px-2 text-mini text-swarm-text outline-none focus:border-swarm-gold/50"
+            placeholder="branch-name"
+            aria-label="New worktree branch"
+            className="h-6 min-w-0 flex-1 rounded border border-swarm-border/50 bg-black/20 px-2 text-mini text-swarm-text outline-none focus:border-swarm-gold/50"
           />
-          <button onClick={submit} disabled={busy || !name.trim()} className="flex size-[26px] shrink-0 items-center justify-center rounded-md text-swarm-goldHi hover:bg-swarm-gold/15 disabled:opacity-40" title="Create tree" aria-label="Create tree">
+          <button onClick={submit} disabled={busy || !name.trim()} className="flex size-6 shrink-0 items-center justify-center rounded text-swarm-goldHi hover:bg-swarm-gold/15 disabled:opacity-40" title="Create">
             {busy ? <LoaderCircle className="size-3 animate-spin" /> : <Check className="size-3" />}
           </button>
-          <button onClick={() => { setAdding(false); setName(""); }} className="flex size-[26px] shrink-0 items-center justify-center rounded-md text-swarm-textMuted hover:text-swarm-text" title="Cancel" aria-label="Cancel new tree">
+          <button onClick={() => { setAdding(false); setName(""); }} className="flex size-6 shrink-0 items-center justify-center rounded text-swarm-textMuted hover:text-swarm-text" title="Cancel">
             <X className="size-3" />
           </button>
         </div>
       )}
 
-      {error && <div className="mx-3 mt-1 break-words text-[11px] text-swarm-err">{error}</div>}
+      {error && <div className="ml-5 mr-1 my-0.5 break-words text-[10px] text-swarm-err">{error}</div>}
 
-      {/* Hierarchical tree rows with guide line */}
-      {!collapsed && (
-        <div className="relative ml-3.5 pl-2.5 mt-0.5 border-l border-swarm-border/35 flex flex-col gap-0.5">
+      {/* Sub-trees (only when multiple worktrees exist and not collapsed) */}
+      {!collapsed && hasTrees && (
+        <div className="relative ml-3 pl-2.5 my-0.5 border-l border-swarm-border/20 flex flex-col">
           <TreeRow
             dot={hasActive ? STATUS_DOT_CLASS.running : "bg-swarm-textMuted/40"}
-            name={repoName || "No folder"}
+            name="main"
             badge="primary"
-            branch={repoName ? "main" : "bind one to start"}
-            fullTitle={ws.boundProjectPath || "No folder bound — click to pick one"}
-            onClick={noRepo ? bindRepo : onActivate}
+            fullTitle={ws.boundProjectPath || "Primary branch"}
+            onClick={onActivate}
           />
           {trees.map((t) => (
             <TreeRow
               key={t.id}
               dot="bg-swarm-textMuted/40"
-              name={t.name}
-              branch={t.branch}
+              name={t.branch || t.name}
               fullTitle={`${t.name}\n${t.branch}\n${t.path}`}
               onClick={onActivate}
               onMerge={() => merge(t.id)}
@@ -1205,14 +1206,13 @@ function ProjectGroup({
   );
 }
 
-/* ── a single 28px row: status dot + name + optional badge + branch ──── */
+/* ── Minimalist Branch Row ───────────────────────────────────────── */
 function TreeRow({
-  dot, name, badge, branch, fullTitle, active, onClick, onMerge, onRemove, pending,
+  dot, name, badge, fullTitle, active, onClick, onMerge, onRemove, pending,
 }: {
   dot: string;
   name: string;
   badge?: string;
-  branch: string;
   fullTitle: string;
   active?: boolean;
   onClick?: () => void;
@@ -1223,24 +1223,22 @@ function TreeRow({
   return (
     <div
       onClick={onClick}
-      {...(onClick ? activatable(onClick, `${name}, branch ${branch}`) : {})}
+      {...(onClick ? activatable(onClick, `Branch ${name}`) : {})}
       aria-current={active ? "true" : undefined}
       title={fullTitle}
-      className={`group/row flex h-6.5 cursor-pointer items-center gap-1.5 rounded-md px-1.5 text-xs transition-colors ${
+      className={`group/row flex h-6 cursor-pointer items-center gap-1.5 rounded px-1.5 text-[11px] transition-colors ${
         active
           ? "bg-swarm-gold/[0.10] text-swarm-goldHi font-medium"
-          : "text-swarm-textDim hover:bg-swarm-border/25 hover:text-swarm-text"
+          : "text-swarm-textDim hover:bg-white/[0.04] hover:text-swarm-text"
       }`}
     >
-      <span className={`size-1.5 shrink-0 rounded-full ${dot}`} />
-      <GitBranch className="size-3 shrink-0 text-swarm-textMuted/70 group-hover/row:text-swarm-gold transition-colors" />
-      <span className="min-w-0 shrink truncate text-[11px] font-medium">{name}</span>
+      <GitBranch className="size-3 shrink-0 text-swarm-textMuted/60 group-hover/row:text-swarm-gold transition-colors" />
+      <span className="min-w-0 flex-1 truncate font-mono text-[11px]">{name}</span>
       {badge && (
-        <span className="shrink-0 rounded-full bg-swarm-gold/15 border border-swarm-gold/25 px-1.5 py-0.2 text-[9px] font-semibold text-swarm-goldHi leading-none">
+        <span className="shrink-0 rounded px-1 text-[9px] font-medium text-swarm-textMuted/60">
           {badge}
         </span>
       )}
-      <span className="min-w-0 flex-1 truncate text-[10px] text-swarm-textMuted/70">{branch}</span>
       {(onMerge || onRemove) && (
         <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity focus-within:opacity-100 group-hover/row:opacity-100">
           {pending ? (
@@ -1250,21 +1248,21 @@ function TreeRow({
               {onMerge && (
                 <button
                   onClick={(e) => { e.stopPropagation(); onMerge(); }}
-                  className="flex size-4.5 items-center justify-center rounded text-swarm-textMuted hover:bg-swarm-gold/15 hover:text-swarm-goldHi transition-colors"
-                  title="Merge branch into main + remove tree"
+                  className="flex size-4 items-center justify-center rounded text-swarm-textMuted hover:text-swarm-goldHi transition-colors"
+                  title="Merge into main"
                   aria-label={`Merge ${name} into main`}
                 >
-                  <GitMerge className="size-3" />
+                  <GitMerge className="size-2.5" />
                 </button>
               )}
               {onRemove && (
                 <button
                   onClick={(e) => { e.stopPropagation(); onRemove(); }}
-                  className="flex size-4.5 items-center justify-center rounded text-swarm-textMuted hover:bg-swarm-err/15 hover:text-swarm-err transition-colors"
-                  title="Remove tree (discard)"
+                  className="flex size-4 items-center justify-center rounded text-swarm-textMuted hover:text-swarm-err transition-colors"
+                  title="Remove tree"
                   aria-label={`Remove tree ${name}`}
                 >
-                  <Trash2 className="size-3" />
+                  <Trash2 className="size-2.5" />
                 </button>
               )}
             </>
@@ -1275,7 +1273,7 @@ function TreeRow({
   );
 }
 
-/* ── An empty region has to say what happened and offer the way out of it. ── */
+/* ── An empty region note ────────────────────────────────────────── */
 function EmptyNote({
   text, hint, actionLabel, onAction,
 }: {
@@ -1285,14 +1283,13 @@ function EmptyNote({
   onAction?: () => void;
 }) {
   return (
-    <div className="flex flex-col items-center gap-1 px-4 py-6 text-center">
-      <WorkspaceMark size={20} className="mb-0.5 text-swarm-textMuted/50" />
-      <p className="text-mini text-swarm-textDim">{text}</p>
-      {hint && <p className="text-micro text-swarm-textMuted/70">{hint}</p>}
+    <div className="flex flex-col items-center gap-1 px-4 py-4 text-center">
+      <p className="text-xs text-swarm-textMuted/70">{text}</p>
+      {hint && <p className="text-[11px] text-swarm-textMuted/50">{hint}</p>}
       {actionLabel && onAction && (
         <button
           onClick={onAction}
-          className="mt-1 rounded-md bg-swarm-gold/10 px-2 py-1 text-micro font-medium text-swarm-goldHi transition-colors hover:bg-swarm-gold/20"
+          className="mt-1 rounded bg-swarm-gold/10 px-2 py-0.5 text-[11px] font-medium text-swarm-goldHi transition-colors hover:bg-swarm-gold/20"
         >
           {actionLabel}
         </button>
@@ -1304,8 +1301,7 @@ function EmptyNote({
 const NO_FILES: string[] = [];
 
 /**
- * The lower half of the rail: what the active workspace actually contains right
- * now — its agents and the files opened out of it.
+ * Clean Zed / Cursor style Active Workspace Detail (Agents & Recent Files)
  */
 function ActiveWorkspaceDetail({
   ws, onOpenFile,
@@ -1322,8 +1318,8 @@ function ActiveWorkspaceDetail({
 
   if (!ws) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col justify-center border-t border-swarm-border/40">
-        <EmptyNote text="No workspace selected" hint="Pick one above to see its agents and files." />
+      <div className="flex min-h-0 flex-1 flex-col justify-center border-t border-swarm-border/30">
+        <EmptyNote text="No workspace selected" hint="Pick one above to see its agents." />
       </div>
     );
   }
@@ -1333,8 +1329,8 @@ function ActiveWorkspaceDetail({
   const recent = (ws.boundProjectPath ? openFiles[ws.boundProjectPath] : undefined) ?? NO_FILES;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col border-t border-swarm-border/30">
-      {/* Collapsible Agents Section */}
+    <div className="flex min-h-0 flex-1 flex-col border-t border-swarm-border/30 pt-1">
+      {/* Agents Header */}
       <CollapsibleSection
         label="Agents"
         count={mine.length}
@@ -1344,48 +1340,45 @@ function ActiveWorkspaceDetail({
       />
 
       {!agentsCollapsed && (
-        <div className="min-h-0 shrink overflow-y-auto overflow-x-hidden scrollbar-sleek px-1.5 pb-2 flex flex-col gap-1 max-h-[48%]">
+        <div className="min-h-0 shrink overflow-y-auto overflow-x-hidden scrollbar-sleek px-1 pb-2 flex flex-col gap-0.5 max-h-[48%]">
           {mine.length === 0 ? (
-            <p className="px-2 py-1.5 text-[11px] text-swarm-textMuted/70 italic">
-              No agents in {ws.name} yet — add one from the top bar.
+            <p className="px-2 py-1 text-[11px] text-swarm-textMuted/50 italic">
+              No agents running
             </p>
           ) : (
             mine.map((a) => {
               const status = statuses[a.id] ?? "idle";
               const label = a.customName || a.cliName;
               const brand = cliBrand(a.cli);
+              const isRunning = status === "running";
               return (
                 <div
                   key={a.id}
-                  className="group flex h-7.5 items-center gap-2 rounded-lg px-2 text-xs text-swarm-textDim transition-colors hover:bg-swarm-border/25 hover:text-swarm-text"
+                  className="group flex h-7 items-center gap-2 rounded-[5px] px-2 text-xs text-swarm-textDim transition-colors hover:bg-white/[0.04] hover:text-swarm-text"
                   title={`${label}\n${a.cliName}${a.model ? ` · ${a.model}` : ""}\n${status}`}
                 >
-                  <span className={`size-2 shrink-0 rounded-full transition-all ${STATUS_DOT_CLASS[status]} ${status === "running" ? "animate-pulse ring-2 ring-swarm-ok/30" : ""}`} />
+                  <span className={`size-1.5 shrink-0 rounded-full transition-all ${
+                    isRunning ? "bg-swarm-ok animate-pulse" : STATUS_DOT_CLASS[status]
+                  }`} />
                   {brand ? (
-                    <BrandGlyph brand={brand} size={13} className="shrink-0 opacity-85 group-hover:opacity-100" />
+                    <BrandGlyph brand={brand} size={12} className="shrink-0 opacity-80 group-hover:opacity-100" />
                   ) : (
-                    <AgentMark size={13} className="shrink-0 text-swarm-textMuted" />
+                    <AgentMark size={12} className="shrink-0 text-swarm-textMuted/70" />
                   )}
-                  <span className="min-w-0 shrink truncate font-medium text-swarm-text">{label}</span>
+                  <span className="min-w-0 shrink truncate font-medium text-swarm-text text-xs">{label}</span>
                   {a.isLead && (
-                    <span className="inline-flex items-center gap-1 rounded-sm bg-swarm-gold/15 border border-swarm-gold/30 px-1 text-[9px] font-semibold text-swarm-goldHi">
-                      <LeadCrown size={9} />
+                    <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-swarm-goldHi/80">
+                      <LeadCrown size={8} />
                       lead
                     </span>
                   )}
                   {a.model && (
-                    <span className="shrink-0 rounded bg-swarm-border/30 px-1 text-[9px] text-swarm-textMuted font-mono">
+                    <span className="shrink-0 text-[10px] text-swarm-textMuted/50 font-mono">
                       {a.model}
                     </span>
                   )}
-                  <span className={`ml-auto shrink-0 rounded-full px-1.5 py-0.2 text-[9px] font-semibold capitalize ${
-                    status === "running"
-                      ? "bg-swarm-ok/15 text-swarm-ok border border-swarm-ok/30"
-                      : status === "launching"
-                      ? "bg-swarm-warn/15 text-swarm-warn border border-swarm-warn/30"
-                      : status === "error"
-                      ? "bg-swarm-err/15 text-swarm-err border border-swarm-err/30"
-                      : "bg-swarm-border/30 text-swarm-textMuted/70"
+                  <span className={`ml-auto shrink-0 text-[10px] font-medium capitalize ${
+                    isRunning ? "text-swarm-ok" : "text-swarm-textMuted/50"
                   }`}>
                     {status}
                   </span>
@@ -1396,10 +1389,10 @@ function ActiveWorkspaceDetail({
         </div>
       )}
 
-      {/* Collapsible Recent files Section */}
+      {/* Recent Files */}
       {recent.length > 0 && (
         <>
-          <div className="border-t border-swarm-border/20 mt-1 pt-0.5">
+          <div className="border-t border-swarm-border/20 mt-1 pt-1">
             <CollapsibleSection
               label="Recent files"
               count={recent.length}
@@ -1408,7 +1401,7 @@ function ActiveWorkspaceDetail({
             />
           </div>
           {!filesCollapsed && (
-            <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden scrollbar-sleek px-1.5 pb-2 flex flex-col gap-0.5">
+            <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden scrollbar-sleek px-1 pb-2 flex flex-col gap-0.5">
               {recent.slice(0, 16).map((path) => {
                 const fileName = path.split(/[\\/]/).pop() || path;
                 const { Icon, className } = getFileIcon(fileName);
@@ -1419,7 +1412,7 @@ function ActiveWorkspaceDetail({
                     onClick={open}
                     {...activatable(open, `Open ${fileName}`)}
                     title={path}
-                    className="flex h-6.5 cursor-pointer items-center gap-1.5 rounded-md px-2 text-xs text-swarm-textDim transition-colors hover:bg-swarm-border/25 hover:text-swarm-text"
+                    className="flex h-6.5 cursor-pointer items-center gap-1.5 rounded-[5px] px-2 text-xs text-swarm-textDim transition-colors hover:bg-white/[0.04] hover:text-swarm-text"
                   >
                     <Icon className={`size-3.5 shrink-0 ${className}`} />
                     <span className="min-w-0 truncate text-[11px]">{fileName}</span>
@@ -1433,4 +1426,5 @@ function ActiveWorkspaceDetail({
     </div>
   );
 }
+
 
