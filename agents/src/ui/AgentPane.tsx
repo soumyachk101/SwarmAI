@@ -1430,9 +1430,10 @@ export default function AgentPane({
         {/* Floating Prompt Bar at the bottom (Matches Screenshot 2) */}
         {spawnState === "running" && (
           <div className="relative shrink-0 p-3 pt-0 z-20">
-            <div className="relative rounded-2xl border border-white/[0.09] bg-[#12141e]/95 backdrop-blur-xl p-3 shadow-2xl transition-all focus-within:border-white/[0.20] focus-within:ring-1 focus-within:ring-white/[0.08]">
-              {/* Top row: Input text + Send button */}
-              <div className="flex items-start gap-2">
+            <div className="relative rounded-2xl border border-white/[0.12] bg-[#0c0e14] p-3 shadow-2xl transition-all focus-within:border-white/[0.22] flex items-stretch gap-3">
+              {/* Left Column: Input + Bottom Controls */}
+              <div className="flex-1 flex flex-col justify-between min-w-0 gap-2">
+                {/* Prompt Text Input */}
                 <textarea
                   value={promptInput}
                   onChange={(e) => setPromptInput(e.target.value)}
@@ -1444,41 +1445,29 @@ export default function AgentPane({
                   }}
                   placeholder={`Prompt ${displayName}...`}
                   rows={1}
-                  className="min-h-[26px] max-h-32 flex-1 resize-none bg-transparent text-xs text-swarm-text placeholder:text-swarm-textMuted/40 outline-none leading-relaxed"
+                  className="w-full resize-none bg-transparent text-xs text-swarm-text placeholder:text-swarm-textMuted/45 outline-none leading-relaxed"
                 />
 
-                <button
-                  onClick={handleSendPrompt}
-                  disabled={!promptInput.trim()}
-                  className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-white/[0.06] text-swarm-text hover:bg-swarm-gold hover:text-black disabled:opacity-25 disabled:hover:bg-white/[0.06] disabled:hover:text-swarm-text transition-all"
-                  title="Send to agent (Enter)"
-                >
-                  <Send size={13} />
-                </button>
-              </div>
-
-              {/* Bottom row: Model Switcher, Effort Selector, Usage Check, Settings */}
-              <div className="mt-2 flex items-center justify-between pt-2 border-t border-white/[0.05]">
-                <div className="flex items-center gap-2">
-                  {/* Model Selector Dropdown */}
+                {/* Bottom Controls Row: Model Selector, Effort Selector, Usage Check */}
+                <div className="flex items-center gap-3 pt-0.5">
+                  {/* Anthropic Star Dropdown */}
                   <div className="relative">
                     <button
                       onClick={() => { setModelMenuOpen(!modelMenuOpen); setEffortMenuOpen(false); setSettingsMenuOpen(false); }}
-                      className="flex items-center gap-1.5 rounded-md px-1.5 py-0.5 text-xs text-swarm-textDim hover:text-swarm-text hover:bg-white/[0.06] transition-colors"
-                      title="Switch Model"
+                      className="flex items-center gap-1 text-swarm-textMuted hover:text-swarm-text transition-colors"
+                      title="Model Selector"
                     >
-                      {cliBrand(agent.cli) ? (
-                        <BrandGlyph brand={cliBrand(agent.cli)!} size={14} className="shrink-0 text-swarm-gold" />
-                      ) : (
-                        <Sparkles size={14} className="text-swarm-gold shrink-0" />
-                      )}
-                      <ChevronDown size={12} className="text-swarm-textMuted/70" />
+                      {/* Anthropic Coral Star Glyph */}
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D97757" strokeWidth="2.8" strokeLinecap="round" className="shrink-0">
+                        <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07l14.14-14.14" />
+                      </svg>
+                      <ChevronDown size={13} className="text-swarm-textMuted/70" />
                     </button>
 
                     {modelMenuOpen && (
-                      <div className="absolute bottom-full left-0 mb-1.5 min-w-[210px] rounded-xl border border-white/[0.12] bg-[#161824] p-1.5 shadow-2xl z-50 animate-fade-in">
+                      <div className="absolute bottom-full left-0 mb-2 min-w-[220px] rounded-xl border border-white/[0.12] bg-[#141720] p-1.5 shadow-2xl z-50 animate-fade-in">
                         <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase">
-                          Model Selector
+                          Select Model
                         </div>
                         {[
                           { id: "claude-fable-5", label: "Claude Opus 4.5 / 5" },
@@ -1505,15 +1494,15 @@ export default function AgentPane({
                   <div className="relative">
                     <button
                       onClick={() => { setEffortMenuOpen(!effortMenuOpen); setModelMenuOpen(false); setSettingsMenuOpen(false); }}
-                      className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs text-swarm-textDim hover:text-swarm-text hover:bg-white/[0.06] transition-colors"
+                      className="flex items-center gap-1 text-xs text-swarm-textDim hover:text-swarm-text transition-colors font-medium"
                       title="Reasoning Effort"
                     >
-                      <span className="font-medium text-swarm-text">{currentEffort}</span>
-                      <ChevronDown size={12} className="text-swarm-textMuted/70" />
+                      <span className="font-semibold text-swarm-text/90">{currentEffort}</span>
+                      <ChevronDown size={13} className="text-swarm-textMuted/70" />
                     </button>
 
                     {effortMenuOpen && (
-                      <div className="absolute bottom-full left-0 mb-1.5 min-w-[130px] rounded-xl border border-white/[0.12] bg-[#161824] p-1.5 shadow-2xl z-50 animate-fade-in">
+                      <div className="absolute bottom-full left-0 mb-2 min-w-[130px] rounded-xl border border-white/[0.12] bg-[#141720] p-1.5 shadow-2xl z-50 animate-fade-in">
                         <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase">
                           Effort Level
                         </div>
@@ -1534,25 +1523,38 @@ export default function AgentPane({
                   {/* Usage Speedometer Check Button */}
                   <button
                     onClick={handleCheckUsage}
-                    className="flex size-6 items-center justify-center rounded-md text-swarm-textMuted hover:text-swarm-text hover:bg-white/[0.06] transition-colors"
+                    className="flex size-5 items-center justify-center text-swarm-textMuted hover:text-swarm-text transition-colors"
                     title="Check Token Usage & Cost (/cost)"
                   >
-                    <Gauge size={14} />
+                    <Gauge size={14} className="text-swarm-textMuted/80" />
                   </button>
                 </div>
+              </div>
 
-                {/* Settings / Sliders Button on Right */}
+              {/* Right Column: Stacked Send and Settings Buttons */}
+              <div className="flex flex-col justify-between items-center gap-1.5 shrink-0">
+                {/* Top Send Button */}
+                <button
+                  onClick={handleSendPrompt}
+                  disabled={!promptInput.trim()}
+                  className="flex size-7.5 items-center justify-center rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-swarm-textDim hover:text-swarm-text disabled:opacity-30 transition-all"
+                  title="Send to agent (Enter)"
+                >
+                  <Send size={13} className="text-swarm-text/80" />
+                </button>
+
+                {/* Bottom Settings Button */}
                 <div className="relative">
                   <button
                     onClick={() => { setSettingsMenuOpen(!settingsMenuOpen); setModelMenuOpen(false); setEffortMenuOpen(false); }}
-                    className="flex size-7 items-center justify-center rounded-lg bg-white/[0.04] border border-white/[0.07] text-swarm-textMuted hover:text-swarm-text hover:bg-white/[0.08] transition-colors"
+                    className="flex size-7.5 items-center justify-center rounded-xl bg-white/[0.03] border border-white/[0.08] text-swarm-textMuted hover:text-swarm-text hover:bg-white/[0.08] transition-colors"
                     title="CLI Shortcuts & Tools"
                   >
                     <SlidersHorizontal size={13} />
                   </button>
 
                   {settingsMenuOpen && (
-                    <div className="absolute bottom-full right-0 mb-1.5 min-w-[170px] rounded-xl border border-white/[0.12] bg-[#161824] p-1.5 shadow-2xl z-50 animate-fade-in">
+                    <div className="absolute bottom-full right-0 mb-2 min-w-[170px] rounded-xl border border-white/[0.12] bg-[#141720] p-1.5 shadow-2xl z-50 animate-fade-in">
                       <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase">
                         Commands
                       </div>
