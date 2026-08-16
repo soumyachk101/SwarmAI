@@ -1466,16 +1466,15 @@ export default function AgentPane({
 
                     {modelMenuOpen && (
                       <div className="absolute bottom-full left-0 mb-2 min-w-[220px] rounded-xl border border-white/[0.12] bg-[#141720] p-1.5 shadow-2xl z-50 animate-fade-in">
-                        <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase">
-                          Select Model
+                        <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase flex items-center justify-between">
+                          <span>Models</span>
+                          <span className="text-[9px] font-mono text-swarm-gold">/model</span>
                         </div>
                         {[
-                          { id: "claude-fable-5", label: "Claude Opus 4.5 / 5" },
+                          { id: "claude-fable-5", label: "Claude Fable 5" },
+                          { id: "claude-opus-5", label: "Claude Opus 5" },
                           { id: "claude-sonnet-5", label: "Claude Sonnet 5" },
-                          { id: "claude-3-7-sonnet", label: "Claude 3.7 Sonnet (Thinking)" },
-                          { id: "claude-3-5-sonnet", label: "Claude 3.5 Sonnet" },
-                          { id: "claude-3-5-haiku", label: "Claude 3.5 Haiku" },
-                          { id: "gpt-4o", label: "GPT-4o" },
+                          { id: "claude-haiku-4-5", label: "Claude Haiku 4.5" },
                         ].map((m) => (
                           <button
                             key={m.id}
@@ -1483,7 +1482,7 @@ export default function AgentPane({
                             className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-xs text-left text-swarm-textDim hover:bg-white/[0.08] hover:text-swarm-text transition-colors"
                           >
                             <span className="truncate">{m.label}</span>
-                            {currentModel.includes(m.id) && <Check size={12} className="text-swarm-gold" />}
+                            {(currentModel === m.id || currentModel === m.label) && <Check size={12} className="text-swarm-gold" />}
                           </button>
                         ))}
                       </div>

@@ -1,0 +1,2335 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - link "Skip to content" [ref=e4] [cursor=pointer]:
+        - /url: "#start-of-content"
+      - banner [ref=e9]:
+        - heading "Navigation Menu" [level=2] [ref=e10]
+        - generic [ref=e11]:
+          - link "Homepage" [ref=e13] [cursor=pointer]:
+            - /url: /
+          - generic [ref=e16]:
+            - navigation "Global" [ref=e17]:
+              - list [ref=e18]:
+                - listitem [ref=e19]:
+                  - button "Platform" [ref=e21] [cursor=pointer]
+                - listitem [ref=e24]:
+                  - button "Solutions" [ref=e26] [cursor=pointer]
+                - listitem [ref=e29]:
+                  - button "Resources" [ref=e31] [cursor=pointer]
+                - listitem [ref=e34]:
+                  - button "Open Source" [ref=e36] [cursor=pointer]
+                - listitem [ref=e39]:
+                  - button "Enterprise" [ref=e41] [cursor=pointer]
+                - listitem [ref=e44]:
+                  - link "Pricing" [ref=e45] [cursor=pointer]:
+                    - /url: https://github.com/pricing
+            - generic [ref=e46]:
+              - button "Search or jump to, type / to search" [ref=e48] [cursor=pointer]
+              - link "Sign in" [ref=e55] [cursor=pointer]:
+                - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fgarrytan%2Fgstack
+              - link "Sign up" [ref=e58] [cursor=pointer]:
+                - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E&source=header-repo&source_repo=garrytan%2Fgstack
+              - button "Appearance settings" [ref=e61] [cursor=pointer]
+    - main [ref=e68]:
+      - generic [ref=e69]:
+        - generic [ref=e70]:
+          - generic [ref=e72]:
+            - link "garrytan" [ref=e76] [cursor=pointer]:
+              - /url: /garrytan
+            - generic [ref=e77]: /
+            - strong [ref=e78]:
+              - link "gstack" [ref=e79] [cursor=pointer]:
+                - /url: /garrytan/gstack
+            - generic [ref=e80]: Public
+          - generic [ref=e81]:
+            - list:
+              - listitem [ref=e82]:
+                - link "You must be signed in to change notification settings" [ref=e83] [cursor=pointer]:
+                  - /url: /login?return_to=%2Fgarrytan%2Fgstack
+                  - text: Notifications
+              - listitem [ref=e86]:
+                - link "Fork 19.3k" [ref=e87] [cursor=pointer]:
+                  - /url: /login?return_to=%2Fgarrytan%2Fgstack
+                  - text: Fork
+                  - generic "19,294" [ref=e90]: 19.3k
+              - listitem [ref=e91]:
+                - link "You must be signed in to star a repository" [ref=e93] [cursor=pointer]:
+                  - /url: /login?return_to=%2Fgarrytan%2Fgstack
+                  - text: Star
+                  - generic "128219 users starred this repository" [ref=e96]: 128k
+        - navigation "Repository" [ref=e97]:
+          - list [ref=e98]:
+            - listitem [ref=e99]:
+              - link "Code" [ref=e100] [cursor=pointer]:
+                - /url: /garrytan/gstack
+            - listitem [ref=e104]:
+              - link "Issues 370" [ref=e105] [cursor=pointer]:
+                - /url: /garrytan/gstack/issues
+                - generic [ref=e109]: Issues
+                - generic "370" [ref=e110]
+            - listitem [ref=e111]:
+              - link "Pull requests 563" [ref=e112] [cursor=pointer]:
+                - /url: /garrytan/gstack/pulls
+                - generic [ref=e115]: Pull requests
+                - generic "563" [ref=e116]
+            - listitem [ref=e117]:
+              - link "Actions" [ref=e118] [cursor=pointer]:
+                - /url: /garrytan/gstack/actions
+            - listitem [ref=e122]:
+              - link "Projects" [ref=e123] [cursor=pointer]:
+                - /url: /garrytan/gstack/projects
+            - listitem [ref=e127]:
+              - link "Security and quality" [ref=e128] [cursor=pointer]:
+                - /url: /garrytan/gstack/security
+            - listitem [ref=e132]:
+              - link "Insights" [ref=e133] [cursor=pointer]:
+                - /url: /garrytan/gstack/pulse
+      - generic [ref=e150]:
+        - generic [ref=e153]:
+          - generic [ref=e154]:
+            - generic [ref=e155]:
+              - button "main branch" [ref=e157] [cursor=pointer]:
+                - generic [ref=e158]: main
+              - generic [ref=e162]:
+                - link [ref=e163] [cursor=pointer]:
+                  - /url: /garrytan/gstack/branches
+                  - generic [ref=e166]:
+                    - strong [ref=e167]: "321"
+                    - text: Branches
+                - link [ref=e168] [cursor=pointer]:
+                  - /url: /garrytan/gstack/tags
+                  - generic [ref=e171]:
+                    - strong [ref=e172]: "0"
+                    - text: Tags
+            - generic [ref=e173]:
+              - combobox "Go to file" [ref=e181]
+              - button "Code" [ref=e182] [cursor=pointer]
+          - generic [ref=e185]:
+            - generic [ref=e186]:
+              - heading "Folders and files" [level=2] [ref=e187]
+              - table "Folders and files" [ref=e188]:
+                - rowgroup:
+                  - row "Name Last commit message Last commit date":
+                    - columnheader "Name"
+                    - columnheader "Last commit message"
+                    - columnheader "Last commit date"
+                - rowgroup [ref=e189]:
+                  - row [ref=e190]:
+                    - 'cell "Latest commit garrytan claude commits by garrytan and commits by claude v1.66.0.0 feat: test/evals/CI speedup — 90s truthful free suite, diff… Open commit details success Commit 410b492 · Aug 16, 20269 hours ago History 368 Commits" [ref=e191]':
+                      - generic [ref=e192]:
+                        - heading "Latest commit" [level=2] [ref=e193]
+                        - generic [ref=e194]:
+                          - generic [ref=e195]:
+                            - generic [ref=e197]:
+                              - img "garrytan" [ref=e198]
+                              - img "claude" [ref=e199]
+                            - link "commits by garrytan" [ref=e201] [cursor=pointer]:
+                              - /url: /garrytan/gstack/commits?author=garrytan
+                              - text: garrytan
+                            - generic [ref=e202]: and
+                            - link "commits by claude" [ref=e204] [cursor=pointer]:
+                              - /url: /garrytan/gstack/commits?author=claude
+                              - text: claude
+                          - generic [ref=e205]:
+                            - 'link "v1.66.0.0 feat: test/evals/CI speedup — 90s truthful free suite, diff…" [ref=e208] [cursor=pointer]':
+                              - /url: /garrytan/gstack/commit/410b4928e7caa229b92827fa3e8cc95a49bb757b
+                            - button "Open commit details" [ref=e209] [cursor=pointer]
+                            - button "success" [ref=e212] [cursor=pointer]
+                        - generic [ref=e215]:
+                          - generic [ref=e217]:
+                            - link "Commit 410b492" [ref=e218] [cursor=pointer]:
+                              - /url: /garrytan/gstack/commit/410b4928e7caa229b92827fa3e8cc95a49bb757b
+                              - text: 410b492
+                            - text: ·
+                            - generic "Aug 16, 2026, 10:50 GMT+5:30" [ref=e219]: Aug 16, 20269 hours ago
+                          - generic [ref=e220]:
+                            - heading "History" [level=2] [ref=e221]
+                            - link "368 Commits" [ref=e222] [cursor=pointer]:
+                              - /url: /garrytan/gstack/commits/main/
+                  - row ".github, (Directory)" [ref=e225]:
+                    - cell [ref=e226]:
+                      - link ".github, (Directory)" [ref=e233] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/.github
+                        - text: .github
+                    - cell [ref=e234]
+                    - cell [ref=e236]
+                  - row "agents, (Directory)" [ref=e239]:
+                    - cell [ref=e240]:
+                      - link "agents, (Directory)" [ref=e247] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/agents
+                        - text: agents
+                    - cell [ref=e248]
+                    - cell [ref=e250]
+                  - row "autoplan, (Directory)" [ref=e253]:
+                    - cell [ref=e254]:
+                      - link "autoplan, (Directory)" [ref=e261] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/autoplan
+                        - text: autoplan
+                    - cell [ref=e262]
+                    - cell [ref=e264]
+                  - row "benchmark-models, (Directory)" [ref=e267]:
+                    - cell [ref=e268]:
+                      - link "benchmark-models, (Directory)" [ref=e275] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/benchmark-models
+                        - text: benchmark-models
+                    - cell [ref=e276]
+                    - cell [ref=e278]
+                  - row "benchmark, (Directory)" [ref=e281]:
+                    - cell [ref=e282]:
+                      - link "benchmark, (Directory)" [ref=e289] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/benchmark
+                        - text: benchmark
+                    - cell [ref=e290]
+                    - cell [ref=e292]
+                  - row "bin, (Directory)" [ref=e295]:
+                    - cell [ref=e296]:
+                      - link "bin, (Directory)" [ref=e303] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/bin
+                        - text: bin
+                    - cell [ref=e304]
+                    - cell [ref=e306]
+                  - row "browse, (Directory)" [ref=e309]:
+                    - cell [ref=e310]:
+                      - link "browse, (Directory)" [ref=e317] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/browse
+                        - text: browse
+                    - cell [ref=e318]
+                    - cell [ref=e320]
+                  - row "browser-skills/hackernews-frontpage, (Directory)" [ref=e323]:
+                    - cell [ref=e324]:
+                      - link "browser-skills/hackernews-frontpage, (Directory)" [ref=e331] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/browser-skills/hackernews-frontpage
+                        - text: browser-skills/hackernews-frontpage
+                    - cell [ref=e332]
+                    - cell [ref=e334]
+                  - row "canary, (Directory)" [ref=e337]:
+                    - cell [ref=e338]:
+                      - link "canary, (Directory)" [ref=e345] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/canary
+                        - text: canary
+                    - cell [ref=e346]
+                    - cell [ref=e348]
+                  - row "careful, (Directory)" [ref=e351]:
+                    - cell [ref=e352]:
+                      - link "careful, (Directory)" [ref=e359] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/careful
+                        - text: careful
+                    - cell [ref=e360]
+                    - cell [ref=e362]
+                  - row "claude, (Directory)" [ref=e365]:
+                    - cell [ref=e366]:
+                      - link "claude, (Directory)" [ref=e373] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/claude
+                        - text: claude
+                    - cell [ref=e374]
+                    - cell [ref=e376]
+                  - row "codex, (Directory)" [ref=e379]:
+                    - cell [ref=e380]:
+                      - link "codex, (Directory)" [ref=e387] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/codex
+                        - text: codex
+                    - cell [ref=e388]
+                    - cell [ref=e390]
+                  - row "context-restore, (Directory)" [ref=e393]:
+                    - cell [ref=e394]:
+                      - link "context-restore, (Directory)" [ref=e401] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/context-restore
+                        - text: context-restore
+                    - cell [ref=e402]
+                    - cell [ref=e404]
+                  - row "context-save, (Directory)" [ref=e407]:
+                    - cell [ref=e408]:
+                      - link "context-save, (Directory)" [ref=e415] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/context-save
+                        - text: context-save
+                    - cell [ref=e416]
+                    - cell [ref=e418]
+                  - row "contrib/add-host, (Directory)" [ref=e421]:
+                    - cell [ref=e422]:
+                      - link "contrib/add-host, (Directory)" [ref=e429] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/contrib/add-host
+                        - text: contrib/add-host
+                    - cell [ref=e430]
+                    - cell [ref=e432]
+                  - row "cso, (Directory)" [ref=e435]:
+                    - cell [ref=e436]:
+                      - link "cso, (Directory)" [ref=e443] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/cso
+                        - text: cso
+                    - cell [ref=e444]
+                    - cell [ref=e446]
+                  - row "design-consultation, (Directory)" [ref=e449]:
+                    - cell [ref=e450]:
+                      - link "design-consultation, (Directory)" [ref=e457] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/design-consultation
+                        - text: design-consultation
+                    - cell [ref=e458]
+                    - cell [ref=e460]
+                  - row "design-html, (Directory)" [ref=e463]:
+                    - cell [ref=e464]:
+                      - link "design-html, (Directory)" [ref=e471] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/design-html
+                        - text: design-html
+                    - cell [ref=e472]
+                    - cell [ref=e474]
+                  - row "design-review, (Directory)" [ref=e477]:
+                    - cell [ref=e478]:
+                      - link "design-review, (Directory)" [ref=e485] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/design-review
+                        - text: design-review
+                    - cell [ref=e486]
+                    - cell [ref=e488]
+                  - row "design-shotgun, (Directory)" [ref=e491]:
+                    - cell [ref=e492]:
+                      - link "design-shotgun, (Directory)" [ref=e499] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/design-shotgun
+                        - text: design-shotgun
+                    - cell [ref=e500]
+                    - cell [ref=e502]
+                  - row "design, (Directory)" [ref=e505]:
+                    - cell [ref=e506]:
+                      - link "design, (Directory)" [ref=e513] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/design
+                        - text: design
+                    - cell [ref=e514]
+                    - cell [ref=e516]
+                  - row "devex-review, (Directory)" [ref=e519]:
+                    - cell [ref=e520]:
+                      - link "devex-review, (Directory)" [ref=e527] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/devex-review
+                        - text: devex-review
+                    - cell [ref=e528]
+                    - cell [ref=e530]
+                  - row "diagram, (Directory)" [ref=e533]:
+                    - cell [ref=e534]:
+                      - link "diagram, (Directory)" [ref=e541] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/diagram
+                        - text: diagram
+                    - cell [ref=e542]
+                    - cell [ref=e544]
+                  - row "docs, (Directory)" [ref=e547]:
+                    - cell [ref=e548]:
+                      - link "docs, (Directory)" [ref=e555] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/docs
+                        - text: docs
+                    - cell [ref=e556]
+                    - cell [ref=e558]
+                  - row "document-generate, (Directory)" [ref=e561]:
+                    - cell [ref=e562]:
+                      - link "document-generate, (Directory)" [ref=e569] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/document-generate
+                        - text: document-generate
+                    - cell [ref=e570]
+                    - cell [ref=e572]
+                  - row "document-release, (Directory)" [ref=e575]:
+                    - cell [ref=e576]:
+                      - link "document-release, (Directory)" [ref=e583] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/document-release
+                        - text: document-release
+                    - cell [ref=e584]
+                    - cell [ref=e586]
+                  - row "extension, (Directory)" [ref=e589]:
+                    - cell [ref=e590]:
+                      - link "extension, (Directory)" [ref=e597] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/extension
+                        - text: extension
+                    - cell [ref=e598]
+                    - cell [ref=e600]
+                  - row "freeze, (Directory)" [ref=e603]:
+                    - cell [ref=e604]:
+                      - link "freeze, (Directory)" [ref=e611] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/freeze
+                        - text: freeze
+                    - cell [ref=e612]
+                    - cell [ref=e614]
+                  - row "gstack-upgrade, (Directory)" [ref=e617]:
+                    - cell [ref=e618]:
+                      - link "gstack-upgrade, (Directory)" [ref=e625] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/gstack-upgrade
+                        - text: gstack-upgrade
+                    - cell [ref=e626]
+                    - cell [ref=e628]
+                  - row "gstack, (Directory)" [ref=e631]:
+                    - cell [ref=e632]:
+                      - link "gstack, (Directory)" [ref=e639] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/gstack
+                        - text: gstack
+                    - cell [ref=e640]
+                    - cell [ref=e642]
+                  - row "guard, (Directory)" [ref=e645]:
+                    - cell [ref=e646]:
+                      - link "guard, (Directory)" [ref=e653] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/guard
+                        - text: guard
+                    - cell [ref=e654]
+                    - cell [ref=e656]
+                  - row "health, (Directory)" [ref=e659]:
+                    - cell [ref=e660]:
+                      - link "health, (Directory)" [ref=e667] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/health
+                        - text: health
+                    - cell [ref=e668]
+                    - cell [ref=e670]
+                  - row "hosts, (Directory)" [ref=e673]:
+                    - cell [ref=e674]:
+                      - link "hosts, (Directory)" [ref=e681] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/hosts
+                        - text: hosts
+                    - cell [ref=e682]
+                    - cell [ref=e684]
+                  - row "investigate, (Directory)" [ref=e687]:
+                    - cell [ref=e688]:
+                      - link "investigate, (Directory)" [ref=e695] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/investigate
+                        - text: investigate
+                    - cell [ref=e696]
+                    - cell [ref=e698]
+                  - row "ios-clean, (Directory)" [ref=e701]:
+                    - cell [ref=e702]:
+                      - link "ios-clean, (Directory)" [ref=e709] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/ios-clean
+                        - text: ios-clean
+                    - cell [ref=e710]
+                    - cell [ref=e712]
+                  - row "ios-design-review, (Directory)" [ref=e715]:
+                    - cell [ref=e716]:
+                      - link "ios-design-review, (Directory)" [ref=e723] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/ios-design-review
+                        - text: ios-design-review
+                    - cell [ref=e724]
+                    - cell [ref=e726]
+                  - row "ios-fix, (Directory)" [ref=e729]:
+                    - cell [ref=e730]:
+                      - link "ios-fix, (Directory)" [ref=e737] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/ios-fix
+                        - text: ios-fix
+                    - cell [ref=e738]
+                    - cell [ref=e740]
+                  - row "ios-qa, (Directory)" [ref=e743]:
+                    - cell [ref=e744]:
+                      - link "ios-qa, (Directory)" [ref=e751] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/ios-qa
+                        - text: ios-qa
+                    - cell [ref=e752]
+                    - cell [ref=e754]
+                  - row "ios-sync, (Directory)" [ref=e757]:
+                    - cell [ref=e758]:
+                      - link "ios-sync, (Directory)" [ref=e765] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/ios-sync
+                        - text: ios-sync
+                    - cell [ref=e766]
+                    - cell [ref=e768]
+                  - row "land-and-deploy, (Directory)" [ref=e771]:
+                    - cell [ref=e772]:
+                      - link "land-and-deploy, (Directory)" [ref=e779] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/land-and-deploy
+                        - text: land-and-deploy
+                    - cell [ref=e780]
+                    - cell [ref=e782]
+                  - row "landing-report, (Directory)" [ref=e785]:
+                    - cell [ref=e786]:
+                      - link "landing-report, (Directory)" [ref=e793] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/landing-report
+                        - text: landing-report
+                    - cell [ref=e794]
+                    - cell [ref=e796]
+                  - row "learn, (Directory)" [ref=e799]:
+                    - cell [ref=e800]:
+                      - link "learn, (Directory)" [ref=e807] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/learn
+                        - text: learn
+                    - cell [ref=e808]
+                    - cell [ref=e810]
+                  - row "lib, (Directory)" [ref=e813]:
+                    - cell [ref=e814]:
+                      - link "lib, (Directory)" [ref=e821] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/lib
+                        - text: lib
+                    - cell [ref=e822]
+                    - cell [ref=e824]
+                  - row "make-pdf, (Directory)" [ref=e827]:
+                    - cell [ref=e828]:
+                      - link "make-pdf, (Directory)" [ref=e835] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/make-pdf
+                        - text: make-pdf
+                    - cell [ref=e836]
+                    - cell [ref=e838]
+                  - row "model-overlays, (Directory)" [ref=e841]:
+                    - cell [ref=e842]:
+                      - link "model-overlays, (Directory)" [ref=e849] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/model-overlays
+                        - text: model-overlays
+                    - cell [ref=e850]
+                    - cell [ref=e852]
+                  - row "office-hours, (Directory)" [ref=e855]:
+                    - cell [ref=e856]:
+                      - link "office-hours, (Directory)" [ref=e863] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/office-hours
+                        - text: office-hours
+                    - cell [ref=e864]
+                    - cell [ref=e866]
+                  - row "open-gstack-browser, (Directory)" [ref=e869]:
+                    - cell [ref=e870]:
+                      - link "open-gstack-browser, (Directory)" [ref=e877] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/open-gstack-browser
+                        - text: open-gstack-browser
+                    - cell [ref=e878]
+                    - cell [ref=e880]
+                  - row "openclaw, (Directory)" [ref=e883]:
+                    - cell [ref=e884]:
+                      - link "openclaw, (Directory)" [ref=e891] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/openclaw
+                        - text: openclaw
+                    - cell [ref=e892]
+                    - cell [ref=e894]
+                  - row "pair-agent, (Directory)" [ref=e897]:
+                    - cell [ref=e898]:
+                      - link "pair-agent, (Directory)" [ref=e905] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/pair-agent
+                        - text: pair-agent
+                    - cell [ref=e906]
+                    - cell [ref=e908]
+                  - row "plan-ceo-review, (Directory)" [ref=e911]:
+                    - cell [ref=e912]:
+                      - link "plan-ceo-review, (Directory)" [ref=e919] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/plan-ceo-review
+                        - text: plan-ceo-review
+                    - cell [ref=e920]
+                    - cell [ref=e922]
+                  - row "plan-design-review, (Directory)" [ref=e925]:
+                    - cell [ref=e926]:
+                      - link "plan-design-review, (Directory)" [ref=e933] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/plan-design-review
+                        - text: plan-design-review
+                    - cell [ref=e934]
+                    - cell [ref=e936]
+                  - row "plan-devex-review, (Directory)" [ref=e939]:
+                    - cell [ref=e940]:
+                      - link "plan-devex-review, (Directory)" [ref=e947] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/plan-devex-review
+                        - text: plan-devex-review
+                    - cell [ref=e948]
+                    - cell [ref=e950]
+                  - row "plan-eng-review, (Directory)" [ref=e953]:
+                    - cell [ref=e954]:
+                      - link "plan-eng-review, (Directory)" [ref=e961] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/plan-eng-review
+                        - text: plan-eng-review
+                    - cell [ref=e962]
+                    - cell [ref=e964]
+                  - row "plan-tune, (Directory)" [ref=e967]:
+                    - cell [ref=e968]:
+                      - link "plan-tune, (Directory)" [ref=e975] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/plan-tune
+                        - text: plan-tune
+                    - cell [ref=e976]
+                    - cell [ref=e978]
+                  - row "qa-only, (Directory)" [ref=e981]:
+                    - cell [ref=e982]:
+                      - link "qa-only, (Directory)" [ref=e989] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/qa-only
+                        - text: qa-only
+                    - cell [ref=e990]
+                    - cell [ref=e992]
+                  - row "qa, (Directory)" [ref=e995]:
+                    - cell [ref=e996]:
+                      - link "qa, (Directory)" [ref=e1003] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/qa
+                        - text: qa
+                    - cell [ref=e1004]
+                    - cell [ref=e1006]
+                  - row "retro, (Directory)" [ref=e1009]:
+                    - cell [ref=e1010]:
+                      - link "retro, (Directory)" [ref=e1017] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/retro
+                        - text: retro
+                    - cell [ref=e1018]
+                    - cell [ref=e1020]
+                  - row "review, (Directory)" [ref=e1023]:
+                    - cell [ref=e1024]:
+                      - link "review, (Directory)" [ref=e1031] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/review
+                        - text: review
+                    - cell [ref=e1032]
+                    - cell [ref=e1034]
+                  - row "scrape, (Directory)" [ref=e1037]:
+                    - cell [ref=e1038]:
+                      - link "scrape, (Directory)" [ref=e1045] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/scrape
+                        - text: scrape
+                    - cell [ref=e1046]
+                    - cell [ref=e1048]
+                  - row "scripts, (Directory)" [ref=e1051]:
+                    - cell [ref=e1052]:
+                      - link "scripts, (Directory)" [ref=e1059] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/scripts
+                        - text: scripts
+                    - cell [ref=e1060]
+                    - cell [ref=e1062]
+                  - row "setup-browser-cookies, (Directory)" [ref=e1065]:
+                    - cell [ref=e1066]:
+                      - link "setup-browser-cookies, (Directory)" [ref=e1073] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/setup-browser-cookies
+                        - text: setup-browser-cookies
+                    - cell [ref=e1074]
+                    - cell [ref=e1076]
+                  - row "setup-deploy, (Directory)" [ref=e1079]:
+                    - cell [ref=e1080]:
+                      - link "setup-deploy, (Directory)" [ref=e1087] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/setup-deploy
+                        - text: setup-deploy
+                    - cell [ref=e1088]
+                    - cell [ref=e1090]
+                  - row "setup-gbrain, (Directory)" [ref=e1093]:
+                    - cell [ref=e1094]:
+                      - link "setup-gbrain, (Directory)" [ref=e1101] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/setup-gbrain
+                        - text: setup-gbrain
+                    - cell [ref=e1102]
+                    - cell [ref=e1104]
+                  - row "ship, (Directory)" [ref=e1107]:
+                    - cell [ref=e1108]:
+                      - link "ship, (Directory)" [ref=e1115] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/ship
+                        - text: ship
+                    - cell [ref=e1116]
+                    - cell [ref=e1118]
+                  - row "skillify, (Directory)" [ref=e1121]:
+                    - cell [ref=e1122]:
+                      - link "skillify, (Directory)" [ref=e1129] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/skillify
+                        - text: skillify
+                    - cell [ref=e1130]
+                    - cell [ref=e1132]
+                  - row "spec, (Directory)" [ref=e1135]:
+                    - cell [ref=e1136]:
+                      - link "spec, (Directory)" [ref=e1143] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/spec
+                        - text: spec
+                    - cell [ref=e1144]
+                    - cell [ref=e1146]
+                  - row "supabase, (Directory)" [ref=e1149]:
+                    - cell [ref=e1150]:
+                      - link "supabase, (Directory)" [ref=e1157] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/supabase
+                        - text: supabase
+                    - cell [ref=e1158]
+                    - cell [ref=e1160]
+                  - row "sync-gbrain, (Directory)" [ref=e1163]:
+                    - cell [ref=e1164]:
+                      - link "sync-gbrain, (Directory)" [ref=e1171] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/sync-gbrain
+                        - text: sync-gbrain
+                    - cell [ref=e1172]
+                    - cell [ref=e1174]
+                  - row "test, (Directory)" [ref=e1177]:
+                    - cell [ref=e1178]:
+                      - link "test, (Directory)" [ref=e1185] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/test
+                        - text: test
+                    - cell [ref=e1186]
+                    - cell [ref=e1188]
+                  - row "unfreeze, (Directory)" [ref=e1191]:
+                    - cell [ref=e1192]:
+                      - link "unfreeze, (Directory)" [ref=e1199] [cursor=pointer]:
+                        - /url: /garrytan/gstack/tree/main/unfreeze
+                        - text: unfreeze
+                    - cell [ref=e1200]
+                    - cell [ref=e1202]
+                  - row ".env.example, (File)" [ref=e1205]:
+                    - cell [ref=e1206]:
+                      - link ".env.example, (File)" [ref=e1213] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/.env.example
+                        - text: .env.example
+                    - cell [ref=e1214]
+                    - cell [ref=e1216]
+                  - row ".gitattributes, (File)" [ref=e1219]:
+                    - cell [ref=e1220]:
+                      - link ".gitattributes, (File)" [ref=e1227] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/.gitattributes
+                        - text: .gitattributes
+                    - cell [ref=e1228]
+                    - cell [ref=e1230]
+                  - row ".gitignore, (File)" [ref=e1233]:
+                    - cell [ref=e1234]:
+                      - link ".gitignore, (File)" [ref=e1241] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/.gitignore
+                        - text: .gitignore
+                    - cell [ref=e1242]
+                    - cell [ref=e1244]
+                  - row ".gitlab-ci.yml, (File)" [ref=e1247]:
+                    - cell [ref=e1248]:
+                      - link ".gitlab-ci.yml, (File)" [ref=e1255] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/.gitlab-ci.yml
+                        - text: .gitlab-ci.yml
+                    - cell [ref=e1256]
+                    - cell [ref=e1258]
+                  - row ".osv-scanner.toml, (File)" [ref=e1261]:
+                    - cell [ref=e1262]:
+                      - link ".osv-scanner.toml, (File)" [ref=e1269] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/.osv-scanner.toml
+                        - text: .osv-scanner.toml
+                    - cell [ref=e1270]
+                    - cell [ref=e1272]
+                  - row "AGENTS.md, (File)" [ref=e1275]:
+                    - cell [ref=e1276]:
+                      - link "AGENTS.md, (File)" [ref=e1283] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/AGENTS.md
+                        - text: AGENTS.md
+                    - cell [ref=e1284]
+                    - cell [ref=e1286]
+                  - row "ARCHITECTURE.md, (File)" [ref=e1289]:
+                    - cell [ref=e1290]:
+                      - link "ARCHITECTURE.md, (File)" [ref=e1297] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/ARCHITECTURE.md
+                        - text: ARCHITECTURE.md
+                    - cell [ref=e1298]
+                    - cell [ref=e1300]
+                  - row "BROWSER.md, (File)" [ref=e1303]:
+                    - cell [ref=e1304]:
+                      - link "BROWSER.md, (File)" [ref=e1311] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/BROWSER.md
+                        - text: BROWSER.md
+                    - cell [ref=e1312]
+                    - cell [ref=e1314]
+                  - row "CHANGELOG.md, (File)" [ref=e1317]:
+                    - cell [ref=e1318]:
+                      - link "CHANGELOG.md, (File)" [ref=e1325] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/CHANGELOG.md
+                        - text: CHANGELOG.md
+                    - cell [ref=e1326]
+                    - cell [ref=e1328]
+                  - row "CLAUDE.md, (File)" [ref=e1331]:
+                    - cell [ref=e1332]:
+                      - link "CLAUDE.md, (File)" [ref=e1339] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/CLAUDE.md
+                        - text: CLAUDE.md
+                    - cell [ref=e1340]
+                    - cell [ref=e1342]
+                  - row "CONTRIBUTING.md, (File)" [ref=e1345]:
+                    - cell [ref=e1346]:
+                      - link "CONTRIBUTING.md, (File)" [ref=e1353] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/CONTRIBUTING.md
+                        - text: CONTRIBUTING.md
+                    - cell [ref=e1354]
+                    - cell [ref=e1356]
+                  - row "DESIGN.md, (File)" [ref=e1359]:
+                    - cell [ref=e1360]:
+                      - link "DESIGN.md, (File)" [ref=e1367] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/DESIGN.md
+                        - text: DESIGN.md
+                    - cell [ref=e1368]
+                    - cell [ref=e1370]
+                  - row "ETHOS.md, (File)" [ref=e1373]:
+                    - cell [ref=e1374]:
+                      - link "ETHOS.md, (File)" [ref=e1381] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/ETHOS.md
+                        - text: ETHOS.md
+                    - cell [ref=e1382]
+                    - cell [ref=e1384]
+                  - row "LICENSE, (File)" [ref=e1387]:
+                    - cell [ref=e1388]:
+                      - link "LICENSE, (File)" [ref=e1395] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/LICENSE
+                        - text: LICENSE
+                    - cell [ref=e1396]
+                    - cell [ref=e1398]
+                  - row "README.md, (File)" [ref=e1401]:
+                    - cell [ref=e1402]:
+                      - link "README.md, (File)" [ref=e1409] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/README.md
+                        - text: README.md
+                    - cell [ref=e1410]
+                    - cell [ref=e1412]
+                  - row "SKILL.md, (File)" [ref=e1415]:
+                    - cell [ref=e1416]:
+                      - link "SKILL.md, (File)" [ref=e1423] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/SKILL.md
+                        - text: SKILL.md
+                    - cell [ref=e1424]
+                    - cell [ref=e1426]
+                  - row "SKILL.md.tmpl, (File)" [ref=e1429]:
+                    - cell [ref=e1430]:
+                      - link "SKILL.md.tmpl, (File)" [ref=e1437] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/SKILL.md.tmpl
+                        - text: SKILL.md.tmpl
+                    - cell [ref=e1438]
+                    - cell [ref=e1440]
+                  - row "TODOS.md, (File)" [ref=e1443]:
+                    - cell [ref=e1444]:
+                      - link "TODOS.md, (File)" [ref=e1451] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/TODOS.md
+                        - text: TODOS.md
+                    - cell [ref=e1452]
+                    - cell [ref=e1454]
+                  - row "USING_GBRAIN_WITH_GSTACK.md, (File)" [ref=e1457]:
+                    - cell [ref=e1458]:
+                      - link "USING_GBRAIN_WITH_GSTACK.md, (File)" [ref=e1465] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/USING_GBRAIN_WITH_GSTACK.md
+                        - text: USING_GBRAIN_WITH_GSTACK.md
+                    - cell [ref=e1466]
+                    - cell [ref=e1468]
+                  - row "VERSION, (File)" [ref=e1471]:
+                    - cell [ref=e1472]:
+                      - link "VERSION, (File)" [ref=e1479] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/VERSION
+                        - text: VERSION
+                    - cell [ref=e1480]
+                    - cell [ref=e1482]
+                  - row "bun.lock, (File)" [ref=e1485]:
+                    - cell [ref=e1486]:
+                      - link "bun.lock, (File)" [ref=e1493] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/bun.lock
+                        - text: bun.lock
+                    - cell [ref=e1494]
+                    - cell [ref=e1496]
+                  - row "bunfig.toml, (File)" [ref=e1499]:
+                    - cell [ref=e1500]:
+                      - link "bunfig.toml, (File)" [ref=e1507] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/bunfig.toml
+                        - text: bunfig.toml
+                    - cell [ref=e1508]
+                    - cell [ref=e1510]
+                  - row "conductor.json, (File)" [ref=e1513]:
+                    - cell [ref=e1514]:
+                      - link "conductor.json, (File)" [ref=e1521] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/conductor.json
+                        - text: conductor.json
+                    - cell [ref=e1522]
+                    - cell [ref=e1524]
+                  - row "connect-chrome, (Symlink to directory)" [ref=e1527]:
+                    - cell [ref=e1528]:
+                      - link "connect-chrome, (Symlink to directory)" [ref=e1535] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/connect-chrome
+                        - text: connect-chrome
+                    - cell [ref=e1536]
+                    - cell [ref=e1538]
+                  - row "package.json, (File)" [ref=e1541]:
+                    - cell [ref=e1542]:
+                      - link "package.json, (File)" [ref=e1549] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/package.json
+                        - text: package.json
+                    - cell [ref=e1550]
+                    - cell [ref=e1552]
+                  - row "setup, (File)" [ref=e1555]:
+                    - cell [ref=e1556]:
+                      - link "setup, (File)" [ref=e1563] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/setup
+                        - text: setup
+                    - cell [ref=e1564]
+                    - cell [ref=e1566]
+                  - row "slop-scan.config.json, (File)" [ref=e1569]:
+                    - cell [ref=e1570]:
+                      - link "slop-scan.config.json, (File)" [ref=e1577] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/slop-scan.config.json
+                        - text: slop-scan.config.json
+                    - cell [ref=e1578]
+                    - cell [ref=e1580]
+                  - row "test-setup.ts, (File)" [ref=e1583]:
+                    - cell [ref=e1584]:
+                      - link "test-setup.ts, (File)" [ref=e1591] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/test-setup.ts
+                        - text: test-setup.ts
+                    - cell [ref=e1592]
+                    - cell [ref=e1594]
+            - generic [ref=e1598]:
+              - generic [ref=e1599]:
+                - heading "Repository files navigation" [level=2] [ref=e1600]
+                - navigation "Repository files" [ref=e1601]:
+                  - list [ref=e1602]:
+                    - listitem [ref=e1603]:
+                      - link "README" [ref=e1604] [cursor=pointer]:
+                        - /url: "#"
+                    - listitem [ref=e1606]:
+                      - link "Contributing" [ref=e1607] [cursor=pointer]:
+                        - /url: "#"
+                    - listitem [ref=e1609]:
+                      - link "MIT license" [ref=e1610] [cursor=pointer]:
+                        - /url: "#"
+                - button "Outline" [ref=e1612] [cursor=pointer]
+              - article [ref=e1616]:
+                - generic [ref=e1617]:
+                  - heading "gstack" [level=1] [ref=e1618]
+                  - 'link "Permalink: gstack" [ref=e1619] [cursor=pointer]':
+                    - /url: "#gstack"
+                - blockquote [ref=e1622]:
+                  - paragraph [ref=e1623]:
+                    - text: "\"I don't think I've typed like a line of code probably since December, basically, which is an extremely large change.\" —"
+                    - link "Andrej Karpathy" [ref=e1624] [cursor=pointer]:
+                      - /url: https://fortune.com/2026/03/21/andrej-karpathy-openai-cofounder-ai-agents-coding-state-of-psychosis-openclaw/
+                    - text: ", No Priors podcast, March 2026"
+                - paragraph [ref=e1625]:
+                  - text: When I heard Karpathy say this, I wanted to find out how. How does one person ship like a team of twenty? Peter Steinberger built
+                  - link "OpenClaw" [ref=e1626] [cursor=pointer]:
+                    - /url: https://github.com/openclaw/openclaw
+                  - text: — 247K GitHub stars — essentially solo with AI agents. The revolution is here. A single builder with the right tooling can move faster than a traditional team.
+                - paragraph [ref=e1627]:
+                  - text: I'm
+                  - link "Garry Tan" [ref=e1628] [cursor=pointer]:
+                    - /url: https://x.com/garrytan
+                  - text: ", President & CEO of"
+                  - link "Y Combinator" [ref=e1629] [cursor=pointer]:
+                    - /url: https://www.ycombinator.com/
+                  - text: . I've worked with thousands of startups — Coinbase, Instacart, Rippling — when they were one or two people in a garage. Before YC, I was one of the first eng/PM/designers at Palantir, cofounded Posterous (sold to Twitter), and built Bookface, YC's internal social network.
+                - paragraph [ref=e1630]:
+                  - strong [ref=e1631]: gstack is my answer.
+                  - text: "I've been building products for twenty years, and right now I'm shipping more products than I ever have. In the last 60 days: 3 production services, 40+ shipped features, part-time, while running YC full-time. On logical code change — not raw LOC, which AI inflates — my 2026 run rate is"
+                  - strong [ref=e1632]: ~810× my 2013 pace
+                  - text: (11,417 vs 14 logical lines/day). Year-to-date (through April 18), 2026 has already produced
+                  - strong [ref=e1633]: 240× the entire 2013 year
+                  - text: . Measured across 40 public + private
+                  - code [ref=e1634]: garrytan/*
+                  - text: repos including Bookface, after excluding one demo repo. AI wrote most of it. The point isn't who typed it, it's what shipped.
+                - blockquote [ref=e1635]:
+                  - paragraph [ref=e1636]:
+                    - text: "The LOC critics aren't wrong that raw line counts inflate with AI. They are wrong that normalized-for-inflation, I'm less productive. I'm more productive, by a lot. Full methodology, caveats, and reproduction script:"
+                    - strong [ref=e1637]:
+                      - link "On the LOC Controversy" [ref=e1638] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/docs/ON_THE_LOC_CONTROVERSY.md
+                    - text: .
+                - paragraph [ref=e1639]:
+                  - strong [ref=e1640]: "2026 — 1,237 contributions and counting:"
+                - paragraph [ref=e1641]:
+                  - link [ref=e1642] [cursor=pointer]:
+                    - /url: /garrytan/gstack/blob/main/docs/images/github-2026.png
+                    - img "GitHub contributions 2026 — 1,237 contributions, massive acceleration in Jan-Mar" [ref=e1643]
+                - paragraph [ref=e1644]:
+                  - strong [ref=e1645]: "2013 — when I built Bookface at YC (772 contributions):"
+                - paragraph [ref=e1646]:
+                  - link [ref=e1647] [cursor=pointer]:
+                    - /url: /garrytan/gstack/blob/main/docs/images/github-2013.png
+                    - img "GitHub contributions 2013 — 772 contributions building Bookface at YC" [ref=e1648]
+                - paragraph [ref=e1649]: Same person. Different era. The difference is the tooling.
+                - paragraph [ref=e1650]:
+                  - strong [ref=e1651]: gstack is how I do it.
+                  - text: It turns Claude Code into a virtual engineering team — a CEO who rethinks the product, an eng manager who locks architecture, a designer who catches AI slop, a reviewer who finds production bugs, a QA lead who opens a real browser, a security officer who runs OWASP + STRIDE audits, and a release engineer who ships the PR. Twenty-three specialists and eight power tools, all slash commands, all Markdown, all free, MIT license.
+                - paragraph [ref=e1652]: This is my open source software factory. I use it every day. I'm sharing it because these tools should be available to everyone.
+                - paragraph [ref=e1653]: Fork it. Improve it. Make it yours. And if you want to hate on free open source software — you're welcome to, but I'd rather you just try it first.
+                - paragraph [ref=e1654]:
+                  - strong [ref=e1655]: "Who this is for:"
+                - list [ref=e1656]:
+                  - listitem [ref=e1657]:
+                    - strong [ref=e1658]: Founders and CEOs
+                    - text: — especially technical ones who still want to ship
+                  - listitem [ref=e1659]:
+                    - strong [ref=e1660]: First-time Claude Code users
+                    - text: — structured roles instead of a blank prompt
+                  - listitem [ref=e1661]:
+                    - strong [ref=e1662]: Tech leads and staff engineers
+                    - text: — rigorous review, QA, and release automation on every PR
+                - generic [ref=e1663]:
+                  - heading "Quick start" [level=2] [ref=e1664]
+                  - 'link "Permalink: Quick start" [ref=e1665] [cursor=pointer]':
+                    - /url: "#quick-start"
+                - list [ref=e1668]:
+                  - listitem [ref=e1669]: Install gstack (30 seconds — see below)
+                  - listitem [ref=e1670]:
+                    - text: Run
+                    - code [ref=e1671]: /office-hours
+                    - text: — describe what you're building
+                  - listitem [ref=e1672]:
+                    - text: Run
+                    - code [ref=e1673]: /plan-ceo-review
+                    - text: on any feature idea
+                  - listitem [ref=e1674]:
+                    - text: Run
+                    - code [ref=e1675]: /review
+                    - text: on any branch with changes
+                  - listitem [ref=e1676]:
+                    - text: Run
+                    - code [ref=e1677]: /qa
+                    - text: on your staging URL
+                  - listitem [ref=e1678]: Stop there. You'll know if this is for you.
+                - generic [ref=e1679]:
+                  - heading "Install — 30 seconds" [level=2] [ref=e1680]
+                  - 'link "Permalink: Install — 30 seconds" [ref=e1681] [cursor=pointer]':
+                    - /url: "#install--30-seconds"
+                - paragraph [ref=e1684]:
+                  - strong [ref=e1685]: "Requirements:"
+                  - link "Claude Code" [ref=e1686] [cursor=pointer]:
+                    - /url: https://docs.anthropic.com/en/docs/claude-code
+                  - text: ","
+                  - link "Git" [ref=e1687] [cursor=pointer]:
+                    - /url: https://git-scm.com/
+                  - text: ","
+                  - link "Bun" [ref=e1688] [cursor=pointer]:
+                    - /url: https://bun.sh/
+                  - text: v1.0+,
+                  - link "Node.js" [ref=e1689] [cursor=pointer]:
+                    - /url: https://nodejs.org/
+                  - text: (Windows only)
+                - generic [ref=e1690]:
+                  - 'heading "Step 1: Install on your machine" [level=3] [ref=e1691]'
+                  - 'link "Permalink: Step 1: Install on your machine" [ref=e1692] [cursor=pointer]':
+                    - /url: "#step-1-install-on-your-machine"
+                - paragraph [ref=e1695]: Open Claude Code and paste this. Claude does the rest.
+                - blockquote [ref=e1696]:
+                  - paragraph [ref=e1697]:
+                    - text: "Install gstack: run"
+                    - strong [ref=e1698]:
+                      - code [ref=e1699]: git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git ~/.claude/skills/gstack && cd ~/.claude/skills/gstack && ./setup
+                    - text: "then add a \"gstack\" section to CLAUDE.md that says to use the /browse skill from gstack for all web browsing, never use mcp__claude-in-chrome__* tools, and lists the available skills: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-design-review, /design-consultation, /design-shotgun, /design-html, /review, /ship, /land-and-deploy, /canary, /benchmark, /browse, /connect-chrome, /qa, /qa-only, /design-review, /setup-browser-cookies, /setup-deploy, /setup-gbrain, /retro, /investigate, /document-release, /document-generate, /codex, /cso, /autoplan, /plan-devex-review, /devex-review, /careful, /freeze, /guard, /unfreeze, /gstack-upgrade, /learn. Then ask the user if they also want to add gstack to the current project so teammates get it."
+                - generic [ref=e1700]:
+                  - 'heading "Step 2: Team mode — auto-update for shared repos (recommended)" [level=3] [ref=e1701]'
+                  - 'link "Permalink: Step 2: Team mode — auto-update for shared repos (recommended)" [ref=e1702] [cursor=pointer]':
+                    - /url: "#step-2-team-mode--auto-update-for-shared-repos-recommended"
+                - paragraph [ref=e1705]: "From inside your repo, paste this. Switches you to team mode, bootstraps the repo so teammates get gstack automatically, and commits the change:"
+                - generic [ref=e1706]:
+                  - generic [ref=e1707]:
+                    - text: (cd ~/.claude/skills/gstack && ./setup --team) && ~/.claude/skills/gstack/bin/gstack-team-init required && git add .claude/ CLAUDE.md && git commit -m
+                    - generic [ref=e1708]: "\"require gstack for AI-assisted work\""
+                  - button "Copy code to clipboard" [ref=e1710] [cursor=pointer]
+                - paragraph [ref=e1714]: No vendored files in your repo, no version drift, no manual upgrades. Every Claude Code session starts with a fast auto-update check (throttled to once/hour, network-failure-safe, completely silent).
+                - paragraph [ref=e1715]:
+                  - text: Swap
+                  - code [ref=e1716]: required
+                  - text: for
+                  - code [ref=e1717]: optional
+                  - text: if you'd rather nudge teammates than block them.
+                - generic [ref=e1718]:
+                  - heading "OpenClaw" [level=3] [ref=e1719]
+                  - 'link "Permalink: OpenClaw" [ref=e1720] [cursor=pointer]':
+                    - /url: "#openclaw"
+                - paragraph [ref=e1723]: "OpenClaw spawns Claude Code sessions via ACP, so every gstack skill just works when Claude Code has gstack installed. Paste this to your OpenClaw agent:"
+                - blockquote [ref=e1724]:
+                  - paragraph [ref=e1725]:
+                    - text: "Install gstack: run"
+                    - code [ref=e1726]: git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git ~/.claude/skills/gstack && cd ~/.claude/skills/gstack && ./setup
+                    - text: "to install gstack for Claude Code. Then add a \"Coding Tasks\" section to AGENTS.md that says: when spawning Claude Code sessions for coding work, tell the session to use gstack skills. Include these examples — security audit: \"Load gstack. Run /cso\", code review: \"Load gstack. Run /review\", QA test a URL: \"Load gstack. Run /qa https://...\", build a feature end-to-end: \"Load gstack. Run /autoplan, implement the plan, then run /ship\", plan before building: \"Load gstack. Run /office-hours then /autoplan. Save the plan, don't implement.\""
+                - paragraph [ref=e1727]:
+                  - strong [ref=e1728]: "After setup, just talk to your OpenClaw agent naturally:"
+                - table [ref=e1730]:
+                  - rowgroup [ref=e1731]:
+                    - row [ref=e1732]:
+                      - columnheader "You say" [ref=e1733]
+                      - columnheader "What happens" [ref=e1734]
+                  - rowgroup [ref=e1735]:
+                    - row [ref=e1736]:
+                      - cell "\"Fix the typo in README\"" [ref=e1737]
+                      - cell "Simple — Claude Code session, no gstack needed" [ref=e1738]
+                    - row [ref=e1739]:
+                      - cell "\"Run a security audit on this repo\"" [ref=e1740]
+                      - cell [ref=e1741]:
+                        - text: Spawns Claude Code with
+                        - code [ref=e1742]: Run /cso
+                    - row [ref=e1743]:
+                      - cell "\"Build me a notifications feature\"" [ref=e1744]
+                      - cell "Spawns Claude Code with /autoplan → implement → /ship" [ref=e1745]
+                    - row [ref=e1746]:
+                      - cell "\"Help me plan the v2 API redesign\"" [ref=e1747]
+                      - cell "Spawns Claude Code with /office-hours → /autoplan, saves plan" [ref=e1748]
+                - paragraph [ref=e1749]:
+                  - text: See
+                  - link "docs/OPENCLAW.md" [ref=e1750] [cursor=pointer]:
+                    - /url: /garrytan/gstack/blob/main/docs/OPENCLAW.md
+                  - text: for advanced dispatch routing and the gstack-lite/gstack-full prompt templates.
+                - generic [ref=e1751]:
+                  - heading "Native OpenClaw Skills (via ClawHub)" [level=3] [ref=e1752]
+                  - 'link "Permalink: Native OpenClaw Skills (via ClawHub)" [ref=e1753] [cursor=pointer]':
+                    - /url: "#native-openclaw-skills-via-clawhub"
+                - paragraph [ref=e1756]: "Four methodology skills that work directly in your OpenClaw agent, no Claude Code session needed. Install from ClawHub:"
+                - generic [ref=e1757]:
+                  - code [ref=e1759]: clawhub install gstack-openclaw-office-hours gstack-openclaw-ceo-review gstack-openclaw-investigate gstack-openclaw-retro
+                  - button "Copy code to clipboard" [ref=e1761] [cursor=pointer]
+                - table [ref=e1766]:
+                  - rowgroup [ref=e1767]:
+                    - row [ref=e1768]:
+                      - columnheader "Skill" [ref=e1769]
+                      - columnheader "What it does" [ref=e1770]
+                  - rowgroup [ref=e1771]:
+                    - row [ref=e1772]:
+                      - cell [ref=e1773]:
+                        - code [ref=e1774]: gstack-openclaw-office-hours
+                      - cell "Product interrogation with 6 forcing questions" [ref=e1775]
+                    - row [ref=e1776]:
+                      - cell [ref=e1777]:
+                        - code [ref=e1778]: gstack-openclaw-ceo-review
+                      - cell "Strategic challenge with 4 scope modes" [ref=e1779]
+                    - row [ref=e1780]:
+                      - cell [ref=e1781]:
+                        - code [ref=e1782]: gstack-openclaw-investigate
+                      - cell "Root cause debugging methodology" [ref=e1783]
+                    - row [ref=e1784]:
+                      - cell [ref=e1785]:
+                        - code [ref=e1786]: gstack-openclaw-retro
+                      - cell "Weekly engineering retrospective" [ref=e1787]
+                - paragraph [ref=e1788]: These are conversational skills. Your OpenClaw agent runs them directly via chat.
+                - generic [ref=e1789]:
+                  - heading "Other AI Agents" [level=3] [ref=e1790]
+                  - 'link "Permalink: Other AI Agents" [ref=e1791] [cursor=pointer]':
+                    - /url: "#other-ai-agents"
+                - paragraph [ref=e1794]: "gstack works on 10 AI coding agents, not just Claude. Setup auto-detects which agents you have installed:"
+                - generic [ref=e1795]:
+                  - generic [ref=e1796]: git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git ~/gstack cd ~/gstack && ./setup
+                  - button "Copy code to clipboard" [ref=e1798] [cursor=pointer]
+                - paragraph [ref=e1802]:
+                  - text: Or target a specific agent with
+                  - code [ref=e1803]: ./setup --host <name>
+                  - text: ":"
+                - table [ref=e1805]:
+                  - rowgroup [ref=e1806]:
+                    - row [ref=e1807]:
+                      - columnheader "Agent" [ref=e1808]
+                      - columnheader "Flag" [ref=e1809]
+                      - columnheader "Skills install to" [ref=e1810]
+                  - rowgroup [ref=e1811]:
+                    - row [ref=e1812]:
+                      - cell "OpenAI Codex CLI" [ref=e1813]
+                      - cell [ref=e1814]:
+                        - code [ref=e1815]: "--host codex"
+                      - cell [ref=e1816]:
+                        - code [ref=e1817]: ~/.codex/skills/gstack-*/
+                    - row [ref=e1818]:
+                      - cell "OpenCode" [ref=e1819]
+                      - cell [ref=e1820]:
+                        - code [ref=e1821]: "--host opencode"
+                      - cell [ref=e1822]:
+                        - code [ref=e1823]: ~/.config/opencode/skills/gstack-*/
+                    - row [ref=e1824]:
+                      - cell "Cursor" [ref=e1825]
+                      - cell [ref=e1826]:
+                        - code [ref=e1827]: "--host cursor"
+                      - cell [ref=e1828]:
+                        - code [ref=e1829]: ~/.cursor/skills/gstack-*/
+                    - row [ref=e1830]:
+                      - cell "Factory Droid" [ref=e1831]
+                      - cell [ref=e1832]:
+                        - code [ref=e1833]: "--host factory"
+                      - cell [ref=e1834]:
+                        - code [ref=e1835]: ~/.factory/skills/gstack-*/
+                    - row [ref=e1836]:
+                      - cell "Slate" [ref=e1837]
+                      - cell [ref=e1838]:
+                        - code [ref=e1839]: "--host slate"
+                      - cell [ref=e1840]:
+                        - code [ref=e1841]: ~/.slate/skills/gstack-*/
+                    - row [ref=e1842]:
+                      - cell "Kiro" [ref=e1843]
+                      - cell [ref=e1844]:
+                        - code [ref=e1845]: "--host kiro"
+                      - cell [ref=e1846]:
+                        - code [ref=e1847]: ~/.kiro/skills/gstack-*/
+                    - row [ref=e1848]:
+                      - cell "Hermes" [ref=e1849]
+                      - cell [ref=e1850]:
+                        - code [ref=e1851]: "--host hermes"
+                      - cell [ref=e1852]:
+                        - code [ref=e1853]: ~/.hermes/skills/gstack-*/
+                    - row [ref=e1854]:
+                      - cell "GBrain (mod)" [ref=e1855]
+                      - cell [ref=e1856]:
+                        - code [ref=e1857]: "--host gbrain"
+                      - cell [ref=e1858]:
+                        - code [ref=e1859]: ~/.gbrain/skills/gstack-*/
+                - paragraph [ref=e1860]:
+                  - strong [ref=e1861]: Want to add support for another agent?
+                  - text: See
+                  - link "docs/ADDING_A_HOST.md" [ref=e1862] [cursor=pointer]:
+                    - /url: /garrytan/gstack/blob/main/docs/ADDING_A_HOST.md
+                  - text: . It's one TypeScript config file, zero code changes.
+                - generic [ref=e1863]:
+                  - heading "See it work" [level=2] [ref=e1864]
+                  - 'link "Permalink: See it work" [ref=e1865] [cursor=pointer]':
+                    - /url: "#see-it-work"
+                - generic [ref=e1868]:
+                  - code [ref=e1870]: "You: I want to build a daily briefing app for my calendar. You: /office-hours Claude: [asks about the pain — specific examples, not hypotheticals] You: Multiple Google calendars, events with stale info, wrong locations. Prep takes forever and the results aren't good enough... Claude: I'm going to push back on the framing. You said \"daily briefing app.\" But what you actually described is a personal chief of staff AI. [extracts 5 capabilities you didn't realize you were describing] [challenges 4 premises — you agree, disagree, or adjust] [generates 3 implementation approaches with effort estimates] RECOMMENDATION: Ship the narrowest wedge tomorrow, learn from real usage. The full vision is a 3-month project — start with the daily briefing that actually works. [writes design doc → feeds into downstream skills automatically] You: /plan-ceo-review [reads the design doc, challenges scope, runs 10-section review] You: /plan-eng-review [ASCII diagrams for data flow, state machines, error paths] [test matrix, failure modes, security concerns] You: Approve plan. Exit plan mode. [writes 2,400 lines across 11 files. ~8 minutes.] You: /review [AUTO-FIXED] 2 issues. [ASK] Race condition → you approve fix. You: /qa https://staging.myapp.com [opens real browser, clicks through flows, finds and fixes a bug] You: /ship Tests: 42 → 51 (+9 new). PR: github.com/you/app/pull/42"
+                  - button "Copy code to clipboard" [ref=e1872] [cursor=pointer]
+                - paragraph [ref=e1876]: You said "daily briefing app." The agent said "you're building a chief of staff AI" — because it listened to your pain, not your feature request. Eight commands, end to end. That is not a copilot. That is a team.
+                - generic [ref=e1877]:
+                  - heading "The sprint" [level=2] [ref=e1878]
+                  - 'link "Permalink: The sprint" [ref=e1879] [cursor=pointer]':
+                    - /url: "#the-sprint"
+                - paragraph [ref=e1882]: "gstack is a process, not a collection of tools. The skills run in the order a sprint runs:"
+                - paragraph [ref=e1883]:
+                  - strong [ref=e1884]: Think → Plan → Build → Review → Test → Ship → Reflect
+                - paragraph [ref=e1885]:
+                  - text: Each skill feeds into the next.
+                  - code [ref=e1886]: /office-hours
+                  - text: writes a design doc that
+                  - code [ref=e1887]: /plan-ceo-review
+                  - text: reads.
+                  - code [ref=e1888]: /plan-eng-review
+                  - text: writes a test plan that
+                  - code [ref=e1889]: /qa
+                  - text: picks up.
+                  - code [ref=e1890]: /review
+                  - text: catches bugs that
+                  - code [ref=e1891]: /ship
+                  - text: verifies are fixed. Nothing falls through the cracks because every step knows what came before it.
+                - table [ref=e1893]:
+                  - rowgroup [ref=e1894]:
+                    - row [ref=e1895]:
+                      - columnheader "Skill" [ref=e1896]
+                      - columnheader "Your specialist" [ref=e1897]
+                      - columnheader "What they do" [ref=e1898]
+                  - rowgroup [ref=e1899]:
+                    - row [ref=e1900]:
+                      - cell [ref=e1901]:
+                        - code [ref=e1902]: /office-hours
+                      - cell [ref=e1903]:
+                        - strong [ref=e1904]: YC Office Hours
+                      - cell "Start here. Six forcing questions that reframe your product before you write code. Pushes back on your framing, challenges premises, generates implementation alternatives. Design doc feeds into every downstream skill." [ref=e1905]
+                    - row [ref=e1906]:
+                      - cell [ref=e1907]:
+                        - code [ref=e1908]: /plan-ceo-review
+                      - cell [ref=e1909]:
+                        - strong [ref=e1910]: CEO / Founder
+                      - 'cell "Rethink the problem. Find the 10-star product hiding inside the request. Four modes: Expansion, Selective Expansion, Hold Scope, Reduction." [ref=e1911]'
+                    - row [ref=e1912]:
+                      - cell [ref=e1913]:
+                        - code [ref=e1914]: /plan-eng-review
+                      - cell [ref=e1915]:
+                        - strong [ref=e1916]: Eng Manager
+                      - cell "Lock in architecture, data flow, diagrams, edge cases, and tests. Forces hidden assumptions into the open." [ref=e1917]
+                    - row [ref=e1918]:
+                      - cell [ref=e1919]:
+                        - code [ref=e1920]: /plan-design-review
+                      - cell [ref=e1921]:
+                        - strong [ref=e1922]: Senior Designer
+                      - cell "Rates each design dimension 0-10, explains what a 10 looks like, then edits the plan to get there. AI Slop detection. Interactive — one AskUserQuestion per design choice." [ref=e1923]
+                    - row [ref=e1924]:
+                      - cell [ref=e1925]:
+                        - code [ref=e1926]: /plan-devex-review
+                      - cell [ref=e1927]:
+                        - strong [ref=e1928]: Developer Experience Lead
+                      - 'cell "Interactive DX review: explores developer personas, benchmarks against competitors'' TTHW, designs your magical moment, traces friction points step by step. Three modes: DX EXPANSION, DX POLISH, DX TRIAGE. 20-45 forcing questions." [ref=e1929]'
+                    - row [ref=e1930]:
+                      - cell [ref=e1931]:
+                        - code [ref=e1932]: /design-consultation
+                      - cell [ref=e1933]:
+                        - strong [ref=e1934]: Design Partner
+                      - cell "Build a complete design system from scratch. Researches the landscape, proposes creative risks, generates realistic product mockups." [ref=e1935]
+                    - row [ref=e1936]:
+                      - cell [ref=e1937]:
+                        - code [ref=e1938]: /review
+                      - cell [ref=e1939]:
+                        - strong [ref=e1940]: Staff Engineer
+                      - cell "Find the bugs that pass CI but blow up in production. Auto-fixes the obvious ones. Flags completeness gaps." [ref=e1941]
+                    - row [ref=e1942]:
+                      - cell [ref=e1943]:
+                        - code [ref=e1944]: /investigate
+                      - cell [ref=e1945]:
+                        - strong [ref=e1946]: Debugger
+                      - 'cell "Systematic root-cause debugging. Iron Law: no fixes without investigation. Traces data flow, tests hypotheses, stops after 3 failed fixes." [ref=e1947]'
+                    - row [ref=e1948]:
+                      - cell [ref=e1949]:
+                        - code [ref=e1950]: /design-review
+                      - cell [ref=e1951]:
+                        - strong [ref=e1952]: Designer Who Codes
+                      - cell "Same audit as /plan-design-review, then fixes what it finds. Atomic commits, before/after screenshots." [ref=e1953]
+                    - row [ref=e1954]:
+                      - cell [ref=e1955]:
+                        - code [ref=e1956]: /devex-review
+                      - cell [ref=e1957]:
+                        - strong [ref=e1958]: DX Tester
+                      - cell [ref=e1959]:
+                        - text: "Live developer experience audit. Actually tests your onboarding: navigates docs, tries the getting started flow, times TTHW, screenshots errors. Compares against"
+                        - code [ref=e1960]: /plan-devex-review
+                        - text: scores — the boomerang that shows if your plan matched reality.
+                    - row [ref=e1961]:
+                      - cell [ref=e1962]:
+                        - code [ref=e1963]: /design-shotgun
+                      - cell [ref=e1964]:
+                        - strong [ref=e1965]: Design Explorer
+                      - cell [ref=e1966]:
+                        - text: "\"Show me options.\" Generates 4-6 AI mockup variants, opens a comparison board in your browser, collects your feedback, and iterates. Taste memory learns what you like. Repeat until you love something, then hand it to"
+                        - code [ref=e1967]: /design-html
+                        - text: .
+                    - row [ref=e1968]:
+                      - cell [ref=e1969]:
+                        - code [ref=e1970]: /design-html
+                      - cell [ref=e1971]:
+                        - strong [ref=e1972]: Design Engineer
+                      - 'cell "Turn a mockup into production HTML that actually works. Pretext computed layout: text reflows, heights adjust, layouts are dynamic. 30KB, zero deps. Detects React/Svelte/Vue. Smart API routing per design type (landing page vs dashboard vs form). The output is shippable, not a demo." [ref=e1973]'
+                    - row [ref=e1974]:
+                      - cell [ref=e1975]:
+                        - code [ref=e1976]: /qa
+                      - cell [ref=e1977]:
+                        - strong [ref=e1978]: QA Lead
+                      - cell "Test your app, find bugs, fix them with atomic commits, re-verify. Auto-generates regression tests for every fix." [ref=e1979]
+                    - row [ref=e1980]:
+                      - cell [ref=e1981]:
+                        - code [ref=e1982]: /qa-only
+                      - cell [ref=e1983]:
+                        - strong [ref=e1984]: QA Reporter
+                      - cell "Same methodology as /qa but report only. Pure bug report without code changes." [ref=e1985]
+                    - row [ref=e1986]:
+                      - cell [ref=e1987]:
+                        - code [ref=e1988]: /pair-agent
+                      - cell [ref=e1989]:
+                        - strong [ref=e1990]: Multi-Agent Coordinator
+                      - cell "Share your browser with any AI agent. One command, one paste, connected. Works with OpenClaw, Hermes, Codex, Cursor, or anything that can curl. Each agent gets its own tab. Auto-launches headed mode so you watch everything. Auto-starts ngrok tunnel for remote agents. Scoped tokens, tab isolation, rate limiting, activity attribution." [ref=e1991]
+                    - row [ref=e1992]:
+                      - cell [ref=e1993]:
+                        - code [ref=e1994]: /cso
+                      - cell [ref=e1995]:
+                        - strong [ref=e1996]: Chief Security Officer
+                      - 'cell "OWASP Top 10 + STRIDE threat model. Zero-noise: 17 false positive exclusions, 8/10+ confidence gate, independent finding verification. Each finding includes a concrete exploit scenario." [ref=e1997]'
+                    - row [ref=e1998]:
+                      - cell [ref=e1999]:
+                        - code [ref=e2000]: /ship
+                      - cell [ref=e2001]:
+                        - strong [ref=e2002]: Release Engineer
+                      - cell "Sync main, run tests, audit coverage, push, open PR. Bootstraps test frameworks if you don't have one." [ref=e2003]
+                    - row [ref=e2004]:
+                      - cell [ref=e2005]:
+                        - code [ref=e2006]: /land-and-deploy
+                      - cell [ref=e2007]:
+                        - strong [ref=e2008]: Release Engineer
+                      - cell "Merge the PR, wait for CI and deploy, verify production health. One command from \"approved\" to \"verified in production.\"" [ref=e2009]
+                    - row [ref=e2010]:
+                      - cell [ref=e2011]:
+                        - code [ref=e2012]: /canary
+                      - cell [ref=e2013]:
+                        - strong [ref=e2014]: SRE
+                      - cell "Post-deploy monitoring loop. Watches for console errors, performance regressions, and page failures." [ref=e2015]
+                    - row [ref=e2016]:
+                      - cell [ref=e2017]:
+                        - code [ref=e2018]: /benchmark
+                      - cell [ref=e2019]:
+                        - strong [ref=e2020]: Performance Engineer
+                      - cell "Baseline page load times, Core Web Vitals, and resource sizes. Compare before/after on every PR." [ref=e2021]
+                    - row [ref=e2022]:
+                      - cell [ref=e2023]:
+                        - code [ref=e2024]: /document-release
+                      - cell [ref=e2025]:
+                        - strong [ref=e2026]: Technical Writer
+                      - cell "Update all project docs to match what you just shipped. Catches stale READMEs automatically. Builds a Diataxis coverage map (reference / how-to / tutorial / explanation) so gaps are visible in the PR body." [ref=e2027]
+                    - row [ref=e2028]:
+                      - cell [ref=e2029]:
+                        - code [ref=e2030]: /document-generate
+                      - cell [ref=e2031]:
+                        - strong [ref=e2032]: Documentation Author
+                      - cell [ref=e2033]:
+                        - text: Generate missing docs from scratch using the Diataxis framework. Researches the codebase first, then writes reference / how-to / tutorial / explanation docs that actually match the code. Invokable standalone or chained from
+                        - code [ref=e2034]: /document-release
+                        - text: "when the coverage map finds gaps. Learn more:"
+                        - link "tutorial" [ref=e2035] [cursor=pointer]:
+                          - /url: /garrytan/gstack/blob/main/docs/tutorial-document-generate.md
+                        - text: •
+                        - link "how-to" [ref=e2036] [cursor=pointer]:
+                          - /url: /garrytan/gstack/blob/main/docs/howto-document-a-shipped-feature.md
+                        - text: •
+                        - link "why Diataxis" [ref=e2037] [cursor=pointer]:
+                          - /url: /garrytan/gstack/blob/main/docs/explanation-diataxis-in-gstack.md
+                        - text: .
+                    - row [ref=e2038]:
+                      - cell [ref=e2039]:
+                        - code [ref=e2040]: /retro
+                      - cell [ref=e2041]:
+                        - strong [ref=e2042]: Eng Manager
+                      - cell [ref=e2043]:
+                        - text: Team-aware weekly retro. Per-person breakdowns, shipping streaks, test health trends, growth opportunities.
+                        - code [ref=e2044]: /retro global
+                        - text: runs across all your projects and AI tools (Claude Code, Codex, Gemini).
+                    - row [ref=e2045]:
+                      - cell [ref=e2046]:
+                        - code [ref=e2047]: /browse
+                      - cell [ref=e2048]:
+                        - strong [ref=e2049]: QA Engineer
+                      - cell [ref=e2050]:
+                        - text: Give the agent eyes. Real Chromium browser, real clicks, real screenshots. ~100ms per command.
+                        - code [ref=e2051]: /open-gstack-browser
+                        - text: launches GStack Browser with sidebar, anti-bot stealth, and auto model routing.
+                    - row [ref=e2052]:
+                      - cell [ref=e2053]:
+                        - code [ref=e2054]: /setup-browser-cookies
+                      - cell [ref=e2055]:
+                        - strong [ref=e2056]: Session Manager
+                      - cell "Import cookies from your real browser (Chrome, Arc, Brave, Edge) into the headless session. Test authenticated pages." [ref=e2057]
+                    - row [ref=e2058]:
+                      - cell [ref=e2059]:
+                        - code [ref=e2060]: /autoplan
+                      - cell [ref=e2061]:
+                        - strong [ref=e2062]: Review Pipeline
+                      - cell "One command, fully reviewed plan. Runs CEO → design → eng review automatically with encoded decision principles. Surfaces only taste decisions for your approval." [ref=e2063]
+                    - row [ref=e2064]:
+                      - cell [ref=e2065]:
+                        - code [ref=e2066]: /spec
+                      - cell [ref=e2067]:
+                        - strong [ref=e2068]: Spec Author
+                      - cell [ref=e2069]:
+                        - text: Turn vague intent into a precise, executable spec in five phases (why, scope, technical with mandatory code-reading, draft, file). Codex quality gate before file (blocks below 7/10), fail-closed secret redaction, dedupe against existing issues, archive to
+                        - code [ref=e2070]: $GSTACK_STATE_ROOT/projects/$SLUG/specs/
+                        - text: for team-corpus recall.
+                        - code [ref=e2071]: "--execute"
+                        - text: spawns
+                        - code [ref=e2072]: claude -p
+                        - text: in a fresh worktree;
+                        - code [ref=e2073]: /ship
+                        - text: auto-closes the source issue on merge. Plan-mode aware.
+                    - row [ref=e2074]:
+                      - cell [ref=e2075]:
+                        - code [ref=e2076]: /learn
+                      - cell [ref=e2077]:
+                        - strong [ref=e2078]: Memory
+                      - cell "Manage what gstack learned across sessions. Review, search, prune, and export project-specific patterns, pitfalls, and preferences. Learnings compound across sessions so gstack gets smarter on your codebase over time." [ref=e2079]
+                    - row [ref=e2080]:
+                      - cell [ref=e2081]:
+                        - code [ref=e2082]: /make-pdf
+                      - cell [ref=e2083]:
+                        - strong [ref=e2084]: Publisher
+                      - cell [ref=e2085]:
+                        - text: Markdown in, publication-quality document out. Mermaid and excalidraw fences render as vector diagrams, fully offline. Images scale to the page and never truncate; wide diagrams get their own landscape page.
+                        - code [ref=e2086]: "--to html"
+                        - text: emits one self-contained file,
+                        - code [ref=e2087]: "--to docx"
+                        - text: a Word doc.
+                    - row [ref=e2088]:
+                      - cell [ref=e2089]:
+                        - code [ref=e2090]: /diagram
+                      - cell [ref=e2091]:
+                        - strong [ref=e2092]: Diagram Maker
+                      - cell [ref=e2093]:
+                        - text: "English in, editable diagram out. Emits a triplet: mermaid source,"
+                        - code [ref=e2094]: .excalidraw
+                        - text: you can open and edit on excalidraw.com (hand-drawn style), and rendered SVG/PNG. Zero network. Embed the source in markdown and
+                        - code [ref=e2095]: /make-pdf
+                        - text: renders it.
+                - generic [ref=e2096]:
+                  - heading "Which review should I use?" [level=3] [ref=e2097]
+                  - 'link "Permalink: Which review should I use?" [ref=e2098] [cursor=pointer]':
+                    - /url: "#which-review-should-i-use"
+                - table [ref=e2102]:
+                  - rowgroup [ref=e2103]:
+                    - row [ref=e2104]:
+                      - columnheader "Building for..." [ref=e2105]
+                      - columnheader "Plan stage (before code)" [ref=e2106]
+                      - columnheader "Live audit (after shipping)" [ref=e2107]
+                  - rowgroup [ref=e2108]:
+                    - row [ref=e2109]:
+                      - cell [ref=e2110]:
+                        - strong [ref=e2111]: End users
+                        - text: (UI, web app, mobile)
+                      - cell [ref=e2112]:
+                        - code [ref=e2113]: /plan-design-review
+                      - cell [ref=e2114]:
+                        - code [ref=e2115]: /design-review
+                    - row [ref=e2116]:
+                      - cell [ref=e2117]:
+                        - strong [ref=e2118]: Developers
+                        - text: (API, CLI, SDK, docs)
+                      - cell [ref=e2119]:
+                        - code [ref=e2120]: /plan-devex-review
+                      - cell [ref=e2121]:
+                        - code [ref=e2122]: /devex-review
+                    - row [ref=e2123]:
+                      - cell [ref=e2124]:
+                        - strong [ref=e2125]: Architecture
+                        - text: (data flow, perf, tests)
+                      - cell [ref=e2126]:
+                        - code [ref=e2127]: /plan-eng-review
+                      - cell [ref=e2128]:
+                        - code [ref=e2129]: /review
+                    - row [ref=e2130]:
+                      - cell [ref=e2131]:
+                        - strong [ref=e2132]: All of the above
+                      - cell [ref=e2133]:
+                        - code [ref=e2134]: /autoplan
+                        - text: (runs CEO → design → eng → DX, auto-detects which apply)
+                      - cell "—" [ref=e2135]
+                - generic [ref=e2136]:
+                  - heading "Power tools" [level=3] [ref=e2137]
+                  - 'link "Permalink: Power tools" [ref=e2138] [cursor=pointer]':
+                    - /url: "#power-tools"
+                - table [ref=e2142]:
+                  - rowgroup [ref=e2143]:
+                    - row [ref=e2144]:
+                      - columnheader "Skill" [ref=e2145]
+                      - columnheader "What it does" [ref=e2146]
+                  - rowgroup [ref=e2147]:
+                    - row [ref=e2148]:
+                      - cell [ref=e2149]:
+                        - code [ref=e2150]: /codex
+                      - cell [ref=e2151]:
+                        - strong [ref=e2152]: Second Opinion
+                        - text: "— independent code review from OpenAI Codex CLI. Three modes: review (pass/fail gate), adversarial challenge, and open consultation. Cross-model analysis when both"
+                        - code [ref=e2153]: /review
+                        - text: and
+                        - code [ref=e2154]: /codex
+                        - text: have run.
+                    - row [ref=e2155]:
+                      - cell [ref=e2156]:
+                        - code [ref=e2157]: /careful
+                      - cell [ref=e2158]:
+                        - strong [ref=e2159]: Safety Guardrails
+                        - text: — warns before destructive commands (rm -rf, DROP TABLE, force-push). Say "be careful" to activate. Override any warning.
+                    - row [ref=e2160]:
+                      - cell [ref=e2161]:
+                        - code [ref=e2162]: /freeze
+                      - cell [ref=e2163]:
+                        - strong [ref=e2164]: Edit Lock
+                        - text: — restrict file edits to one directory. Prevents accidental changes outside scope while debugging.
+                    - row [ref=e2165]:
+                      - cell [ref=e2166]:
+                        - code [ref=e2167]: /guard
+                      - cell [ref=e2168]:
+                        - strong [ref=e2169]: Full Safety
+                        - text: —
+                        - code [ref=e2170]: /careful
+                        - text: +
+                        - code [ref=e2171]: /freeze
+                        - text: in one command. Maximum safety for prod work.
+                    - row [ref=e2172]:
+                      - cell [ref=e2173]:
+                        - code [ref=e2174]: /unfreeze
+                      - cell [ref=e2175]:
+                        - strong [ref=e2176]: Unlock
+                        - text: — remove the
+                        - code [ref=e2177]: /freeze
+                        - text: boundary.
+                    - row [ref=e2178]:
+                      - cell [ref=e2179]:
+                        - code [ref=e2180]: /open-gstack-browser
+                      - cell [ref=e2181]:
+                        - strong [ref=e2182]: GStack Browser
+                        - text: — launch GStack Browser with sidebar, anti-bot stealth, auto model routing (Sonnet for actions, Opus for analysis), one-click cookie import, and Claude Code integration. Clean up pages, take smart screenshots, edit CSS, and pass info back to your terminal.
+                    - row [ref=e2183]:
+                      - cell [ref=e2184]:
+                        - code [ref=e2185]: /setup-deploy
+                      - cell [ref=e2186]:
+                        - strong [ref=e2187]: Deploy Configurator
+                        - text: — one-time setup for
+                        - code [ref=e2188]: /land-and-deploy
+                        - text: . Detects your platform, production URL, and deploy commands.
+                    - row [ref=e2189]:
+                      - cell [ref=e2190]:
+                        - code [ref=e2191]: /setup-gbrain
+                      - cell [ref=e2192]:
+                        - strong [ref=e2193]: GBrain Onboarding
+                        - text: — from zero to running gbrain in under 5 minutes. PGLite local, Supabase existing URL, or auto-provision a new Supabase project via Management API. MCP registration for Claude Code + per-repo trust triad (read-write/read-only/deny).
+                        - link "Full guide" [ref=e2194] [cursor=pointer]:
+                          - /url: /garrytan/gstack/blob/main/USING_GBRAIN_WITH_GSTACK.md
+                        - text: .
+                    - row [ref=e2195]:
+                      - cell [ref=e2196]:
+                        - code [ref=e2197]: /sync-gbrain
+                      - cell [ref=e2198]:
+                        - strong [ref=e2199]: Keep Brain Current
+                        - text: — re-index this repo's code into gbrain via
+                        - code [ref=e2200]: gbrain sources add
+                        - text: +
+                        - code [ref=e2201]: gbrain sync --strategy code
+                        - text: ", refresh the"
+                        - code [ref=e2202]: "## GBrain Search Guidance"
+                        - text: block in CLAUDE.md, and auto-remove guidance when the capability check fails.
+                        - code [ref=e2203]: "--incremental"
+                        - text: (default),
+                        - code [ref=e2204]: "--full"
+                        - text: ","
+                        - code [ref=e2205]: "--dry-run"
+                        - text: . Idempotent; safe to re-run.
+                    - row [ref=e2206]:
+                      - cell [ref=e2207]:
+                        - code [ref=e2208]: /gstack-upgrade
+                      - cell [ref=e2209]:
+                        - strong [ref=e2210]: Self-Updater
+                        - text: — upgrade gstack to latest. Detects global vs vendored install, syncs both, shows what changed.
+                    - row [ref=e2211]:
+                      - cell [ref=e2212]:
+                        - code [ref=e2213]: /ios-qa
+                      - cell [ref=e2214]:
+                        - strong [ref=e2215]: iOS Live-Device QA (v1.43.0.0+)
+                        - text: — drive a real iPhone over USB CoreDevice via an embedded
+                        - code [ref=e2216]: StateServer
+                        - text: in the app. Read Swift source, codegen typed
+                        - code [ref=e2217]: "@Observable"
+                        - text: accessors, run the agent loop. Optional
+                        - code [ref=e2218]: "--tailnet"
+                        - text: flag exposes the device to OpenClaw or any HTTP-capable agent on your Tailscale tailnet so remote agents can run iOS QA without ever touching the hardware. Capability-tier allowlist (observe/interact/mutate/restore), per-device session lock, audit log.
+                    - row [ref=e2219]:
+                      - cell [ref=e2220]:
+                        - code [ref=e2221]: /ios-fix
+                        - text: ","
+                        - code [ref=e2222]: /ios-design-review
+                        - text: ","
+                        - code [ref=e2223]: /ios-clean
+                        - text: ","
+                        - code [ref=e2224]: /ios-sync
+                      - cell [ref=e2225]:
+                        - text: iOS bug-fix loop, designer's-eye HIG audit, debug-bridge cleanup, and accessor resync. See
+                        - code [ref=e2226]: docs/skills.md
+                        - text: ". End-to-end walkthrough:"
+                        - link "docs/howto-ios-testing-with-gstack.md" [ref=e2227] [cursor=pointer]:
+                          - /url: /garrytan/gstack/blob/main/docs/howto-ios-testing-with-gstack.md
+                        - text: .
+                - generic [ref=e2228]:
+                  - heading "Standalone binaries" [level=3] [ref=e2229]
+                  - 'link "Permalink: Standalone binaries" [ref=e2230] [cursor=pointer]':
+                    - /url: "#standalone-binaries"
+                - paragraph [ref=e2233]: "Beyond the slash-command skills, gstack ships standalone CLIs for workflows that don't belong inside a session:"
+                - table [ref=e2235]:
+                  - rowgroup [ref=e2236]:
+                    - row [ref=e2237]:
+                      - columnheader "Command" [ref=e2238]
+                      - columnheader "What it does" [ref=e2239]
+                  - rowgroup [ref=e2240]:
+                    - row [ref=e2241]:
+                      - cell [ref=e2242]:
+                        - code [ref=e2243]: gstack-model-benchmark
+                      - cell [ref=e2244]:
+                        - strong [ref=e2245]: Cross-model benchmark
+                        - text: — run the same prompt through Claude, GPT (via Codex CLI), and Gemini; compare latency, tokens, cost, and (optionally) LLM-judge quality score. Auth detected per provider, unavailable providers skip cleanly. Output as table, JSON, or markdown.
+                        - code [ref=e2246]: "--dry-run"
+                        - text: validates flags + auth without spending API calls.
+                    - row [ref=e2247]:
+                      - cell [ref=e2248]:
+                        - code [ref=e2249]: gstack-taste-update
+                      - cell [ref=e2250]:
+                        - strong [ref=e2251]: Design taste learning
+                        - text: — writes approvals and rejections from
+                        - code [ref=e2252]: /design-shotgun
+                        - text: into a persistent per-project taste profile. Decays 5%/week. Feeds back into future variant generation so the system learns what you actually pick.
+                    - row [ref=e2253]:
+                      - cell [ref=e2254]:
+                        - code [ref=e2255]: gstack-egress
+                      - cell [ref=e2256]:
+                        - strong [ref=e2257]: Egress receipt auditor
+                        - text: — every gstack-initiated off-machine send writes a tamper-evident, hash-chained receipt to
+                        - code [ref=e2258]: ~/.gstack/security/egress.jsonl
+                        - text: before the send.
+                        - code [ref=e2259]: list
+                        - text: shows what gstack attempted to send and to which host,
+                        - code [ref=e2260]: grants
+                        - text: shows the standing consent settings plus the exact command that revokes each,
+                        - code [ref=e2261]: verify
+                        - text: recomputes the hash chain and exits 3 on tamper.
+                    - row [ref=e2262]:
+                      - cell [ref=e2263]:
+                        - code [ref=e2264]: gstack-context-bill
+                      - cell [ref=e2265]:
+                        - strong [ref=e2266]: Token bill-of-materials
+                        - text: "— read-only, offline audit of what an installed skills tree costs in tokens: always-on frontmatter every session pays vs per-invocation SKILL.md + forced references."
+                        - code [ref=e2267]: "--diff"
+                        - text: compares two trees,
+                        - code [ref=e2268]: "--budget"
+                        - text: enforces a ceiling,
+                        - code [ref=e2269]: "--exact"
+                        - text: opts into Anthropic
+                        - code [ref=e2270]: count_tokens
+                        - text: (sends file text off-machine; writes an egress receipt first, degrades to the offline estimate if the receipt can't be written).
+                    - row [ref=e2271]:
+                      - cell [ref=e2272]:
+                        - code [ref=e2273]: gstack-code-intelligence
+                      - cell [ref=e2274]:
+                        - strong [ref=e2275]: Code-intelligence provider picker
+                        - text: "— wraps GBrain, Sourcebot, and Graphify behind one interface:"
+                        - code [ref=e2276]: options
+                        - text: /
+                        - code [ref=e2277]: status
+                        - text: to see what's available,
+                        - code [ref=e2278]: select
+                        - text: to pick one,
+                        - code [ref=e2279]: index
+                        - text: /
+                        - code [ref=e2280]: search
+                        - text: to use it,
+                        - code [ref=e2281]: suggest
+                        - text: to check whether the one-time indexing offer should fire here. The offer triggers on large repos (1,000+ tracked files; a decline is persisted). Non-local providers refuse to index
+                        - emphasis [ref=e2282]: or search
+                        - text: until you record per-repo consent (
+                        - code [ref=e2283]: consent <repo> yes|no
+                        - text: — the query text is repo-derived content), the per-repo trust policy's deny and read-only tiers veto write-class operations regardless of consent, and every off-machine send writes an egress receipt. Fully optional — with nothing selected, gstack falls back to grep.
+                    - row [ref=e2284]:
+                      - cell [ref=e2285]:
+                        - code [ref=e2286]: gstack-verify-gate
+                      - cell [ref=e2287]:
+                        - strong [ref=e2288]: Verification stop hook (opt-in)
+                        - text: "— blocks a Claude Code turn from ending until the project's declared verify command passes (after 3 blocked re-entries it yields with a loud still-RED warning instead of looping forever). Declare it on one line in CLAUDE.md:"
+                        - code [ref=e2289]: "<!-- gstack:verify: bun test -->"
+                        - text: . Hooks bypass the permission system, so a declared command never runs until you trust it once per repo (
+                        - code [ref=e2290]: gstack-verify-gate --trust
+                        - text: ); editing the command invalidates trust until re-granted, and every grant is audit-logged.
+                        - code [ref=e2291]: ./setup
+                        - text: never registers it for you — opt in with
+                        - code [ref=e2292]: gstack-settings-hook add-event --event Stop --command ~/.claude/skills/gstack/bin/gstack-verify-gate --source verify-gate
+                        - text: ", remove with"
+                        - code [ref=e2293]: gstack-settings-hook remove-source --source verify-gate
+                        - text: .
+                    - row [ref=e2294]:
+                      - cell [ref=e2295]:
+                        - code [ref=e2296]: gstack-ios-qa-daemon
+                      - cell [ref=e2297]:
+                        - strong [ref=e2298]: iOS QA daemon
+                        - text: — Mac-side broker between an agent and a connected iPhone over USB CoreDevice. Loopback by default;
+                        - code [ref=e2299]: "--tailnet"
+                        - text: opens a Tailscale-facing listener with identity-gated capability tiers. Single-instance via flock on
+                        - code [ref=e2300]: ~/.gstack/ios-qa-daemon.pid
+                        - text: . See
+                        - link "docs/howto-ios-testing-with-gstack.md" [ref=e2301] [cursor=pointer]:
+                          - /url: /garrytan/gstack/blob/main/docs/howto-ios-testing-with-gstack.md
+                        - text: .
+                    - row [ref=e2302]:
+                      - cell [ref=e2303]:
+                        - code [ref=e2304]: gstack-ios-qa-mint
+                      - cell [ref=e2305]:
+                        - strong [ref=e2306]: iOS allowlist manager
+                        - text: — owner-grant CLI for the tailnet allowlist.
+                        - code [ref=e2307]: grant
+                        - text: /
+                        - code [ref=e2308]: revoke
+                        - text: /
+                        - code [ref=e2309]: list
+                        - text: against
+                        - code [ref=e2310]: ~/.gstack/ios-qa-allowlist.json
+                        - text: (mode 0600). Remote agents never auto-allowlist; this is the explicit-intent path.
+                    - row [ref=e2311]:
+                      - cell [ref=e2312]:
+                        - code [ref=e2313]: gstack-ios-qa-regen
+                      - cell [ref=e2314]:
+                        - strong [ref=e2315]: iOS bridge regenerator
+                        - text: — deterministically installs the canonical DebugBridge package, generates typed state accessors, and records the installed gstack version. Safe to rerun after source changes or upgrades.
+                - generic [ref=e2316]:
+                  - heading "Continuous checkpoint mode (opt-in, local by default)" [level=3] [ref=e2317]
+                  - 'link "Permalink: Continuous checkpoint mode (opt-in, local by default)" [ref=e2318] [cursor=pointer]':
+                    - /url: "#continuous-checkpoint-mode-opt-in-local-by-default"
+                - paragraph [ref=e2321]:
+                  - text: Set
+                  - code [ref=e2322]: gstack-config set checkpoint_mode continuous
+                  - text: and skills auto-commit your work as you go with a
+                  - code [ref=e2323]: "WIP:"
+                  - text: prefix plus a structured
+                  - code [ref=e2324]: "[gstack-context]"
+                  - text: body (decisions, remaining work, failed approaches). Survives crashes and context switches.
+                  - code [ref=e2325]: /context-restore
+                  - text: reads those commits to reconstruct session state.
+                  - code [ref=e2326]: /ship
+                  - text: filter-squashes WIP commits before the PR (preserving non-WIP commits) so bisect stays clean. Push is opt-in via
+                  - code [ref=e2327]: checkpoint_push=true
+                  - text: — default is local-only so you don't trigger CI on every WIP commit.
+                - generic [ref=e2328]:
+                  - heading "Domain skills + raw CDP escape hatch" [level=3] [ref=e2329]
+                  - 'link "Permalink: Domain skills + raw CDP escape hatch" [ref=e2330] [cursor=pointer]':
+                    - /url: "#domain-skills--raw-cdp-escape-hatch"
+                - paragraph [ref=e2333]: "Two new browser primitives compound the gstack agent over time:"
+                - list [ref=e2334]:
+                  - listitem [ref=e2335]:
+                    - strong [ref=e2336]:
+                      - code [ref=e2337]: $B domain-skill save
+                    - text: — agent saves a per-site note (e.g., "LinkedIn's Apply button lives in an iframe") that fires automatically next time it visits that hostname. Quarantined → active after 3 successful uses → optional cross-project promotion via
+                    - code [ref=e2338]: $B domain-skill promote-to-global
+                    - text: . Storage lives alongside
+                    - code [ref=e2339]: /learn
+                    - text: "'s per-project learnings file. Full reference:"
+                    - strong [ref=e2340]:
+                      - link "docs/domain-skills.md" [ref=e2341] [cursor=pointer]:
+                        - /url: /garrytan/gstack/blob/main/docs/domain-skills.md
+                    - text: .
+                  - listitem [ref=e2342]:
+                    - strong [ref=e2343]:
+                      - code [ref=e2344]: $B cdp <Domain.method>
+                    - text: "— raw Chrome DevTools Protocol escape hatch for the rare case curated commands miss. Deny-default: methods must be explicitly added to"
+                    - code [ref=e2345]: browse/src/cdp-allowlist.ts
+                    - text: with a one-line justification. Two-tier mutex serializes browser-scoped CDP calls against per-tab work. Output for data-exfil methods is wrapped in the UNTRUSTED envelope.
+                - blockquote [ref=e2346]:
+                  - paragraph [ref=e2347]:
+                    - text: Want raw CDP with no rails, no allowlist, no daemon — just thin transport from agent to Chrome?
+                    - link "browser-use/browser-harness-js" [ref=e2348] [cursor=pointer]:
+                      - /url: https://github.com/browser-use/browser-harness-js
+                    - text: "is a different philosophy (agent-authored helpers vs gstack's curated commands) and a good fit if you don't want gstack's security stack. The two can coexist: gstack's"
+                    - code [ref=e2349]: $B cdp
+                    - text: and harness can both attach to the same Chrome via Playwright's
+                    - code [ref=e2350]: newCDPSession
+                    - text: .
+                - paragraph [ref=e2351]:
+                  - strong [ref=e2352]:
+                    - link "Deep dives with examples and philosophy for every skill →" [ref=e2353] [cursor=pointer]:
+                      - /url: /garrytan/gstack/blob/main/docs/skills.md
+                - generic [ref=e2354]:
+                  - heading "Karpathy's four failure modes? Already covered." [level=3] [ref=e2355]
+                  - 'link "Permalink: Karpathy''s four failure modes? Already covered." [ref=e2356] [cursor=pointer]':
+                    - /url: "#karpathys-four-failure-modes-already-covered"
+                - paragraph [ref=e2359]:
+                  - text: Andrej Karpathy's
+                  - link "AI coding rules" [ref=e2360] [cursor=pointer]:
+                    - /url: https://github.com/forrestchang/andrej-karpathy-skills
+                  - text: "(17K stars) nail four failure modes: wrong assumptions, overcomplexity, orthogonal edits, imperative over declarative. gstack's workflow skills enforce all four."
+                  - code [ref=e2361]: /office-hours
+                  - text: forces assumptions into the open before code is written. The Confusion Protocol stops Claude from guessing on architectural decisions.
+                  - code [ref=e2362]: /review
+                  - text: catches unnecessary complexity and drive-by edits.
+                  - code [ref=e2363]: /ship
+                  - text: transforms tasks into verifiable goals with test-first execution. If you already use Karpathy-style CLAUDE.md rules, gstack is the workflow enforcement layer that makes them stick across entire sprints, not just single prompts.
+                - generic [ref=e2364]:
+                  - heading "Parallel sprints" [level=2] [ref=e2365]
+                  - 'link "Permalink: Parallel sprints" [ref=e2366] [cursor=pointer]':
+                    - /url: "#parallel-sprints"
+                - paragraph [ref=e2369]: gstack works well with one sprint. It gets interesting with ten running at once.
+                - paragraph [ref=e2370]:
+                  - strong [ref=e2371]: Design is at the heart.
+                  - code [ref=e2372]: /design-consultation
+                  - text: builds your design system from scratch, researches what's out there, proposes creative risks, and writes
+                  - code [ref=e2373]: DESIGN.md
+                  - text: . But the real magic is the shotgun-to-HTML pipeline.
+                - paragraph [ref=e2374]:
+                  - strong [ref=e2375]:
+                    - code [ref=e2376]: /design-shotgun
+                    - text: is how you explore.
+                  - text: You describe what you want. It generates 4-6 AI mockup variants using GPT Image. Then it opens a comparison board in your browser with all variants side by side. You pick favorites, leave feedback ("more whitespace", "bolder headline", "lose the gradient"), and it generates a new round. Repeat until you love something. Taste memory kicks in after a few rounds so it starts biasing toward what you actually like. No more describing your vision in words and hoping the AI gets it. You see options, pick the good ones, and iterate visually.
+                - paragraph [ref=e2377]:
+                  - strong [ref=e2378]:
+                    - code [ref=e2379]: /design-html
+                    - text: makes it real.
+                  - text: Take that approved mockup (from
+                  - code [ref=e2380]: /design-shotgun
+                  - text: ", a CEO plan, a design review, or just a description) and turn it into production-quality HTML/CSS. Not the kind of AI HTML that looks fine at one viewport width and breaks everywhere else. This uses Pretext for computed text layout: text actually reflows on resize, heights adjust to content, layouts are dynamic. 30KB overhead, zero dependencies. It detects your framework (React, Svelte, Vue) and outputs the right format. Smart API routing picks different Pretext patterns depending on whether it's a landing page, dashboard, form, or card layout. The output is something you'd actually ship, not a demo."
+                - paragraph [ref=e2381]:
+                  - strong [ref=e2382]:
+                    - code [ref=e2383]: /qa
+                    - text: was a massive unlock.
+                  - text: It let me go from 6 to 12 parallel workers. Claude Code saying
+                  - emphasis [ref=e2384]: "\"I SEE THE ISSUE\""
+                  - text: and then actually fixing it, generating a regression test, and verifying the fix — that changed how I work. The agent has eyes now.
+                - paragraph [ref=e2385]:
+                  - strong [ref=e2386]: Smart review routing.
+                  - text: "Just like at a well-run startup: CEO doesn't have to look at infra bug fixes, design review isn't needed for backend changes. gstack tracks what reviews are run, figures out what's appropriate, and just does the smart thing. The Review Readiness Dashboard tells you where you stand before you ship."
+                - paragraph [ref=e2387]:
+                  - strong [ref=e2388]: Test everything.
+                  - code [ref=e2389]: /ship
+                  - text: bootstraps test frameworks from scratch if your project doesn't have one. Every
+                  - code [ref=e2390]: /ship
+                  - text: run produces a coverage audit. Every
+                  - code [ref=e2391]: /qa
+                  - text: bug fix generates a regression test. 100% test coverage is the goal — tests make vibe coding safe instead of yolo coding.
+                - paragraph [ref=e2392]:
+                  - strong [ref=e2393]:
+                    - code [ref=e2394]: /document-release
+                    - text: is the engineer you never had.
+                  - text: It reads every doc file in your project, cross-references the diff, and updates everything that drifted. README, ARCHITECTURE, CONTRIBUTING, CLAUDE.md, TODOS — all kept current automatically. And now
+                  - code [ref=e2395]: /ship
+                  - text: auto-invokes it — docs stay current without an extra command.
+                - paragraph [ref=e2396]:
+                  - strong [ref=e2397]: Real browser mode.
+                  - code [ref=e2398]: /open-gstack-browser
+                  - text: launches GStack Browser, an AI-controlled Chromium with anti-bot stealth, custom branding, and the sidebar extension baked in. Sites like Google and NYTimes work without captchas. The menu bar says "GStack Browser" instead of "Chrome for Testing." Your regular Chrome stays untouched. All existing browse commands work unchanged.
+                  - code [ref=e2399]: $B disconnect
+                  - text: returns to headless. The browser stays alive as long as the window is open... no idle timeout killing it while you're working.
+                - paragraph [ref=e2400]:
+                  - strong [ref=e2401]: Sidebar agent — your AI browser assistant.
+                  - text: "Type natural language in the Chrome side panel and a child Claude instance executes it. \"Navigate to the settings page and screenshot it.\" \"Fill out this form with test data.\" \"Go through every item in this list and extract the prices.\" The sidebar auto-routes to the right model: Sonnet for fast actions (click, navigate, screenshot) and Opus for reading and analysis. Each task gets up to 5 minutes. The sidebar agent runs in an isolated session, so it won't interfere with your main Claude Code window. One-click cookie import right from the sidebar footer."
+                - paragraph [ref=e2402]:
+                  - strong [ref=e2403]: Personal automation.
+                  - text: "The sidebar agent isn't just for dev workflows. Example: \"Browse my kid's school parent portal and add all the other parents' names, phone numbers, and photos to my Google Contacts.\" Two ways to get authenticated: (1) log in once in the headed browser, your session persists, or (2) click the \"cookies\" button in the sidebar footer to import cookies from your real Chrome. Once authenticated, Claude navigates the directory, extracts the data, and creates the contacts."
+                - paragraph [ref=e2404]:
+                  - strong [ref=e2405]: Prompt injection defense.
+                  - text: "Hostile web pages try to hijack your sidebar agent. gstack ships a layered defense: a 22MB ML classifier bundled with the browser scans every page and tool output locally, a Claude Haiku transcript check votes on the full conversation shape, a random canary token in the system prompt catches session exfil attempts across text, tool args, URLs, and file writes, and a verdict combiner requires two classifiers to agree before blocking (prevents single-model false positives on Stack Overflow-style instruction pages). A shield icon in the sidebar header shows status (green/amber/red). Opt in to a 721MB DeBERTa-v3 ensemble via"
+                  - code [ref=e2406]: GSTACK_SECURITY_ENSEMBLE=deberta
+                  - text: "for 2-of-3 agreement. Emergency kill switch:"
+                  - code [ref=e2407]: GSTACK_SECURITY_OFF=1
+                  - text: . See
+                  - link "ARCHITECTURE.md" [ref=e2408] [cursor=pointer]:
+                    - /url: /garrytan/gstack/blob/main/ARCHITECTURE.md#prompt-injection-defense-sidebar-agent
+                  - text: for the full stack.
+                - paragraph [ref=e2409]:
+                  - strong [ref=e2410]: Browser handoff when the AI gets stuck.
+                  - text: Hit a CAPTCHA, auth wall, or MFA prompt?
+                  - code [ref=e2411]: $B handoff
+                  - text: opens a visible Chrome at the exact same page with all your cookies and tabs intact. Solve the problem, tell Claude you're done,
+                  - code [ref=e2412]: $B resume
+                  - text: picks up right where it left off. The agent even suggests it automatically after 3 consecutive failures.
+                - paragraph [ref=e2413]:
+                  - strong [ref=e2414]:
+                    - code [ref=e2415]: /pair-agent
+                    - text: is cross-agent coordination.
+                  - text: You're in Claude Code. You also have OpenClaw running. Or Hermes. Or Codex. You want them both looking at the same website. Type
+                  - code [ref=e2416]: /pair-agent
+                  - text: ", pick your agent, and a GStack Browser window opens so you can watch. The skill prints a block of instructions. Paste that block into the other agent's chat. It exchanges a one-time setup key for a session token, creates its own tab, and starts browsing. You see both agents working in the same browser, each in their own tab, neither able to interfere with the other. If ngrok is installed, the tunnel starts automatically so the other agent can be on a completely different machine. Same-machine agents get a zero-friction shortcut that writes credentials directly. This is the first time AI agents from different vendors can coordinate through a shared browser with real security: scoped tokens, tab isolation, rate limiting, domain restrictions, and activity attribution."
+                - paragraph [ref=e2417]:
+                  - strong [ref=e2418]: Multi-AI second opinion.
+                  - code [ref=e2419]: /codex
+                  - text: "gets an independent review from OpenAI's Codex CLI — a completely different AI looking at the same diff. Three modes: code review with a pass/fail gate, adversarial challenge that actively tries to break your code, and open consultation with session continuity. When both"
+                  - code [ref=e2420]: /review
+                  - text: (Claude) and
+                  - code [ref=e2421]: /codex
+                  - text: (OpenAI) have reviewed the same branch, you get a cross-model analysis showing which findings overlap and which are unique to each.
+                - paragraph [ref=e2422]:
+                  - strong [ref=e2423]: Safety guardrails on demand.
+                  - text: Say "be careful" and
+                  - code [ref=e2424]: /careful
+                  - text: warns before any destructive command — rm -rf, DROP TABLE, force-push, git reset --hard.
+                  - code [ref=e2425]: /freeze
+                  - text: locks edits to one directory while debugging so Claude can't accidentally "fix" unrelated code.
+                  - code [ref=e2426]: /guard
+                  - text: activates both.
+                  - code [ref=e2427]: /investigate
+                  - text: auto-freezes to the module being investigated.
+                - paragraph [ref=e2428]:
+                  - strong [ref=e2429]: Proactive skill suggestions.
+                  - text: gstack notices what stage you're in — brainstorming, reviewing, debugging, testing — and suggests the right skill. Don't like it? Say "stop suggesting" and it remembers across sessions.
+                - generic [ref=e2430]:
+                  - heading "10-15 parallel sprints" [level=2] [ref=e2431]
+                  - 'link "Permalink: 10-15 parallel sprints" [ref=e2432] [cursor=pointer]':
+                    - /url: "#10-15-parallel-sprints"
+                - paragraph [ref=e2435]: gstack is powerful with one sprint. It is transformative with ten running at once.
+                - paragraph [ref=e2436]:
+                  - link "Conductor" [ref=e2437] [cursor=pointer]:
+                    - /url: https://conductor.build
+                  - text: runs multiple Claude Code sessions in parallel — each in its own isolated workspace. One session running
+                  - code [ref=e2438]: /office-hours
+                  - text: on a new idea, another doing
+                  - code [ref=e2439]: /review
+                  - text: on a PR, a third implementing a feature, a fourth running
+                  - code [ref=e2440]: /qa
+                  - text: on staging, and six more on other branches. All at the same time. I regularly run 10-15 parallel sprints — that's the practical max right now.
+                - paragraph [ref=e2441]: "The sprint structure is what makes parallelism work. Without a process, ten agents is ten sources of chaos. With a process — think, plan, build, review, test, ship — each agent knows exactly what to do and when to stop. You manage them the way a CEO manages a team: check in on the decisions that matter, let the rest run."
+                - generic [ref=e2442]:
+                  - heading "Voice input (AquaVoice, Whisper, etc.)" [level=3] [ref=e2443]
+                  - 'link "Permalink: Voice input (AquaVoice, Whisper, etc.)" [ref=e2444] [cursor=pointer]':
+                    - /url: "#voice-input-aquavoice-whisper-etc"
+                - paragraph [ref=e2447]: gstack skills have voice-friendly trigger phrases. Say what you want naturally — "run a security check", "test the website", "do an engineering review" — and the right skill activates. You don't need to remember slash command names or acronyms.
+                - generic [ref=e2448]:
+                  - heading "Uninstall" [level=2] [ref=e2449]
+                  - 'link "Permalink: Uninstall" [ref=e2450] [cursor=pointer]':
+                    - /url: "#uninstall"
+                - generic [ref=e2453]:
+                  - 'heading "Option 1: Run the uninstall script" [level=3] [ref=e2454]'
+                  - 'link "Permalink: Option 1: Run the uninstall script" [ref=e2455] [cursor=pointer]':
+                    - /url: "#option-1-run-the-uninstall-script"
+                - paragraph [ref=e2458]: "If gstack is installed on your machine:"
+                - generic [ref=e2459]:
+                  - generic [ref=e2460]: ~/.claude/skills/gstack/bin/gstack-uninstall
+                  - button "Copy code to clipboard" [ref=e2462] [cursor=pointer]
+                - paragraph [ref=e2466]:
+                  - text: This handles skills, symlinks, global state (
+                  - code [ref=e2467]: ~/.gstack/
+                  - text: ), project-local state, browse daemons, and temp files. Use
+                  - code [ref=e2468]: "--keep-state"
+                  - text: to preserve config and analytics. Use
+                  - code [ref=e2469]: "--force"
+                  - text: to skip confirmation.
+                - generic [ref=e2470]:
+                  - 'heading "Option 2: Manual removal (no local repo)" [level=3] [ref=e2471]'
+                  - 'link "Permalink: Option 2: Manual removal (no local repo)" [ref=e2472] [cursor=pointer]':
+                    - /url: "#option-2-manual-removal-no-local-repo"
+                - paragraph [ref=e2475]: "If you don't have the repo cloned (e.g. you installed via a Claude Code paste and later deleted the clone):"
+                - generic [ref=e2476]:
+                  - generic [ref=e2477]:
+                    - generic [ref=e2478]: "# 1. Stop browse daemons"
+                    - text: pkill -f
+                    - generic [ref=e2479]: "\"gstack.*browse\""
+                    - text: 2>/dev/null || true
+                    - generic [ref=e2480]: "# 2. Remove per-skill directories whose SKILL.md points into gstack/"
+                    - text: find ~/.claude/skills -mindepth 1 -maxdepth 1 -type d ! -name gstack 2>/dev/null | while IFS= read -r dir; do link=
+                    - generic [ref=e2481]: "\"$dir/SKILL.md\""
+                    - text: "[ -L"
+                    - generic [ref=e2482]: "\"$link\""
+                    - text: "] || continue target="
+                    - generic [ref=e2483]:
+                      - text: $(readlink
+                      - generic [ref=e2484]: "\"$link\""
+                      - text: 2>/dev/null)
+                    - text: "|| continue case"
+                    - generic [ref=e2485]: "\"$target\""
+                    - text: in gstack/*|*/gstack/*) rm -f
+                    - generic [ref=e2486]: "\"$link\""
+                    - text: rmdir
+                    - generic [ref=e2487]: "\"$dir\""
+                    - text: 2>/dev/null || true ;; esac done
+                    - generic [ref=e2488]: "# 3. Remove gstack"
+                    - text: rm -rf ~/.claude/skills/gstack
+                    - generic [ref=e2489]: "# 4. Remove global state"
+                    - text: rm -rf ~/.gstack
+                    - generic [ref=e2490]: "# 5. Remove integrations (skip any you never installed)"
+                    - text: rm -rf ~/.codex/skills/gstack* 2>/dev/null rm -rf ~/.factory/skills/gstack* 2>/dev/null rm -rf ~/.kiro/skills/gstack* 2>/dev/null rm -rf ~/.openclaw/skills/gstack* 2>/dev/null
+                    - generic [ref=e2491]: "# 6. Remove temp files"
+                    - text: rm -f /tmp/gstack-* 2>/dev/null
+                    - generic [ref=e2492]: "# 7. Per-project cleanup (run from each project root)"
+                    - text: rm -rf .gstack .gstack-worktrees .claude/skills/gstack 2>/dev/null rm -rf .agents/skills/gstack* .factory/skills/gstack* 2>/dev/null
+                  - button "Copy code to clipboard" [ref=e2494] [cursor=pointer]
+                - generic [ref=e2498]:
+                  - heading "Clean up CLAUDE.md" [level=3] [ref=e2499]
+                  - 'link "Permalink: Clean up CLAUDE.md" [ref=e2500] [cursor=pointer]':
+                    - /url: "#clean-up-claudemd"
+                - paragraph [ref=e2503]:
+                  - text: The uninstall script does not edit CLAUDE.md. In each project where gstack was added, remove the
+                  - code [ref=e2504]: "## gstack"
+                  - text: and
+                  - code [ref=e2505]: "## Skill routing"
+                  - text: sections.
+                - generic [ref=e2506]:
+                  - heading "Playwright" [level=3] [ref=e2507]
+                  - 'link "Permalink: Playwright" [ref=e2508] [cursor=pointer]':
+                    - /url: "#playwright"
+                - paragraph [ref=e2511]:
+                  - code [ref=e2512]: ~/Library/Caches/ms-playwright/
+                  - text: (macOS) is left in place because other tools may share it. Remove it if nothing else needs it.
+                - separator [ref=e2513]
+                - paragraph [ref=e2514]: Free, MIT licensed, open source. No premium tier, no waitlist.
+                - paragraph [ref=e2515]: I open sourced how I build software. You can fork it and make it your own.
+                - blockquote [ref=e2516]:
+                  - paragraph [ref=e2517]:
+                    - strong [ref=e2518]: We're hiring.
+                    - text: Want to ship real products at AI-coding speed and help harden gstack? Come work at YC —
+                    - link "ycombinator.com/software" [ref=e2519] [cursor=pointer]:
+                      - /url: https://ycombinator.com/software
+                    - text: Extremely competitive salary and equity. San Francisco, Dogpatch District.
+                - generic [ref=e2520]:
+                  - heading "GBrain — persistent knowledge for your coding agent" [level=2] [ref=e2521]
+                  - 'link "Permalink: GBrain — persistent knowledge for your coding agent" [ref=e2522] [cursor=pointer]':
+                    - /url: "#gbrain--persistent-knowledge-for-your-coding-agent"
+                - paragraph [ref=e2525]:
+                  - link "GBrain" [ref=e2526] [cursor=pointer]:
+                    - /url: https://github.com/garrytan/gbrain
+                  - text: is a persistent knowledge base for AI agents — think of it as the memory your agent actually keeps between sessions. GStack gives you a one-command path from zero to "it's running, my agent can call it."
+                - generic [ref=e2527]:
+                  - generic [ref=e2528]: /setup-gbrain
+                  - button "Copy code to clipboard" [ref=e2530] [cursor=pointer]
+                - paragraph [ref=e2534]: "Four paths, pick one:"
+                - list [ref=e2535]:
+                  - listitem [ref=e2536]:
+                    - strong [ref=e2537]: Supabase, existing URL
+                    - text: — your cloud agent already provisioned a brain; paste the Session Pooler URL, now this laptop uses the same data.
+                  - listitem [ref=e2538]:
+                    - strong [ref=e2539]: Supabase, auto-provision
+                    - text: — paste a Supabase Personal Access Token; the skill creates a new project, polls to healthy, fetches the pooler URL, hands it to
+                    - code [ref=e2540]: gbrain init
+                    - text: . ~90 seconds end-to-end.
+                  - listitem [ref=e2541]:
+                    - strong [ref=e2542]: PGLite local
+                    - text: — zero accounts, zero network, ~30 seconds. Isolated brain on this Mac only. Great for try-first; migrate to Supabase later with
+                    - code [ref=e2543]: /setup-gbrain --switch
+                    - text: .
+                  - listitem [ref=e2544]:
+                    - strong [ref=e2545]: Remote gbrain MCP
+                    - text: — your brain runs on another machine (Tailscale, ngrok, internal LAN) or a teammate's server; paste an MCP URL and bearer token. Optionally pair with a local PGLite for symbol-aware code search in split-engine mode. Best for cross-machine memory without standing up a local DB.
+                - paragraph [ref=e2546]:
+                  - text: After init, the skill offers to register gbrain as an MCP server for Claude Code (
+                  - code [ref=e2547]: claude mcp add gbrain -- gbrain serve
+                  - text: ) so
+                  - code [ref=e2548]: gbrain search
+                  - text: ","
+                  - code [ref=e2549]: gbrain put
+                  - text: ", etc. show up as first-class typed tools — not bash shell-outs."
+                - paragraph [ref=e2550]:
+                  - strong [ref=e2551]: Keeping the brain current.
+                  - text: Run
+                  - code [ref=e2552]: /sync-gbrain
+                  - text: from any repo to re-index its code into gbrain (incremental by default,
+                  - code [ref=e2553]: "--full"
+                  - text: for a full reindex,
+                  - code [ref=e2554]: "--dry-run"
+                  - text: to preview). The skill registers the cwd as a federated source via
+                  - code [ref=e2555]: gbrain sources add
+                  - text: ", runs"
+                  - code [ref=e2556]: gbrain sync --strategy code
+                  - text: ", and writes a"
+                  - code [ref=e2557]: "## GBrain Search Guidance"
+                  - text: block to your project's CLAUDE.md so the agent prefers
+                  - code [ref=e2558]: gbrain search
+                  - text: /
+                  - code [ref=e2559]: code-def
+                  - text: /
+                  - code [ref=e2560]: code-refs
+                  - text: over Grep. The block is removed automatically if the capability check fails — no stale guidance pointing at tools that aren't installed.
+                - paragraph [ref=e2561]:
+                  - strong [ref=e2562]: Per-remote trust policy.
+                  - text: "Each repo on your machine gets one of three tiers:"
+                - list [ref=e2563]:
+                  - listitem [ref=e2564]:
+                    - code [ref=e2565]: read-write
+                    - text: — agent can search the brain AND write new pages back from this repo
+                  - listitem [ref=e2566]:
+                    - code [ref=e2567]: read-only
+                    - text: "— agent can search but never writes (best for multi-client consultants: search the shared brain, don't contaminate it with Client A's work while in Client B's repo)"
+                  - listitem [ref=e2568]:
+                    - code [ref=e2569]: deny
+                    - text: — no gbrain interaction at all
+                - paragraph [ref=e2570]: The skill asks once per repo. The decision is sticky across worktrees and branches of the same remote.
+                - paragraph [ref=e2571]:
+                  - strong [ref=e2572]: GStack memory sync (different feature, same private-repo infra).
+                  - text: Optionally pushes your gstack state (learnings, CEO plans, design docs, retros, developer profile) to a private git repo so your memory follows you across machines, with a one-time privacy prompt (everything allowlisted / artifacts only / off) and a defense-in-depth secret scanner that blocks AWS keys, tokens, PEM blocks, and JWTs before they leave your machine.
+                - generic [ref=e2573]:
+                  - generic [ref=e2574]: gstack-artifacts-init
+                  - button "Copy code to clipboard" [ref=e2576] [cursor=pointer]
+                - paragraph [ref=e2580]:
+                  - strong [ref=e2581]: Running gstack in Conductor?
+                  - text: Conductor explicitly strips
+                  - code [ref=e2582]: ANTHROPIC_API_KEY
+                  - text: and
+                  - code [ref=e2583]: OPENAI_API_KEY
+                  - text: from every workspace's process env, so paid evals and gbrain embeddings won't work out of the box. Set
+                  - code [ref=e2584]: GSTACK_ANTHROPIC_API_KEY
+                  - text: and
+                  - code [ref=e2585]: GSTACK_OPENAI_API_KEY
+                  - text: "in Conductor's workspace env config instead — gstack's TS entry points promote them to canonical names at runtime. Full details and the contributor checklist for adding the import to new entry points:"
+                  - link "Conductor + GSTACK_* env vars" [ref=e2586] [cursor=pointer]:
+                    - /url: /garrytan/gstack/blob/main/USING_GBRAIN_WITH_GSTACK.md#conductor--gstack_-env-vars
+                  - text: .
+                - paragraph [ref=e2587]:
+                  - strong [ref=e2588]: "Full monty — every scenario, every flag, every bin helper, every troubleshooting step:"
+                  - link "USING_GBRAIN_WITH_GSTACK.md" [ref=e2589] [cursor=pointer]:
+                    - /url: /garrytan/gstack/blob/main/USING_GBRAIN_WITH_GSTACK.md
+                - paragraph [ref=e2590]:
+                  - text: "Other references:"
+                  - link "docs/gbrain-sync.md" [ref=e2591] [cursor=pointer]:
+                    - /url: /garrytan/gstack/blob/main/docs/gbrain-sync.md
+                  - text: (sync-specific guide) •
+                  - link "docs/gbrain-sync-errors.md" [ref=e2592] [cursor=pointer]:
+                    - /url: /garrytan/gstack/blob/main/docs/gbrain-sync-errors.md
+                  - text: (error index)
+                - generic [ref=e2593]:
+                  - heading "Docs" [level=2] [ref=e2594]
+                  - 'link "Permalink: Docs" [ref=e2595] [cursor=pointer]':
+                    - /url: "#docs"
+                - table [ref=e2599]:
+                  - rowgroup [ref=e2600]:
+                    - row [ref=e2601]:
+                      - columnheader "Doc" [ref=e2602]
+                      - columnheader "What it covers" [ref=e2603]
+                  - rowgroup [ref=e2604]:
+                    - row [ref=e2605]:
+                      - cell [ref=e2606]:
+                        - link "Skill Deep Dives" [ref=e2607] [cursor=pointer]:
+                          - /url: /garrytan/gstack/blob/main/docs/skills.md
+                      - cell "Philosophy, examples, and workflow for every skill (includes Greptile integration)" [ref=e2608]
+                    - row [ref=e2609]:
+                      - cell [ref=e2610]:
+                        - link "Diagrams & Document Formats" [ref=e2611] [cursor=pointer]:
+                          - /url: /garrytan/gstack/blob/main/docs/howto-diagrams-and-formats.md
+                      - cell [ref=e2612]:
+                        - text: Mermaid/excalidraw fences in PDFs, image sizing and safety defaults,
+                        - code [ref=e2613]: "--to html|docx"
+                        - text: ","
+                        - code [ref=e2614]: /diagram
+                        - text: triplets
+                    - row [ref=e2615]:
+                      - cell [ref=e2616]:
+                        - link "Builder Ethos" [ref=e2617] [cursor=pointer]:
+                          - /url: /garrytan/gstack/blob/main/ETHOS.md
+                      - 'cell "Builder philosophy: Boil the Ocean, Search Before Building, three layers of knowledge" [ref=e2618]'
+                    - row [ref=e2619]:
+                      - cell [ref=e2620]:
+                        - link "Using GBrain with GStack" [ref=e2621] [cursor=pointer]:
+                          - /url: /garrytan/gstack/blob/main/USING_GBRAIN_WITH_GSTACK.md
+                      - cell [ref=e2622]:
+                        - text: Every path, flag, bin helper, and troubleshooting step for
+                        - code [ref=e2623]: /setup-gbrain
+                    - row [ref=e2624]:
+                      - cell [ref=e2625]:
+                        - link "GBrain Sync" [ref=e2626] [cursor=pointer]:
+                          - /url: /garrytan/gstack/blob/main/docs/gbrain-sync.md
+                      - cell "Cross-machine memory setup, privacy modes, troubleshooting" [ref=e2627]
+                    - row [ref=e2628]:
+                      - cell [ref=e2629]:
+                        - link "Architecture" [ref=e2630] [cursor=pointer]:
+                          - /url: /garrytan/gstack/blob/main/ARCHITECTURE.md
+                      - cell "Design decisions and system internals" [ref=e2631]
+                    - row [ref=e2632]:
+                      - cell [ref=e2633]:
+                        - link "Browser Reference" [ref=e2634] [cursor=pointer]:
+                          - /url: /garrytan/gstack/blob/main/BROWSER.md
+                      - cell [ref=e2635]:
+                        - text: Full command reference for
+                        - code [ref=e2636]: /browse
+                    - row [ref=e2637]:
+                      - cell [ref=e2638]:
+                        - link "Contributing" [ref=e2639] [cursor=pointer]:
+                          - /url: /garrytan/gstack/blob/main/CONTRIBUTING.md
+                      - cell "Dev setup, testing, contributor mode, and dev mode" [ref=e2640]
+                    - row [ref=e2641]:
+                      - cell [ref=e2642]:
+                        - link "Changelog" [ref=e2643] [cursor=pointer]:
+                          - /url: /garrytan/gstack/blob/main/CHANGELOG.md
+                      - cell "What's new in every version" [ref=e2644]
+                - generic [ref=e2645]:
+                  - heading "Privacy & Telemetry" [level=2] [ref=e2646]
+                  - 'link "Permalink: Privacy & Telemetry" [ref=e2647] [cursor=pointer]':
+                    - /url: "#privacy--telemetry"
+                - paragraph [ref=e2650]:
+                  - text: gstack includes
+                  - strong [ref=e2651]: opt-in
+                  - text: "usage telemetry to help improve the project. Here's exactly what happens:"
+                - list [ref=e2652]:
+                  - listitem [ref=e2653]:
+                    - strong [ref=e2654]: Default is off.
+                    - text: Nothing is sent anywhere unless you explicitly say yes.
+                  - listitem [ref=e2655]:
+                    - strong [ref=e2656]: On first run,
+                    - text: gstack asks if you want to share anonymous usage data. You can say no.
+                  - listitem [ref=e2657]:
+                    - strong [ref=e2658]: "What's sent (if you opt in):"
+                    - text: skill name, duration, success/fail, gstack version, OS. That's it.
+                  - listitem [ref=e2659]:
+                    - strong [ref=e2660]: "What's never sent:"
+                    - text: code, file paths, repo names, branch names, prompts, or any user-generated content.
+                  - listitem [ref=e2661]:
+                    - strong [ref=e2662]: "Change anytime:"
+                    - code [ref=e2663]: gstack-config set telemetry off
+                    - text: disables everything instantly.
+                  - listitem [ref=e2664]:
+                    - strong [ref=e2665]: Every off-machine send is receipted.
+                    - text: Any gstack-initiated network send — telemetry included — writes a hash-chained, tamper-evident receipt to
+                    - code [ref=e2666]: ~/.gstack/security/egress.jsonl
+                    - text: before the send; sensitive sinks refuse to send at all if the receipt can't be written. Audit with
+                    - code [ref=e2667]: gstack-egress list
+                    - text: ", verify the chain with"
+                    - code [ref=e2668]: gstack-egress verify
+                    - text: (exit 3 on tamper), see the standing consent settings with
+                    - code [ref=e2669]: gstack-egress grants
+                    - text: . The ledger records attempted sends so accidents are auditable — it's an audit trail, not a network firewall.
+                - paragraph [ref=e2670]:
+                  - text: Data is stored in
+                  - link "Supabase" [ref=e2671] [cursor=pointer]:
+                    - /url: https://supabase.com
+                  - text: (open source Firebase alternative). The schema is in
+                  - link [ref=e2672] [cursor=pointer]:
+                    - /url: /garrytan/gstack/blob/main/supabase/migrations
+                    - code [ref=e2673]: supabase/migrations/
+                  - text: — you can verify exactly what's collected. The Supabase publishable key in the repo is a public key (like a Firebase API key) — row-level security policies deny all direct access. Telemetry flows through validated edge functions that enforce schema checks, event type allowlists, and field length limits.
+                - paragraph [ref=e2674]:
+                  - strong [ref=e2675]: Local analytics are always available.
+                  - text: Run
+                  - code [ref=e2676]: gstack-analytics
+                  - text: to see your personal usage dashboard from the local JSONL file — no remote data needed.
+                - generic [ref=e2677]:
+                  - heading "Troubleshooting" [level=2] [ref=e2678]
+                  - 'link "Permalink: Troubleshooting" [ref=e2679] [cursor=pointer]':
+                    - /url: "#troubleshooting"
+                - paragraph [ref=e2682]:
+                  - strong [ref=e2683]: Skill not showing up?
+                  - code [ref=e2684]: cd ~/.claude/skills/gstack && ./setup
+                - paragraph [ref=e2685]:
+                  - strong [ref=e2686]:
+                    - code [ref=e2687]: /browse
+                    - text: fails?
+                  - code [ref=e2688]: cd ~/.claude/skills/gstack && bun install && bun run build
+                - paragraph [ref=e2689]:
+                  - strong [ref=e2690]: Stale install?
+                  - text: Run
+                  - code [ref=e2691]: /gstack-upgrade
+                  - text: — or set
+                  - code [ref=e2692]: "auto_upgrade: true"
+                  - text: in
+                  - code [ref=e2693]: ~/.gstack/config.yaml
+                - paragraph [ref=e2694]:
+                  - strong [ref=e2695]: Want shorter commands?
+                  - code [ref=e2696]: cd ~/.claude/skills/gstack && ./setup --no-prefix
+                  - text: — switches from
+                  - code [ref=e2697]: /gstack-qa
+                  - text: to
+                  - code [ref=e2698]: /qa
+                  - text: . Your choice is remembered for future upgrades.
+                - paragraph [ref=e2699]:
+                  - strong [ref=e2700]: Want namespaced commands?
+                  - code [ref=e2701]: cd ~/.claude/skills/gstack && ./setup --prefix
+                  - text: — switches from
+                  - code [ref=e2702]: /qa
+                  - text: to
+                  - code [ref=e2703]: /gstack-qa
+                  - text: . Useful if you run other skill packs alongside gstack.
+                - paragraph [ref=e2704]:
+                  - strong [ref=e2705]: Codex says "Skipped loading skill(s) due to invalid SKILL.md"?
+                  - text: "Your Codex skill descriptions are stale. Fix:"
+                  - code [ref=e2706]: cd ~/.codex/skills/gstack && git pull && ./setup --host codex
+                  - text: "— or for repo-local installs:"
+                  - code [ref=e2707]: cd "$(readlink -f .agents/skills/gstack)" && git pull && ./setup --host codex
+                - paragraph [ref=e2708]:
+                  - strong [ref=e2709]: "Windows users:"
+                  - text: gstack works on Windows 11 via Git Bash or WSL. Node.js is required in addition to Bun — Bun has a known bug with Playwright's pipe transport on Windows (
+                  - link "bun#4253" [ref=e2710] [cursor=pointer]:
+                    - /url: https://github.com/oven-sh/bun/issues/4253
+                  - text: ). The browse server automatically falls back to Node.js. Make sure both
+                  - code [ref=e2711]: bun
+                  - text: and
+                  - code [ref=e2712]: node
+                  - text: are on your PATH.
+                - paragraph [ref=e2713]:
+                  - text: On Windows without Developer Mode (MSYS2 / Git Bash),
+                  - code [ref=e2714]: setup
+                  - text: falls back to file copies instead of symlinks because
+                  - code [ref=e2715]: ln -snf
+                  - text: produces frozen copies that don't refresh on
+                  - code [ref=e2716]: git pull
+                  - text: .
+                  - strong [ref=e2717]:
+                    - text: Re-run
+                    - code [ref=e2718]: cd ~/.claude/skills/gstack && ./setup
+                    - text: after every
+                    - code [ref=e2719]: git pull
+                  - text: so your skill files match the repo.
+                  - code [ref=e2720]: setup
+                  - text: prints a one-line note reminding you. Unix and WSL keep symlinks and don't need the re-run.
+                - paragraph [ref=e2721]:
+                  - strong [ref=e2722]: Claude says it can't see the skills?
+                  - text: Make sure your project's
+                  - code [ref=e2723]: CLAUDE.md
+                  - text: "has a gstack section. Add this:"
+                - generic [ref=e2724]:
+                  - code [ref=e2726]: "## gstack Use /browse from gstack for all web browsing. Never use mcp__claude-in-chrome__* tools. Available skills: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-design-review, /design-consultation, /design-shotgun, /design-html, /review, /ship, /land-and-deploy, /canary, /benchmark, /browse, /open-gstack-browser, /qa, /qa-only, /design-review, /setup-browser-cookies, /setup-deploy, /setup-gbrain, /sync-gbrain, /retro, /investigate, /document-release, /document-generate, /codex, /cso, /autoplan, /pair-agent, /careful, /freeze, /guard, /unfreeze, /gstack-upgrade, /learn."
+                  - button "Copy code to clipboard" [ref=e2728] [cursor=pointer]
+                - generic [ref=e2732]:
+                  - heading "License" [level=2] [ref=e2733]
+                  - 'link "Permalink: License" [ref=e2734] [cursor=pointer]':
+                    - /url: "#license"
+                - paragraph [ref=e2737]: MIT. Free forever. Go build something.
+        - generic [ref=e2740]:
+          - generic [ref=e2741]:
+            - heading "About" [level=2] [ref=e2742]
+            - paragraph [ref=e2743]: "Use Garry Tan's exact Claude Code setup: 23 opinionated tools that serve as CEO, Designer, Eng Manager, Release Manager, Doc Engineer, and QA"
+            - heading "Resources" [level=3] [ref=e2744]
+            - link "Readme" [ref=e2746] [cursor=pointer]:
+              - /url: "#readme-ov-file"
+            - link "MIT license" [ref=e2750] [cursor=pointer]:
+              - /url: "#MIT-1-ov-file"
+            - heading "Contributing" [level=3] [ref=e2753]
+            - link "Contributing" [ref=e2755] [cursor=pointer]:
+              - /url: "#contributing-ov-file"
+            - link "Activity" [ref=e2759] [cursor=pointer]:
+              - /url: /garrytan/gstack/activity
+            - heading "Stars" [level=3] [ref=e2762]
+            - generic [ref=e2764]:
+              - strong [ref=e2767]: 128.2k
+              - text: stars
+            - heading "Watchers" [level=3] [ref=e2768]
+            - generic [ref=e2770]:
+              - strong [ref=e2773]: "782"
+              - text: watching
+            - heading "Forks" [level=3] [ref=e2774]
+            - link [ref=e2776] [cursor=pointer]:
+              - /url: /garrytan/gstack/forks
+              - strong [ref=e2780]: 19.3k
+              - text: forks
+            - link "Report repository" [ref=e2782] [cursor=pointer]:
+              - /url: /contact/report-content?content_url=https%3A%2F%2Fgithub.com%2Fgarrytan%2Fgstack&report=garrytan+%28user%29
+          - heading "Releases" [level=2] [ref=e2784]
+          - heading "Packages" [level=2] [ref=e2788]
+          - heading "Used by" [level=2] [ref=e2791]
+          - heading "Contributors" [level=2] [ref=e2794]
+          - heading "Languages" [level=2] [ref=e2797]
+    - contentinfo [ref=e2800]:
+      - heading "Footer" [level=2] [ref=e2801]
+      - generic [ref=e2802]:
+        - generic [ref=e2803]:
+          - link "GitHub Homepage" [ref=e2804] [cursor=pointer]:
+            - /url: https://github.com
+          - generic [ref=e2807]: © 2026 GitHub, Inc.
+        - navigation "Footer" [ref=e2808]:
+          - heading "Footer navigation" [level=3] [ref=e2809]
+          - list "Footer navigation" [ref=e2810]:
+            - listitem [ref=e2811]:
+              - link "Terms" [ref=e2812] [cursor=pointer]:
+                - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+            - listitem [ref=e2813]:
+              - link "Privacy" [ref=e2814] [cursor=pointer]:
+                - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+            - listitem [ref=e2815]:
+              - link "Security" [ref=e2816] [cursor=pointer]:
+                - /url: https://github.com/security
+            - listitem [ref=e2817]:
+              - link "Status" [ref=e2818] [cursor=pointer]:
+                - /url: https://www.githubstatus.com/
+            - listitem [ref=e2819]:
+              - link "Community" [ref=e2820] [cursor=pointer]:
+                - /url: https://github.community/
+            - listitem [ref=e2821]:
+              - link "Docs" [ref=e2822] [cursor=pointer]:
+                - /url: https://docs.github.com/
+            - listitem [ref=e2823]:
+              - link "Contact" [ref=e2824] [cursor=pointer]:
+                - /url: https://support.github.com?tags=dotcom-footer
+            - listitem [ref=e2825]:
+              - button "Manage cookies" [ref=e2827] [cursor=pointer]
+            - listitem [ref=e2828]:
+              - button "Do not share my personal information" [ref=e2830] [cursor=pointer]
+  - alert [ref=e2833]
