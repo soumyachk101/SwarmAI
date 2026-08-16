@@ -17,6 +17,11 @@ import {
   Check,
   MoreHorizontal,
   RefreshCw,
+  Send,
+  SlidersHorizontal,
+  Gauge,
+  Sparkles,
+  ChevronDown,
 } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
@@ -286,6 +291,42 @@ export default function AgentPane({
   const menuRef = useRef<HTMLDivElement>(null);
   const compactHeader = paneWidth > 0 && paneWidth < COMPACT_HEADER_WIDTH;
   const refitCount = useAgentsStore((s) => s.refitCount);
+
+  // Prompt bar & Model / Effort / Usage controls (Matches Screenshot 2)
+  const [promptInput, setPromptInput] = useState("");
+  const [modelMenuOpen, setModelMenuOpen] = useState(false);
+  const [effortMenuOpen, setEffortMenuOpen] = useState(false);
+  const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
+  const [currentModel, setCurrentModel] = useState(agent.model || "claude-fable-5");
+  const [currentEffort, setCurrentEffort] = useState(agent.effort || "Max");
+
+  const sendTerminal = (data: string) => {
+    invoke("write_to_terminal", { paneId, data }).catch(console.error);
+    terminalInstance.current?.focus();
+  };
+
+  const handleSendPrompt = () => {
+    if (!promptInput.trim()) return;
+    const text = promptInput;
+    setPromptInput("");
+    sendTerminal(text + "\r");
+  };
+
+  const handleSelectModel = (modelId: string, modelLabel: string) => {
+    setCurrentModel(modelLabel);
+    setModelMenuOpen(false);
+    sendTerminal(`/model ${modelId}\r`);
+  };
+
+  const handleSelectEffort = (effort: string) => {
+    setCurrentEffort(effort);
+    setEffortMenuOpen(false);
+    sendTerminal(`/effort ${effort.toLowerCase()}\r`);
+  };
+
+  const handleCheckUsage = () => {
+    sendTerminal(`/cost\r`);
+  };
 
   // Dismiss the overflow menu on an outside click, Escape, or the pane simply
   // growing wide enough to show the buttons again — otherwise it hangs there
@@ -1373,15 +1414,173 @@ export default function AgentPane({
 
       {/* terminal content — bg matches the xterm theme so the whole-cell fit
           remainder on the right/bottom blends in instead of showing a strip. */}
+      {/* terminal content + bottom prompt bar */}
       <div
-        className="flex-1 overflow-hidden relative min-h-0 p-2"
+        className="flex-1 overflow-hidden relative min-h-0 flex flex-col"
         style={{ contain: "layout paint", background: "rgb(var(--swarm-canvas-hi))" }}
       >
-        {/* xterm canvas — hidden (not unmounted) when CLI isn't installed */}
-        <div
-          ref={terminalRef}
-          className={`absolute inset-2 overflow-hidden ${spawnState === "notFound" ? "invisible" : ""}`}
-        />
+        {/* xterm canvas */}
+        <div className="flex-1 relative min-h-0 p-2">
+          <div
+            ref={terminalRef}
+            className={`absolute inset-2 overflow-hidden ${spawnState === "notFound" ? "invisible" : ""}`}
+          />
+        </div>
+
+        {/* Floating Prompt Bar at the bottom (Matches Screenshot 2) */}
+        {spawnState === "running" && (
+          <div className="relative shrink-0 p-3 pt-0 z-20">
+            <div className="relative rounded-2xl border border-white/[0.09] bg-[#12141e]/95 backdrop-blur-xl p-3 shadow-2xl transition-all focus-within:border-white/[0.20] focus-within:ring-1 focus-within:ring-white/[0.08]">
+              {/* Top row: Input text + Send button */}
+              <div className="flex items-start gap-2">
+                <textarea
+                  value={promptInput}
+                  onChange={(e) => setPromptInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendPrompt();
+                    }
+                  }}
+                  placeholder={`Prompt ${displayName}...`}
+                  rows={1}
+                  className="min-h-[26px] max-h-32 flex-1 resize-none bg-transparent text-xs text-swarm-text placeholder:text-swarm-textMuted/40 outline-none leading-relaxed"
+                />
+
+                <button
+                  onClick={handleSendPrompt}
+                  disabled={!promptInput.trim()}
+                  className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-white/[0.06] text-swarm-text hover:bg-swarm-gold hover:text-black disabled:opacity-25 disabled:hover:bg-white/[0.06] disabled:hover:text-swarm-text transition-all"
+                  title="Send to agent (Enter)"
+                >
+                  <Send size={13} />
+                </button>
+              </div>
+
+              {/* Bottom row: Model Switcher, Effort Selector, Usage Check, Settings */}
+              <div className="mt-2 flex items-center justify-between pt-2 border-t border-white/[0.05]">
+                <div className="flex items-center gap-2">
+                  {/* Model Selector Dropdown */}
+                  <div className="relative">
+                    <button
+                      onClick={() => { setModelMenuOpen(!modelMenuOpen); setEffortMenuOpen(false); setSettingsMenuOpen(false); }}
+                      className="flex items-center gap-1.5 rounded-md px-1.5 py-0.5 text-xs text-swarm-textDim hover:text-swarm-text hover:bg-white/[0.06] transition-colors"
+                      title="Switch Model"
+                    >
+                      {cliBrand(agent.cli) ? (
+                        <BrandGlyph brand={cliBrand(agent.cli)!} size={14} className="shrink-0 text-swarm-gold" />
+                      ) : (
+                        <Sparkles size={14} className="text-swarm-gold shrink-0" />
+                      )}
+                      <ChevronDown size={12} className="text-swarm-textMuted/70" />
+                    </button>
+
+                    {modelMenuOpen && (
+                      <div className="absolute bottom-full left-0 mb-1.5 min-w-[210px] rounded-xl border border-white/[0.12] bg-[#161824] p-1.5 shadow-2xl z-50 animate-fade-in">
+                        <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase">
+                          Model Selector
+                        </div>
+                        {[
+                          { id: "claude-fable-5", label: "Claude Opus 4.5 / 5" },
+                          { id: "claude-sonnet-5", label: "Claude Sonnet 5" },
+                          { id: "claude-3-7-sonnet", label: "Claude 3.7 Sonnet (Thinking)" },
+                          { id: "claude-3-5-sonnet", label: "Claude 3.5 Sonnet" },
+                          { id: "claude-3-5-haiku", label: "Claude 3.5 Haiku" },
+                          { id: "gpt-4o", label: "GPT-4o" },
+                        ].map((m) => (
+                          <button
+                            key={m.id}
+                            onClick={() => handleSelectModel(m.id, m.label)}
+                            className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-xs text-left text-swarm-textDim hover:bg-white/[0.08] hover:text-swarm-text transition-colors"
+                          >
+                            <span className="truncate">{m.label}</span>
+                            {currentModel.includes(m.id) && <Check size={12} className="text-swarm-gold" />}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Effort Selector Dropdown */}
+                  <div className="relative">
+                    <button
+                      onClick={() => { setEffortMenuOpen(!effortMenuOpen); setModelMenuOpen(false); setSettingsMenuOpen(false); }}
+                      className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs text-swarm-textDim hover:text-swarm-text hover:bg-white/[0.06] transition-colors"
+                      title="Reasoning Effort"
+                    >
+                      <span className="font-medium text-swarm-text">{currentEffort}</span>
+                      <ChevronDown size={12} className="text-swarm-textMuted/70" />
+                    </button>
+
+                    {effortMenuOpen && (
+                      <div className="absolute bottom-full left-0 mb-1.5 min-w-[130px] rounded-xl border border-white/[0.12] bg-[#161824] p-1.5 shadow-2xl z-50 animate-fade-in">
+                        <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase">
+                          Effort Level
+                        </div>
+                        {["Low", "Medium", "High", "Max"].map((eff) => (
+                          <button
+                            key={eff}
+                            onClick={() => handleSelectEffort(eff)}
+                            className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-xs text-left text-swarm-textDim hover:bg-white/[0.08] hover:text-swarm-text transition-colors"
+                          >
+                            <span>{eff}</span>
+                            {currentEffort === eff && <Check size={12} className="text-swarm-gold" />}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Usage Speedometer Check Button */}
+                  <button
+                    onClick={handleCheckUsage}
+                    className="flex size-6 items-center justify-center rounded-md text-swarm-textMuted hover:text-swarm-text hover:bg-white/[0.06] transition-colors"
+                    title="Check Token Usage & Cost (/cost)"
+                  >
+                    <Gauge size={14} />
+                  </button>
+                </div>
+
+                {/* Settings / Sliders Button on Right */}
+                <div className="relative">
+                  <button
+                    onClick={() => { setSettingsMenuOpen(!settingsMenuOpen); setModelMenuOpen(false); setEffortMenuOpen(false); }}
+                    className="flex size-7 items-center justify-center rounded-lg bg-white/[0.04] border border-white/[0.07] text-swarm-textMuted hover:text-swarm-text hover:bg-white/[0.08] transition-colors"
+                    title="CLI Shortcuts & Tools"
+                  >
+                    <SlidersHorizontal size={13} />
+                  </button>
+
+                  {settingsMenuOpen && (
+                    <div className="absolute bottom-full right-0 mb-1.5 min-w-[170px] rounded-xl border border-white/[0.12] bg-[#161824] p-1.5 shadow-2xl z-50 animate-fade-in">
+                      <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase">
+                        Commands
+                      </div>
+                      {[
+                        { label: "Compact Context (/compact)", cmd: "/compact\r" },
+                        { label: "Check Cost (/cost)", cmd: "/cost\r" },
+                        { label: "Clear Session (/clear)", cmd: "/clear\r" },
+                        { label: "Doctor Diagnostic (/doctor)", cmd: "/doctor\r" },
+                        { label: "Review Diffs (/review)", cmd: "/review\r" },
+                      ].map((sc) => (
+                        <button
+                          key={sc.label}
+                          onClick={() => {
+                            setSettingsMenuOpen(false);
+                            sendTerminal(sc.cmd);
+                          }}
+                          className="flex w-full items-center rounded-lg px-2 py-1.5 text-xs text-left text-swarm-textDim hover:bg-white/[0.08] hover:text-swarm-text transition-colors"
+                        >
+                          {sc.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* CLI not found — rich install card, replaces xterm entirely */}
         {spawnState === "notFound" && (
@@ -1392,10 +1591,7 @@ export default function AgentPane({
           />
         )}
 
-        {/* Loading / generic error overlay. No `animate-fade-in`: that keyframe
-            animates translateY, and a transform over a live terminal is how the
-            glyph atlas ends up rasterised at the wrong scale. No backdrop-blur
-            either — it sits on an opaque terminal, so it only cost GPU. */}
+        {/* Loading / generic error overlay */}
         {spawnState !== "running" && spawnState !== "notFound" && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 pointer-events-none glass-inset px-4 text-center">
             {spawnState === "error" ? (
@@ -1404,9 +1600,6 @@ export default function AgentPane({
                 <span className="text-xs text-swarm-textDim">
                   {displayName} failed to start
                 </span>
-                {/* "Failed" with no cause leaves the user with nothing to do
-                    but delete the pane. The command is the one fact that
-                    always narrows it down. */}
                 <span className="text-mini text-swarm-textMuted max-w-[240px]">
                   Running <code className="font-mono">{agent.cli}</code> in this
                   folder failed. Check the console for the spawn error, then
