@@ -1,0 +1,448 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Self-hosted variable fonts (bundled by Vite) — the app is local-first, so
+   no runtime Google Fonts fetch. Geist for UI, Geist Mono for terminals. */
+@font-face {
+  font-family: 'Geist';
+  src: url('../assets/fonts/geist.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('../assets/fonts/geist-mono.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Design tokens — RGB channel triplets so Tailwind opacity modifiers work.
+   applyTheme() overwrites all of these inline on <html>; these values are the
+   pre-JS paint, so they must match DEFAULT_THEME_ID (graphite) or the window
+   flashes one palette and settles on another. The old `[data-theme="swarm"]`
+   twin of this block was a rename leftover — no theme has that id any more, so
+   it matched nothing. */
+:root {
+  --font-sans: 'Geist', sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+  --swarm-canvas: 14 16 19;
+  --swarm-canvas-hi: 20 23 28;
+  --swarm-surface: 25 29 35;
+  --swarm-surface-hi: 33 39 48;
+  --swarm-border: 44 51 61;
+  --swarm-border-hi: 97 105 114;
+  --swarm-gold: 224 168 58;
+  --swarm-gold-hi: 240 195 104;
+  --swarm-gold-dim: 169 122 37;
+  --swarm-honey: 240 195 104;
+  --swarm-amber: 208 146 47;
+  --swarm-text: 238 241 245;
+  --swarm-text-dim: 179 189 201;
+  --swarm-text-muted: 125 136 150;
+  --swarm-ok: 79 178 134;
+  --swarm-warn: 216 161 60;
+  --swarm-err: 224 100 94;
+  /* Hex mirrors (JS/SVG); applyTheme keeps these in sync with channel tokens */
+  --swarm-canvas-hex: #0e1013;
+  --swarm-canvas-hi-hex: #14171c;
+  --swarm-surface-hex: #191d23;
+  --swarm-surface-hi-hex: #212730;
+  --swarm-border-hex: #2c333d;
+  --swarm-border-hi-hex: #616972;
+  --swarm-gold-hex: #e0a83a;
+  --swarm-gold-hi-hex: #f0c368;
+  --swarm-gold-dim-hex: #a97a25;
+  --swarm-honey-hex: #f0c368;
+  --swarm-amber-hex: #d0922f;
+  --swarm-text-hex: #eef1f5;
+  --swarm-text-dim-hex: #b3bdc9;
+  --swarm-text-muted-hex: #7d8896;
+  --swarm-ok-hex: #4fb286;
+  --swarm-warn-hex: #d8a13c;
+  --swarm-err-hex: #e0645e;
+}
+
+/* Motion scale. Two durations and one curve for the whole app — the file used
+   to carry 0.14s/0.24s/5000s picked per rule, so a hover and the elevation
+   change it triggered ran at different speeds and read as two events. These are
+   NOT theme tokens; applyTheme never touches them. */
+:root {
+  --swarm-ease: cubic-bezier(0.2, 0, 0, 1);
+  --swarm-t-fast: 90ms;  /* hover, press, colour-only feedback */
+  --swarm-t-base: 150ms; /* elevation and state changes */
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow: hidden;
+  color: rgb(var(--swarm-text));
+  background-color: rgb(var(--swarm-canvas));
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'cv11', 'ss01';
+  letter-spacing: -0.008em;
+}
+
+/* Terminal panes and code keep tabular figures so columns never wobble.
+   The three resets undo body's UI typography, which inherits into here: xterm
+   measures ONE glyph and lays every cell of the grid out on that width, so
+   body's negative tracking, its stylistic sets and optimizeLegibility's
+   ligature/kerning pass all shift glyphs off the cell they were measured for.
+   The drift is sub-pixel per column and a full character by column 80 — which
+   is exactly the "terminals don't look right" everyone sees and nobody can
+   name. */
+.font-mono, code, kbd, pre, .xterm {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: normal;
+  font-feature-settings: normal;
+  text-rendering: auto;
+}
+
+/* Selection had no theme colour, so every surface fell back to the platform
+   blue — the one non-themed pixel in the app. */
+::selection {
+  background: rgb(var(--swarm-gold) / 0.3);
+  color: rgb(var(--swarm-text));
+}
+
+/* Baseline for the many buttons that ship no disabled treatment of their own.
+   Kept in :where() so it has zero specificity: any component that already
+   picks its own `disabled:opacity-*` still wins without needing !important. */
+:where(button, [role="button"]):disabled,
+:where([aria-disabled="true"]) {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Global scrollbar — extremely thin, themed, unobtrusive. Set on the root and
+   inherited, not sprayed via `*`: both properties inherit, and re-asserting
+   them on every element is what stopped `.xterm-viewport { scrollbar-width:
+   none }` from reaching the scroller Firefox actually sizes. */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--swarm-gold) / 0.3) transparent;
+}
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--swarm-gold) / 0.28);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--swarm-gold) / 0.55);
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+/* xterm manages its own scroll — hide its viewport bar (wheel still works) */
+.xterm-viewport {
+  scrollbar-width: none;
+}
+.xterm-viewport::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Global input & autofill — follow active theme tokens */
+input, select, textarea {
+  color: rgb(var(--swarm-text)) !important;
+  caret-color: rgb(var(--swarm-gold));
+  /* The UA paints form fields on an opaque white `field` background, which the
+     light text forced above becomes invisible against. Clearing it lets a bare
+     input sit on its parent's surface; an input carrying `.glass-inset` gets
+     that class's own opaque fill instead (class beats type selector). */
+  background-color: transparent;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: rgb(var(--swarm-text)) !important;
+  -webkit-box-shadow: 0 0 0px 1000px rgb(var(--swarm-canvas)) inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Kill Chromium's default blue focus ring on pointer focus — components draw
+   their own accent ring. :focus-visible is deliberately NOT killed here: that
+   is the keyboard user's only way to see where they are. */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none !important;
+  box-shadow: none;
+}
+
+/* One keyboard focus ring for the whole app, in the active theme's accent.
+   Applies to every package's buttons too — they all render into this document. */
+:focus-visible {
+  outline: 2px solid rgb(var(--swarm-gold));
+  outline-offset: 1px;
+  border-radius: inherit;
+}
+
+/* xterm draws its own cursor; a ring around the canvas is noise. */
+.xterm-helper-textarea:focus-visible,
+.xterm textarea:focus-visible {
+  outline: none;
+}
+
+@layer components {
+  /*
+   * THE ELEVATION LADDER
+   *
+   * canvas -> canvas-hi -> surface -> surface-hi, four token values that are
+   * genuinely four different greys. They used to be painted at 0.5-0.86 alpha
+   * over a dark floor, which composited all four toward the same rendered
+   * value — the translucency, not a missing shadow, is what made the whole app
+   * read as one flat sheet. So the ladder is opaque now, and blur survives on
+   * exactly one class (.glass-hi), the only tier that actually overlaps other
+   * content. Blur therefore means "this floats above you" instead of being
+   * ambient noise, and a grid of panes stopped stacking four backdrop-filters
+   * per frame for a result nobody could see.
+   *
+   * Every value is a --swarm-* token: a hardcoded hex here breaks two of the
+   * three themes.
+   */
+
+  /* Floor. The darkest thing on screen — deliberately no canvas-hi wash at the
+     top any more, because that is the value .glass uses and a floor that
+     matches the panes is the flatness this pass exists to fix. */
+  .app-canvas {
+    background-color: rgb(var(--swarm-canvas));
+    background-image:
+      radial-gradient(1200px 700px at 15% -10%, rgb(var(--swarm-gold) / 0.07), transparent 60%),
+      radial-gradient(1000px 800px at 100% 0%, rgb(var(--swarm-gold-dim) / 0.07), transparent 55%),
+      radial-gradient(900px 900px at 50% 120%, rgb(var(--swarm-border) / 0.3), transparent 60%),
+      repeating-linear-gradient(60deg, rgb(var(--swarm-gold) / 0.025) 0 1px, transparent 1px 26px),
+      repeating-linear-gradient(-60deg, rgb(var(--swarm-gold) / 0.025) 0 1px, transparent 1px 26px);
+  }
+
+  /*
+   * The Flow canvas floor. Two dot grids at a 1:5 ratio — a fine one for
+   * placement and a brighter one every fifth cell, so distance is still
+   * readable when zoomed out and the fine grid has collapsed into fog. Same
+   * warm depth wash as the app canvas, so Flow reads as part of the swarm
+   * rather than a blank document.
+   */
+  .canvas-surface {
+    background-color: rgb(var(--swarm-canvas));
+    background-image:
+      radial-gradient(circle at center, rgb(var(--swarm-text) / 0.10) 1px, transparent 1.2px),
+      radial-gradient(circle at center, rgb(var(--swarm-gold) / 0.18) 1.4px, transparent 1.6px),
+      radial-gradient(1000px 640px at 12% -8%, rgb(var(--swarm-gold) / 0.07), transparent 62%),
+      radial-gradient(900px 720px at 92% 4%, rgb(var(--swarm-gold-dim) / 0.06), transparent 58%);
+    background-repeat: repeat, repeat, no-repeat, no-repeat;
+  }
+
+  /* Elevation 1 — a pane or card frame, sitting on the floor. Opaque, so the
+     1px border and the drop shadow are the whole separation; the top rim-light
+     and bottom shade are what stop it reading as a flat rectangle. */
+  .glass {
+    background-color: rgb(var(--swarm-canvas-hi));
+    border: 1px solid rgb(var(--swarm-border));
+    box-shadow:
+      0 10px 28px -14px rgb(0 0 0 / 0.7),
+      inset 0 1px 0 0 rgb(var(--swarm-text) / 0.06),
+      inset 0 -1px 0 0 rgb(0 0 0 / 0.25);
+    transition:
+      box-shadow var(--swarm-t-base) var(--swarm-ease),
+      border-color var(--swarm-t-base) var(--swarm-ease);
+  }
+
+  /* A pane's content area. Same value as its frame so the two are continuous —
+     the frame's job is the edge, not a second colour. */
+  .glass-body {
+    background-color: rgb(var(--swarm-canvas-hi));
+  }
+
+  /* Elevation 2 — pane headers, title bars, the board strip. One step lighter
+     than the pane it sits on, which is what finally separates a header from its
+     own body; the hairline is a bottom inset rather than a border so it costs
+     no layout height. */
+  .glass-toolbar {
+    background-color: rgb(var(--swarm-surface));
+    box-shadow:
+      inset 0 1px 0 0 rgb(var(--swarm-text) / 0.05),
+      inset 0 -1px 0 0 rgb(var(--swarm-border));
+  }
+
+  /* A vertical rail: sidebars and docks. One step above the floor, one below a
+     header, with a single lit inner edge facing the board. */
+  .glass-rail {
+    background-color: rgb(var(--swarm-canvas-hi));
+    box-shadow: inset -1px 0 0 0 rgb(var(--swarm-text) / 0.05);
+  }
+
+  /* Elevation -1 — inputs, wells, anything cut INTO a surface. Must set
+     background-color, not just a background-image: on an <input> the UA's
+     opaque white field colour shows through a semi-transparent image and the
+     light text above it disappears. */
+  .glass-inset {
+    background-color: rgb(var(--swarm-canvas));
+    border: 1px solid rgb(var(--swarm-border));
+    box-shadow:
+      inset 0 1px 3px 0 rgb(0 0 0 / 0.35),
+      inset 0 -1px 0 0 rgb(var(--swarm-text) / 0.04);
+  }
+
+  /* Elevation 3 — menus, dialogs, popovers, the command palette. The only tier
+     that genuinely overlaps other content, so it is the only one that keeps a
+     backdrop blur: here the blur carries information (what is behind is out of
+     reach) instead of being decoration. */
+  .glass-hi {
+    background-color: rgb(var(--swarm-surface-hi) / 0.92);
+    backdrop-filter: blur(20px) saturate(1.6);
+    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+    border: 1px solid rgb(var(--swarm-border-hi) / 0.7);
+    box-shadow:
+      0 20px 48px -18px rgb(0 0 0 / 0.75),
+      inset 0 1px 0 0 rgb(var(--swarm-text) / 0.1),
+      inset 0 -1px 0 0 rgb(0 0 0 / 0.3);
+  }
+
+  /* The hover binding for the lifted shadow below. Tailwind cannot supply a
+     `hover:` variant here: `shadow-glass-lg` is a component class, not a key
+     in the theme's boxShadow scale, so `hover:shadow-glass-lg` compiles to
+     nothing and the lift silently never happens. */
+  .glass-lift {
+    transition:
+      box-shadow var(--swarm-t-base) var(--swarm-ease),
+      border-color var(--swarm-t-base) var(--swarm-ease);
+  }
+  .glass-lift:hover {
+    border-color: rgb(var(--swarm-border-hi));
+    box-shadow:
+      0 16px 36px -14px rgb(0 0 0 / 0.75),
+      inset 0 1px 0 0 rgb(var(--swarm-text) / 0.1),
+      inset 0 -1px 0 0 rgb(0 0 0 / 0.28);
+  }
+
+  /* Lift on hover. Paired with .glass on anything interactive. */
+  .shadow-glass-lg {
+    box-shadow:
+      0 16px 36px -14px rgb(0 0 0 / 0.75),
+      inset 0 1px 0 0 rgb(var(--swarm-text) / 0.1),
+      inset 0 -1px 0 0 rgb(0 0 0 / 0.28);
+  }
+
+  /* A specular sweep across the top of a sheet. Opt-in, and only meaningful on
+     .glass-hi — everything below that tier is opaque now, and a z-index:-1
+     pseudo-element behind an opaque background paints nothing. */
+  .glass-sheen {
+    position: relative;
+    isolation: isolate;
+  }
+  .glass-sheen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(
+      120% 80% at 12% -20%,
+      rgb(var(--swarm-text) / 0.08),
+      transparent 62%
+    );
+  }
+
+  /*
+   * Active pane — the focused one, across a grid of identical ones. This is the
+   * product's core job (tell agents apart at a glance), so it is the one place
+   * the design is allowed to shout.
+   *
+   * An outline rather than a border + glow, for two reasons that were both live
+   * bugs. It used to bump border-width 1px -> 2px, which changes the pane's
+   * content box: the terminal inside re-fit its whole character grid on every
+   * focus change, so clicking between panes made the text jump. And its glow was
+   * a box-shadow declared here in the components layer, which loses the cascade
+   * tie to the `shadow-glass` utility the pane also carries — so the glow never
+   * actually painted. Outline is painted outside layout and fights nothing,
+   * which also leaves box-shadow free for the drag-drop ring and leaves the
+   * drop-target's accent top border visible.
+   *
+   * Near-opaque so it survives Obsidian, whose accent is a cold blue against an
+   * almost black pane — a 0.18-alpha ring simply vanished there.
+   */
+  .pane-active {
+    outline: 2px solid rgb(var(--swarm-gold) / 0.9);
+    outline-offset: -1px;
+  }
+
+  /* The second half of focus: the pane's header lifts a rung. Descendant, not
+     child — the header is nested inside the pane's own component, not a direct
+     child of the frame. Two classes beats .glass-toolbar's one, so this wins
+     without !important. */
+  .pane-active .glass-toolbar {
+    background-color: rgb(var(--swarm-surface-hi));
+  }
+
+  /*
+   * Two thinner variants of the global bar. They only override the track
+   * WIDTH — track/thumb/hover colours are inherited from the global
+   * ::-webkit-scrollbar rules above, which they used to restate at very
+   * slightly different alphas. Three near-identical treatments meant a list
+   * and the strip beside it drew visibly different greys; now there is one
+   * colour and three sizes. Firefox has no per-element sizing beyond
+   * `thin`/`none`, so it keeps the global thin bar for all three — the two
+   * engines agree on colour, which is the part you can see.
+   */
+  .scrollbar-sleek::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  /* Hairline horizontal scrollbar — for the tab strip */
+  .scrollbar-hair::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+}
+
+/* The two accessibility overrides live at the very END of the file, after the
+   components layer, so plain source order settles the tie with the classes they
+   override and neither needs !important to win. */
+
+/* Motion is decoration here, never information. Strip it on request. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* The ladder is already opaque, so .glass-hi is the only surface left to fix:
+   drop its blur and close the last 8% of transparency. The sheen goes too — a
+   tint gradient over an opaque fill just looks dirty. */
+@media (prefers-reduced-transparency: reduce) {
+  .glass-hi {
+    background-color: rgb(var(--swarm-surface-hi));
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .glass-sheen::before {
+    display: none;
+  }
+}
