@@ -151,7 +151,7 @@ const INITIAL_MESSAGES: DevChatMessage[] = [
   {
     id: "msg-welcome",
     sender: "assistant",
-    text: "Hey there! 👋 I'm your AI Copilot powered by **Claude 5 Opus**. Ask me anything about your project, brainstorm ideas, write code, attach context with `@`, or execute live tasks with your installed CLIs.",
+    text: "I am your AI Copilot powered by **Claude 5 Opus**. You can ask technical questions, write and refactor code, inspect project structure, or attach context with `@`.",
     timestamp: "Just now",
   },
 ];
@@ -269,8 +269,8 @@ function generateSmartAssistantResponse(query: string, modelName: string): { rep
     lower.includes("library")
   ) {
     return {
-      thought: `1. Analyzed query for UI component libraries & design systems.\n2. Curated the top 2026 production-ready UI libraries with modern Tailwind CSS & React/Next.js integration.\n3. Formatted with features, use cases, and setup commands.`,
-      reply: `Bhai, modern web development aur React/Next.js ke liye **Top Best UI Component Websites & Libraries** ye hain:\n\n### 🏆 1. shadcn/ui (Sabse Popular & Industry Standard)\n• **Website**: \`ui.shadcn.com\`\n• **Kyu use karein**: Copy-paste architecture, Radix UI primitives + Tailwind CSS. Code aapke project me rehta hai toh 100% full customization control milta hai.\n• **Setup**: \`npx shadcn@latest init\`\n\n### ✨ 2. Aceternity UI (Insane 3D & Modern Animations)\n• **Website**: \`ui.aceternity.com\`\n• **Kyu use karein**: Glowing cards, 3D Pin, Sparkles, Background Beams, Parallax Scroll aur Bento Grid jaise hero section components.\n\n### 🪄 3. Magic UI (High-End Animations & Micro-Interactions)\n• **Website**: \`magicui.design\`\n• **Kyu use karein**: Retro grids, Marquee, Shimmer buttons, Animated beam, aur interactive particles.\n\n### 🎨 4. Uiverse.io (Community Pure CSS & Tailwind)\n• **Website**: \`uiverse.io\`\n• **Kyu use karein**: Ready-made animated buttons, loaders, checkbox, aur switch designs jise bina kisi package install ke direct copy kar sakte hain.\n\n### ⚡ 5. Tailwind UI (Official Premium Components)\n• **Website**: \`tailwindui.com\`\n• **Kyu use karein**: Official Tailwind team ke banaye highly polished application UI, marketing headers, aur dashboards.\n\n### 🛠️ 6. NextUI / HeroUI\n• **Website**: \`heroui.com\` (pehle NextUI)\n• **Kyu use karein**: Pre-styled rich dark mode support aur accessible components.\n\n**Recommendation**: Landing page ke liye **Aceternity UI + Magic UI** use karo, aur dashboard/app ke forms & tables ke liye **shadcn/ui**!`,
+      thought: `1. Analyzed query for UI component libraries & design systems.\n2. Curated top production-ready UI libraries with modern Tailwind CSS & React/Next.js integration.\n3. Formatted with features, use cases, and setup commands.`,
+      reply: `Modern React aur Next.js ke liye **Top Best UI Component Libraries & Websites** ye hain:\n\n### 1. shadcn/ui (Industry Standard)\n• **Website**: \`ui.shadcn.com\`\n• **Features**: Copy-paste architecture, Radix UI primitives + Tailwind CSS. Code aapke project me rehta hai isliye 100% customization control milta hai.\n• **Setup**: \`npx shadcn@latest init\`\n\n### 2. Aceternity UI (Modern 3D & Hero Animations)\n• **Website**: \`ui.aceternity.com\`\n• **Features**: Glowing cards, 3D Pin, Sparkles, Background Beams, Parallax Scroll aur Bento Grid components.\n\n### 3. Magic UI (High-End Micro-Interactions)\n• **Website**: \`magicui.design\`\n• **Features**: Retro grids, Marquee, Shimmer buttons, Animated beam, aur interactive particle flows.\n\n### 4. Uiverse.io (Community Pure CSS & Tailwind)\n• **Website**: \`uiverse.io\`\n• **Features**: 3,000+ ready-to-use animated buttons, loaders, cards, aur switches jo bina package install kiye copy-paste ho jaate hain.\n\n### 5. Tailwind UI (Official Templates)\n• **Website**: \`tailwindui.com\`\n• **Features**: Official Tailwind team ke banaye application dashboards aur marketing headers.\n\n### 6. NextUI / HeroUI\n• **Website**: \`heroui.com\`\n• **Features**: Pre-styled accessible components with built-in dark mode support.\n\n**Recommendation**: Landing page animations ke liye **Aceternity UI + Magic UI**, aur core dashboard forms & tables ke liye **shadcn/ui** best combination hai.`,
     };
   }
 
@@ -286,7 +286,7 @@ function generateSmartAssistantResponse(query: string, modelName: string): { rep
   ) {
     return {
       thought: `1. Identified frontend React/Next.js architecture question.\n2. Synthesizing best practice state management and lifecycle patterns.`,
-      reply: `### React & Next.js Best Practices:\n\n• **State Management**: Local state ke liye \`useState\`, lightweight global state ke liye **Zustand** (Redux se bahut fast & clean hai), aur server data caching ke liye **TanStack React Query**.\n• **Server vs Client Components**: Next.js App Router me by default components Server Components hote hain. State, events, ya hooks (\`useState\`, \`useEffect\`) lagane ke liye top par \`"use client";\` likhein.\n• **Performance**: Expensive computations ke liye \`useMemo\` aur stable callbacks ke liye \`useCallback\` use karein.`,
+      reply: `### React & Next.js Architecture:\n\n• **State Management**: Local component state ke liye \`useState\`, global state ke liye **Zustand** (lightweight aur boilerplate-free), aur server state caching ke liye **TanStack React Query**.\n• **Server vs Client Components**: Next.js App Router me default Server Components hote hain. Interactive state ya hooks ke liye top par \`"use client";\` add karein.\n• **Performance Optimization**: Expensive computation memoization ke liye \`useMemo\` aur stable callback references ke liye \`useCallback\` use karein.`,
     };
   }
 
@@ -303,15 +303,15 @@ function generateSmartAssistantResponse(query: string, modelName: string): { rep
   ) {
     return {
       thought: `1. Processing backend & database architecture query.\n2. Outlining modern backend stack recommendations with ORMs.`,
-      reply: `### Backend & Database Recommendations:\n\n• **Relational DB**: **PostgreSQL** + **Prisma ORM** ya **Drizzle ORM** (Type-safe schemas aur fast migrations).\n• **Auth**: **NextAuth.js (Auth.js)**, **Clerk**, ya **Supabase Auth**.\n• **Server Frameworks**: Node.js me **Fastify** ya **Express**, aur Python me **FastAPI**.\n• **Caching & Queue**: **Redis** (Upstash Redis serverless ke liye best hai).`,
+      reply: `### Backend & Database Recommendations:\n\n• **Relational DB**: **PostgreSQL** with **Prisma ORM** ya **Drizzle ORM** (full type safety & auto-migrations).\n• **Authentication**: **NextAuth.js (Auth.js)**, **Clerk**, ya **Supabase Auth**.\n• **API Framework**: Node.js me **Fastify** / **Express**, aur Python me **FastAPI**.\n• **Caching & Queue**: **Redis** (Upstash Redis for serverless deployments).`,
     };
   }
 
   // 4. Greetings
   if (/^(hi|hello|hey|hola|namaste|sup|yo|kya hal|kaise ho|kaisi ho|bhai)\b/i.test(lower)) {
     return {
-      thought: `1. Received user greeting.\n2. Formulating warm contextual introduction with ${modelName}.`,
-      reply: `Haan bhai, bolo! 👋 Main **${modelName}** hu.\n\nKaise madad karu? Aap mujhse:\n• Koi bhi tech question pooch sakte ho (e.g. UI tools, architecture, frameworks)\n• Code likhwa ya refactor karwa sakte ho\n• Bugs aur UI errors debug karwa sakte ho\n\nBatao kya shuru karein?`,
+      thought: `1. Received user greeting.\n2. Formulating clean contextual introduction with ${modelName}.`,
+      reply: `Hello! Main **${modelName}** hu. Bataiye aaj kya kaam karna hai?\n\n• Code generation ya refactoring\n• UI design systems & library recommendations\n• Project architecture ya bug debugging\n• Direct CLI command execution`,
     };
   }
 
@@ -319,7 +319,7 @@ function generateSmartAssistantResponse(query: string, modelName: string): { rep
   if (/^(kaise bat karu|kaise baat karu|how to chat|how to talk|help|kya karu)\b/i.test(lower)) {
     return {
       thought: `1. Formulating user guide and interaction cheatsheet.`,
-      reply: `Aap mujhse bilkul normal ChatGPT ya Claude ki tarah baat kar sakte hain! 💬\n\n**Aap aise pooch sakte hain:**\n1. *"Best website batao UI components ke liye"*\n2. *"React me Auth component bana ke do"*\n3. *"Git Diff review karo"* (\`Attach\` button se attach karke)\n4. Top right me **🎙️ Voice Mode** click karke voice se baat kar sakte ho.\n\nBataiye abhi kya help chahiye?`,
+      reply: `Aap yahan direct technical queries pooch sakte hain:\n\n1. Kisi bhi library ya architecture ke baare me sawaal poochein\n2. Naya feature ya component banane ka prompt dein\n3. \`Attach\` menu se **Git Diff** ya **Project Tree** attach karke code review karwayen\n4. Top right me **Voice Mode** se voice command execute karein`,
     };
   }
 
@@ -327,7 +327,7 @@ function generateSmartAssistantResponse(query: string, modelName: string): { rep
   if (lower.includes("explain") || lower.includes("structure") || lower.includes("architecture")) {
     return {
       thought: `1. Reviewing package topology and IPC communication layers.`,
-      reply: `### Swarm Architecture\n\nAapka workspace clean modular packages me divide hai:\n\n• **\`@swarm/workspace\`**: WorkHives aur file explorer manage karta hai.\n• **\`@swarm/agents\`**: Multi-agent orchestration layer jo subagents spawn karta hai.\n• **\`@swarm/plugins\`**: DevChat Studio aur DevTools ko host karta hai.\n• **\`@swarm/lead\`**: Lead agent supervisor jo tasks coordinate karta hai.`,
+      reply: `### Swarm Architecture\n\nWorkspace modular packages me divide hai:\n\n• **\`@swarm/workspace\`**: WorkHives aur file explorer system\n• **\`@swarm/agents\`**: Multi-agent orchestration layer\n• **\`@swarm/plugins\`**: DevChat Studio aur DevTools host\n• **\`@swarm/lead\`**: Lead agent supervisor coordination`,
     };
   }
 
@@ -335,14 +335,14 @@ function generateSmartAssistantResponse(query: string, modelName: string): { rep
   if (lower.includes("test") || lower.includes("vitest") || lower.includes("jest")) {
     return {
       thought: `1. Synthesizing isolated unit test suite with Vitest.`,
-      reply: `Ye lijiye aapke module ke liye clean Vitest unit test:\n\n\`\`\`typescript\nimport { describe, it, expect } from "vitest";\n\ndescribe("Workspace Engine", () => {\n  it("initializes active session cleanly", () => {\n    expect(true).toBe(true);\n  });\n});\n\`\`\``,
+      reply: `Vitest unit test template:\n\n\`\`\`typescript\nimport { describe, it, expect } from "vitest";\n\ndescribe("Workspace Engine", () => {\n  it("initializes active session cleanly", () => {\n    expect(true).toBe(true);\n  });\n});\n\`\`\``,
     };
   }
 
   // 8. General Detailed Tech Resolution
   return {
-    thought: `1. Deconstructed user query: "${query}".\n2. Performing multi-layer technical analysis with ${modelName}.\n3. Synthesizing comprehensive, structured explanation with actionable advice.`,
-    reply: `Maine aapke question **"${query}"** ko analyze kiya hai:\n\n### 💡 Solution & Key Points:\n1. **Core Concept**: Aapki query ke hisaab se best practice modular approach follow karna chahiye.\n2. **Implementation**: Agar aapko iska code template ya architecture plan chahiye toh bataiye, main exact component likh dunga.\n3. **Recommendation**: Project requirements ke sath match karke standard tools integrate karein.\n\nKya aapko iska specific code example ya setup steps chahiye?`,
+    thought: `1. Deconstructed user query: "${query}".\n2. Performing technical analysis with ${modelName}.\n3. Synthesizing structured explanation.`,
+    reply: `Aapki query **"${query}"** ka analysis:\n\n### Key Technical Points:\n1. **Approach**: Modular aur type-safe architecture follow karna recommended hai.\n2. **Actionable Step**: Is requirement ke specific implementation details ya code snippet generate karne ke liye exact scenario specify karein.\n\nMain iska complete code block generate kar deta hu.`,
   };
 }
 
