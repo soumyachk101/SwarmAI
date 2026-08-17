@@ -115,10 +115,10 @@ Swarm follows a **ports-and-adapters** architecture with a strict **purity bound
 │ TAURI IPC │ │ (typed ports) │ │ │
 ├────────────┴────────────┴──────────────────┴────────┴───────────────┤
 │ RUST BACKEND (lib.rs) │
-│ PTY │ FS │ Git/Worktree │ Pheromone │ CDP Browser │ Whisper │ Emulator│
+│ PTY │ FS │ Git/Worktree │ Pheromone │ CDP Browser │ Whisper │ Emu │
 ├─────────────────────────────────────────────────────────────────────┤
 │ SHARED MEMORY (Pheromone) │
-│ SQLite + FTS5 │ Hybrid Vector+Keyword │ RRF Merge │
+│ SQLite + FTS5 │ Hybrid Vector+Keyword │ RRF Merge │ Token Budget │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -134,24 +134,38 @@ Swarm follows a **ports-and-adapters** architecture with a strict **purity bound
 
 ### Monorepo Topology
 
-The project is organized as **13 packages** in a pnpm workspace, orchestrated by Turborepo (`pnpm-workspace.yaml` lists 14 entries but `landing-page` is a stale entry with no on-disk directory):
+The project is organized as **13 packages** in a pnpm workspace, orchestrated by Turborepo:
 
-```
-swarm-ai/
-├── swarm/ # 🖥️ Desktop app (Tauri shell + React frontend)
-├── pheromone/ # 🧠 Project memory engine (SQLite, FTS5, embeddings, RRF)
-│ └── pheromone-mcp/ # MCP stdio server exposing pheromone_query
-├── swarmmind/ # ⚡ Orchestration engine (pure core + Tauri adapter)
-├── lead/ # 🎯 AI planner (goal → task decomposition + modes)
-├── tasks/ # 📋 Task board & pipeline state
-├── agents/ # 🤖 Agent launcher & 10+ CLI adapters
-├── voice/ # 🎙️ Local dictation (whisper.cpp)
-├── board/ # 📊 Board primitives & accessibility
-├── flow/ # 🎨 Infinite canvas editor
-├── workspace/ # 🗂️ Multi-workspace coordination
-├── swarmplugins/ # 🔌 Internal plugin registry
-├── swarmextension/ # 🧩 VS Code extension (Open VSX)
-└── design-system/ # 🎨 Design tokens & components
+```mermaid
+graph TD
+ subgraph "Swarm AI Monorepo"
+ swarm["swarm/<br/>🖥️ Desktop App<br/>(Tauri + React)"]
+ pheromone["pheromone/<br/>🧠 Memory Engine<br/>(SQLite + FTS5 + RRF)"]
+ swarmmind["swarmmind/<br/>⚡ Orchestrator<br/>(Pure Core + Tauri)"]
+ lead["lead/<br/>🎯 AI Planner<br/>(3 Modes)"]
+ tasks["tasks/<br/>📋 Task Board"]
+ agents["agents/<br/>🤖 Agent Launcher<br/>(10+ CLI Adapters)"]
+ voice["voice/<br/>🎙️ Whisper.cpp STT"]
+ board["board/<br/>📊 Board Primitives"]
+ flow["flow/<br/>🎨 Infinite Canvas"]
+ workspace["workspace/<br/>🗂️ Multi-Workspace"]
+ plugins["swarmplugins/<br/>🔌 Plugin Registry"]
+ extension["swarmextension/<br/>🧩 VS Code Extension"]
+ design["design-system/<br/>🎨 Design Tokens"]
+ end
+
+ swarm --> pheromone
+ swarm --> swarmmind
+ swarm --> lead
+ swarm --> tasks
+ swarm --> agents
+ swarm --> voice
+ swarm --> board
+ swarm --> flow
+ swarm --> workspace
+ swarm --> plugins
+ swarm --> extension
+ swarm --> design
 ```
 
 ---
@@ -217,17 +231,23 @@ Lead's workflow:
 
 SwarmMind is the engine that makes parallel agent work safe:
 
-```
-Goal → Breakdown → Plan (lock check) → Dispatch → Worktree → Agent
- ↓
- Complete
- ↓
- Review
- / \
- Approve Reject
- ↓ ↓
- Merge + Retry
- Release Locks
+```mermaid
+stateDiagram-v2
+ [*] --> Plan: Goal received
+ Plan --> LockCheck: Tasks broken down
+ LockCheck --> Blocked: File conflict
+ LockCheck --> Dispatch: All clear
+ Blocked --> LockCheck: Conflict resolved
+ Dispatch --> Worktree: Create git worktree
+ Worktree --> Running: Agent spawned
+ Running --> Complete: Agent finishes
+ Complete --> Review: Diff generated
+ Review --> Approve: Checks pass
+ Review --> Reject: Issues found
+ Reject --> Retry: Fix & re-dispatch
+ Approve --> Merge: git merge to main
+ Merge --> [*]: Locks released
+ Retry --> Running
 ```
 
 **Roles** understood by the orchestrator:
@@ -246,6 +266,18 @@ Goal → Breakdown → Plan (lock check) → Dispatch → Worktree → Agent
 - Locks released only after successful merge
 - Survives across multiple dispatch cycles
 
+### 🔄 Agent Handoff System
+
+```mermaid
+graph LR
+ A[Agent A<br/>Builder] -->|writes handoff| H[handoffs/task-id.md]
+ H -->|read by| B[Agent B<br/>Reviewer]
+ H -->|read by| C[SwarmMind<br/>Coordinator]
+ B -->|messages via| M[MessageBus<br/>inbox.jsonl]
+ C -->|broadcasts to| M
+ M -->|delivers to| D[All Agents]
+```
+
 ---
 
 ## Features Deep Dive
@@ -261,6 +293,7 @@ Swarm uses a **plane-based layout** — one surface at a time, switchable from t
 | **Browser** | CDP-powered localhost preview with screenshot capture for agents |
 | **Emulator** | Android AVD builder and boot pane with immutable device configs |
 | **Board** | Visual task board (Kanban) with drag-and-drop |
+| **Flow** | Infinite canvas editor for visual planning |
 
 ### 🌐 Browser Pane (CDP Integration)
 
@@ -358,7 +391,7 @@ An **infinite canvas editor** for visual planning:
 | **OpenCode** | Open-source coding assistant |
 | **Aider** | AI pair programming |
 | **Cursor CLI** | Cursor editor AI |
-| ** Cline, Kiro, Kilo, Antigravity CLI** | Additional supported CLIs |
+| **Cline, Kiro, Kilo, Antigravity CLI** | Additional supported CLIs |
 
 ### Memory & Search
 
@@ -377,6 +410,7 @@ An **infinite canvas editor** for visual planning:
 | **Turborepo** | Monorepo build orchestration |
 | **Vitest** | Unit testing framework |
 | **Tauri CLI** | Desktop app build and packaging |
+| **GitHub Actions** | CI/CD for Windows (.exe, .msi) and macOS (.dmg) releases |
 
 ---
 
@@ -408,6 +442,7 @@ Each agent pane gets:
 - MCP auto-registration (Pheromone query tool)
 - Permission bypass flags where applicable
 - Environment variables (API keys from Settings)
+- Security-hardened environment — only allowlisted env vars forwarded
 
 ### 3. Break Down a Goal
 
@@ -496,9 +531,9 @@ agents/ 8 test files — CLI integration, security, UI state, spawn lifecycle
 board/ 2 test files — Accessibility, brand consistency
 flow/ 2 test files — Canvas geometry, camera math
 lead/ 2 test files — Task decomposition, mode-based permissions
-pheromone/2 test files — Search algorithms, plan persistence
+pheromone/ 2 test files — Search algorithms, plan persistence
 swarm/ 4 test files — CDP browser, AVD config, migrations, WCAG contrast
-swarmmind/5 test files — Orchestration, handoffs, purity guards, messages, dispatch
+swarmmind/ 5 test files — Orchestration, handoffs, purity guards, messages, dispatch
 tasks/ 3 test files — Board ops, card immutability, pipeline construction
 voice/ 5 test files — STT engine, voice processor, purity, cleanup, types
 ```
@@ -716,7 +751,7 @@ swarm-ai/
 │ └── extensionStore.ts # Extension state management
 │
 ├── design-system/ # 🎨 Design tokens & components
-├── pnpm-workspace.yaml # Workspace configuration (13 actual packages; `landing-page` is a stale entry)
+├── pnpm-workspace.yaml # Workspace configuration (13 actual packages)
 ├── turbo.json # Build pipeline configuration
 ├── package.json # Root monorepo config
 └── LICENSE # Personal, non-commercial license
@@ -767,6 +802,7 @@ Each agent gets:
 - Permission bypass flags (where supported)
 - Proper PATH resolution (login shell + npm global bins)
 - Context injection from Pheromone before each turn
+- Security-hardened environment with allowlisted env vars only
 
 ---
 
@@ -774,37 +810,55 @@ Each agent gets:
 
 ### Hybrid Retrieval (Pheromone Search)
 
-The search pipeline in the Rust backend (lib.rs) and mirrored in JavaScript:
+The search pipeline combines keyword and vector search through Reciprocal Rank Fusion:
 
-1. **Sanitize** query — strip FTS5 metacharacters (`"`, `(`, `)`, `*`, leading `-`)
-2. **Keyword search** — FTS5 BM25 over all memory chunks
-3. **Vector search** — Embed query + all chunks with deterministic 384-dim char n-gram, cosine similarity
-4. **RRF merge** — Reciprocal Rank Fusion with k=60
-5. **Token budget** — Cap injected chunks at configurable token limit
+```mermaid
+graph LR
+ subgraph "Keyword Path"
+ Q1[Query] --> FTS[FTS5 BM25]
+ FTS --> KR[Keyword Rankings]
+ end
+ subgraph "Vector Path"
+ Q2[Query] --> EMB[Char n-gram → 384-dim]
+ EMB --> VS[Cosine Similarity]
+ VS --> VR[Vector Rankings]
+ end
+ KR --> RRF[RRF Merge k=60]
+ VR --> RRF
+ RRF --> TB[Token Budget]
+ TB --> OUT[Injected Context]
+```
+
+The Rust backend and JavaScript implementation produce **identical embeddings** using:
+- **Trigrams**: `(char[i] * 31 + char[i+1] * 7 + char[i+2]) % 384` — weight 1.0
+- **Bigrams**: `(char[i] * 31 + char[i+1]) % 384` — weight 0.5
+- **Unigrams**: `charCode % 384` — weight 0.25
+- **L2 normalization** → cosine similarity = dot product
 
 ### Rust Backend Commands (lib.rs)
 
-| Command | Purpose |
-|---------|---------|
-| `spawn_terminal` | Create PTY session, spawn child process, stream output via events |
-| `write_to_terminal` | Write stdin to PTY master |
-| `resize_terminal` | Resize PTY (SIGWINCH) |
-| `kill_terminal` | Kill child + reap |
-| `create_worktree` | Git worktree creation with conflict resolution (20 retry attempts) |
-| `merge_worktree` | Git merge + worktree removal |
-| `pheromone_ensure_structure` | Create `.pheromone/` directory tree + default memory files |
-| `pheromone_read/write_memory_file` | CRUD on `.pheromone/memory/*.md` |
-| `pheromone_index_file` | Chunk + embed + index a memory file (incremental by mtime) |
-| `pheromone_search` | Hybrid FTS5 + vector + RRF search |
-| `pheromone_inject` | Token-budgeted context injection |
-| `pheromone_log_session` | Log agent session to `.pheromone/agents/sessions/` |
-| `pheromone_list_sessions` | Enumerate sessions with frontmatter parsing |
-| `launch_cdp_browser` | Headless Chromium with CDP for Browser pane |
-| `git_status` | Branch + changed file count |
-| `git_push` / `git_pull` | Remote operations |
-| `detect_shells` | Platform-aware shell detection |
-| `copy_dir` / `remove_dir` | Skill installation/uninstallation |
-| `get_pheromone_mcp_path` | Resolve MCP server path across cwd changes |
+| Category | Command | Purpose |
+|----------|---------|---------|
+| **PTY** | `spawn_terminal` | Create PTY session, spawn child process, stream output via events |
+| **PTY** | `write_to_terminal` | Write stdin to PTY master |
+| **PTY** | `resize_terminal` | Resize PTY (SIGWINCH) |
+| **PTY** | `kill_terminal` | Kill child + reap |
+| **Git** | `create_worktree` | Git worktree creation with conflict resolution (20 retry attempts) |
+| **Git** | `merge_worktree` | Git merge + worktree removal |
+| **Git** | `git_status` | Branch + changed file count |
+| **Git** | `git_push` / `git_pull` | Remote operations |
+| **Pheromone** | `pheromone_ensure_structure` | Create `.pheromone/` directory tree + default memory files |
+| **Pheromone** | `pheromone_read/write_memory_file` | CRUD on `.pheromone/memory/*.md` |
+| **Pheromone** | `pheromone_index_file` | Chunk + embed + index a memory file (incremental by mtime) |
+| **Pheromone** | `pheromone_search` | Hybrid FTS5 + vector + RRF search |
+| **Pheromone** | `pheromone_inject` | Token-budgeted context injection |
+| **Pheromone** | `pheromone_log_session` | Log agent session to `.pheromone/agents/sessions/` |
+| **Pheromone** | `pheromone_list_sessions` | Enumerate sessions with frontmatter parsing |
+| **Browser** | `launch_cdp_browser` | Headless Chromium with CDP for Browser pane |
+| **Voice** | Whisper integration | Local STT via whisper.cpp |
+| **FS** | `copy_dir` / `remove_dir` | Skill installation/uninstallation |
+| **Misc** | `get_pheromone_mcp_path` | Resolve MCP server path across cwd changes |
+| **Misc** | `detect_shells` | Platform-aware shell detection |
 
 ### PATH Resolution Strategy
 
@@ -818,6 +872,14 @@ augmented_path_env = process PATH
 ```
 
 Timeout: 3 seconds for login shell probe — never blocks pane spawn.
+
+### Security-Hardened Environment
+
+The Rust backend carefully filters environment variables forwarded to agent processes:
+
+- **Allowlisted prefixes only**: `ANTHROPIC_`, `OPENAI_`, `GEMINI_`, `AWS_`, `GIT_*`, `HOME`, `USER`, `LANG`, etc.
+- **Explicitly blocked**: `LD_PRELOAD`, `DYLD_INSERT_LIBRARIES`, `NODE_OPTIONS`, `BASH_ENV`, `PYTHONPATH`, `GIT_SSH_COMMAND`, and other injection vectors
+- **macOS-first PATH**: Queries `launchctl getenv PATH` before falling back to login shell probe
 
 ### Architecture Purity Enforcement
 
