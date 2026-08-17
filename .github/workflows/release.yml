@@ -1,0 +1,87 @@
+name: Build & Release Cross-Platform App
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'windows-latest'
+            args: '--bundles nsis,msi'
+          - platform: 'macos-latest'
+            args: '--bundles dmg'
+          - platform: 'ubuntu-22.04'
+            args: '--bundles deb,appimage'
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install Rust Stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Install Linux Dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile || pnpm install
+
+      - name: Build dependencies
+        run: |
+          pnpm -r --filter "@swarm/*" --filter "!@swarm/app" build
+          pnpm --filter @swarm/plugins build || true
+
+      - name: Build Tauri Frontend
+        run: pnpm --filter @swarm/app build
+
+      - name: Build Tauri Desktop Bundle
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: './swarm'
+          tagName: v__VERSION__
+          releaseName: 'SwarmAI v__VERSION__'
+          releaseBody: 'Automated release for Windows (.exe, .msi), macOS (.dmg), and Linux.'
+          releaseDraft: false
+          prerelease: false
+          args: ${{ matrix.args }}
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: swarm-ai-${{ matrix.platform }}
+          path: |
+            swarm/src-tauri/target/release/bundle/nsis/*.exe
+            swarm/src-tauri/target/release/bundle/msi/*.msi
+            swarm/src-tauri/target/release/bundle/dmg/*.dmg
+            swarm/src-tauri/target/release/bundle/deb/*.deb
+            swarm/src-tauri/target/release/bundle/appimage/*.AppImage
+          if-no-files-found: warn
