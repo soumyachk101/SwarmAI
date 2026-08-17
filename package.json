@@ -7,6 +7,8 @@
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "turbo run lint",
+    "package": "./scripts/package-installers.sh",
+    "build:dmg": "pnpm --filter @swarm/app build && pnpm --filter @swarm/app tauri build --bundles dmg && ./scripts/package-installers.sh",
     "tauri": "pnpm --filter @swarm/app tauri",
     "tauri:dev": "pnpm --filter @swarm/app tauri:dev",
     "tauri:build": "pnpm --filter @swarm/app tauri:build"
