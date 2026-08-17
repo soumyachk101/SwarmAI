@@ -41,6 +41,12 @@
  <em>Built by <a href="https://github.com/soumyachk101">Soumya Chakraborty</a> · <a href="mailto:soumya.chk101@gmail.com">soumya.chk101@gmail.com</a></em>
 </p>
 
+<br />
+
+<p align="center">
+  <img src="assets/swarmai-preview.png" alt="SwarmAI Desktop Environment Preview" width="95%" style="border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);" />
+</p>
+
 </div>
 
 ---
