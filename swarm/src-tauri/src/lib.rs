@@ -401,7 +401,7 @@ async fn spawn_terminal(
                     break;
                 }
                 Ok(n) => {
-                    let mut combined = if leftover.is_empty() {
+                    let combined = if leftover.is_empty() {
                         buffer[..n].to_vec()
                     } else {
                         let mut v = std::mem::take(&mut leftover);
@@ -977,6 +977,7 @@ fn find_cli_executable(command: &str) -> Option<PathBuf> {
     None
 }
 
+#[allow(dead_code)]
 fn quote_for_cmd(s: &str) -> String {
     if s.is_empty() {
         return "\"\"".to_string();
@@ -3340,8 +3341,21 @@ pub struct CliUsage {
 /// ship more than one location depending on platform and version.
 fn usage_sources(cli: &str) -> Option<(&'static str, &'static [&'static [&'static str]])> {
     match cli {
-        "claude" => Some(("Claude Code", &[&[".claude", "projects"]])),
+        "claude" => Some((
+            "Claude Code",
+            &[
+                &[".claude", "projects"],
+                &[".claude", "sessions"],
+            ],
+        )),
         "codex" => Some(("Codex", &[&[".codex", "sessions"]])),
+        "agy" | "antigravity" => Some((
+            "Antigravity",
+            &[
+                &[".gemini", "antigravity-ide", "brain"],
+                &[".gemini", "config"],
+            ],
+        )),
         "opencode" => Some((
             "OpenCode",
             &[
@@ -3399,19 +3413,42 @@ fn parse_ts_millis(ts: &str) -> Option<i64> {
     Some(((days * 86_400) + h * 3600 + mi * 60 + sec) * 1000)
 }
 
-/// Sum the token fields Claude Code records for one assistant message.
-/// The plan a CLI is signed in with. Claude Code keeps it next to its OAuth
-/// token; nothing else in that file is touched, and no token ever leaves Rust.
+/// The plan and active model a CLI is configured with.
 fn cli_plan(home: &Path, cli: &str) -> Option<String> {
-    if cli != "claude" {
-        return None;
+    if cli == "claude" {
+        let mut model_name = None;
+        if let Ok(raw) = fs::read_to_string(home.join(".claude").join("settings.json")) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&raw) {
+                if let Some(m) = json.get("model").and_then(|v| v.as_str()) {
+                    model_name = Some(m.to_string());
+                }
+            }
+        }
+
+        let mut sub_tier = None;
+        if let Ok(raw) = fs::read_to_string(home.join(".claude").join(".credentials.json")) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&raw) {
+                if let Some(s) = json.get("claudeAiOauth").and_then(|o| o.get("subscriptionType")).and_then(|v| v.as_str()) {
+                    sub_tier = Some(s.to_string());
+                }
+            }
+        }
+
+        if let (Some(tier), Some(model)) = (sub_tier.as_ref(), model_name.as_ref()) {
+            return Some(format!("{} · {}", tier, model));
+        }
+        if let Some(model) = model_name {
+            return Some(model);
+        }
+        if let Some(tier) = sub_tier {
+            return Some(tier);
+        }
+        return Some("Pro Plan".to_string());
     }
-    let raw = fs::read_to_string(home.join(".claude").join(".credentials.json")).ok()?;
-    let json: serde_json::Value = serde_json::from_str(&raw).ok()?;
-    json.get("claudeAiOauth")?
-        .get("subscriptionType")?
-        .as_str()
-        .map(|s| s.to_string())
+    if cli == "agy" || cli == "antigravity" {
+        return Some("1M Context".to_string());
+    }
+    None
 }
 
 /// The four token counters Claude Code records per assistant message.
@@ -3541,6 +3578,41 @@ async fn cli_usage(clis: Vec<String>) -> Result<Vec<CliUsage>, String> {
             }
             if in_five {
                 usage.five_hour.sessions += 1;
+            }
+        }
+
+        // Also incorporate stats-cache.json for Claude Code so historical cumulative usage is never lost
+        if cli == "claude" {
+            let stats_path = home.join(".claude").join("stats-cache.json");
+            if let Ok(raw) = fs::read_to_string(&stats_path) {
+                if let Ok(val) = serde_json::from_str::<serde_json::Value>(&raw) {
+                    if let Some(model_usage) = val.get("modelUsage").and_then(|m| m.as_object()) {
+                        let mut total_in = 0u64;
+                        let mut total_out = 0u64;
+                        let mut total_cache_read = 0u64;
+                        let mut total_cache_write = 0u64;
+                        for (_, stats) in model_usage {
+                            total_in += stats.get("inputTokens").and_then(|v| v.as_u64()).unwrap_or(0);
+                            total_out += stats.get("outputTokens").and_then(|v| v.as_u64()).unwrap_or(0);
+                            total_cache_read += stats.get("cacheReadInputTokens").and_then(|v| v.as_u64()).unwrap_or(0);
+                            total_cache_write += stats.get("cacheCreationInputTokens").and_then(|v| v.as_u64()).unwrap_or(0);
+                        }
+                        if total_in > 0 || total_out > 0 {
+                            usage.has_token_data = true;
+                            let split = TokenSplit {
+                                input: total_in,
+                                output: total_out,
+                                cache_write: total_cache_write,
+                                cache_read: total_cache_read,
+                            };
+                            if usage.weekly.tokens == 0 {
+                                add_split(&mut usage.weekly, split);
+                                usage.weekly.messages = val.get("totalMessages").and_then(|v| v.as_u64()).unwrap_or(0);
+                                usage.weekly.sessions = val.get("totalSessions").and_then(|v| v.as_u64()).unwrap_or(0);
+                            }
+                        }
+                    }
+                }
             }
         }
 

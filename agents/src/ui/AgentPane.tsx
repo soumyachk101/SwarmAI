@@ -245,6 +245,8 @@ function flattenForStdin(text: string): string {
 interface ModelOption {
   id: string;
   label: string;
+  is1M?: boolean;
+  pricing?: string;
 }
 
 interface CliModelPreset {
@@ -262,12 +264,14 @@ function getCliModelPresets(cli: string): CliModelPreset {
       brandName: "Claude Code Models",
       brandColor: "#D97757",
       switchCommand: "/model",
-      defaultModel: "Claude Fable 5",
+      defaultModel: "Opus (1M context)",
       models: [
-        { id: "claude-fable-5", label: "Claude Fable 5" },
-        { id: "claude-opus-5", label: "Claude Opus 5" },
-        { id: "claude-sonnet-5", label: "Claude Sonnet 5" },
-        { id: "claude-haiku-4-5", label: "Claude Haiku 4.5" },
+        { id: "opus[1m]", label: "Opus (1M context)", is1M: true, pricing: "$5/$25 Mtok" },
+        { id: "claude-fable-5[1m]", label: "Claude Fable 5 (1M context)", is1M: true, pricing: "$5/$25 Mtok" },
+        { id: "sonnet[1m]", label: "Sonnet 5 (1M context)", is1M: true, pricing: "$3/$15 Mtok" },
+        { id: "haiku[1m]", label: "Haiku 4.5 (1M context)", is1M: true, pricing: "$1/$5 Mtok" },
+        { id: "claude-sonnet-5", label: "Sonnet 5", is1M: false, pricing: "$3/$15 Mtok" },
+        { id: "claude-opus-5", label: "Opus 5", is1M: false, pricing: "$5/$25 Mtok" },
       ],
     };
   }
@@ -278,13 +282,13 @@ function getCliModelPresets(cli: string): CliModelPreset {
       switchCommand: "/model",
       defaultModel: "Gemini 3.7 Flash",
       models: [
-        { id: "gemini-3.7-flash", label: "Gemini 3.7 Flash" },
-        { id: "gemini-3.6-flash", label: "Gemini 3.6 Flash" },
-        { id: "gemini-3.5-flash", label: "Gemini 3.5 Flash" },
-        { id: "gemini-3.1-pro", label: "Gemini 3.1 Pro" },
-        { id: "claude-sonnet-4.6-thinking", label: "Claude Sonnet 4.6 (Thinking)" },
-        { id: "claude-opus-4.6-thinking", label: "Claude Opus 4.6 (Thinking)" },
-        { id: "gpt-oss-120b", label: "GPT-OSS 120B (Medium)" },
+        { id: "gemini-3.7-flash", label: "Gemini 3.7 Flash", is1M: true },
+        { id: "gemini-3.6-flash", label: "Gemini 3.6 Flash", is1M: true },
+        { id: "gemini-3.5-flash", label: "Gemini 3.5 Flash", is1M: true },
+        { id: "gemini-3.1-pro", label: "Gemini 3.1 Pro", is1M: true },
+        { id: "claude-sonnet-4.6-thinking", label: "Claude Sonnet 4.6 (Thinking)", is1M: true },
+        { id: "claude-opus-4.6-thinking", label: "Claude Opus 4.6 (Thinking)", is1M: true },
+        { id: "gpt-oss-120b", label: "GPT-OSS 120B (Medium)", is1M: false },
       ],
     };
   }
@@ -456,17 +460,20 @@ export default function AgentPane({
   const handleSelectModel = (modelId: string, modelLabel: string) => {
     setCurrentModel(modelLabel);
     setModelMenuOpen(false);
-    sendTerminal(`/model ${modelId}\r`);
+    useAgentsStore.getState().updateAgent(paneId, { model: modelId });
+    // \x15 (Ctrl+U) clears any existing prompt draft characters in terminal readline
+    sendTerminal(`\x15/model ${modelId}\r`);
   };
 
   const handleSelectEffort = (effort: string) => {
     setCurrentEffort(effort);
     setEffortMenuOpen(false);
-    sendTerminal(`/effort ${effort.toLowerCase()}\r`);
+    useAgentsStore.getState().updateAgent(paneId, { effort });
+    sendTerminal(`\x15/effort ${effort.toLowerCase()}\r`);
   };
 
   const handleCheckUsage = () => {
-    sendTerminal(`/cost\r`);
+    sendTerminal(`\x15/status\r`);
   };
 
   // Dismiss the overflow menu on an outside click, Escape, or the pane simply
@@ -1610,10 +1617,26 @@ export default function AgentPane({
                           <button
                             key={m.id}
                             onClick={() => handleSelectModel(m.id, m.label)}
-                            className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-xs text-left text-swarm-textDim hover:bg-white/[0.08] hover:text-swarm-text transition-colors"
+                            className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-xs text-left text-swarm-textDim hover:bg-white/[0.08] hover:text-swarm-text transition-colors group"
                           >
-                            <span className="truncate">{m.label}</span>
-                            {(currentModel === m.id || currentModel === m.label) && <Check size={12} className="text-swarm-gold" />}
+                            <div className="flex items-center gap-1.5 min-w-0 pr-2">
+                              <span className="truncate">{m.label}</span>
+                              {m.is1M && (
+                                <span className="shrink-0 px-1 py-0.2 rounded text-[9px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                                  1M
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              {m.pricing && (
+                                <span className="text-[10px] tabular-nums text-swarm-textMuted/60 group-hover:text-swarm-textMuted/90">
+                                  {m.pricing}
+                                </span>
+                              )}
+                              {(currentModel === m.id || currentModel === m.label) && (
+                                <Check size={12} className="text-swarm-gold ml-0.5" />
+                              )}
+                            </div>
                           </button>
                         ))}
                       </div>
@@ -1654,7 +1677,7 @@ export default function AgentPane({
                   <button
                     onClick={handleCheckUsage}
                     className="flex size-5 items-center justify-center text-swarm-textMuted hover:text-swarm-text transition-colors"
-                    title="Check Token Usage & Cost (/cost)"
+                    title="Check Model & Token Usage (/status)"
                   >
                     <Gauge size={14} className="text-swarm-textMuted/80" />
                   </button>
@@ -1684,16 +1707,17 @@ export default function AgentPane({
                   </button>
 
                   {settingsMenuOpen && (
-                    <div className="absolute bottom-full right-0 mb-2 min-w-[170px] rounded-xl border border-white/[0.12] bg-[#141720] p-1.5 shadow-2xl z-50 animate-fade-in">
+                    <div className="absolute bottom-full right-0 mb-2 min-w-[185px] rounded-xl border border-white/[0.12] bg-[#141720] p-1.5 shadow-2xl z-50 animate-fade-in">
                       <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase">
                         Commands
                       </div>
                       {[
-                        { label: "Compact Context (/compact)", cmd: "/compact\r" },
-                        { label: "Check Cost (/cost)", cmd: "/cost\r" },
-                        { label: "Clear Session (/clear)", cmd: "/clear\r" },
-                        { label: "Doctor Diagnostic (/doctor)", cmd: "/doctor\r" },
-                        { label: "Review Diffs (/review)", cmd: "/review\r" },
+                        { label: "Status & Model (/status)", cmd: "\x15/status\r" },
+                        { label: "Check Cost (/cost)", cmd: "\x15/cost\r" },
+                        { label: "Compact Context (/compact)", cmd: "\x15/compact\r" },
+                        { label: "Clear Session (/clear)", cmd: "\x15/clear\r" },
+                        { label: "Doctor Diagnostic (/doctor)", cmd: "\x15/doctor\r" },
+                        { label: "Review Diffs (/review)", cmd: "\x15/review\r" },
                       ].map((sc) => (
                         <button
                           key={sc.label}

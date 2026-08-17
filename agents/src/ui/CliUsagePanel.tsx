@@ -37,7 +37,7 @@ export interface CliUsage {
 }
 
 /** CLIs whose transcripts Swarm knows how to read. */
-const TRACKED = ["claude", "codex", "opencode"];
+const TRACKED = ["claude", "agy", "codex", "opencode"];
 
 const BUDGET_KEY = "swarm_cli_budgets";
 
@@ -45,6 +45,7 @@ const BUDGET_KEY = "swarm_cli_budgets";
 const USAGE_PAGE: Record<string, string> = {
   claude: "https://claude.ai/settings/usage",
   codex: "https://platform.openai.com/usage",
+  agy: "https://aistudio.google.com/",
 };
 
 // A tile per CLI, carrying that CLI's own logo. The tile *plate* stays in the
@@ -52,6 +53,7 @@ const USAGE_PAGE: Record<string, string> = {
 // vendor's, so a row is identifiable before you read the name.
 const TILE: Record<string, { bg: string }> = {
   claude: { bg: "bg-swarm-gold/10" },
+  agy: { bg: "bg-blue-500/10" },
   codex: { bg: "bg-swarm-border/50" },
   opencode: { bg: "bg-swarm-amber/10" },
 };
