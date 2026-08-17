@@ -9,17 +9,18 @@ const config: Config = {
     // These paths are case-SENSITIVE on Linux/CI even though macOS APFS lets a
     // wrong case slide: a stale capitalised glob here matches nothing there and
     // silently purges every class those packages use.
-    '../Tasks/src/**/*.{ts,tsx}',
-    '../Agents/src/ui/**/*.{ts,tsx}',
-    '../Workspace/src/ui/**/*.{ts,tsx}',
-    '../Lead/src/ui/**/*.{ts,tsx}',
-    '../Voice/src/ui/**/*.{ts,tsx}',
-    '../Pheromone/src/ui/**/*.{ts,tsx}',
-    '../Board/src/**/*.{ts,tsx}',
-    '../Flow/src/**/*.{ts,tsx}',
-    '../SwarmPlugins/src/**/*.{ts,tsx}',
-    '../SwarmExtension/src/**/*.{ts,tsx}',
-    '../Tasks/dist/**/*.js',
+    '../tasks/src/**/*.{ts,tsx}',
+    '../agents/src/ui/**/*.{ts,tsx}',
+    '../workspace/src/ui/**/*.{ts,tsx}',
+    '../lead/src/ui/**/*.{ts,tsx}',
+    '../voice/src/ui/**/*.{ts,tsx}',
+    '../pheromone/src/ui/**/*.{ts,tsx}',
+    '../board/src/**/*.{ts,tsx}',
+    '../flow/src/**/*.{ts,tsx}',
+    '../swarmplugins/src/**/*.{ts,tsx}',
+    '../swarmextension/src/**/*.{ts,tsx}',
+    '../tasks/dist/**/*.js',
+    '../swarmplugins/dist/**/*.js',
   ],
   theme: {
     extend: {

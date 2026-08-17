@@ -5,8 +5,9 @@ import { createPortal } from "react-dom";
 import {
   Globe, Smartphone,
   Plus, Maximize2, Minimize2,
-  SquareTerminal, Blocks, Search, Boxes, ChevronDown,
+  SquareTerminal, Blocks, Search, Boxes, ChevronDown, Sparkles,
 } from "lucide-react";
+import { DevChatStudio } from "@swarm/plugins";
 import {
   BoardLogo, BoardStrip, themeForKind, type StripItem,
   LeadCrown, BrandGlyph, cliBrand, shellBrand, AgentMark,
@@ -339,12 +340,22 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
     };
     addAgent(swarm);
   };
+  const addChatPane = () => {
+    const swarm: Agent = {
+      id: `devchat-${Date.now()}`,
+      cli: "devchat",
+      cliName: "AI Copilot Chat",
+      kind: "devchat" as any,
+      plane: "board",
+    };
+    addAgent(swarm);
+  };
 
   // Panes whose `kind` marks them as something other than a live CLI-agent
   // session — these don't run a stateful agent, so closing them needs no
   // confirmation. Anything else (kind undefined, rendered via AgentPane)
   // is a running swarm and can lose real work if killed by accident.
-  const NON_AGENT_KINDS = new Set(["shell", "browser", "toolbox", "emulator", "openvsx"]);
+  const NON_AGENT_KINDS = new Set(["shell", "browser", "toolbox", "emulator", "openvsx", "devchat"]);
   const handleRemove = (id: string) => {
     const swarm = agents.find((b) => b.id === id);
     const isAgentPane = !!swarm && !NON_AGENT_KINDS.has(swarm.kind ?? "");
@@ -406,6 +417,39 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
     const close = () => handleRemove(swarm.id);
     const max = () => toggleMaximize(swarm.id);
 
+    if (swarm.kind === "devchat" || swarm.cli === "devchat")
+      return (
+        <div className="flex h-full w-full flex-col overflow-hidden bg-swarm-canvas">
+          <div className="flex h-8 shrink-0 items-center justify-between border-b border-swarm-border/40 bg-swarm-surface px-2.5">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <Sparkles size={13} className="text-swarm-gold shrink-0" />
+              <span className="text-xs font-semibold text-swarm-text truncate">AI Copilot Chat</span>
+              <span className="rounded-full bg-swarm-gold/15 px-1.5 py-0.2 text-[10px] font-medium text-swarm-gold font-mono shrink-0">
+                Claude · Gemini · CLI
+              </span>
+            </div>
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                onClick={max}
+                className="rounded p-1 text-swarm-textMuted hover:text-swarm-text transition-colors"
+                title={isThisMax ? "Restore" : "Maximize"}
+              >
+                {isThisMax ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
+              </button>
+              <button
+                onClick={close}
+                className="rounded p-1 text-swarm-textMuted hover:text-swarm-err transition-colors"
+                title="Close chat pane"
+              >
+                <X size={12} />
+              </button>
+            </div>
+          </div>
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <DevChatStudio projectPath={activeWorkspace?.boundProjectPath || workingDir} />
+          </div>
+        </div>
+      );
     if (swarm.kind === "emulator")
       return <EmulatorPane onClose={close} onToggleMaximize={max} isMaximized={isThisMax} />;
     if (swarm.kind === "openvsx")
@@ -607,6 +651,7 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
               <PlaneAddMenu
                 plane={plane}
                 shells={shells}
+                onChat={() => { addChatPane(); setShowAdd(false); }}
                 onAgent={(id, name) => { addAgentPane(id, name); setShowAdd(false); }}
                 onShell={(s) => { addShell(s); setShowAdd(false); }}
                 onBrowser={() => { addBrowser(plane.kind); setShowAdd(false); }}
@@ -637,6 +682,7 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
               <PlaneAddMenu
                 plane={plane}
                 shells={shells}
+                onChat={() => { addChatPane(); setShowAdd(false); }}
                 onAgent={(id, name) => { addAgentPane(id, name); setShowAdd(false); }}
                 onShell={(s) => { addShell(s); setShowAdd(false); }}
                 onBrowser={() => { addBrowser(plane.kind); setShowAdd(false); }}
@@ -847,10 +893,11 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
 
 /* ── add menu ─────────────────────────────────────────────────── */
 function PlaneAddMenu({
-  plane, shells, onAgent, onShell, onBrowser, onToolbox, onEmulator, onOpenVsx, onClose,
+  plane, shells, onChat, onAgent, onShell, onBrowser, onToolbox, onEmulator, onOpenVsx, onClose,
 }: {
   plane: PlaneDef;
   shells: { id: string; label: string; command: string }[];
+  onChat: () => void;
   onAgent: (id: string, name: string) => void;
   onShell: (s: { label: string; command: string }) => void;
   onBrowser: () => void;
@@ -868,9 +915,9 @@ function PlaneAddMenu({
     const agents = CLI_METADATA.filter((c) => has(c.name) || has(c.command)).slice(0, 4);
     const terms = shells.filter((s) => has(s.label)).slice(0, 4);
     const exts = extensions.filter((e) => has(e.name) || has(e.publisher)).slice(0, 4);
-    // Panes that are not an agent, a terminal or an extension, but still belong
-    // on the board: a preview next to the agent building it, and the toolbox
-    // that arms every swarm in the swarm.
+    const aiTools = [
+      { key: "devchat", title: "AI Copilot Chat", subtitle: "Claude 5, Gemini 3.7 & CLI Executor", icon: Sparkles, onClick: onChat },
+    ].filter((t) => has(t.title) || has(t.subtitle));
     const tools = [
       { key: "browser", title: "Browser", subtitle: "localhost preview", icon: Globe, onClick: onBrowser },
       { key: "emulator", title: "Android Emulator", subtitle: "run an AVD", icon: Smartphone, onClick: onEmulator },
@@ -889,6 +936,10 @@ function PlaneAddMenu({
             />
           </div>
           <div className="max-h-[60vh] overflow-y-auto scrollbar-sleek">
+            {aiTools.length > 0 && <MenuLabel>AI Copilot</MenuLabel>}
+            {aiTools.map((t) => (
+              <MenuItem key={t.key} onClick={t.onClick} icon={t.icon} title={t.title} subtitle={t.subtitle} />
+            ))}
             {terms.length > 0 && <MenuLabel>Terminals</MenuLabel>}
             {terms.map((s) => (
               <MenuItem key={s.id} onClick={() => onShell(s)} iconNode={shellIconNode(s.label)} title={s.label} />
@@ -909,7 +960,7 @@ function PlaneAddMenu({
             {tools.map((t) => (
               <MenuItem key={t.key} onClick={t.onClick} icon={t.icon} title={t.title} subtitle={t.subtitle} />
             ))}
-            {terms.length + agents.length + exts.length + tools.length === 0 && (
+            {aiTools.length + terms.length + agents.length + exts.length + tools.length === 0 && (
               <div className="px-2.5 py-3 text-center text-mini text-swarm-textMuted">No matches.</div>
             )}
           </div>

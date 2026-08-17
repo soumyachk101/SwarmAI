@@ -11,9 +11,9 @@ export interface Agent {
   customName?: string;
   args?: string[];
   // 'agent' (a CLI coding agent, the default), 'shell' (a plain terminal),
-  // 'browser' (a CDP-driven Chromium view), 'emulator' (Android/AVD), or
-  // 'openvsx' (an embedded openvscode-server). Each renders its own pane.
-  kind?: 'agent' | 'shell' | 'browser' | 'emulator' | 'openvsx' | 'toolbox';
+  // 'browser' (a CDP-driven Chromium view), 'emulator' (Android/AVD),
+  // 'openvsx' (an embedded openvscode-server), 'toolbox', or 'devchat' (AI Copilot). Each renders its own pane.
+  kind?: 'agent' | 'shell' | 'browser' | 'emulator' | 'openvsx' | 'toolbox' | 'devchat';
   /** Which plane this pane was added to. Some kinds (browser, toolbox) are
    *  allowed in more than one plane, so the choice has to be recorded or the
    *  pane would render in every plane that accepts its kind. */

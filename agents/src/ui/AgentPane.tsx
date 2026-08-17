@@ -289,7 +289,7 @@ function getCliModelPresets(cli: string): CliModelPreset {
       defaultModel: "Claude 5 Sonnet",
       models: [
         { id: "claude-5-sonnet", label: "Claude 5 Sonnet (1M Context)", is1M: true, pricing: "$3/$15 Mtok" },
-        { id: "claude-4-8-opus", label: "Claude 4.8 Opus (Ultra)", is1M: true, pricing: "$5/$25 Mtok" },
+        { id: "claude-5-opus", label: "Claude 5 Opus (Ultra SOTA)", is1M: true, pricing: "$5/$25 Mtok" },
         { id: "claude-4-6-thinking", label: "Claude 4.6 Sonnet (Thinking 128k)", is1M: true, pricing: "$3/$15 Mtok" },
         { id: "claude-3-7-sonnet", label: "Claude 3.7 Sonnet (Hybrid)", is1M: true, pricing: "$3/$15 Mtok" },
         { id: "claude-3-5-sonnet", label: "Claude 3.5 Sonnet", is1M: false, pricing: "$3/$15 Mtok" },
@@ -335,7 +335,7 @@ function getCliModelPresets(cli: string): CliModelPreset {
       defaultModel: "Claude 5 Sonnet",
       models: [
         { id: "anthropic/claude-5-sonnet", label: "Claude 5 Sonnet" },
-        { id: "anthropic/claude-4-8-opus", label: "Claude 4.8 Opus" },
+        { id: "anthropic/claude-5-opus", label: "Claude 5 Opus" },
         { id: "google/gemini-3.7-flash", label: "Gemini 3.7 Flash" },
         { id: "google/gemini-3.6-flash", label: "Gemini 3.6 Flash" },
         { id: "openai/gpt-5-omni", label: "GPT-5 Omni" },
