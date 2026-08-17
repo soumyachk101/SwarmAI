@@ -14,8 +14,8 @@ export const EFFORT_LEVELS: EffortLevel[] = ["low", "medium", "high", "xhigh", "
 function normaliseModel(cli: string, model: string): string {
   const m = model.trim().toLowerCase();
   if (cli === "claude") {
-    // Claude Code takes an alias ("opus", "sonnet", "fable") or a full name.
-    // "opus 5" / "opus-5" is how people say it; the alias already means latest.
+    // Preserve 1M context tags like opus[1m], sonnet[1m], claude-fable-5[1m]
+    if (m.includes("[1m]")) return m;
     const alias = m.replace(/\s+/g, "-");
     if (/^(opus|sonnet|haiku|fable)(-\d+(\.\d+)?)?$/.test(alias)) {
       return alias.split("-")[0];

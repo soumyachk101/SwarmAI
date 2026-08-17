@@ -249,6 +249,28 @@ interface ModelOption {
   pricing?: string;
 }
 
+export interface CommandSuggestion {
+  name: string;
+  description: string;
+  syntax?: string;
+  category?: string;
+}
+
+const COMMAND_SUGGESTIONS: CommandSuggestion[] = [
+  { name: "/model", description: "Switch AI model (Opus 1M, Sonnet 1M, etc.)", syntax: "/model <name>", category: "Model" },
+  { name: "/effort", description: "Set reasoning effort (UltraCode, Max, High...)", syntax: "/effort <level>", category: "Reasoning" },
+  { name: "/status", description: "Check model, 1M context memory & session details", category: "Diagnostics" },
+  { name: "/cost", description: "Check current session tokens and cost breakdown", category: "Diagnostics" },
+  { name: "/compact", description: "Compact context window to save tokens", category: "Context" },
+  { name: "/clear", description: "Clear conversation history / session transcript", category: "Context" },
+  { name: "/doctor", description: "Run environment and health diagnostics", category: "Diagnostics" },
+  { name: "/review", description: "Review pending diffs and file changes", category: "Tools" },
+  { name: "/pr", description: "Create or summarize pull request", category: "Tools" },
+  { name: "/init", description: "Initialize project settings and configs", category: "Tools" },
+  { name: "/help", description: "Show all available commands and help", category: "General" },
+  { name: "/memory", description: "Inspect or manage agent long-term memory", category: "Memory" },
+];
+
 interface CliModelPreset {
   brandName: string;
   brandColor: string;
@@ -264,14 +286,13 @@ function getCliModelPresets(cli: string): CliModelPreset {
       brandName: "Claude Code Models",
       brandColor: "#D97757",
       switchCommand: "/model",
-      defaultModel: "Opus (1M context)",
+      defaultModel: "Claude 5 Sonnet",
       models: [
-        { id: "opus[1m]", label: "Opus (1M context)", is1M: true, pricing: "$5/$25 Mtok" },
-        { id: "claude-fable-5[1m]", label: "Claude Fable 5 (1M context)", is1M: true, pricing: "$5/$25 Mtok" },
-        { id: "sonnet[1m]", label: "Sonnet 5 (1M context)", is1M: true, pricing: "$3/$15 Mtok" },
-        { id: "haiku[1m]", label: "Haiku 4.5 (1M context)", is1M: true, pricing: "$1/$5 Mtok" },
-        { id: "claude-sonnet-5", label: "Sonnet 5", is1M: false, pricing: "$3/$15 Mtok" },
-        { id: "claude-opus-5", label: "Opus 5", is1M: false, pricing: "$5/$25 Mtok" },
+        { id: "claude-5-sonnet", label: "Claude 5 Sonnet (1M Context)", is1M: true, pricing: "$3/$15 Mtok" },
+        { id: "claude-4-8-opus", label: "Claude 4.8 Opus (Ultra)", is1M: true, pricing: "$5/$25 Mtok" },
+        { id: "claude-4-6-thinking", label: "Claude 4.6 Sonnet (Thinking 128k)", is1M: true, pricing: "$3/$15 Mtok" },
+        { id: "claude-3-7-sonnet", label: "Claude 3.7 Sonnet (Hybrid)", is1M: true, pricing: "$3/$15 Mtok" },
+        { id: "claude-3-5-sonnet", label: "Claude 3.5 Sonnet", is1M: false, pricing: "$3/$15 Mtok" },
       ],
     };
   }
@@ -282,13 +303,12 @@ function getCliModelPresets(cli: string): CliModelPreset {
       switchCommand: "/model",
       defaultModel: "Gemini 3.7 Flash",
       models: [
-        { id: "gemini-3.7-flash", label: "Gemini 3.7 Flash", is1M: true },
-        { id: "gemini-3.6-flash", label: "Gemini 3.6 Flash", is1M: true },
+        { id: "gemini-3.7-flash", label: "Gemini 3.7 Flash (Ultra Realtime)", is1M: true },
+        { id: "gemini-3.6-flash", label: "Gemini 3.6 Flash (1M Context)", is1M: true },
         { id: "gemini-3.5-flash", label: "Gemini 3.5 Flash", is1M: true },
-        { id: "gemini-3.1-pro", label: "Gemini 3.1 Pro", is1M: true },
-        { id: "claude-sonnet-4.6-thinking", label: "Claude Sonnet 4.6 (Thinking)", is1M: true },
-        { id: "claude-opus-4.6-thinking", label: "Claude Opus 4.6 (Thinking)", is1M: true },
-        { id: "gpt-oss-120b", label: "GPT-OSS 120B (Medium)", is1M: false },
+        { id: "gemini-3.1-pro", label: "Gemini 3.1 Pro (2M Context)", is1M: true },
+        { id: "claude-5-sonnet", label: "Claude 5 Sonnet", is1M: true },
+        { id: "deepseek-r1", label: "DeepSeek-R1 (671B CoT)", is1M: false },
       ],
     };
   }
@@ -297,13 +317,13 @@ function getCliModelPresets(cli: string): CliModelPreset {
       brandName: "OpenAI Codex Models",
       brandColor: "#10A37F",
       switchCommand: "/model",
-      defaultModel: "GPT-4o",
+      defaultModel: "GPT-5 Omni",
       models: [
-        { id: "gpt-4o", label: "GPT-4o" },
-        { id: "o3-mini", label: "o3-mini" },
-        { id: "o1", label: "o1" },
-        { id: "gpt-4.5-preview", label: "GPT-4.5 Preview" },
-        { id: "o1-mini", label: "o1-mini" },
+        { id: "gpt-5-omni", label: "GPT-5 Omni (Next-Gen)" },
+        { id: "gpt-4.5-preview", label: "GPT-4.5 Preview (Orion)" },
+        { id: "o3-mini", label: "o3-mini (High Reasoning)" },
+        { id: "o1", label: "o1 (Full Reasoning)" },
+        { id: "gpt-4o", label: "GPT-4o (Latest)" },
       ],
     };
   }
@@ -312,13 +332,16 @@ function getCliModelPresets(cli: string): CliModelPreset {
       brandName: "OpenCode Models",
       brandColor: "#A855F7",
       switchCommand: "/model",
-      defaultModel: "Claude 3.7 Sonnet",
+      defaultModel: "Claude 5 Sonnet",
       models: [
-        { id: "anthropic/claude-3-7-sonnet", label: "Claude 3.7 Sonnet" },
-        { id: "openai/gpt-4o", label: "GPT-4o" },
+        { id: "anthropic/claude-5-sonnet", label: "Claude 5 Sonnet" },
+        { id: "anthropic/claude-4-8-opus", label: "Claude 4.8 Opus" },
+        { id: "google/gemini-3.7-flash", label: "Gemini 3.7 Flash" },
+        { id: "google/gemini-3.6-flash", label: "Gemini 3.6 Flash" },
+        { id: "openai/gpt-5-omni", label: "GPT-5 Omni" },
+        { id: "openai/gpt-4.5-preview", label: "GPT-4.5 Preview" },
+        { id: "openai/o3-mini", label: "OpenAI o3-mini" },
         { id: "deepseek/deepseek-r1", label: "DeepSeek R1" },
-        { id: "google/gemini-2.5-pro", label: "Gemini 2.5 Pro" },
-        { id: "anthropic/claude-3-5-sonnet", label: "Claude 3.5 Sonnet" },
       ],
     };
   }
@@ -330,10 +353,11 @@ function getCliModelPresets(cli: string): CliModelPreset {
       defaultModel: "Claude 3.7 Sonnet",
       models: [
         { id: "sonnet", label: "Claude 3.7 Sonnet" },
+        { id: "o3-mini", label: "OpenAI o3-mini" },
         { id: "gpt-4o", label: "GPT-4o" },
         { id: "deepseek/deepseek-reasoner", label: "DeepSeek R1" },
+        { id: "deepseek/deepseek-chat", label: "DeepSeek V3" },
         { id: "gemini/gemini-2.5-pro", label: "Gemini 2.5 Pro" },
-        { id: "o3-mini", label: "o3-mini" },
       ],
     };
   }
@@ -344,6 +368,7 @@ function getCliModelPresets(cli: string): CliModelPreset {
     defaultModel: "Claude 3.7 Sonnet",
     models: [
       { id: "claude-3-7-sonnet", label: "Claude 3.7 Sonnet" },
+      { id: "o3-mini", label: "o3-mini" },
       { id: "gpt-4o", label: "GPT-4o" },
       { id: "deepseek-r1", label: "DeepSeek R1" },
       { id: "gemini-2.5-pro", label: "Gemini 2.5 Pro" },
@@ -403,8 +428,11 @@ export default function AgentPane({
 
   const cliPreset = useMemo(() => getCliModelPresets(agent.cli), [agent.cli]);
 
-  // Prompt bar & Model / Effort / Usage controls (Matches Screenshot 2)
   const [promptInput, setPromptInput] = useState("");
+  const promptTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const [commandSuggestionsOpen, setCommandSuggestionsOpen] = useState(false);
+  const [selectedCommandIndex, setSelectedCommandIndex] = useState(0);
+
   const [modelMenuOpen, setModelMenuOpen] = useState(false);
   const [effortMenuOpen, setEffortMenuOpen] = useState(false);
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
@@ -414,6 +442,29 @@ export default function AgentPane({
   const modelMenuRef = useRef<HTMLDivElement>(null);
   const effortMenuRef = useRef<HTMLDivElement>(null);
   const settingsMenuRef = useRef<HTMLDivElement>(null);
+
+  const isSlashCommand = promptInput.startsWith("/") && !promptInput.includes("\n");
+  const commandQuery = isSlashCommand ? promptInput.split(" ")[0].toLowerCase() : "";
+  const filteredCommands = useMemo(() => {
+    if (!isSlashCommand) return [];
+    return COMMAND_SUGGESTIONS.filter(
+      (cmd) =>
+        cmd.name.toLowerCase().startsWith(commandQuery) ||
+        cmd.description.toLowerCase().includes(commandQuery.replace("/", ""))
+    );
+  }, [isSlashCommand, commandQuery]);
+
+  const handleSelectCommand = (cmd: CommandSuggestion) => {
+    if (cmd.syntax && cmd.syntax.includes("<")) {
+      setPromptInput(cmd.name + " ");
+      setCommandSuggestionsOpen(false);
+      promptTextareaRef.current?.focus();
+    } else {
+      setPromptInput("");
+      setCommandSuggestionsOpen(false);
+      sendTerminal(`\x15${cmd.name}\r`);
+    }
+  };
 
   // Auto-close dropdowns when clicking anywhere outside or pressing Escape
   useEffect(() => {
@@ -1575,18 +1626,106 @@ export default function AgentPane({
           <div className="relative shrink-0 p-3 pt-0 z-20">
             <div className="relative rounded-2xl border border-white/[0.12] bg-[#0c0e14] p-3 shadow-2xl transition-all focus-within:border-white/[0.22] flex items-stretch gap-3">
               {/* Left Column: Input + Bottom Controls */}
-              <div className="flex-1 flex flex-col justify-between min-w-0 gap-2">
+              <div className="flex-1 flex flex-col justify-between min-w-0 gap-2 relative">
+                {/* Slash Command Autocomplete Suggestion Popup */}
+                {isSlashCommand && commandSuggestionsOpen && filteredCommands.length > 0 && (
+                  <div
+                    style={{ backgroundColor: "#151824", opacity: 1, zIndex: 100 }}
+                    className="absolute bottom-full left-0 mb-2 w-full max-h-[240px] overflow-y-auto rounded-2xl border border-white/[0.2] p-2 shadow-[0_20px_60px_rgba(0,0,0,1)] scrollbar-sleek"
+                  >
+                    <div className="px-2.5 py-1.5 text-[10px] font-bold text-white/50 tracking-wider uppercase flex items-center justify-between border-b border-white/[0.1] mb-1.5">
+                      <span className="flex items-center gap-1.5 text-swarm-gold font-semibold">
+                        <Sparkles size={12} className="text-swarm-gold shrink-0" />
+                        Commands
+                      </span>
+                      <span className="text-[10px] font-mono text-white/40">↑↓ navigate · Tab/↵ select · Esc close</span>
+                    </div>
+                    <div className="space-y-0.5">
+                      {filteredCommands.map((cmd, idx) => {
+                        const active = idx === selectedCommandIndex;
+                        return (
+                          <button
+                            key={cmd.name}
+                            type="button"
+                            style={{
+                              backgroundColor: active ? "#252b3d" : "transparent",
+                            }}
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              handleSelectCommand(cmd);
+                            }}
+                            onMouseEnter={() => setSelectedCommandIndex(idx)}
+                            className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left transition-colors ${
+                              active ? "text-white ring-1 ring-white/[0.25]" : "text-white/80 hover:text-white"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <span className="font-mono text-xs font-bold text-[#E5A93C] shrink-0">
+                                {cmd.name}
+                              </span>
+                              <span className="truncate text-xs text-white/70 font-normal">
+                                {cmd.description}
+                              </span>
+                            </div>
+                            {cmd.category && (
+                              <span className="shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-md bg-white/[0.1] text-white/80 border border-white/[0.1]">
+                                {cmd.category}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 {/* Prompt Text Input */}
                 <textarea
+                  ref={promptTextareaRef}
                   value={promptInput}
-                  onChange={(e) => setPromptInput(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setPromptInput(val);
+                    if (val.startsWith("/")) {
+                      setCommandSuggestionsOpen(true);
+                      setSelectedCommandIndex(0);
+                    } else {
+                      setCommandSuggestionsOpen(false);
+                    }
+                  }}
                   onKeyDown={(e) => {
+                    if (isSlashCommand && commandSuggestionsOpen && filteredCommands.length > 0) {
+                      if (e.key === "ArrowDown") {
+                        e.preventDefault();
+                        setSelectedCommandIndex((i) => (i + 1) % filteredCommands.length);
+                        return;
+                      }
+                      if (e.key === "ArrowUp") {
+                        e.preventDefault();
+                        setSelectedCommandIndex((i) => (i - 1 + filteredCommands.length) % filteredCommands.length);
+                        return;
+                      }
+                      if (e.key === "Tab" || (e.key === "Enter" && !e.shiftKey)) {
+                        e.preventDefault();
+                        const targetCmd = filteredCommands[selectedCommandIndex] || filteredCommands[0];
+                        if (targetCmd) {
+                          handleSelectCommand(targetCmd);
+                          return;
+                        }
+                      }
+                      if (e.key === "Escape") {
+                        e.preventDefault();
+                        setCommandSuggestionsOpen(false);
+                        return;
+                      }
+                    }
+
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
                       handleSendPrompt();
                     }
                   }}
-                  placeholder={`Prompt ${displayName}...`}
+                  placeholder={`Prompt ${displayName}... (Type / for commands)`}
                   rows={1}
                   className="w-full resize-none bg-transparent text-xs text-swarm-text placeholder:text-swarm-textMuted/45 outline-none leading-relaxed"
                 />

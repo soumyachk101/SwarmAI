@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { MessageSquareText, RefreshCw, KeyRound, ExternalLink, ShieldCheck, Zap, Maximize2, Minimize2 } from "lucide-react";
+import { MessageSquareText, RefreshCw, KeyRound, ExternalLink, ShieldCheck, Zap, Maximize2, Minimize2, Sparkles, ArrowLeft, Bot } from "lucide-react";
 import type { SwarmPluginProps } from "../../types";
 import { GlassChatPlatformAPI } from "./platformApi";
+import { DevChatStudio } from "./DevChatStudio";
 
 declare global {
   interface Window {
@@ -23,6 +24,7 @@ export interface GlassChatEmbedProps extends SwarmPluginProps {
   themeName?: string;
   isExpanded?: boolean;
   onToggleExpand?: () => void;
+  defaultMode?: "devchat" | "glasschat";
 }
 
 // Credentials come from the host app's Vite env (Swarm/.env), not source.
@@ -40,6 +42,7 @@ const STORAGE_KEYS = {
   API_KEY: "swarm_glasschat_api_key",
   TEAM_ID: "swarm_glasschat_team_id",
   USER_ID: "swarm_glasschat_user_id",
+  VIEW_MODE: "swarm_chat_active_mode",
 };
 
 export function GlassChatEmbed({
@@ -51,11 +54,18 @@ export function GlassChatEmbed({
   themeName = "glasschat",
   isExpanded: propIsExpanded,
   onToggleExpand,
+  defaultMode = "devchat",
+  projectPath,
+  ...restProps
 }: GlassChatEmbedProps) {
   const [internalExpanded, setInternalExpanded] = useState(false);
   const isExpanded = propIsExpanded ?? internalExpanded;
   const handleToggleExpand = onToggleExpand ?? (() => setInternalExpanded((prev) => !prev));
   const effectiveLayout = isExpanded ? (layout === "embedded" ? "desktop" : layout) : layout;
+
+  const [viewMode, setViewMode] = useState<"devchat" | "glasschat">(() => {
+    return (localStorage.getItem(STORAGE_KEYS.VIEW_MODE) as "devchat" | "glasschat") || defaultMode;
+  });
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
@@ -81,8 +91,16 @@ export function GlassChatEmbed({
 
   const [isConfiguring, setIsConfiguring] = useState<boolean>(false);
 
-  // Dynamic script loader for official GlassChat embed bundle
+  const switchMode = (mode: "devchat" | "glasschat") => {
+    setViewMode(mode);
+    try {
+      localStorage.setItem(STORAGE_KEYS.VIEW_MODE, mode);
+    } catch (_) {}
+  };
+
+  // Dynamic script loader for official GlassChat embed bundle (only if glasschat view active)
   useEffect(() => {
+    if (viewMode !== "glasschat") return;
     const scriptId = "glasschat-embed-script";
     let existingScript = document.getElementById(scriptId) as HTMLScriptElement;
 
@@ -105,7 +123,7 @@ export function GlassChatEmbed({
     } else {
       existingScript.addEventListener("load", () => setScriptLoaded(true));
     }
-  }, [baseUrl]);
+  }, [baseUrl, viewMode]);
 
   // Provision & Mint Embed Session Token automatically for Partner Mode
   const initPartnerSession = useCallback(async () => {
@@ -130,8 +148,6 @@ export function GlassChatEmbed({
         console.warn("Provision team warning:", e);
       }
 
-      // Member must exist before an embed session can be minted, else the
-      // embed-session route returns 404 member_not_found.
       try {
         await client.ensureMember(activeTeamId, userId, "Swarm Owner");
       } catch (e) {
@@ -170,16 +186,17 @@ export function GlassChatEmbed({
 
   // Initial auto-mint if token is missing
   useEffect(() => {
+    if (viewMode !== "glasschat") return;
     if (!configuredToken && apiKey) {
       initPartnerSession();
     } else {
       setLoading(false);
     }
-  }, [configuredToken, apiKey, initPartnerSession]);
+  }, [configuredToken, apiKey, initPartnerSession, viewMode]);
 
   // Mount GlassChat instance into container in Partner Mode
   useEffect(() => {
-    if (loading || isConfiguring || !scriptLoaded || !containerRef.current || !window.GlassChat) return;
+    if (viewMode !== "glasschat" || loading || isConfiguring || !scriptLoaded || !containerRef.current || !window.GlassChat) return;
 
     try {
       const targetEl = containerRef.current;
@@ -208,11 +225,24 @@ export function GlassChatEmbed({
       console.error("GlassChat Partner Mount Error:", e);
       setError(String(e?.message || e));
     }
-  }, [scriptLoaded, configuredAppId, configuredToken, baseUrl, effectiveLayout, themeName, isConfiguring, loading]);
+  }, [scriptLoaded, configuredAppId, configuredToken, baseUrl, effectiveLayout, themeName, isConfiguring, loading, viewMode]);
+
+  // Render DevChat Studio by default
+  if (viewMode === "devchat") {
+    return (
+      <DevChatStudio
+        isExpanded={isExpanded}
+        onToggleExpand={handleToggleExpand}
+        onSwitchToGlassChat={() => switchMode("glasschat")}
+        projectPath={projectPath}
+        {...restProps}
+      />
+    );
+  }
 
   if (isConfiguring) {
     return (
-      <div className="flex h-full flex-col items-center justify-center p-5 text-center text-swarm-text overflow-y-auto scrollbar-sleek">
+      <div className="flex h-full flex-col items-center justify-center p-5 text-center text-swarm-text overflow-y-auto scrollbar-sleek glass-body">
         <div className="flex size-11 items-center justify-center rounded-2xl border border-swarm-gold/40 bg-swarm-gold/10 text-swarm-gold">
           <ShieldCheck size={24} />
         </div>
@@ -289,10 +319,21 @@ export function GlassChatEmbed({
     <div className="relative flex h-full w-full flex-col overflow-hidden glass-body">
       {/* Top Banner Header */}
       <div className="flex items-center justify-between border-b border-swarm-border/40 glass-hi px-3 py-1.5 text-mini">
-        <span className="flex items-center gap-1.5 font-medium text-swarm-gold">
-          <ShieldCheck size={13} />
-          GlassChat Workspace
-        </span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => switchMode("devchat")}
+            className="flex items-center gap-1 rounded px-1.5 py-0.5 text-micro font-medium text-swarm-gold hover:bg-swarm-gold/15 transition-colors border border-swarm-gold/30"
+            title="Switch back to Native DevChat Copilot"
+          >
+            <ArrowLeft size={11} />
+            <span>DevChat Studio</span>
+          </button>
+          <span className="flex items-center gap-1 font-medium text-swarm-textDim">
+            <ShieldCheck size={13} className="text-swarm-gold" />
+            GlassChat Cloud
+          </span>
+        </div>
+
         <div className="flex items-center gap-2">
           <button
             onClick={handleToggleExpand}
@@ -331,12 +372,20 @@ export function GlassChatEmbed({
           <div className="flex h-full flex-col items-center justify-center p-4 text-center">
             <p className="text-xs text-swarm-err font-medium mb-1">Partner Session Error</p>
             <p className="text-mini text-swarm-textMuted max-w-[32ch]">{error}</p>
-            <button
-              onClick={initPartnerSession}
-              className="mt-3 flex items-center gap-1.5 rounded-md bg-swarm-gold/15 border border-swarm-gold/30 px-3 py-1 text-xs text-swarm-goldHi hover:bg-swarm-gold/25 transition-colors"
-            >
-              <RefreshCw size={12} /> Retry Connection
-            </button>
+            <div className="mt-3 flex items-center gap-2">
+              <button
+                onClick={initPartnerSession}
+                className="flex items-center gap-1.5 rounded-md bg-swarm-gold/15 border border-swarm-gold/30 px-3 py-1 text-xs text-swarm-goldHi hover:bg-swarm-gold/25 transition-colors"
+              >
+                <RefreshCw size={12} /> Retry
+              </button>
+              <button
+                onClick={() => switchMode("devchat")}
+                className="flex items-center gap-1.5 rounded-md bg-swarm-gold px-3 py-1 text-xs font-medium text-swarm-ink hover:opacity-90 transition-opacity"
+              >
+                <Sparkles size={12} /> Open DevChat Studio
+              </button>
+            </div>
           </div>
         ) : (
           <div ref={containerRef} id="glasschat-container" className="h-full w-full" />
@@ -345,3 +394,5 @@ export function GlassChatEmbed({
     </div>
   );
 }
+
+export { DevChatStudio };

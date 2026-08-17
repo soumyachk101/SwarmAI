@@ -31,6 +31,20 @@ import {
   Check,
   FolderPlus,
   GitMerge,
+  Terminal,
+  Wrench,
+  Cpu,
+  Play,
+  Copy,
+  RefreshCw,
+  Sparkles,
+  Filter,
+  Code2,
+  Clock,
+  Binary,
+  Activity,
+  Zap,
+  Sliders,
   type LucideIcon,
 } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
@@ -46,7 +60,7 @@ const WIDTH_KEY = "swarm.sidebarWidth";
 
 const clampWidth = (px: number) => Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, px));
 
-type LeftTab = "workspaces" | "explorer" | "search";
+type LeftTab = "workspaces" | "explorer" | "search" | "devtools" | "fleet";
 
 // Tokens, not raw Tailwind palette entries: bg-green-400 stayed the same green
 // in Rose, Forest and Dracula and clashed with every one of them.
@@ -231,12 +245,24 @@ function ExplorerPanel({
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [filterText, setFilterText] = useState("");
+
+  const refreshTree = useCallback(async () => {
+    if (!projectPath) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const nodes = await loadDir(projectPath);
+      setTree(nodes);
+    } catch (e: any) {
+      setError(String(e?.message ?? e));
+    } finally {
+      setLoading(false);
+    }
+  }, [projectPath]);
 
   useEffect(() => {
     if (!projectPath) return;
-    // Switching projects has to reset `loading` and drop the in-flight read:
-    // without the reset the spinner never returns, and without the cancel a
-    // slow listing of the *old* folder can land last and overwrite the new tree.
     let cancelled = false;
     setLoading(true);
     setTree([]);
@@ -248,9 +274,6 @@ function ExplorerPanel({
     return () => { cancelled = true; };
   }, [projectPath]);
 
-  // Deliberately not caught here: a workspace bound to a folder that has since
-  // been moved or deleted used to render as an empty tree, which is
-  // indistinguishable from an empty folder. Callers surface the reason instead.
   async function loadDir(path: string): Promise<FileNode[]> {
     const files = await invoke<any[]>("list_directory", { path });
     return files.map((f: any) => ({
@@ -274,9 +297,24 @@ function ExplorerPanel({
       }
     }
     node.expanded = !node.expanded;
-    // Functional update: `tree` from the render closure is stale after the await
-    // above, so a fast second toggle could resurrect the pre-expansion tree.
     setTree((t) => [...t]);
+  }
+
+  function filterNodes(nodes: FileNode[], query: string): FileNode[] {
+    if (!query.trim()) return nodes;
+    const q = query.toLowerCase();
+    return nodes
+      .map((node) => {
+        if (node.is_dir) {
+          const matchingChildren = node.children ? filterNodes(node.children, query) : [];
+          if (node.name.toLowerCase().includes(q) || matchingChildren.length > 0) {
+            return { ...node, expanded: true, children: matchingChildren };
+          }
+          return null;
+        }
+        return node.name.toLowerCase().includes(q) ? node : null;
+      })
+      .filter(Boolean) as FileNode[];
   }
 
   function renderNodes(nodes: FileNode[], level = 0) {
@@ -296,8 +334,6 @@ function ExplorerPanel({
                 ? "bg-swarm-gold/[0.14] text-swarm-goldHi"
                 : "text-swarm-textDim hover:bg-swarm-gold/10 hover:text-swarm-text"
             }`}
-            // Indent is capped: a node 20 folders deep would otherwise get zero
-            // width left for its name and the row would read as blank.
             style={{ paddingLeft: `${Math.min(level, 8) * 12 + 8}px` }}
             onClick={activate}
             {...activatable(activate, node.name)}
@@ -345,38 +381,79 @@ function ExplorerPanel({
     );
   }
 
+  const displayedTree = filterNodes(tree, filterText);
+
   return (
-    <div className="h-full overflow-y-auto overflow-x-hidden scrollbar-sleek">
-      {loading ? (
-        <div className="flex items-center gap-2 px-3 py-2 text-xs text-swarm-textMuted">
-          <LoaderCircle className="size-3 animate-spin" /> Loading…
-        </div>
-      ) : error && tree.length === 0 ? (
-        <div className="flex h-full flex-col items-center justify-center px-4 text-center text-swarm-textMuted">
-          <FolderOpen className="size-6 mb-2 opacity-50 text-swarm-err" />
-          <p className="text-xs font-medium text-swarm-err">Can’t read this folder</p>
-          <p className="mt-1 break-words text-micro text-swarm-textMuted/70" title={projectPath}>{error}</p>
-        </div>
-      ) : tree.length === 0 ? (
-        <div className="flex h-full flex-col items-center justify-center px-4 text-center text-swarm-textMuted">
-          <FolderOpen className="size-6 mb-2 opacity-50 text-swarm-gold" />
-          <p className="text-xs font-medium">This folder is empty</p>
-        </div>
-      ) : (
-        <div className="py-1.5">
-          {/* One unreadable subfolder must not replace the whole tree with an
-              error screen — it gets a dismissible strip instead. */}
-          {error && (
-            <div className="mx-1.5 mb-1 flex items-start gap-1.5 rounded-md border border-swarm-err/30 bg-swarm-err/10 px-2 py-1 text-micro text-swarm-err">
-              <span className="min-w-0 flex-1 break-words">{error}</span>
-              <button onClick={() => setError(null)} title="Dismiss" aria-label="Dismiss" className="shrink-0 opacity-70 hover:opacity-100">
-                <X className="size-3" />
-              </button>
-            </div>
+    <div className="h-full flex flex-col overflow-hidden">
+      {/* Explorer Instant File Filter Toolbar */}
+      <div className="p-2 border-b border-swarm-border/30 flex items-center gap-1.5 shrink-0">
+        <div className="flex-1 flex h-7 items-center gap-1.5 rounded-md border border-swarm-border/50 glass-inset px-2 focus-within:border-swarm-gold/40">
+          <Filter className="size-3 shrink-0 text-swarm-textMuted" />
+          <input
+            value={filterText}
+            onChange={(e) => setFilterText(e.target.value)}
+            placeholder="Filter files in tree…"
+            spellCheck={false}
+            className="min-w-0 flex-1 bg-transparent py-0.5 text-mini text-swarm-text outline-none placeholder:text-swarm-textMuted/50"
+          />
+          {filterText && (
+            <button
+              onClick={() => setFilterText("")}
+              className="text-swarm-textMuted hover:text-swarm-text"
+              title="Clear filter"
+            >
+              <X className="size-3" />
+            </button>
           )}
-          {renderNodes(tree)}
         </div>
-      )}
+        <button
+          onClick={refreshTree}
+          disabled={loading}
+          className="flex size-7 shrink-0 items-center justify-center rounded-md border border-swarm-border/40 text-swarm-textMuted hover:text-swarm-gold hover:bg-swarm-border/30 transition-colors disabled:opacity-50"
+          title="Refresh file tree"
+        >
+          <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-sleek">
+        {loading ? (
+          <div className="flex items-center gap-2 px-3 py-2 text-xs text-swarm-textMuted">
+            <LoaderCircle className="size-3 animate-spin" /> Loading…
+          </div>
+        ) : error && tree.length === 0 ? (
+          <div className="flex h-full flex-col items-center justify-center px-4 text-center text-swarm-textMuted">
+            <FolderOpen className="size-6 mb-2 opacity-50 text-swarm-err" />
+            <p className="text-xs font-medium text-swarm-err">Can’t read this folder</p>
+            <p className="mt-1 break-words text-micro text-swarm-textMuted/70" title={projectPath}>{error}</p>
+          </div>
+        ) : displayedTree.length === 0 ? (
+          <div className="flex h-full flex-col items-center justify-center px-4 text-center text-swarm-textMuted">
+            <FolderOpen className="size-6 mb-2 opacity-50 text-swarm-gold" />
+            <p className="text-xs font-medium">{filterText ? "No matching files" : "This folder is empty"}</p>
+            {filterText && (
+              <button
+                onClick={() => setFilterText("")}
+                className="mt-2 text-micro text-swarm-gold underline hover:opacity-80"
+              >
+                Clear filter
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="py-1.5">
+            {error && (
+              <div className="mx-1.5 mb-1 flex items-start gap-1.5 rounded-md border border-swarm-err/30 bg-swarm-err/10 px-2 py-1 text-micro text-swarm-err">
+                <span className="min-w-0 flex-1 break-words">{error}</span>
+                <button onClick={() => setError(null)} title="Dismiss" aria-label="Dismiss" className="shrink-0 opacity-70 hover:opacity-100">
+                  <X className="size-3" />
+                </button>
+              </div>
+            )}
+            {renderNodes(displayedTree)}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -411,9 +488,6 @@ function SearchPanel({
         })
       );
     } catch (e: any) {
-      // rg exits non-zero on "no matches" too, so an empty result and a missing
-      // ripgrep binary used to look identical — both rendered "No results" and
-      // left the user retyping a query that could never work.
       const msg = String(e?.message ?? e);
       setResults([]);
       setError(/no such file|not found|ENOENT|cannot run|No such/i.test(msg) ? "ripgrep (rg) is not installed or not on PATH." : null);
@@ -423,8 +497,6 @@ function SearchPanel({
     }
   };
 
-  // Results come back as absolute paths; inside a sidebar this is all prefix and
-  // no signal, so the workspace root is stripped for display only.
   const relative = (p: string) => (projectPath && p.startsWith(projectPath) ? p.slice(projectPath.length).replace(/^[\\/]/, "") : p);
 
   return (
@@ -495,13 +567,542 @@ function SearchPanel({
                   <span className="min-w-0 flex-1 truncate text-swarm-gold">{relative(r.path)}</span>
                   <span className="shrink-0 font-mono text-micro text-swarm-textMuted/70">{r.line}</span>
                 </div>
-                {/* One line, clipped by the box rather than by a magic slice()
-                    count — a hard 80-char cut chopped mid-word at every width. */}
                 <div className="truncate font-mono text-micro text-swarm-textMuted/70">{r.text.trim()}</div>
               </div>
             ))}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ── Developer Playground & DevTools Panel ───────────────────────
+function DevToolsPanel({ projectPath }: { projectPath: string | null }) {
+  const [subTab, setSubTab] = useState<"regex" | "json" | "base64" | "time" | "scripts">("regex");
+
+  // Regex State
+  const [regexPattern, setRegexPattern] = useState("([a-zA-Z0-9_-]+)@([a-zA-Z0-9_-]+)\\.([a-zA-Z]{2,5})");
+  const [regexFlags, setRegexFlags] = useState("g");
+  const [regexText, setRegexText] = useState("Contact us at dev@swarm.ai or team@antigravity.dev for issues.");
+  const [regexMatches, setRegexMatches] = useState<string[]>([]);
+  const [regexError, setRegexError] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      setRegexError(null);
+      const re = new RegExp(regexPattern, regexFlags);
+      const matches: string[] = [];
+      let m: RegExpExecArray | null;
+      if (regexFlags.includes("g")) {
+        while ((m = re.exec(regexText)) !== null) {
+          matches.push(m[0]);
+          if (!re.global || m.index === re.lastIndex) re.lastIndex++;
+        }
+      } else {
+        const single = re.exec(regexText);
+        if (single) matches.push(single[0]);
+      }
+      setRegexMatches(matches);
+    } catch (e: any) {
+      setRegexError(String(e?.message ?? e));
+      setRegexMatches([]);
+    }
+  }, [regexPattern, regexFlags, regexText]);
+
+  // JSON State
+  const [jsonText, setJsonText] = useState('{\n  "name": "@swarm/core",\n  "status": "online",\n  "agents": 4,\n  "lead": true\n}');
+  const [jsonStatus, setJsonStatus] = useState<{ ok: boolean; message: string } | null>(null);
+
+  const formatJson = (spaces = 2) => {
+    try {
+      const parsed = JSON.parse(jsonText);
+      setJsonText(JSON.stringify(parsed, null, spaces));
+      setJsonStatus({ ok: true, message: `Formatted with ${spaces} spaces` });
+    } catch (e: any) {
+      setJsonStatus({ ok: false, message: e.message });
+    }
+  };
+
+  const minifyJson = () => {
+    try {
+      const parsed = JSON.parse(jsonText);
+      setJsonText(JSON.stringify(parsed));
+      setJsonStatus({ ok: true, message: "Minified successfully" });
+    } catch (e: any) {
+      setJsonStatus({ ok: false, message: e.message });
+    }
+  };
+
+  // Base64 State
+  const [b64Input, setB64Input] = useState("Swarm AI Agent Copilot");
+  const [b64Mode, setB64Mode] = useState<"b64-enc" | "b64-dec" | "url-enc" | "url-dec">("b64-enc");
+  const [b64Output, setB64Output] = useState("");
+
+  useEffect(() => {
+    try {
+      if (b64Mode === "b64-enc") setB64Output(btoa(unescape(encodeURIComponent(b64Input))));
+      else if (b64Mode === "b64-dec") setB64Output(decodeURIComponent(escape(atob(b64Input))));
+      else if (b64Mode === "url-enc") setB64Output(encodeURIComponent(b64Input));
+      else if (b64Mode === "url-dec") setB64Output(decodeURIComponent(b64Input));
+    } catch (e: any) {
+      setB64Output(`Error: ${e.message}`);
+    }
+  }, [b64Input, b64Mode]);
+
+  // Time Converter State
+  const [timestamp, setTimestamp] = useState<string>(() => String(Math.floor(Date.now() / 1000)));
+  const [isoDate, setIsoDate] = useState<string>(() => new Date().toISOString());
+
+  const handleTsChange = (val: string) => {
+    setTimestamp(val);
+    const num = Number(val);
+    if (!isNaN(num)) {
+      const ms = num > 1e11 ? num : num * 1000;
+      setIsoDate(new Date(ms).toISOString());
+    }
+  };
+
+  const handleIsoChange = (val: string) => {
+    setIsoDate(val);
+    const ms = Date.parse(val);
+    if (!isNaN(ms)) {
+      setTimestamp(String(Math.floor(ms / 1000)));
+    }
+  };
+
+  // Script Runner State
+  const [scriptOutput, setScriptOutput] = useState<string | null>(null);
+  const [scriptRunning, setScriptRunning] = useState(false);
+
+  const runQuickScript = async (name: string, command: string, args: string[]) => {
+    if (!projectPath) return;
+    setScriptRunning(true);
+    setScriptOutput(`Running: ${command} ${args.join(" ")} in ${projectPath}...\n`);
+    try {
+      const res = await invoke<string>("run_command", {
+        command,
+        args: ["-C", projectPath, ...args],
+      });
+      setScriptOutput(res || "(Command completed with empty output)");
+    } catch (e: any) {
+      setScriptOutput(`Failed:\n${String(e?.message ?? e)}`);
+    } finally {
+      setScriptRunning(false);
+    }
+  };
+
+  const SUB_TABS = [
+    { id: "regex", label: "Regex", icon: Sparkles },
+    { id: "json", label: "JSON", icon: Braces },
+    { id: "base64", label: "B64/URL", icon: Binary },
+    { id: "time", label: "Epoch", icon: Clock },
+    { id: "scripts", label: "Scripts", icon: Terminal },
+  ] as const;
+
+  return (
+    <div className="flex h-full flex-col overflow-hidden bg-swarm-canvas">
+      {/* Sub-tab Navigation Bar */}
+      <div className="flex shrink-0 items-center border-b border-swarm-border/40 bg-swarm-surface/60 p-1 gap-0.5 overflow-x-auto scrollbar-none">
+        {SUB_TABS.map((t) => {
+          const Icon = t.icon;
+          const active = subTab === t.id;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setSubTab(t.id)}
+              className={`flex items-center gap-1 rounded-md px-2 py-1 text-mini font-medium transition-all ${
+                active
+                  ? "bg-swarm-gold/20 text-swarm-goldHi border border-swarm-gold/40 shadow-sm"
+                  : "text-swarm-textMuted hover:bg-swarm-border/30 hover:text-swarm-text"
+              }`}
+            >
+              <Icon size={12} className={active ? "text-swarm-gold" : "text-swarm-textMuted"} />
+              <span>{t.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Sub-tab Content Body */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 scrollbar-sleek space-y-3 text-xs">
+        {/* Regex Playground */}
+        {subTab === "regex" && (
+          <div className="space-y-2.5">
+            <div>
+              <div className="flex items-center justify-between mb-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
+                <span>Pattern & Flags</span>
+              </div>
+              <div className="flex gap-1.5">
+                <input
+                  value={regexPattern}
+                  onChange={(e) => setRegexPattern(e.target.value)}
+                  placeholder="Regex pattern…"
+                  className="flex-1 rounded-lg border border-swarm-border/60 glass-inset px-2.5 py-1.5 font-mono text-xs text-swarm-text outline-none focus:border-swarm-gold/60"
+                />
+                <input
+                  value={regexFlags}
+                  onChange={(e) => setRegexFlags(e.target.value)}
+                  placeholder="gims"
+                  className="w-14 rounded-lg border border-swarm-border/60 glass-inset px-2 py-1.5 font-mono text-xs text-center text-swarm-gold outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
+                Test String
+              </div>
+              <textarea
+                value={regexText}
+                onChange={(e) => setRegexText(e.target.value)}
+                rows={3}
+                className="w-full rounded-lg border border-swarm-border/60 glass-inset p-2 font-mono text-xs text-swarm-textDim outline-none focus:border-swarm-gold/60"
+              />
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
+                <span>Matches ({regexMatches.length})</span>
+              </div>
+              {regexError ? (
+                <div className="rounded-lg border border-swarm-err/30 bg-swarm-err/10 p-2 text-micro text-swarm-err font-mono">
+                  {regexError}
+                </div>
+              ) : regexMatches.length === 0 ? (
+                <div className="rounded-lg border border-swarm-border/40 bg-swarm-surface/40 p-2 text-micro text-swarm-textMuted italic">
+                  No matches found.
+                </div>
+              ) : (
+                <div className="space-y-1 max-h-36 overflow-y-auto scrollbar-sleek">
+                  {regexMatches.map((m, idx) => (
+                    <div key={idx} className="flex items-center gap-1.5 rounded bg-swarm-gold/10 border border-swarm-gold/20 px-2 py-1 font-mono text-micro text-swarm-goldHi">
+                      <span className="text-swarm-textMuted font-bold">#{idx + 1}</span>
+                      <span className="truncate">{m}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* JSON Playground */}
+        {subTab === "json" && (
+          <div className="space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">JSON Document</span>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => formatJson(2)}
+                  className="rounded px-2 py-0.5 text-micro font-medium text-swarm-gold border border-swarm-gold/30 hover:bg-swarm-gold/15 transition-colors"
+                >
+                  Prettify
+                </button>
+                <button
+                  onClick={minifyJson}
+                  className="rounded px-2 py-0.5 text-micro font-medium text-swarm-textDim border border-swarm-border/50 hover:bg-swarm-border/30 transition-colors"
+                >
+                  Minify
+                </button>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(jsonText);
+                    setJsonStatus({ ok: true, message: "Copied to clipboard" });
+                  }}
+                  className="flex items-center gap-0.5 rounded px-1.5 py-0.5 text-micro text-swarm-textMuted hover:text-swarm-text"
+                >
+                  <Copy size={11} />
+                </button>
+              </div>
+            </div>
+
+            <textarea
+              value={jsonText}
+              onChange={(e) => setJsonText(e.target.value)}
+              rows={8}
+              spellCheck={false}
+              className="w-full rounded-lg border border-swarm-border/60 glass-inset p-2 font-mono text-xs text-swarm-text outline-none focus:border-swarm-gold/60"
+            />
+
+            {jsonStatus && (
+              <div className={`rounded-lg border p-2 text-micro font-mono ${
+                jsonStatus.ok ? "border-swarm-ok/40 bg-swarm-ok/10 text-swarm-ok" : "border-swarm-err/40 bg-swarm-err/10 text-swarm-err"
+              }`}>
+                {jsonStatus.message}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Base64 & URL */}
+        {subTab === "base64" && (
+          <div className="space-y-2.5">
+            <div className="flex items-center gap-1 rounded-lg border border-swarm-border/40 p-0.5 bg-swarm-surface/40">
+              {(["b64-enc", "b64-dec", "url-enc", "url-dec"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => setB64Mode(mode)}
+                  className={`flex-1 rounded py-1 text-micro font-medium transition-colors ${
+                    b64Mode === mode ? "bg-swarm-gold text-swarm-canvas font-semibold" : "text-swarm-textMuted hover:text-swarm-text"
+                  }`}
+                >
+                  {mode.toUpperCase()}
+                </button>
+              ))}
+            </div>
+
+            <div>
+              <div className="mb-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">Input Text</div>
+              <textarea
+                value={b64Input}
+                onChange={(e) => setB64Input(e.target.value)}
+                rows={3}
+                className="w-full rounded-lg border border-swarm-border/60 glass-inset p-2 font-mono text-xs text-swarm-text outline-none"
+              />
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
+                <span>Output</span>
+                <button
+                  onClick={() => navigator.clipboard.writeText(b64Output)}
+                  className="flex items-center gap-1 text-micro text-swarm-gold hover:underline"
+                >
+                  <Copy size={11} /> Copy
+                </button>
+              </div>
+              <textarea
+                readOnly
+                value={b64Output}
+                rows={3}
+                className="w-full rounded-lg border border-swarm-border/60 bg-swarm-surface/70 p-2 font-mono text-xs text-swarm-goldHi outline-none"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Epoch & Timestamp */}
+        {subTab === "time" && (
+          <div className="space-y-3">
+            <div>
+              <div className="flex items-center justify-between mb-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
+                <span>Unix Epoch (Seconds)</span>
+                <button
+                  onClick={() => {
+                    const now = Math.floor(Date.now() / 1000);
+                    handleTsChange(String(now));
+                  }}
+                  className="text-micro text-swarm-gold hover:underline"
+                >
+                  Current Time
+                </button>
+              </div>
+              <input
+                value={timestamp}
+                onChange={(e) => handleTsChange(e.target.value)}
+                placeholder="1710000000"
+                className="w-full rounded-lg border border-swarm-border/60 glass-inset px-2.5 py-1.5 font-mono text-xs text-swarm-text outline-none"
+              />
+            </div>
+
+            <div>
+              <div className="mb-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">ISO 8601 UTC Time</div>
+              <input
+                value={isoDate}
+                onChange={(e) => handleIsoChange(e.target.value)}
+                placeholder="2026-08-17T12:00:00.000Z"
+                className="w-full rounded-lg border border-swarm-border/60 glass-inset px-2.5 py-1.5 font-mono text-xs text-swarm-gold outline-none"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Dev Scripts Hub */}
+        {subTab === "scripts" && (
+          <div className="space-y-3">
+            <div className="text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">Workspace Quick Commands</div>
+            <div className="grid grid-cols-2 gap-1.5">
+              <button
+                disabled={scriptRunning || !projectPath}
+                onClick={() => runQuickScript("Git Status", "git", ["status", "-s"])}
+                className="flex items-center gap-1.5 rounded-lg border border-swarm-border/60 bg-swarm-surface/60 px-2.5 py-1.5 text-xs text-swarm-text hover:border-swarm-gold/50 hover:bg-swarm-gold/10 transition-colors disabled:opacity-50"
+              >
+                <GitBranch size={12} className="text-swarm-gold" />
+                <span>git status</span>
+              </button>
+              <button
+                disabled={scriptRunning || !projectPath}
+                onClick={() => runQuickScript("Git Diff", "git", ["diff", "--stat"])}
+                className="flex items-center gap-1.5 rounded-lg border border-swarm-border/60 bg-swarm-surface/60 px-2.5 py-1.5 text-xs text-swarm-text hover:border-swarm-gold/50 hover:bg-swarm-gold/10 transition-colors disabled:opacity-50"
+              >
+                <Code2 size={12} className="text-swarm-amber" />
+                <span>git diff stat</span>
+              </button>
+              <button
+                disabled={scriptRunning || !projectPath}
+                onClick={() => runQuickScript("Git Log", "git", ["log", "-n", "5", "--oneline"])}
+                className="flex items-center gap-1.5 rounded-lg border border-swarm-border/60 bg-swarm-surface/60 px-2.5 py-1.5 text-xs text-swarm-text hover:border-swarm-gold/50 hover:bg-swarm-gold/10 transition-colors disabled:opacity-50"
+              >
+                <Activity size={12} className="text-swarm-ok" />
+                <span>git log -5</span>
+              </button>
+              <button
+                disabled={scriptRunning || !projectPath}
+                onClick={() => runQuickScript("Git Branches", "git", ["branch", "-a"])}
+                className="flex items-center gap-1.5 rounded-lg border border-swarm-border/60 bg-swarm-surface/60 px-2.5 py-1.5 text-xs text-swarm-text hover:border-swarm-gold/50 hover:bg-swarm-gold/10 transition-colors disabled:opacity-50"
+              >
+                <GitMerge size={12} className="text-swarm-goldHi" />
+                <span>git branches</span>
+              </button>
+            </div>
+
+            {scriptOutput && (
+              <div className="mt-2">
+                <div className="flex items-center justify-between mb-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
+                  <span>Output</span>
+                  <button onClick={() => setScriptOutput(null)} className="text-swarm-textMuted hover:text-swarm-text">
+                    <X size={11} />
+                  </button>
+                </div>
+                <pre className="max-h-48 overflow-auto rounded-lg border border-swarm-border/60 bg-swarm-canvas p-2 font-mono text-micro leading-relaxed text-swarm-textDim scrollbar-sleek">
+                  {scriptOutput}
+                </pre>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Swarm Fleet Monitor Panel ───────────────────────────────────
+function FleetPanel({ onSelectWorkspace }: { onSelectWorkspace: (wsId: string) => void }) {
+  const agents = useAgentsStore((s) => s.agents);
+  const statuses = useAgentsStore((s) => s.agentStatuses);
+  const workspaces = useWorkspaceStore((s) => s.workspaces);
+
+  const runningCount = agents.filter((a) => statuses[a.id] === "running" || statuses[a.id] === "launching").length;
+
+  return (
+    <div className="flex h-full flex-col overflow-hidden bg-swarm-canvas">
+      {/* Fleet Overview Header */}
+      <div className="flex items-center justify-between border-b border-swarm-border/40 bg-swarm-surface/70 px-3 py-2 shrink-0">
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-swarm-text">
+          <Cpu size={14} className="text-swarm-gold" />
+          <span>Swarm Agent Fleet</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="flex items-center gap-1 rounded-full bg-swarm-ok/10 border border-swarm-ok/30 px-2 py-0.5 text-micro font-medium text-swarm-ok">
+            <span className="size-1.5 rounded-full bg-swarm-ok animate-pulse" />
+            {runningCount} Active
+          </span>
+          <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-micro text-swarm-textMuted font-mono">
+            {agents.length} Total
+          </span>
+        </div>
+      </div>
+
+      {/* Agents Fleet List */}
+      <div className="flex-1 overflow-y-auto p-2 space-y-1.5 scrollbar-sleek">
+        {agents.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full p-4 text-center text-swarm-textMuted">
+            <Cpu className="size-8 mb-2 opacity-40 text-swarm-gold" />
+            <p className="text-xs font-medium">No agents spawned</p>
+            <p className="mt-1 text-micro text-swarm-textMuted/70">Create a workHive to launch swarm agents.</p>
+          </div>
+        ) : (
+          agents.map((a) => {
+            const status = statuses[a.id] ?? "idle";
+            const isRunning = status === "running" || status === "launching";
+            const ws = workspaces.find((w) => w.id === a.workspaceId);
+            const brand = cliBrand(a.cli);
+
+            return (
+              <div
+                key={a.id}
+                onClick={() => a.workspaceId && onSelectWorkspace(a.workspaceId)}
+                className="group flex flex-col gap-1 rounded-xl border border-swarm-border/50 bg-swarm-surface/60 p-2.5 transition-all hover:border-swarm-gold/50 hover:bg-swarm-gold/[0.04] cursor-pointer shadow-sm"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className={`size-2 rounded-full ${isRunning ? "bg-swarm-ok animate-pulse" : STATUS_DOT_CLASS[status]}`} />
+                    <span className="font-semibold text-xs text-swarm-text">{a.customName || a.cliName}</span>
+                    {a.isLead && (
+                      <span className="inline-flex items-center gap-0.5 rounded bg-swarm-gold/20 px-1 py-0.5 text-[9px] font-bold text-swarm-goldHi uppercase">
+                        <LeadCrown size={8} /> Lead
+                      </span>
+                    )}
+                  </div>
+                  <span className={`text-[10px] font-mono capitalize ${isRunning ? "text-swarm-ok font-medium" : "text-swarm-textMuted"}`}>
+                    {status}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-micro text-swarm-textMuted pt-0.5 border-t border-swarm-border/20">
+                  <span className="truncate max-w-[130px] font-medium text-swarm-goldDim">{ws?.name || "Global Workspace"}</span>
+                  <span className="font-mono text-swarm-textMuted/70">{a.model || a.cli}</span>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Developer HUD Mini-Status Footer ─────────────────────────────
+function SidebarDeveloperHud({
+  projectPath,
+  onOpenTab,
+}: {
+  projectPath: string | null;
+  onOpenTab: (tab: LeftTab) => void;
+}) {
+  const [branch, setBranch] = useState<string>("");
+  const agents = useAgentsStore((s) => s.agents);
+  const statuses = useAgentsStore((s) => s.agentStatuses);
+  const runningCount = agents.filter((a) => statuses[a.id] === "running" || statuses[a.id] === "launching").length;
+
+  useEffect(() => {
+    if (!projectPath) { setBranch(""); return; }
+    let cancelled = false;
+    invoke<string>("run_command", {
+      command: "git",
+      args: ["-C", projectPath, "rev-parse", "--abbrev-ref", "HEAD"],
+    })
+      .then((b) => { if (!cancelled) setBranch(b.trim()); })
+      .catch(() => { if (!cancelled) setBranch(""); });
+    return () => { cancelled = true; };
+  }, [projectPath]);
+
+  return (
+    <div className="flex h-8 shrink-0 items-center justify-between border-t border-swarm-border/40 bg-swarm-surface/90 px-2.5 text-micro font-mono">
+      <div className="flex items-center gap-1.5 min-w-0">
+        <span className="size-1.5 rounded-full bg-swarm-ok" />
+        <span className="truncate text-swarm-textDim max-w-[100px]" title={branch || "Detached"}>
+          {branch || "main"}
+        </span>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => onOpenTab("fleet")}
+          className="flex items-center gap-1 rounded px-1.5 py-0.5 text-swarm-textMuted hover:bg-swarm-border/30 hover:text-swarm-gold transition-colors"
+          title="Swarm Fleet Status"
+        >
+          <Cpu size={11} className={runningCount > 0 ? "text-swarm-ok" : "text-swarm-textMuted"} />
+          <span>{runningCount}</span>
+        </button>
+        <button
+          onClick={() => onOpenTab("devtools")}
+          className="flex items-center gap-1 rounded px-1.5 py-0.5 text-swarm-textMuted hover:bg-swarm-border/30 hover:text-swarm-gold transition-colors"
+          title="Open DevTools"
+        >
+          <Wrench size={11} />
+        </button>
       </div>
     </div>
   );
@@ -644,10 +1245,12 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
     { id: "workspaces", label: "Projects", icon: WorkspaceMark },
     { id: "explorer", label: "Explorer", icon: Folder },
     { id: "search", label: "Search", icon: Search },
+    { id: "devtools", label: "DevTools", icon: Wrench },
+    { id: "fleet", label: "Fleet", icon: Cpu },
   ];
 
   // Narrow sidebar → icon-only tabs (matches the right dock's behavior).
-  const compact = sidebarWidth < 300;
+  const compact = sidebarWidth < 340;
 
   return (
     <div
@@ -671,8 +1274,8 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
         </div>
       )}
 
-      {/* Sidebar Sub-Tabs Header (Workspaces, Explorer, Search) */}
-      <div className="flex items-center border-b border-swarm-border/40 shrink-0">
+      {/* Sidebar Sub-Tabs Header (Workspaces, Explorer, Search, DevTools, Fleet) */}
+      <div className="flex items-center border-b border-swarm-border/40 shrink-0 overflow-x-auto scrollbar-none">
         {TABS.map((tab) => {
           const Icon = tab.icon;
           const active = activeTab === tab.id;
@@ -681,7 +1284,7 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
               key={tab.id}
               onClick={() => { setActiveTab(tab.id); setViewer(null); }}
               title={tab.label}
-              className={`flex items-center justify-center gap-1.5 flex-1 min-w-0 h-8 px-2 text-mini font-medium transition-colors whitespace-nowrap ${
+              className={`flex items-center justify-center gap-1.5 flex-1 min-w-0 h-8 px-1.5 text-mini font-medium transition-colors whitespace-nowrap ${
                 active
                   ? "text-swarm-goldHi bg-swarm-gold/[0.06] border-b-2 border-swarm-gold"
                   : "text-swarm-textMuted hover:text-swarm-textDim hover:bg-swarm-border/20"
@@ -726,6 +1329,10 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
           <ExplorerPanel projectPath={projectPath || null} onOpen={setViewer} />
         ) : activeTab === "search" ? (
           <SearchPanel projectPath={projectPath || null} onOpen={setViewer} />
+        ) : activeTab === "devtools" ? (
+          <DevToolsPanel projectPath={projectPath || null} />
+        ) : activeTab === "fleet" ? (
+          <FleetPanel onSelectWorkspace={(wsId) => activateAndSync(wsId)} />
         ) : (
           /* Workspaces Tab Content */
           <>
@@ -884,7 +1491,8 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
         )}
       </div>
 
-      {/* Context menu — portaled above the plane (backdrop-blur traps in-tree fixed). */}
+      {/* Developer HUD Mini-Status Footer */}
+      <SidebarDeveloperHud projectPath={projectPath || null} onOpenTab={(tab) => setActiveTab(tab)} />
       {contextMenu && createPortal(
         <>
           <div className="fixed inset-0 z-[200]" onClick={() => setContextMenu(null)} />

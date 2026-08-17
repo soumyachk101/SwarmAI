@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { MessageSquare, GitBranch, X, Plus, Minus, Check, ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
+import { Sparkles, MessageSquare, GitBranch, X, Plus, Minus, Check, ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 import { LeadPanel, LeadModeSelect } from "@swarm/lead/ui";
 import { LeadCrown } from "@swarm/board";
@@ -357,9 +357,9 @@ function GitPanel({
 
 // ── Dock Tabs ─────────────────────────────────────────────────
 const TABS: { id: DockTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
- { id: "chat", label: "Lead", icon: LeadCrown },
- { id: "glasschat", label: "GlassChat", icon: MessageSquare },
- { id: "git", label: "Git", icon: GitBranch },
+  { id: "chat", label: "Lead", icon: LeadCrown },
+  { id: "glasschat", label: "DevChat", icon: Sparkles },
+  { id: "git", label: "Git", icon: GitBranch },
 ];
 
 const RIGHT_DOCK_MIN = 260;
@@ -508,6 +508,7 @@ export default function ADERightDock({ projectPath, onClose }: Props) {
  </div>
  {activeTab === "glasschat" && (
  <GlassChatEmbed
+ projectPath={projectPath}
  isExpanded={isExpanded}
  onToggleExpand={() => setIsExpanded(!isExpanded)}
  />
