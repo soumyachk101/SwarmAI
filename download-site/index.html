@@ -1,1165 +1,1780 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Swarm AI — Download</title>
- <meta name="description" content="Download Swarm AI — the local-first, AI-native desktop environment. Available for Windows, macOS, and Linux." />
- <link rel="preconnect" href="https://fonts.googleapis.com" />
- <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
- <style>
- /* ═══════════════════════════════════════
- SWARM AI — Premium Download Experience
- Inspired by: Cursor, Linear, Arc, Raycast
- ═══════════════════════════════════════ */
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Download Swarm AI — The Autonomous AI-Native Desktop Workspace</title>
+  <meta name="description" content="Download Swarm AI. The local-first desktop workspace where multiple AI coding agents build simultaneously with shared project memory." />
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <style>
+    /* ══════════════════════════════════════════════════════════════
+       SWARM AI — Ultra-Premium Direct Download Experience
+       Inspired by: Linear, Raycast, Cursor, Vercel & Apple
+       Zero Emojis • Pure Custom Vector SVGs • Instant Direct Downloads
+       ══════════════════════════════════════════════════════════════ */
 
- :root {
- --bg-primary: #050505;
- --bg-elevated: #0c0c10;
- --bg-card: #111116;
- --bg-card-hover: #18181f;
- --border: rgba(255,255,255,0.06);
- --border-hover: rgba(255,255,255,0.12);
- --text-primary: #f5f5f7;
- --text-secondary: #a1a1aa;
- --text-muted: #52525b;
- --accent: #FF6B00;
- --accent-bright: #FF8533;
- --accent-glow: rgba(255,107,0,0.35);
- --accent-soft: rgba(255,107,0,0.08);
- --accent-soft-hover: rgba(255,107,0,0.14);
- --windows: #0078d4;
- --macos: #a2aaad;
- --linux: #e8b339;
- --radius-lg: 20px;
- --radius-md: 14px;
- --radius-sm: 10px;
- }
+    :root {
+      --bg-void: #030306;
+      --bg-surface: #08080E;
+      --bg-elevated: #0E0E17;
+      --bg-card: rgba(15, 15, 24, 0.75);
+      --bg-card-hover: rgba(22, 22, 36, 0.9);
+      
+      --border-subtle: rgba(255, 255, 255, 0.06);
+      --border-bright: rgba(255, 255, 255, 0.14);
+      --border-gold: rgba(255, 166, 0, 0.35);
+      --border-gold-subtle: rgba(255, 166, 0, 0.15);
+      
+      --text-primary: #FFFFFF;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      
+      --gold-primary: #FF9E00;
+      --gold-bright: #FFB703;
+      --gold-light: #FFE066;
+      --gold-deep: #E85D04;
+      --gold-glow: rgba(255, 158, 0, 0.35);
+      --gold-soft: rgba(255, 158, 0, 0.08);
+      
+      --emerald: #10B981;
+      --emerald-glow: rgba(16, 185, 129, 0.3);
+      --cyan: #38BDF8;
+      --purple: #A855F7;
+      
+      --windows-blue: #0078D4;
+      --macos-silver: #A2AAAD;
+      --linux-gold: #E8B339;
+      
+      --radius-2xl: 28px;
+      --radius-xl: 20px;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+    }
 
- *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
- html {
- scroll-behavior: smooth;
- -webkit-font-smoothing: antialiased;
- -moz-osx-font-smoothing: grayscale;
- }
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
 
- body {
- font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
- background: var(--bg-primary);
- color: var(--text-primary);
- line-height: 1.6;
- overflow-x: hidden;
- cursor: default;
- }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-void);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
- /* ─── Noise Texture Overlay ─── */
- body::before {
- content: '';
- position: fixed; inset: 0; z-index: 9999;
- pointer-events: none;
- opacity: 0.025;
- background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
- background-repeat: repeat;
- background-size: 256px 256px;
- }
+    /* ─── Ambient Glow Mesh Background ─── */
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
 
- /* ─── Animated Background ─── */
- .bg-mesh {
- position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
- }
- .bg-mesh .orb {
- position: absolute; border-radius: 50%; filter: blur(100px);
- }
- .bg-mesh .orb--1 {
- width: 700px; height: 700px; top: -300px; right: -150px;
- background: radial-gradient(circle, rgba(255,107,0,0.15) 0%, transparent 70%);
- animation: float-orb 20s ease-in-out infinite;
- }
- .bg-mesh .orb--2 {
- width: 500px; height: 500px; bottom: -200px; left: -100px;
- background: radial-gradient(circle, rgba(255,107,0,0.08) 0%, transparent 70%);
- animation: float-orb 25s ease-in-out infinite reverse;
- }
- .bg-mesh .orb--3 {
- width: 400px; height: 400px; top: 50%; left: 50%;
- background: radial-gradient(circle, rgba(255,140,60,0.06) 0%, transparent 70%);
- animation: float-orb 18s ease-in-out infinite 5s;
- }
- .bg-grid {
- position: fixed; inset: 0; z-index: 0; pointer-events: none;
- background-image:
- linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
- linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
- background-size: 80px 80px;
- mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
- -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
- }
+    .mesh-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(140px);
+      opacity: 0.65;
+    }
 
- @keyframes float-orb {
- 0%, 100% { transform: translate(0, 0) scale(1); }
- 25% { transform: translate(60px, -40px) scale(1.1); }
- 50% { transform: translate(-30px, 60px) scale(0.95); }
- 75% { transform: translate(-50px, -30px) scale(1.05); }
- }
+    .mesh-orb--top {
+      width: 800px;
+      height: 800px;
+      top: -380px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: radial-gradient(circle, rgba(255, 166, 0, 0.25) 0%, rgba(232, 93, 4, 0.1) 45%, transparent 70%);
+      animation: float-slow 16s ease-in-out infinite alternate;
+    }
 
- /* ─── Layout ─── */
- .container {
- max-width: 1200px; margin: 0 auto; padding: 0 24px;
- position: relative; z-index: 1;
- }
+    .mesh-orb--left {
+      width: 600px;
+      height: 600px;
+      top: 30%;
+      left: -250px;
+      background: radial-gradient(circle, rgba(255, 183, 3, 0.14) 0%, transparent 70%);
+    }
 
- /* ─── Cursor Glow Follower ─── */
- .cursor-glow {
- position: fixed; width: 400px; height: 400px;
- border-radius: 50%; pointer-events: none; z-index: 0;
- background: radial-gradient(circle, rgba(255,107,0,0.06) 0%, transparent 70%);
- transform: translate(-50%, -50%);
- transition: opacity 0.3s;
- opacity: 0;
- }
- body:hover .cursor-glow { opacity: 1; }
+    .mesh-orb--right {
+      width: 550px;
+      height: 550px;
+      top: 55%;
+      right: -200px;
+      background: radial-gradient(circle, rgba(255, 110, 0, 0.12) 0%, transparent 70%);
+    }
 
- /* ─── Navigation ─── */
- nav {
- position: fixed; top: 0; left: 0; right: 0; z-index: 100;
- padding: 0 24px;
- background: rgba(5,5,5,0.7);
- backdrop-filter: blur(24px) saturate(1.5);
- border-bottom: 1px solid var(--border);
- transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
- }
- nav.scrolled {
- background: rgba(5,5,5,0.92);
- border-bottom-color: var(--border-hover);
- }
- .nav-inner {
- max-width: 1200px; margin: 0 auto; height: 60px;
- display: flex; align-items: center; justify-content: space-between;
- }
- .nav-brand {
- display: flex; align-items: center; gap: 10px;
- text-decoration: none; color: var(--text-primary);
- transition: opacity 0.2s;
- }
- .nav-brand:hover { opacity: 0.8; }
- .nav-logo {
- width: 32px; height: 32px; border-radius: 9px;
- background: linear-gradient(135deg, var(--accent), #ff8533);
- display: flex; align-items: center; justify-content: center;
- font-weight: 900; font-size: 13px; color: #fff;
- box-shadow: 0 0 20px var(--accent-glow);
- }
- .nav-brand-name {
- font-family: 'Space Grotesk', sans-serif;
- font-weight: 600; font-size: 15px; letter-spacing: -0.02em;
- }
- .nav-links { display: flex; gap: 8px; align-items: center; }
- .nav-links a {
- color: var(--text-secondary); text-decoration: none; font-size: 13px;
- font-weight: 500; padding: 6px 14px; border-radius: 8px;
- transition: all 0.2s;
- }
- .nav-links a:hover {
- color: var(--text-primary); background: rgba(255,255,255,0.05);
- }
- .nav-version {
- font-family: 'JetBrains Mono', monospace; font-size: 11px;
- padding: 4px 10px; border-radius: 6px;
- background: var(--accent-soft); color: var(--accent);
- border: 1px solid rgba(255,107,0,0.15);
- }
+    @keyframes float-slow {
+      0% { transform: translateX(-50%) translateY(0) scale(1); }
+      100% { transform: translateX(-50%) translateY(30px) scale(1.06); }
+    }
 
- /* ─── Hero ─── */
- .hero {
- padding: 180px 0 120px;
- text-align: center;
- position: relative;
- }
- .hero-visual {
- position: relative; width: 100%; max-width: 900px;
- margin: 0 auto 48px;
- height: 340px;
- }
- .hero-orb-group {
- position: absolute; inset: 0;
- display: flex; align-items: center; justify-content: center; gap: 80px;
- }
- .hero-orb {
- width: 140px; height: 140px; border-radius: 36px;
- display: flex; align-items: center; justify-content: center;
- font-size: 56px;
- background: var(--bg-card);
- border: 1px solid var(--border);
- box-shadow: 0 20px 60px rgba(0,0,0,0.5);
- animation: float 6s ease-in-out infinite;
- position: relative;
- }
- .hero-orb::after {
- content: ''; position: absolute; inset: -1px;
- border-radius: 37px; padding: 1px;
- background: linear-gradient(135deg, rgba(255,107,0,0.3), transparent 60%);
- -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
- mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
- -webkit-mask-composite: xor; mask-composite: exclude;
- }
- .hero-orb:nth-child(1) { animation-delay: 0s; }
- .hero-orb:nth-child(2) { animation-delay: -2s; transform: scale(1.15); z-index: 2; }
- .hero-orb:nth-child(3) { animation-delay: -4s; }
- .hero-orb:nth-child(2)::after {
- background: linear-gradient(135deg, rgba(255,107,0,0.5), transparent 60%);
- }
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(ellipse at 50% 30%, black 40%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse at 50% 30%, black 40%, transparent 80%);
+    }
 
- .hero-orbit-ring {
- position: absolute; top: 50%; left: 50%;
- width: 400px; height: 400px;
- margin: -200px 0 0 -200px;
- border: 1px dashed rgba(255,107,0,0.08);
- border-radius: 50%;
- animation: spin-slow 40s linear infinite;
- }
- .hero-orbit-dot {
- position: absolute; width: 8px; height: 8px;
- background: var(--accent); border-radius: 50%;
- box-shadow: 0 0 15px var(--accent-glow);
- }
- .hero-orbit-dot--1 { top: 0; left: 50%; margin: -4px 0 0 -4px; }
- .hero-orbit-dot--2 { bottom: 20%; right: 0; margin: 0 -4px 0 0; }
- .hero-orbit-dot--3 { bottom: 0; left: 30%; margin: 0 0 -4px 0; }
+    /* ─── Layout Container ─── */
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+    }
 
- @keyframes float {
- 0%, 100% { transform: translateY(0); }
- 50% { transform: translateY(-16px); }
- }
- @keyframes spin-slow {
- from { transform: rotate(0deg); }
- to { transform: rotate(360deg); }
- }
+    /* ─── Navigation Bar ─── */
+    header.site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 24px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
 
- .hero-badge {
- display: inline-flex; align-items: center; gap: 8px;
- padding: 6px 16px 6px 8px; border-radius: 100px;
- background: var(--accent-soft);
- border: 1px solid rgba(255,107,0,0.15);
- color: var(--accent-bright); font-size: 13px; font-weight: 600;
- margin-bottom: 28px;
- opacity: 0; animation: reveal-up 0.7s cubic-bezier(0.16,1,0.3,1) 0.1s forwards;
- }
- .hero-badge-dot {
- width: 8px; height: 8px; border-radius: 50%;
- background: var(--accent);
- box-shadow: 0 0 10px var(--accent-glow);
- animation: pulse-dot 2s ease-in-out infinite;
- }
+    header.site-header.scrolled {
+      padding: 12px 24px;
+    }
 
- .hero-title {
- font-family: 'Space Grotesk', sans-serif;
- font-size: clamp(3rem, 7vw, 5.5rem);
- font-weight: 700;
- line-height: 1.02;
- letter-spacing: -0.04em;
- margin-bottom: 24px;
- opacity: 0; animation: reveal-up 0.7s cubic-bezier(0.16,1,0.3,1) 0.2s forwards;
- }
- .hero-title .gradient-text {
- background: linear-gradient(135deg, #FF6B00, #FF9A44, #FF6B00);
- background-size: 200% 200%;
- -webkit-background-clip: text;
- background-clip: text;
- -webkit-text-fill-color: transparent;
- animation: gradient-shift 4s ease-in-out infinite;
- }
- @keyframes gradient-shift {
- 0%, 100% { background-position: 0% 50%; }
- 50% { background-position: 100% 50%; }
- }
+    .nav-pill {
+      max-width: 1140px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 18px;
+      border-radius: 999px;
+      background: rgba(10, 10, 16, 0.7);
+      backdrop-filter: blur(24px) saturate(1.8);
+      -webkit-backdrop-filter: blur(24px) saturate(1.8);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 10px 36px rgba(0, 0, 0, 0.5);
+      transition: all 0.3s ease;
+    }
 
- .hero-subtitle {
- font-size: clamp(1rem, 2vw, 1.2rem);
- color: var(--text-secondary);
- max-width: 580px;
- margin: 0 auto 40px;
- font-weight: 400; line-height: 1.7;
- opacity: 0; animation: reveal-up 0.7s cubic-bezier(0.16,1,0.3,1) 0.3s forwards;
- }
+    .site-header.scrolled .nav-pill {
+      background: rgba(8, 8, 14, 0.92);
+      border-color: var(--border-bright);
+      box-shadow: 0 14px 44px rgba(0, 0, 0, 0.7);
+    }
 
- .hero-cta-row {
- display: flex; align-items: center; justify-content: center;
- gap: 14px; flex-wrap: wrap;
- opacity: 0; animation: reveal-up 0.7s cubic-bezier(0.16,1,0.3,1) 0.4s forwards;
- }
- .btn-primary {
- display: inline-flex; align-items: center; gap: 10px;
- padding: 15px 34px; border-radius: 14px;
- background: linear-gradient(135deg, var(--accent), #e85d00);
- color: #fff; font-size: 15px; font-weight: 600;
- text-decoration: none; border: none; cursor: pointer;
- transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
- box-shadow: 0 0 40px rgba(255,107,0,0.25), 0 4px 20px rgba(0,0,0,0.3);
- position: relative; overflow: hidden;
- }
- .btn-primary::before {
- content: ''; position: absolute; inset: 0;
- background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
- transform: translateX(-100%) skewX(-15deg);
- transition: transform 0.6s cubic-bezier(0.4,0,0.2,1);
- }
- .btn-primary:hover::before { transform: translateX(100%) skewX(-15deg); }
- .btn-primary:hover {
- transform: translateY(-2px) scale(1.02);
- box-shadow: 0 0 60px rgba(255,107,0,0.35), 0 8px 30px rgba(0,0,0,0.4);
- }
- .btn-secondary {
- display: inline-flex; align-items: center; gap: 10px;
- padding: 15px 34px; border-radius: 14px;
- background: rgba(255,255,255,0.04);
- border: 1px solid var(--border-hover);
- color: var(--text-primary); font-size: 15px; font-weight: 600;
- text-decoration: none; cursor: pointer;
- transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
- }
- .btn-secondary:hover {
- background: rgba(255,255,255,0.08);
- border-color: rgba(255,255,255,0.2);
- transform: translateY(-2px);
- }
+    .brand-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
 
- .hero-stats {
- display: flex; justify-content: center; gap: 56px;
- margin-top: 64px;
- opacity: 0; animation: reveal-up 0.7s cubic-bezier(0.16,1,0.3,1) 0.5s forwards;
- }
- .hero-stat { text-align: center; position: relative; }
- .hero-stat:not(:last-child)::after {
- content: ''; position: absolute; right: -28px; top: 50%;
- transform: translateY(-50%);
- width: 1px; height: 32px; background: var(--border);
- }
- .hero-stat .num {
- font-family: 'Space Grotesk', sans-serif;
- font-size: 1.6rem; font-weight: 700;
- background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
- -webkit-background-clip: text; background-clip: text;
- -webkit-text-fill-color: transparent;
- }
- .hero-stat .lbl {
- font-size: 0.72rem; color: var(--text-muted);
- text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px;
- font-weight: 500;
- }
+    .brand-logo-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, rgba(255, 183, 3, 0.22), rgba(255, 110, 0, 0.1));
+      border: 1px solid var(--border-gold-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 18px var(--gold-glow);
+    }
 
- /* ─── Section Common ─── */
- .section {
- padding: 100px 0;
- position: relative;
- }
- .section-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
- .section-label {
- font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
- letter-spacing: 0.14em; color: var(--accent); margin-bottom: 14px;
- display: flex; align-items: center; gap: 10px;
- }
- .section-label::before {
- content: ''; width: 20px; height: 1px; background: var(--accent);
- }
- .section-title {
- font-family: 'Space Grotesk', sans-serif;
- font-size: clamp(2rem, 4vw, 3rem);
- font-weight: 700; letter-spacing: -0.03em;
- margin-bottom: 14px; line-height: 1.1;
- }
- .section-desc {
- color: var(--text-secondary); font-size: 1rem;
- max-width: 520px; line-height: 1.7;
- }
+    .brand-logo-wrap img {
+      width: 24px;
+      height: 24px;
+    }
 
- /* ─── OS Download Cards ─── */
- .os-grid {
- display: grid;
- grid-template-columns: repeat(3, 1fr);
- gap: 16px;
- }
- .os-card {
- background: var(--bg-card);
- border: 1px solid var(--border);
- border-radius: var(--radius-lg);
- padding: 28px;
- transition: all 0.5s cubic-bezier(0.4,0,0.2,1);
- position: relative; overflow: hidden;
- }
- .os-card::before {
- content: ''; position: absolute; top: 0; left: 0; right: 0;
- height: 2px; background: var(--card-accent);
- opacity: 0; transition: opacity 0.4s;
- }
- .os-card::after {
- content: ''; position: absolute; inset: 0;
- background: radial-gradient(ellipse at top, var(--card-accent-glow), transparent 60%);
- opacity: 0; transition: opacity 0.5s;
- pointer-events: none;
- }
- .os-card:hover {
- border-color: var(--card-border);
- transform: translateY(-6px);
- box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 40px var(--card-accent-glow);
- }
- .os-card:hover::before { opacity: 1; }
- .os-card:hover::after { opacity: 0.04; }
+    .brand-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 1.18rem;
+      letter-spacing: -0.02em;
+      background: linear-gradient(180deg, #FFFFFF 20%, #E2E8F0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
- .os-card--windows { --card-accent: var(--windows); --card-border: rgba(0,120,212,0.3); --card-accent-glow: rgba(0,120,212,0.08); }
- .os-card--macos { --card-accent: var(--macos); --card-border: rgba(162,170,173,0.3); --card-accent-glow: rgba(162,170,173,0.06); }
- .os-card--linux { --card-accent: var(--linux); --card-border: rgba(232,179,57,0.3); --card-accent-glow: rgba(232,179,57,0.06); }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
 
- .os-card-header {
- display: flex; align-items: center; gap: 14px; margin-bottom: 20px;
- }
- .os-icon-wrap {
- width: 48px; height: 48px; border-radius: 13px;
- display: flex; align-items: center; justify-content: center;
- background: var(--accent-soft);
- border: 1px solid var(--border);
- transition: all 0.3s;
- }
- .os-card:hover .os-icon-wrap {
- border-color: var(--card-border);
- background: var(--accent-soft-hover);
- }
- .os-card-name {
- font-family: 'Space Grotesk', sans-serif;
- font-size: 1.1rem; font-weight: 600;
- }
- .os-card-ver {
- font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;
- font-family: 'JetBrains Mono', monospace;
- }
+    .nav-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
- .dl-list { display: flex; flex-direction: column; gap: 8px; }
- .dl-item {
- display: flex; align-items: center; gap: 12px;
- padding: 12px 14px; border-radius: var(--radius-sm);
- background: var(--bg-elevated);
- border: 1px solid transparent;
- text-decoration: none; color: var(--text-primary);
- transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
- cursor: pointer; position: relative; overflow: hidden;
- }
- .dl-item::before {
- content: ''; position: absolute; inset: 0;
- background: linear-gradient(135deg, transparent, rgba(255,255,255,0.02));
- opacity: 0; transition: opacity 0.3s;
- }
- .dl-item:hover {
- border-color: var(--border-hover);
- background: var(--bg-card-hover);
- transform: translateX(4px);
- }
- .dl-item:hover::before { opacity: 1; }
+    .nav-link:hover {
+      color: var(--text-primary);
+    }
 
- .dl-item-icon {
- width: 36px; height: 36px; border-radius: 9px;
- display: flex; align-items: center; justify-content: center;
- background: var(--accent-soft);
- flex-shrink: 0;
- transition: all 0.3s;
- }
- .os-card:hover .dl-item-icon {
- background: var(--accent-soft-hover);
- }
+    .nav-cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 20px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-bright) 40%, var(--gold-deep) 100%);
+      color: #050508;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.88rem;
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      box-shadow: 0 0 24px rgba(255, 158, 0, 0.4);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
 
- .dl-item-body { flex: 1; min-width: 0; }
- .dl-item-format {
- font-size: 0.85rem; font-weight: 600;
- }
- .dl-item-size {
- font-size: 0.72rem; color: var(--text-muted);
- font-family: 'JetBrains Mono', monospace; margin-top: 1px;
- }
- .dl-item-arrow {
- color: var(--text-muted); font-size: 16px; flex-shrink: 0;
- opacity: 0; transform: translateX(-8px);
- transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
- }
- .dl-item:hover .dl-item-arrow {
- opacity: 1; transform: translateX(0);
- color: var(--accent);
- }
+    .nav-cta-btn:hover {
+      transform: translateY(-1px) scale(1.02);
+      box-shadow: 0 0 32px rgba(255, 158, 0, 0.6);
+    }
 
- /* ─── Architecture Pill Strip ─── */
- .arch-pills {
- display: flex; gap: 8px; margin-top: 28px;
- padding-top: 20px; border-top: 1px solid var(--border);
- }
- .arch-pill {
- font-family: 'JetBrains Mono', monospace;
- font-size: 0.7rem; font-weight: 500;
- padding: 4px 10px; border-radius: 6px;
- background: rgba(255,255,255,0.03);
- color: var(--text-muted);
- border: 1px solid var(--border);
- }
+    /* ══════════════════════════════════════════════════════════════
+       HERO SECTION — ELEVATED & WORLD-CLASS
+       ══════════════════════════════════════════════════════════════ */
+    section.hero-section {
+      padding-top: 155px;
+      padding-bottom: 75px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
 
- /* ─── Terminal Showcase ─── */
- .terminal-section {
- padding: 100px 0;
- }
- .terminal-grid {
- display: grid;
- grid-template-columns: 1fr 1fr;
- gap: 60px; align-items: center;
- }
- .terminal-visual {
- position: relative; border-radius: var(--radius-lg);
- background: var(--bg-card);
- border: 1px solid var(--border);
- overflow: hidden;
- box-shadow: 0 40px 100px rgba(0,0,0,0.5);
- }
- .terminal-bar {
- display: flex; align-items: center; gap: 8px;
- padding: 14px 18px; background: var(--bg-elevated);
- border-bottom: 1px solid var(--border);
- }
- .terminal-dot {
- width: 12px; height: 12px; border-radius: 50%;
- }
- .terminal-dot--r { background: #ff5f57; }
- .terminal-dot--y { background: #febc2e; }
- .terminal-dot--g { background: #28c840; }
- .terminal-title {
- font-family: 'JetBrains Mono', monospace;
- font-size: 0.72rem; color: var(--text-muted);
- margin-left: 12px;
- }
- .terminal-body {
- padding: 20px 22px;
- font-family: 'JetBrains Mono', monospace;
- font-size: 0.82rem; line-height: 1.8;
- color: var(--text-secondary);
- overflow: hidden;
- }
- .terminal-line { opacity: 0; animation: terminal-appear 0.5s ease forwards; }
- .terminal-line:nth-child(1) { animation-delay: 0.5s; }
- .terminal-line:nth-child(2) { animation-delay: 1.2s; }
- .terminal-line:nth-child(3) { animation-delay: 1.9s; }
- .terminal-line:nth-child(4) { animation-delay: 2.6s; }
- .terminal-line:nth-child(5) { animation-delay: 3.3s; }
- .terminal-line:nth-child(6) { animation-delay: 4.0s; }
- @keyframes terminal-appear {
- from { opacity: 0; transform: translateY(6px); }
- to { opacity: 1; transform: translateY(0); }
- }
- .t-prompt { color: var(--accent); }
- .t-cmd { color: var(--text-primary); }
- .t-flag { color: #7dd3fc; }
- .t-comment { color: var(--text-muted); }
- .t-success { color: #4ade80; }
- .t-json-key { color: #c084fc; }
- .t-json-val { color: #fbbf24; }
+    /* Floating Emblem Visual Above Headline */
+    .hero-emblem-wrap {
+      width: 72px;
+      height: 72px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(255, 183, 3, 0.2), rgba(232, 93, 4, 0.15));
+      border: 1px solid var(--border-gold);
+      box-shadow: 0 0 50px rgba(255, 158, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      position: relative;
+      animation: float-emblem 6s ease-in-out infinite;
+    }
 
- .terminal-content h2 {
- font-family: 'Space Grotesk', sans-serif;
- font-size: clamp(1.6rem, 3vw, 2.2rem);
- font-weight: 700; letter-spacing: -0.03em;
- margin-bottom: 16px; line-height: 1.2;
- }
- .terminal-content p {
- color: var(--text-secondary); font-size: 0.95rem;
- line-height: 1.7; margin-bottom: 20px;
- }
- .terminal-content .feature-list {
- list-style: none; display: flex; flex-direction: column; gap: 10px;
- }
- .terminal-content .feature-list li {
- display: flex; align-items: center; gap: 10px;
- font-size: 0.9rem; color: var(--text-secondary);
- }
- .feature-check {
- width: 20px; height: 20px; border-radius: 6px;
- background: var(--accent-soft);
- display: flex; align-items: center; justify-content: center;
- color: var(--accent); font-size: 11px; font-weight: 700;
- flex-shrink: 0;
- }
+    .hero-emblem-wrap img {
+      width: 44px;
+      height: 44px;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6));
+    }
 
- /* ─── Features Grid ─── */
- .features-grid {
- display: grid;
- grid-template-columns: repeat(3, 1fr);
- gap: 14px;
- margin-top: 48px;
- }
- .feature-card {
- background: var(--bg-card);
- border: 1px solid var(--border);
- border-radius: var(--radius-lg);
- padding: 28px;
- transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
- position: relative; overflow: hidden;
- }
- .feature-card::before {
- content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
- background: linear-gradient(90deg, transparent, rgba(255,107,0,0.3), transparent);
- opacity: 0; transition: opacity 0.4s;
- }
- .feature-card:hover {
- border-color: var(--border-hover);
- transform: translateY(-4px);
- box-shadow: 0 20px 60px rgba(0,0,0,0.4);
- }
- .feature-card:hover::before { opacity: 1; }
- .feature-icon {
- width: 42px; height: 42px; border-radius: 11px;
- background: var(--accent-soft);
- border: 1px solid rgba(255,107,0,0.1);
- display: flex; align-items: center; justify-content: center;
- font-size: 20px; margin-bottom: 16px;
- transition: all 0.3s;
- }
- .feature-card:hover .feature-icon {
- background: var(--accent-soft-hover);
- border-color: rgba(255,107,0,0.2);
- transform: scale(1.05);
- }
- .feature-card h3 {
- font-family: 'Space Grotesk', sans-serif;
- font-size: 0.95rem; font-weight: 600; margin-bottom: 8px;
- }
- .feature-card p {
- font-size: 0.82rem; color: var(--text-muted); line-height: 1.65;
- }
+    @keyframes float-emblem {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(2deg); }
+    }
 
- /* ─── Social Proof / Trust ─── */
- .trust-bar {
- display: flex; align-items: center; justify-content: center;
- gap: 48px; padding: 40px 0;
- opacity: 0; animation: reveal-up 0.7s cubic-bezier(0.16,1,0.3,1) 0.6s forwards;
- }
- .trust-item {
- font-size: 0.8rem; color: var(--text-muted);
- display: flex; align-items: center; gap: 8px;
- font-weight: 500;
- }
- .trust-star { color: var(--accent); font-size: 14px; }
+    /* Glowing Badge Pill */
+    .hero-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 18px;
+      border-radius: 999px;
+      background: rgba(255, 158, 0, 0.08);
+      border: 1px solid var(--border-gold-subtle);
+      color: var(--gold-bright);
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      margin-bottom: 22px;
+      box-shadow: 0 0 30px rgba(255, 158, 0, 0.15);
+      backdrop-filter: blur(16px);
+    }
 
- /* ─── Install Steps ─── */
- .steps-grid {
- display: grid;
- grid-template-columns: repeat(4, 1fr);
- gap: 16px;
- margin-top: 40px;
- }
- .step-card {
- background: var(--bg-card); border: 1px solid var(--border);
- border-radius: var(--radius-lg); padding: 24px;
- text-align: center;
- transition: all 0.3s;
- }
- .step-card:hover {
- border-color: var(--border-hover);
- transform: translateY(-3px);
- }
- .step-num {
- font-family: 'Space Grotesk', sans-serif;
- font-size: 2rem; font-weight: 700;
- background: linear-gradient(135deg, var(--accent), #ff8533);
- -webkit-background-clip: text; background-clip: text;
- -webkit-text-fill-color: transparent;
- margin-bottom: 10px;
- }
- .step-card h4 {
- font-size: 0.9rem; font-weight: 600; margin-bottom: 6px;
- }
- .step-card p {
- font-size: 0.78rem; color: var(--text-muted); line-height: 1.6;
- }
+    .pulse-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 12px var(--emerald);
+      display: inline-block;
+      animation: pulse-emerald 2s infinite;
+    }
 
- /* ─── Footer ─── */
- footer {
- border-top: 1px solid var(--border);
- padding: 48px 0 32px;
- position: relative; z-index: 1;
- }
- .footer-inner {
- max-width: 1200px; margin: 0 auto; padding: 0 24px;
- display: flex; justify-content: space-between; align-items: center;
- flex-wrap: wrap; gap: 20px;
- }
- .footer-brand {
- display: flex; align-items: center; gap: 10px;
- font-weight: 600; font-size: 0.9rem;
- }
- .footer-links { display: flex; gap: 24px; }
- .footer-links a {
- color: var(--text-muted); text-decoration: none;
- font-size: 0.82rem; transition: color 0.2s; font-weight: 500;
- }
- .footer-links a:hover { color: var(--text-primary); }
- .footer-copy {
- width: 100%; text-align: center;
- font-size: 0.72rem; color: var(--text-muted); margin-top: 24px;
- padding-top: 24px; border-top: 1px solid var(--border);
- }
+    @keyframes pulse-emerald {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.2); }
+    }
 
- /* ─── Scroll Reveal ─── */
- .reveal {
- opacity: 0; transform: translateY(30px);
- transition: all 0.8s cubic-bezier(0.16,1,0.3,1);
- }
- .reveal.visible {
- opacity: 1; transform: translateY(0);
- }
- .reveal-delay-1 { transition-delay: 0.1s; }
- .reveal-delay-2 { transition-delay: 0.2s; }
- .reveal-delay-3 { transition-delay: 0.3s; }
+    /* Main Headline */
+    h1.hero-headline {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.6rem, 6vw, 4.8rem);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.04em;
+      max-width: 980px;
+      margin-bottom: 24px;
+    }
 
- /* ─── Animations ─── */
- @keyframes reveal-up {
- from { opacity: 0; transform: translateY(24px); }
- to { opacity: 1; transform: translateY(0); }
- }
- @keyframes pulse-dot {
- 0%, 100% { opacity: 1; transform: scale(1); }
- 50% { opacity: 0.5; transform: scale(0.8); }
- }
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #FFFFFF 15%, #FFE066 45%, #FFB703 70%, #FB8500 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
 
- /* ─── Scrollbar ─── */
- ::-webkit-scrollbar { width: 6px; }
- ::-webkit-scrollbar-track { background: var(--bg-primary); }
- ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
- ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+    p.hero-subtext {
+      font-size: clamp(1.1rem, 2.2vw, 1.3rem);
+      color: var(--text-secondary);
+      max-width: 720px;
+      margin-bottom: 42px;
+      font-weight: 400;
+      line-height: 1.65;
+    }
 
- /* ─── Responsive ─── */
- @media (max-width: 1024px) {
- .os-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
- .terminal-grid { grid-template-columns: 1fr; }
- .features-grid { grid-template-columns: repeat(2, 1fr); }
- .steps-grid { grid-template-columns: repeat(2, 1fr); }
- }
- @media (max-width: 768px) {
- .nav-links { display: none; }
- .hero { padding: 130px 0 80px; }
- .hero-orbit-ring { display: none; }
- .hero-orb-group { gap: 24px; }
- .hero-orb { width: 100px; height: 100px; font-size: 36px; border-radius: 24px; }
- .hero-orb:nth-child(2) { transform: scale(1.05); }
- .hero-stats { gap: 20px; flex-wrap: wrap; }
- .hero-stat::after { display: none; }
- .features-grid { grid-template-columns: 1fr; }
- .steps-grid { grid-template-columns: 1fr; }
- .footer-inner { flex-direction: column; text-align: center; }
- .footer-links { justify-content: center; }
- .trust-bar { gap: 20px; flex-wrap: wrap; }
- }
- </style>
+    p.hero-subtext strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* ─── Dual Action CTA Bar ─── */
+    .hero-actions-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 20px;
+      width: 100%;
+    }
+
+    .primary-download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 36px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #FFE066 0%, #FFB703 35%, #FB8500 70%, #E85D04 100%);
+      color: #030306;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.12rem;
+      font-weight: 800;
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      cursor: pointer;
+      box-shadow: 0 12px 38px rgba(255, 158, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .primary-download-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 18px 50px rgba(255, 158, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .primary-download-btn svg {
+      transition: transform 0.25s ease;
+    }
+
+    .primary-download-btn:hover svg {
+      transform: translateY(2px);
+    }
+
+    .hero-secondary-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 26px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-primary);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.02rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid var(--border-bright);
+      cursor: pointer;
+      backdrop-filter: blur(16px);
+      transition: all 0.25s ease;
+    }
+
+    .hero-secondary-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+    }
+
+    .os-detected-label {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 34px;
+    }
+
+    .os-detected-label span.highlight {
+      color: var(--gold-bright);
+      font-weight: 600;
+    }
+
+    /* ─── Trust Proof Strip ─── */
+    .trust-strip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 28px;
+      margin-bottom: 50px;
+      padding: 12px 24px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .trust-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .trust-badge svg {
+      color: var(--gold-bright);
+    }
+
+    /* ─── Hero Product IDE Window Showcase ─── */
+    .hero-ide-window {
+      width: 100%;
+      max-width: 1080px;
+      margin-top: 10px;
+      border-radius: var(--radius-2xl);
+      background: rgba(11, 11, 18, 0.85);
+      border: 1px solid var(--border-bright);
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.85), 0 0 60px rgba(255, 158, 0, 0.12);
+      backdrop-filter: blur(30px);
+      overflow: hidden;
+      text-align: left;
+    }
+
+    .ide-title-bar {
+      background: rgba(6, 6, 11, 0.95);
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .dot--red { background: #FF5F56; }
+    .dot--yellow { background: #FFBD2E; }
+    .dot--green { background: #27C93F; }
+
+    .ide-status-center {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .project-pill {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 3px 10px;
+      border-radius: 6px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .memory-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--gold-bright);
+      font-size: 0.74rem;
+    }
+
+    .live-status-pill {
+      font-size: 0.74rem;
+      padding: 4px 11px;
+      border-radius: 999px;
+      background: var(--emerald-soft);
+      color: var(--emerald);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ide-body-grid {
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      min-height: 320px;
+    }
+
+    @media (max-width: 820px) {
+      .ide-body-grid { grid-template-columns: 1fr; }
+    }
+
+    .ide-agents-sidebar {
+      background: rgba(8, 8, 13, 0.65);
+      border-right: 1px solid var(--border-subtle);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .agent-card-item {
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+      cursor: default;
+    }
+
+    .agent-card-item.active {
+      background: var(--gold-soft);
+      border-color: var(--border-gold);
+    }
+
+    .agent-icon-badge {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .agent-info-wrap {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .agent-name-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .agent-role-text {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .ide-terminal-console {
+      padding: 22px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.84rem;
+      color: #E2E8F0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #050509;
+    }
+
+    .console-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .c-line {
+      display: flex;
+      gap: 10px;
+      line-height: 1.5;
+    }
+
+    .c-prefix { color: var(--gold-primary); font-weight: 600; }
+    .c-dim { color: var(--text-muted); }
+    .c-ok { color: var(--emerald); font-weight: 600; }
+    .c-cyan { color: var(--cyan); }
+    .c-purple { color: var(--purple); }
+
+    /* ─── Platform Direct Download Grid ─── */
+    section.downloads-section {
+      padding: 110px 0 70px;
+      position: relative;
+    }
+
+    .section-header-block {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .section-tag {
+      font-size: 0.84rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--gold-bright);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+      margin-bottom: 14px;
+    }
+
+    .section-description {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .platforms-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    @media (max-width: 950px) {
+      .platforms-grid { grid-template-columns: 1fr; }
+    }
+
+    .platform-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-2xl);
+      padding: 34px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: blur(20px);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .platform-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: transparent;
+      transition: background 0.3s ease;
+    }
+
+    .platform-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--border-bright);
+      background: var(--bg-card-hover);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+    }
+
+    .platform-card--mac:hover::before { background: var(--macos-silver); }
+    .platform-card--win:hover::before { background: var(--windows-blue); }
+    .platform-card--linux:hover::before { background: var(--linux-gold); }
+
+    .platform-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+
+    .platform-icon-box {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .platform-card--mac .platform-icon-box { background: rgba(162, 170, 173, 0.12); color: var(--macos-silver); }
+    .platform-card--win .platform-icon-box { background: rgba(0, 120, 212, 0.12); color: var(--windows-blue); }
+    .platform-card--linux .platform-icon-box { background: rgba(232, 179, 57, 0.12); color: var(--linux-gold); }
+
+    .platform-compat-badge {
+      font-size: 0.76rem;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .platform-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .platform-subtitle {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+    }
+
+    .direct-download-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 26px;
+    }
+
+    .direct-dl-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 16px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      text-decoration: none;
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .direct-dl-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--border-bright);
+      transform: translateX(3px);
+    }
+
+    .direct-dl-item.highlight {
+      background: var(--gold-soft);
+      border-color: var(--border-gold-subtle);
+    }
+
+    .direct-dl-item.highlight:hover {
+      background: rgba(255, 158, 0, 0.15);
+      border-color: var(--gold-primary);
+    }
+
+    .dl-left-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .dl-format-title {
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: var(--text-primary);
+    }
+
+    .dl-format-desc {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .dl-action-icon {
+      color: var(--gold-bright);
+      display: flex;
+      align-items: center;
+    }
+
+    .arch-tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .arch-tag {
+      font-size: 0.74rem;
+      padding: 4px 10px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-secondary);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ─── Features Showcase Grid ─── */
+    section.features-section {
+      padding: 90px 0;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    @media (max-width: 950px) {
+      .features-grid { grid-template-columns: 1fr; }
+    }
+
+    .feature-box {
+      background: rgba(14, 14, 22, 0.65);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 30px;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .feature-box:hover {
+      border-color: var(--border-bright);
+      background: rgba(20, 20, 32, 0.85);
+      transform: translateY(-4px);
+    }
+
+    .feature-svg-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      background: var(--gold-soft);
+      border: 1px solid var(--border-gold-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold-bright);
+    }
+
+    .feature-heading {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .feature-paragraph {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ─── Terminal Quickstart ─── */
+    section.quickstart-section {
+      padding: 80px 0 100px;
+    }
+
+    .quickstart-wrapper {
+      background: linear-gradient(135deg, rgba(18, 18, 28, 0.8) 0%, rgba(10, 10, 16, 0.95) 100%);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-2xl);
+      padding: 44px;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    @media (max-width: 880px) {
+      .quickstart-wrapper { grid-template-columns: 1fr; padding: 28px; }
+    }
+
+    .quickstart-content h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+      letter-spacing: -0.02em;
+    }
+
+    .quickstart-content p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      margin-bottom: 24px;
+    }
+
+    .terminal-box {
+      background: #050508;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+
+    .term-bar {
+      background: #0D0D14;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .term-code {
+      padding: 22px 24px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      color: #ECEFF4;
+      line-height: 1.8;
+    }
+
+    .copy-code-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-secondary);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 0.76rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .copy-code-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+      color: #FFF;
+    }
+
+    /* ─── Footer ─── */
+    footer.site-footer {
+      margin-top: auto;
+      padding: 60px 0 36px;
+      border-top: 1px solid var(--border-subtle);
+      background: rgba(4, 4, 8, 0.85);
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-copy {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .footer-links-row {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links-row a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.86rem;
+      transition: color 0.2s;
+    }
+
+    .footer-links-row a:hover { color: var(--gold-bright); }
+
+    /* ─── Direct Download Toast Notification ─── */
+    .download-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      background: rgba(14, 14, 22, 0.95);
+      border: 1px solid var(--border-gold);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      box-shadow: 0 16px 50px rgba(0, 0, 0, 0.8), 0 0 30px var(--gold-glow);
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transform: translateY(120%);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      max-width: 420px;
+    }
+
+    .download-toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--gold-soft);
+      border: 1px solid var(--border-gold-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold-bright);
+      flex-shrink: 0;
+    }
+
+    .toast-content {
+      flex: 1;
+    }
+
+    .toast-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .toast-desc {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+  </style>
 </head>
 <body>
 
- <!-- Cursor Glow -->
- <div class="cursor-glow" id="cursorGlow"></div>
+  <!-- Ambient Glow & Grid -->
+  <div class="bg-mesh">
+    <div class="mesh-orb mesh-orb--top"></div>
+    <div class="mesh-orb mesh-orb--left"></div>
+    <div class="mesh-orb mesh-orb--right"></div>
+  </div>
+  <div class="bg-grid"></div>
 
- <!-- Background Effects -->
- <div class="bg-mesh">
- <div class="orb orb--1"></div>
- <div class="orb orb--2"></div>
- <div class="orb orb--3"></div>
- </div>
- <div class="bg-grid"></div>
+  <!-- Header Navigation -->
+  <header class="site-header" id="siteHeader">
+    <nav class="nav-pill">
+      <a href="#" class="brand-link">
+        <div class="brand-logo-wrap">
+          <img src="assets/logo.svg" alt="Swarm AI Logo" />
+        </div>
+        <span class="brand-name">Swarm AI</span>
+      </a>
 
- <!-- Navigation -->
- <nav id="nav">
- <div class="nav-inner">
- <a href="#" class="nav-brand">
- <div class="nav-logo">S</div>
- <span class="nav-brand-name">Swarm AI</span>
- </a>
- <div class="nav-links">
- <a href="#download">Download</a>
- <a href="#features">Features</a>
- <a href="#terminal">How it Works</a>
- <a href="https://github.com/soumyachk101/swarm" target="_blank" rel="noopener">GitHub</a>
- </div>
- <div class="nav-version">v1.0.0</div>
- </div>
- </nav>
+      <div class="nav-links">
+        <a href="#download" class="nav-link">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Downloads
+        </a>
+        <a href="#features" class="nav-link">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Architecture
+        </a>
+        <a href="#quickstart" class="nav-link">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          Quickstart
+        </a>
+      </div>
 
- <!-- Hero -->
- <section class="hero">
- <div class="container">
- <div class="hero-visual">
- <div class="hero-orbit-ring">
- <div class="hero-orbit-dot hero-orbit-dot--1"></div>
- <div class="hero-orbit-dot hero-orbit-dot--2"></div>
- <div class="hero-orbit-dot hero-orbit-dot--3"></div>
- </div>
- <div class="hero-orb-group">
- <div class="hero-orb">&#x1F4BB;</div>
- <div class="hero-orb">&#x1F4BB;</div>
- <div class="hero-orb">&#x1F4BB;</div>
- </div>
- </div>
+      <button class="nav-cta-btn" onclick="triggerAutoDownload()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M20 17v1a2 2 0 0 1-2 2H6a2 2 0 01-2-2v-1"/></svg>
+        <span>Direct Download</span>
+      </button>
+    </nav>
+  </header>
 
- <div class="hero-badge">
- <span class="hero-badge-dot"></span>
- Free &amp; Open Source — MIT License
- </div>
+  <!-- ══════════════════════════════════════════════════════════════
+       HERO SECTION
+       ══════════════════════════════════════════════════════════════ -->
+  <section class="hero-section">
+    <div class="container">
+      
+      <!-- Floating Emblem Visual -->
+      <div class="hero-emblem-wrap">
+        <img src="assets/logo.svg" alt="Swarm AI Golden Mark" />
+      </div>
 
- <h1 class="hero-title">
- Download <span class="gradient-text">Swarm AI</span>
- </h1>
+      <!-- Radiant Status Pill -->
+      <div class="hero-badge-pill">
+        <span class="pulse-indicator"></span>
+        <span>Swarm AI v0.1.0 &middot; Autonomous Multi-Agent Desktop &middot; MIT Open Source</span>
+      </div>
 
- <p class="hero-subtitle">
- A local-first, AI-native desktop environment where multiple coding agents
- build together, share memory, and never lose context.
- </p>
+      <!-- Grand Impact Headline -->
+      <h1 class="hero-headline">
+        One Human Architect.<br />
+        <span class="gold-gradient-text">A Swarm of Autonomous Agents.</span>
+      </h1>
 
- <div class="hero-cta-row">
- <a href="#download" class="btn-primary">
- <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M20 17v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"/></svg>
- Download Now
- </a>
- <a href="https://github.com/soumyachk101/swarm" target="_blank" rel="noopener" class="btn-secondary">
- <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.1.39-1.99 1.03-2.69-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0112 6.8c.85.004 1.71.11 2.52.34 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.69 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.16.58.67.5A10.01 10.01 0 0022 12c0-5.523-4.477-10-10-10z"/></svg>
- View Source
- </a>
- </div>
+      <p class="hero-subtext">
+        Coordinate <strong>Claude Code</strong>, <strong>Codex</strong>, and <strong>OpenCode</strong> across isolated git worktrees with <strong>shared persistent memory</strong> &mdash; all inside a blazing-fast native desktop app.
+      </p>
 
- <div class="trust-bar">
- <div class="trust-item">
- <span class="trust-star">&#9733;</span>
- <span>6+ Stars</span>
- </div>
- <div class="trust-item">
- <span class="trust-star">&#9733;</span>
- <span>Open Source</span>
- </div>
- <div class="trust-item">
- <span class="trust-star">&#9733;</span>
- <span>Local-First</span>
- </div>
- <div class="trust-item">
- <span class="trust-star">&#9733;</span>
- <span>MIT License</span>
- </div>
- </div>
- </div>
- </section>
+      <!-- Dual Action High-Conversion Bar -->
+      <div class="hero-actions-row">
+        <button class="primary-download-btn" id="heroDownloadBtn" onclick="triggerAutoDownload()">
+          <svg id="heroOsIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v12M8 11l4 4 4-4"/><path d="M20 17v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"/>
+          </svg>
+          <span id="heroBtnText">Direct Download for macOS (.dmg)</span>
+        </button>
 
- <!-- Downloads -->
- <section class="section" id="download">
- <div class="section-inner">
- <div class="section-label">Get Started</div>
- <div class="section-title">Choose Your Platform</div>
- <div class="section-desc">Native installers for every major OS. One setup, full power.</div>
+        <a href="#download" class="hero-secondary-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>All Platforms &amp; Formats</span>
+        </a>
+      </div>
 
- <div class="os-grid">
+      <!-- OS Detection Subtitle -->
+      <div class="os-detected-label">
+        <span>Detected OS: <span class="highlight" id="detectedOsLabel">macOS Universal (Apple Silicon &amp; Intel)</span> &middot; 5.8 MB &middot; Instant Direct Download</span>
+      </div>
 
- <!-- Windows -->
- <div class="os-card os-card--windows reveal">
- <div class="os-card-header">
- <div class="os-icon-wrap">
- <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="1.5" fill="#0078d4"/><rect x="13" y="3" width="8" height="8" rx="1.5" fill="#0078d4"/><rect x="3" y="13" width="8" height="8" rx="1.5" fill="#0078d4"/><rect x="13" y="13" width="8" height="8" rx="1.5" fill="#0078d4"/></svg>
- </div>
- <div>
- <div class="os-card-name">Windows</div>
- <div class="os-card-ver">Win 10 / 11 (x64)</div>
- </div>
- </div>
- <div class="dl-list">
- <a class="dl-item" href="https://github.com/soumyachk101/swarm/releases/latest" target="_blank" rel="noopener">
- <div class="dl-item-icon">
- <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0078d4" stroke-width="2"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M20 17v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"/></svg>
- </div>
- <div class="dl-item-body">
- <div class="dl-item-format">NSIS Installer</div>
- <div class="dl-item-size">.exe — Recommended</div>
- </div>
- <span class="dl-item-arrow">&rarr;</span>
- </a>
- <a class="dl-item" href="https://github.com/soumyachk101/swarm/releases/latest" target="_blank" rel="noopener">
- <div class="dl-item-icon">
- <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0078d4" stroke-width="2"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M20 17v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"/></svg>
- </div>
- <div class="dl-item-body">
- <div class="dl-item-format">MSI Package</div>
- <div class="dl-item-size">.msi — Enterprise</div>
- </div>
- <span class="dl-item-arrow">&rarr;</span>
- </a>
- </div>
- <div class="arch-pills">
- <span class="arch-pill">x64</span>
- <span class="arch-pill">ARM64</span>
- <span class="arch-pill">WebView2</span>
- </div>
- </div>
+      <!-- Trust Proof Strip -->
+      <div class="trust-strip">
+        <div class="trust-badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>100% Local-First Memory</span>
+        </div>
+        <div class="trust-badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+          <span>Zero Merge Conflicts</span>
+        </div>
+        <div class="trust-badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <span>Tauri v2 + Rust Core</span>
+        </div>
+        <div class="trust-badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span>No Cloud Lock-in</span>
+        </div>
+      </div>
 
- <!-- macOS -->
- <div class="os-card os-card--macos reveal reveal-delay-1">
- <div class="os-card-header">
- <div class="os-icon-wrap">
- <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.21-1.98 1.07-3.11-1.05.05-2.31.7-3.06 1.56-.64.74-1.19 1.97-1.04 3.1 1.18.09 2.36-.68 3.03-1.55" stroke="#a2aaad" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
- </div>
- <div>
- <div class="os-card-name">macOS</div>
- <div class="os-card-ver">macOS 12+ (Apple Silicon &amp; Intel)</div>
- </div>
- </div>
- <div class="dl-list">
- <a class="dl-item" href="https://github.com/soumyachk101/swarm/releases/latest" target="_blank" rel="noopener">
- <div class="dl-item-icon">
- <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a2aaad" stroke-width="2"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M20 17v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"/></svg>
- </div>
- <div class="dl-item-body">
- <div class="dl-item-format">Disk Image</div>
- <div class="dl-item-size">.dmg — Universal Binary</div>
- </div>
- <span class="dl-item-arrow">&rarr;</span>
- </a>
- <a class="dl-item" href="https://github.com/soumyachk101/swarm/releases/latest" target="_blank" rel="noopener">
- <div class="dl-item-icon">
- <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a2aaad" stroke-width="2"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M20 17v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"/></svg>
- </div>
- <div class="dl-item-body">
- <div class="dl-item-format">macOS App</div>
- <div class="dl-item-size">.app — Drag to Applications</div>
- </div>
- <span class="dl-item-arrow">&rarr;</span>
- </a>
- </div>
- <div class="arch-pills">
- <span class="arch-pill">Apple Silicon</span>
- <span class="arch-pill">Intel</span>
- <span class="arch-pill">Universal</span>
- </div>
- </div>
+      <!-- Interactive Swarm IDE Window Showcase -->
+      <div class="hero-ide-window">
+        <div class="ide-title-bar">
+          <div class="window-dots">
+            <div class="dot dot--red"></div>
+            <div class="dot dot--yellow"></div>
+            <div class="dot dot--green"></div>
+          </div>
 
- <!-- Linux -->
- <div class="os-card os-card--linux reveal reveal-delay-2">
- <div class="os-card-header">
- <div class="os-icon-wrap">
- <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="7" stroke="#e8b339" stroke-width="1.5"/><circle cx="9" cy="10.5" r="1.5" fill="#e8b339"/><circle cx="15" cy="10.5" r="1.5" fill="#e8b339"/><path d="M9 15c.7.9 1.7 1.5 3 1.5s2.3-.6 3-1.5" stroke="#e8b339" stroke-width="1.5" stroke-linecap="round"/></svg>
- </div>
- <div>
- <div class="os-card-name">Linux</div>
- <div class="os-card-ver">Ubuntu, Debian, Fedora, Arch &amp; more</div>
- </div>
- </div>
- <div class="dl-list">
- <a class="dl-item" href="https://github.com/soumyachk101/swarm/releases/latest" target="_blank" rel="noopener">
- <div class="dl-item-icon">
- <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e8b339" stroke-width="2"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M20 17v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"/></svg>
- </div>
- <div class="dl-item-body">
- <div class="dl-item-format">AppImage</div>
- <div class="dl-item-size">Portable — Any distro</div>
- </div>
- <span class="dl-item-arrow">&rarr;</span>
- </a>
- <a class="dl-item" href="https://github.com/soumyachk101/swarm/releases/latest" target="_blank" rel="noopener">
- <div class="dl-item-icon">
- <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e8b339" stroke-width="2"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M20 17v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"/></svg>
- </div>
- <div class="dl-item-body">
- <div class="dl-item-format">Debian Package</div>
- <div class="dl-item-size">.deb — Debian/Ubuntu</div>
- </div>
- <span class="dl-item-arrow">&rarr;</span>
- </a>
- </div>
- <div class="arch-pills">
- <span class="arch-pill">x64</span>
- <span class="arch-pill">ARM64</span>
- <span class="arch-pill">Flatpak</span>
- </div>
- </div>
+          <div class="ide-status-center">
+            <div class="project-pill">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+              <span>bridgebench:main (3 worktrees active)</span>
+            </div>
+            <div class="memory-indicator">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.8c0 0 6.6 7.4 6.6 11.6A6.6 6.6 0 0 1 5.4 14.4C5.4 10.2 12 2.8 12 2.8Z"/></svg>
+              <span>Pheromone: 4,820 tokens in sync</span>
+            </div>
+          </div>
 
- </div>
- </div>
- </section>
+          <div class="live-status-pill">
+            <span class="pulse-indicator"></span>
+            <span>Parallel Swarm Active</span>
+          </div>
+        </div>
 
- <!-- Terminal Showcase -->
- <section class="terminal-section" id="terminal">
- <div class="section-inner">
- <div class="terminal-grid">
- <div class="terminal-visual reveal">
- <div class="terminal-bar">
- <div class="terminal-dot terminal-dot--r"></div>
- <div class="terminal-dot terminal-dot--y"></div>
- <div class="terminal-dot terminal-dot--g"></div>
- <div class="terminal-title">swarm — install</div>
- </div>
- <div class="terminal-body">
- <div class="terminal-line"><span class="t-comment"># Install Swarm AI globally</span></div>
- <div class="terminal-line"><span class="t-prompt">$</span> <span class="t-cmd">npm install</span> <span class="t-flag">-g</span> <span class="t-flag">@swarm-ai/cli</span></div>
- <div class="terminal-line">&nbsp;</div>
- <div class="terminal-line"><span class="t-success">&#10003; Installed v1.0.0</span></div>
- <div class="terminal-line"><span class="t-comment"># Initialize in your project</span></div>
- <div class="terminal-line"><span class="t-prompt">$</span> <span class="t-cmd">swarm init</span> <span class="t-flag">--agents</span> <span class="t-flag">10</span></div>
- <div class="terminal-line">&nbsp;</div>
- <div class="terminal-line"><span class="t-success">&#10003; 10 agents ready</span> <span class="t-comment">— Lead dispatched</span></div>
- </div>
- </div>
- <div class="terminal-content reveal reveal-delay-1">
- <div class="section-label">How it Works</div>
- <h2>One command.<br/>Full swarm, ready.</h2>
- <p>Swarm AI gives you a complete multi-agent development environment. No config hell, no API setup. Just install and start building.</p>
- <ul class="feature-list">
- <li><span class="feature-check">&#10003;</span> Install once, works on any project</li>
- <li><span class="feature-check">&#10003;</span> 10+ AI agents pre-configured</li>
- <li><span class="feature-check">&#10003;</span> Shared memory across all agents</li>
- <li><span class="feature-check">&#10003;</span> Git worktrees for parallel work</li>
- <li><span class="feature-check">&#10003;</span> Voice control with Whisper</li>
- </ul>
- </div>
- </div>
- </div>
- </section>
+        <div class="ide-body-grid">
+          <!-- Sidebar Panes List -->
+          <div class="ide-agents-sidebar">
+            <div class="agent-card-item active">
+              <div class="agent-icon-badge" style="color:#FFB703;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></svg>
+              </div>
+              <div class="agent-info-wrap">
+                <div class="agent-name-row">
+                  <span>Lead Steward</span>
+                  <span style="color:#10B981;font-size:0.68rem;font-weight:700;">ORCHESTRATING</span>
+                </div>
+                <div class="agent-role-text">Task Planner &amp; Router</div>
+              </div>
+            </div>
 
- <!-- Features -->
- <section class="section" id="features">
- <div class="section-inner">
- <div class="section-label">Why Swarm AI</div>
- <div class="section-title">Built for the future<br/>of coding</div>
- <div class="section-desc">Every feature is designed to make you ship faster, think bigger, and never lose context.</div>
+            <div class="agent-card-item">
+              <div class="agent-icon-badge" style="color:#D97757;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 8 4 4-4 4"/></svg>
+              </div>
+              <div class="agent-info-wrap">
+                <div class="agent-name-row">
+                  <span>Claude Code</span>
+                  <span style="color:#38BDF8;font-size:0.68rem;font-weight:700;">BUILDING</span>
+                </div>
+                <div class="agent-role-text">Branch: feat/auth-tokens</div>
+              </div>
+            </div>
 
- <div class="features-grid">
- <div class="feature-card reveal">
- <div class="feature-icon">&#x1F9E0;</div>
- <h3>Shared Project Memory</h3>
- <p>Pheromone gives every agent the same project context. Switch tools — never lose context.</p>
- </div>
- <div class="feature-card reveal reveal-delay-1">
- <div class="feature-icon">&#x1F3AF;</div>
- <h3>Parallel Agents</h3>
- <p>Lead dispatches multiple agents across git worktrees. Build, review, test — all at once.</p>
- </div>
- <div class="feature-card reveal reveal-delay-2">
- <div class="feature-icon">&#x1F50D;</div>
- <h3>Hybrid Search</h3>
- <p>SQLite FTS5 + 384-dim embeddings with RRF ranking. Find anything in your project instantly.</p>
- </div>
- <div class="feature-card reveal reveal-delay-3">
- <div class="feature-icon">&#x1F3A4;</div>
- <h3>10+ CLI Agents</h3>
- <p>Claude Code, Codex, Aider, OpenCode, Cursor, Cline, Kiro and more — all in one place.</p>
- </div>
- <div class="feature-card reveal reveal-delay-1">
- <div class="feature-icon">&#x1F399;&#xFE0F;</div>
- <h3>Local Voice Dictation</h3>
- <p>Whisper.cpp offline speech-to-text. No API calls, no network — fully private voice control.</p>
- </div>
- <div class="feature-card reveal reveal-delay-2">
- <div class="feature-icon">&#x1F6E0;&#xFE0F;</div>
- <h3>Native Desktop</h3>
- <p>Built with Tauri v2 + Rust. One binary, full PTY, filesystem, git, and browser control.</p>
- </div>
- </div>
- </div>
- </section>
+            <div class="agent-card-item">
+              <div class="agent-icon-badge" style="color:#A855F7;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              </div>
+              <div class="agent-info-wrap">
+                <div class="agent-name-row">
+                  <span>OpenCode</span>
+                  <span style="color:#A855F7;font-size:0.68rem;font-weight:700;">ZEN FREE</span>
+                </div>
+                <div class="agent-role-text">Branch: feat/api-schema</div>
+              </div>
+            </div>
 
- <!-- How to Install -->
- <section class="section" id="install">
- <div class="section-inner">
- <div class="section-label">Get Started</div>
- <div class="section-title">Up and running<br/>in 60 seconds</div>
- <div class="section-desc">From download to first agent in under a minute.</div>
+            <div class="agent-card-item">
+              <div class="agent-icon-badge" style="color:#10B981;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div class="agent-info-wrap">
+                <div class="agent-name-row">
+                  <span>Lead Stinger</span>
+                  <span style="color:#10B981;font-size:0.68rem;font-weight:700;">SECURITY AUDIT</span>
+                </div>
+                <div class="agent-role-text">Zero Vulnerabilities</div>
+              </div>
+            </div>
+          </div>
 
- <div class="steps-grid">
- <div class="step-card reveal">
- <div class="step-num">01</div>
- <h4>Download</h4>
- <p>Grab the installer for your OS. No account needed.</p>
- </div>
- <div class="step-card reveal reveal-delay-1">
- <div class="step-num">02</div>
- <h4>Install</h4>
- <p>Run the installer. Swarm AI sets up everything automatically.</p>
- </div>
- <div class="step-card reveal reveal-delay-2">
- <div class="step-num">03</div>
- <h4>Connect</h4>
- <p>Add your API keys. Supports all major providers out of the box.</p>
- </div>
- <div class="step-card reveal reveal-delay-3">
- <div class="step-num">04</div>
- <h4>Build</h4>
- <p>Dispatch agents, start coding. Your AI team is ready.</p>
- </div>
- </div>
- </div>
- </section>
+          <!-- Live Terminal Output -->
+          <div class="ide-terminal-console">
+            <div class="console-lines">
+              <div class="c-line">
+                <span class="c-prefix">[Lead Steward]</span>
+                <span>Decomposed human goal &rarr; 3 subtasks dispatched across git worktrees.</span>
+              </div>
+              <div class="c-line">
+                <span class="c-prefix">[Pheromone]</span>
+                <span class="c-dim">Shared project memory synced: architecture.md &bull; schema.prisma &bull; conventions.md</span>
+              </div>
+              <div class="c-line">
+                <span class="c-prefix">[Claude Code]</span>
+                <span class="c-cyan">Working on .worktrees/auth-tokens &rarr; writing JWT middleware and RSA verification.</span>
+              </div>
+              <div class="c-line">
+                <span class="c-prefix">[OpenCode Zen]</span>
+                <span class="c-purple">Running Nemotron 3.5 Lightning Free &rarr; generated 18 type definitions &amp; unit tests.</span>
+              </div>
+              <div class="c-line">
+                <span class="c-prefix">[Stinger Audit]</span>
+                <span class="c-ok">&#10003; Verified: Zero secret leaks in git history &bull; Strict Content-Security-Policy passed.</span>
+              </div>
+              <div class="c-line">
+                <span class="c-prefix">[SwarmMind]</span>
+                <span class="c-ok">&#10003; Lock Registry clean: All branches merged into main with 0 conflicts.</span>
+              </div>
+            </div>
+            
+            <div style="font-size:0.76rem; color:var(--text-muted); border-top:1px solid rgba(255,255,255,0.06); padding-top:12px; display:flex; justify-content:space-between; align-items:center;">
+              <span>Native Tauri Engine &middot; Low Memory &middot; Real PTY Terminals</span>
+              <span style="color:var(--gold-bright); font-weight:600;">Autonomous Pipeline Running</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
- <!-- Footer -->
- <footer>
- <div class="footer-inner">
- <div class="footer-brand">
- <div class="nav-logo" style="width:28px;height:28px;border-radius:8px;font-size:12px;">S</div>
- Swarm AI
- </div>
- <div class="footer-links">
- <a href="https://github.com/soumyachk101/swarm" target="_blank" rel="noopener">GitHub</a>
- <a href="https://github.com/soumyachk101/swarm/blob/main/LICENSE" target="_blank" rel="noopener">License</a>
- <a href="https://tauri.app" target="_blank" rel="noopener">Powered by Tauri</a>
- </div>
- <div class="footer-copy">
- Swarm AI by Soumya Chakraborty &middot; Personal, non-commercial use only.
- </div>
- </div>
- </footer>
+    </div>
+  </section>
 
- <script>
- /* ─── Cursor Glow Follower ─── */
- const glow = document.getElementById('cursorGlow');
- let mouseX = 0, mouseY = 0, glowX = 0, glowY = 0;
+  <!-- ══════════════════════════════════════════════════════════════
+       PLATFORM DIRECT DOWNLOADS SECTION
+       ══════════════════════════════════════════════════════════════ -->
+  <section class="downloads-section" id="download">
+    <div class="container">
+      
+      <div class="section-header-block">
+        <div class="section-tag">Direct Downloads</div>
+        <h2 class="section-title">Get Swarm AI for Your OS</h2>
+        <p class="section-description">
+          Click any native installer below to download immediately to your machine. No accounts or redirects required.
+        </p>
+      </div>
 
- document.addEventListener('mousemove', (e) => {
- mouseX = e.clientX; mouseY = e.clientY;
- });
+      <div class="platforms-grid">
+        
+        <!-- macOS Card -->
+        <div class="platform-card platform-card--mac" id="cardMac">
+          <div>
+            <div class="platform-top-row">
+              <div class="platform-icon-box">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.21-1.98 1.07-3.11-1.05.05-2.31.7-3.06 1.56-.64.74-1.19 1.97-1.04 3.1 1.18.09 2.36-.68 3.03-1.55"/>
+                </svg>
+              </div>
+              <span class="platform-compat-badge">macOS 12+</span>
+            </div>
 
- function animateGlow() {
- glowX += (mouseX - glowX) * 0.08;
- glowY += (mouseY - glowY) * 0.08;
- glow.style.left = glowX + 'px';
- glow.style.top = glowY + 'px';
- requestAnimationFrame(animateGlow);
- }
- animateGlow();
+            <h3 class="platform-name">macOS</h3>
+            <p class="platform-subtitle">Universal binary for Apple Silicon (M1/M2/M3/M4) &amp; Intel Macs</p>
 
- /* ─── Nav Scroll State ─── */
- const nav = document.getElementById('nav');
- window.addEventListener('scroll', () => {
- nav.classList.toggle('scrolled', window.scrollY > 20);
- });
+            <div class="direct-download-group">
+              <a href="releases/macOS/SwarmAI.dmg" download="SwarmAI.dmg" class="direct-dl-item highlight" onclick="notifyDownload('SwarmAI.dmg', 'macOS Universal Installer (5.8 MB)')">
+                <div class="dl-left-meta">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFB703" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <div>
+                    <div class="dl-format-title">Disk Image (.dmg)</div>
+                    <div class="dl-format-desc">Recommended &middot; 5.8 MB</div>
+                  </div>
+                </div>
+                <div class="dl-action-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </div>
+              </a>
 
- /* ─── Scroll Reveal (Intersection Observer) ─── */
- const revealEls = document.querySelectorAll('.reveal');
- const observer = new IntersectionObserver((entries) => {
- entries.forEach(entry => {
- if (entry.isIntersecting) {
- entry.target.classList.add('visible');
- observer.unobserve(entry.target);
- }
- });
- }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+              <a href="releases/macOS/SwarmAI_0.1.0_aarch64.dmg" download="SwarmAI_0.1.0_aarch64.dmg" class="direct-dl-item" onclick="notifyDownload('SwarmAI_0.1.0_aarch64.dmg', 'Apple Silicon ARM64 DMG (5.8 MB)')">
+                <div class="dl-left-meta">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <div>
+                    <div class="dl-format-title">Apple Silicon (.dmg)</div>
+                    <div class="dl-format-desc">ARM64 Optimized &middot; 5.8 MB</div>
+                  </div>
+                </div>
+                <div class="dl-action-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </div>
+              </a>
+            </div>
+          </div>
 
- revealEls.forEach(el => observer.observe(el));
+          <div class="arch-tags-row">
+            <span class="arch-tag">Apple Silicon</span>
+            <span class="arch-tag">Intel x64</span>
+            <span class="arch-tag">Universal Binary</span>
+          </div>
+        </div>
 
- /* ─── Smooth Anchor Scroll ─── */
- document.querySelectorAll('a[href^="#"]').forEach(anchor => {
- anchor.addEventListener('click', function (e) {
- e.preventDefault();
- const target = document.querySelector(this.getAttribute('href'));
- if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
- });
- });
+        <!-- Windows Card -->
+        <div class="platform-card platform-card--win" id="cardWin">
+          <div>
+            <div class="platform-top-row">
+              <div class="platform-icon-box">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                  <rect x="3" y="3" width="8.5" height="8.5" rx="1.5" fill="#0078D4"/>
+                  <rect x="12.5" y="3" width="8.5" height="8.5" rx="1.5" fill="#0078D4"/>
+                  <rect x="3" y="12.5" width="8.5" height="8.5" rx="1.5" fill="#0078D4"/>
+                  <rect x="12.5" y="12.5" width="8.5" height="8.5" rx="1.5" fill="#0078D4"/>
+                </svg>
+              </div>
+              <span class="platform-compat-badge">Win 10 / 11</span>
+            </div>
 
- /* ─── Parallax orbs on scroll ─── */
- window.addEventListener('scroll', () => {
- const scrollY = window.scrollY;
- document.querySelector('.bg-mesh .orb--1').style.transform = `translateY(${scrollY * 0.03}px)`;
- document.querySelector('.bg-mesh .orb--2').style.transform = `translateY(${scrollY * -0.02}px)`;
- }, { passive: true });
- </script>
+            <h3 class="platform-name">Windows</h3>
+            <p class="platform-subtitle">Native high-performance desktop installer with WebView2 support</p>
+
+            <div class="direct-download-group">
+              <a href="releases/windows/SwarmAI_Setup.exe" download="SwarmAI_Setup.exe" class="direct-dl-item highlight" onclick="notifyDownload('SwarmAI_Setup.exe', 'Windows Setup Installer (4.0 MB)')">
+                <div class="dl-left-meta">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0078D4" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <div>
+                    <div class="dl-format-title">Setup Installer (.exe)</div>
+                    <div class="dl-format-desc">NSIS 64-bit &middot; 4.0 MB</div>
+                  </div>
+                </div>
+                <div class="dl-action-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </div>
+              </a>
+
+              <a href="releases/windows/SwarmAI_0.1.0_x64_en-US.msi" download="SwarmAI_0.1.0_x64_en-US.msi" class="direct-dl-item" onclick="notifyDownload('SwarmAI_0.1.0_x64_en-US.msi', 'Enterprise MSI Package (5.6 MB)')">
+                <div class="dl-left-meta">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <div>
+                    <div class="dl-format-title">MSI Package (.msi)</div>
+                    <div class="dl-format-desc">Enterprise Managed &middot; 5.6 MB</div>
+                  </div>
+                </div>
+                <div class="dl-action-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div class="arch-tags-row">
+            <span class="arch-tag">Windows x64</span>
+            <span class="arch-tag">ARM64 Ready</span>
+            <span class="arch-tag">WebView2</span>
+          </div>
+        </div>
+
+        <!-- Linux Card -->
+        <div class="platform-card platform-card--linux" id="cardLinux">
+          <div>
+            <div class="platform-top-row">
+              <div class="platform-icon-box">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="9"/>
+                  <path d="M12 3v18"/>
+                  <path d="M3 12h18"/>
+                  <circle cx="9" cy="9" r="1.5" fill="currentColor"/>
+                  <circle cx="15" cy="9" r="1.5" fill="currentColor"/>
+                </svg>
+              </div>
+              <span class="platform-compat-badge">glibc 2.31+</span>
+            </div>
+
+            <h3 class="platform-name">Linux</h3>
+            <p class="platform-subtitle">Native packages for Ubuntu, Debian, Fedora, Arch &amp; Manjaro</p>
+
+            <div class="direct-download-group">
+              <a href="releases/linux/SwarmAI_0.1.0_amd64.deb" download="SwarmAI_0.1.0_amd64.deb" class="direct-dl-item highlight" onclick="notifyDownload('SwarmAI_0.1.0_amd64.deb', 'Debian / Ubuntu Package (6.0 MB)')">
+                <div class="dl-left-meta">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E8B339" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <div>
+                    <div class="dl-format-title">Debian Package (.deb)</div>
+                    <div class="dl-format-desc">Ubuntu / Mint / Debian &middot; 6.0 MB</div>
+                  </div>
+                </div>
+                <div class="dl-action-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </div>
+              </a>
+
+              <div class="direct-dl-item" onclick="copyLinuxCommand()">
+                <div class="dl-left-meta">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                  <div>
+                    <div class="dl-format-title">CLI Installer</div>
+                    <div class="dl-format-desc">curl -sSL install.sh | bash</div>
+                  </div>
+                </div>
+                <div class="dl-action-icon">
+                  <span style="font-size:0.75rem; color:var(--text-muted);" id="cliCopyText">Copy</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="arch-tags-row">
+            <span class="arch-tag">x86_64</span>
+            <span class="arch-tag">Debian</span>
+            <span class="arch-tag">AppImage</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       FEATURES ARCHITECTURE SECTION
+       ══════════════════════════════════════════════════════════════ -->
+  <section class="features-section" id="features">
+    <div class="container">
+      
+      <div class="section-header-block">
+        <div class="section-tag">Core Architecture</div>
+        <h2 class="section-title">Engineered for Multi-Agent Supremacy</h2>
+        <p class="section-description">
+          Local-first architecture that eliminates context loss, orchestrates parallel execution, and guarantees absolute privacy.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        
+        <!-- Feature 1 -->
+        <div class="feature-box">
+          <div class="feature-svg-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2.8c0 0 6.6 7.4 6.6 11.6A6.6 6.6 0 0 1 5.4 14.4C5.4 10.2 12 2.8 12 2.8Z"/>
+              <path d="M9.4 14.6a2.6 2.6 0 0 0 2.6 2.6"/>
+            </svg>
+          </div>
+          <h3 class="feature-heading">Shared Pheromone Memory</h3>
+          <p class="feature-paragraph">
+            All agents read and write to a single project brain (.pheromone). When one agent learns an architectural rule or writes an API, all other agents instantly know.
+          </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="feature-box">
+          <div class="feature-svg-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="6" y1="3" x2="6" y2="15"/>
+              <circle cx="18" cy="6" r="3"/>
+              <circle cx="6" cy="18" r="3"/>
+              <path d="M18 9a9 9 0 0 1-9 9"/>
+            </svg>
+          </div>
+          <h3 class="feature-heading">Parallel Git Worktrees</h3>
+          <p class="feature-paragraph">
+            Lead automatically isolates every task in its own git worktree branch. Multiple CLIs edit code simultaneously without overwriting files or merge deadlocks.
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="feature-box">
+          <div class="feature-svg-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              <path d="M11 8v6M8 11h6"/>
+            </svg>
+          </div>
+          <h3 class="feature-heading">Hybrid Vector &amp; FTS5 Search</h3>
+          <p class="feature-paragraph">
+            Local SQLite FTS5 full-text indexing merged with 384-dimensional dense semantic embeddings via Reciprocal Rank Fusion (RRF). Sub-millisecond context retrieval.
+          </p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="feature-box">
+          <div class="feature-svg-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/>
+            </svg>
+          </div>
+          <h3 class="feature-heading">Strategic Lead Modes</h3>
+          <p class="feature-paragraph">
+            Switch between <strong>Steward</strong> (feature planner &amp; task dispatcher), <strong>Forager</strong> (autonomous bug hunter), and <strong>Stinger</strong> (deep security auditor).
+          </p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="feature-box">
+          <div class="feature-svg-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+            </svg>
+          </div>
+          <h3 class="feature-heading">Offline Voice Dictation</h3>
+          <p class="feature-paragraph">
+            Built-in Whisper.cpp engine runs 100% locally on your CPU/Metal/Vulkan without sending audio streams to third-party cloud servers. Dictate prompts hands-free.
+          </p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="feature-box">
+          <div class="feature-svg-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="4" width="16" height="16" rx="2"/>
+              <rect x="9" y="9" width="6" height="6"/>
+              <line x1="9" y1="1" x2="9" y2="4"/>
+              <line x1="15" y1="1" x2="15" y2="4"/>
+              <line x1="9" y1="20" x2="9" y2="23"/>
+              <line x1="15" y1="20" x2="15" y2="23"/>
+              <line x1="20" y1="9" x2="23" y2="9"/>
+              <line x1="20" y1="14" x2="23" y2="14"/>
+              <line x1="1" y1="9" x2="4" y2="9"/>
+              <line x1="1" y1="14" x2="4" y2="14"/>
+            </svg>
+          </div>
+          <h3 class="feature-heading">Tauri v2 &amp; Rust Performance</h3>
+          <p class="feature-paragraph">
+            Under 35MB RAM baseline, instant cold startup, real OS pseudoterminal (PTY) control, and zero bloat compared to traditional Chromium wrappers.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       TERMINAL CLI QUICKSTART
+       ══════════════════════════════════════════════════════════════ -->
+  <section class="quickstart-section" id="quickstart">
+    <div class="container">
+      <div class="quickstart-wrapper">
+        <div class="quickstart-content">
+          <div class="section-tag">Command Line Ready</div>
+          <h3>Prefer the Terminal?</h3>
+          <p>
+            Initialize a complete multi-agent Swarm in your terminal or existing repository with a single command.
+          </p>
+          <button class="nav-cta-btn" onclick="triggerAutoDownload()">
+            <span>Download Desktop App</span>
+          </button>
+        </div>
+
+        <div class="terminal-box">
+          <div class="term-bar">
+            <div class="window-dots">
+              <div class="dot dot--red"></div>
+              <div class="dot dot--yellow"></div>
+              <div class="dot dot--green"></div>
+            </div>
+            <button class="copy-code-btn" onclick="copyTerminalCode()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span id="termCopyBtnText">Copy</span>
+            </button>
+          </div>
+          <div class="term-code" id="termCodeSnippet">
+            <span style="color:#64748B;"># Open any project folder</span><br />
+            <span style="color:#FFB703;">$</span> cd my-awesome-project<br />
+            <br />
+            <span style="color:#64748B;"># Launch Swarm AI with 4 parallel worker agents</span><br />
+            <span style="color:#FFB703;">$</span> npx @swarm-ai/cli --lead steward --agents 4<br />
+            <br />
+            <span style="color:#10B981;">&#10003; Connected to Pheromone shared memory engine</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       FOOTER
+       ══════════════════════════════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="brand-link">
+          <div class="brand-logo-wrap" style="width:30px;height:30px;">
+            <img src="assets/logo.svg" alt="Swarm AI" style="width:20px;height:20px;" />
+          </div>
+          <span class="brand-name" style="font-size:1.05rem;">Swarm AI</span>
+        </div>
+
+        <div class="footer-links-row">
+          <a href="#download">Downloads</a>
+          <a href="#features">Architecture</a>
+          <a href="https://github.com/soumyachk101/swarm" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/soumyachk101/swarm/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+        </div>
+
+        <div class="footer-copy">
+          &copy; 2026 Swarm AI. Built with Tauri v2, Rust &amp; Pheromone.
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       DIRECT DOWNLOAD TOAST NOTIFICATION
+       ══════════════════════════════════════════════════════════════ -->
+  <div class="download-toast" id="downloadToast">
+    <div class="toast-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+    </div>
+    <div class="toast-content">
+      <div class="toast-title" id="toastTitle">Download Started!</div>
+      <div class="toast-desc" id="toastDesc">SwarmAI.dmg is downloading directly to your system.</div>
+    </div>
+  </div>
+
+  <script>
+    /* ─── OS Auto-Detection & 1-Click Direct Download ─── */
+    let detectedPlatform = 'macOS';
+    let directDownloadFile = 'releases/macOS/SwarmAI.dmg';
+    let directFileName = 'SwarmAI.dmg';
+    let directMetaText = 'macOS Universal (.dmg)';
+
+    function detectOS() {
+      const ua = navigator.userAgent.toLowerCase();
+      const platform = navigator.platform?.toLowerCase() || '';
+
+      if (ua.includes('win') || platform.includes('win')) {
+        detectedPlatform = 'Windows';
+        directDownloadFile = 'releases/windows/SwarmAI_Setup.exe';
+        directFileName = 'SwarmAI_Setup.exe';
+        directMetaText = 'Windows Setup (.exe)';
+        document.getElementById('heroBtnText').textContent = 'Direct Download for Windows (.exe)';
+        document.getElementById('detectedOsLabel').textContent = 'Windows 10 / 11 (x64)';
+      } else if (ua.includes('linux') || platform.includes('linux')) {
+        detectedPlatform = 'Linux';
+        directDownloadFile = 'releases/linux/SwarmAI_0.1.0_amd64.deb';
+        directFileName = 'SwarmAI_0.1.0_amd64.deb';
+        directMetaText = 'Linux Debian Package (.deb)';
+        document.getElementById('heroBtnText').textContent = 'Direct Download for Linux (.deb)';
+        document.getElementById('detectedOsLabel').textContent = 'Linux Debian / Ubuntu (x64)';
+      } else {
+        detectedPlatform = 'macOS';
+        directDownloadFile = 'releases/macOS/SwarmAI.dmg';
+        directFileName = 'SwarmAI.dmg';
+        directMetaText = 'macOS Universal (.dmg)';
+        document.getElementById('heroBtnText').textContent = 'Direct Download for macOS (.dmg)';
+        document.getElementById('detectedOsLabel').textContent = 'macOS Universal (Apple Silicon & Intel)';
+      }
+    }
+
+    detectOS();
+
+    function triggerAutoDownload() {
+      notifyDownload(directFileName, directMetaText);
+      const link = document.createElement('a');
+      link.href = directDownloadFile;
+      link.download = directFileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    /* ─── Download Toast Feedback ─── */
+    let toastTimer = null;
+    function notifyDownload(filename, meta) {
+      const toast = document.getElementById('downloadToast');
+      document.getElementById('toastTitle').textContent = `Downloading ${filename}`;
+      document.getElementById('toastDesc').textContent = `${meta} — Check your browser downloads folder.`;
+      
+      toast.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 5500);
+    }
+
+    /* ─── Copy Utilities ─── */
+    function copyTerminalCode() {
+      const text = `npx @swarm-ai/cli --lead steward --agents 4`;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('termCopyBtnText');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+      });
+    }
+
+    function copyLinuxCommand() {
+      const text = `curl -sSL https://raw.githubusercontent.com/soumyachk101/swarm/main/scripts/install.sh | bash`;
+      navigator.clipboard.writeText(text).then(() => {
+        const label = document.getElementById('cliCopyText');
+        label.textContent = 'Copied!';
+        setTimeout(() => { label.textContent = 'Copy'; }, 2000);
+      });
+    }
+
+    /* ─── Navbar Scroll Effect ─── */
+    const siteHeader = document.getElementById('siteHeader');
+    window.addEventListener('scroll', () => {
+      siteHeader.classList.toggle('scrolled', window.scrollY > 20);
+    }, { passive: true });
+  </script>
 </body>
 </html>
