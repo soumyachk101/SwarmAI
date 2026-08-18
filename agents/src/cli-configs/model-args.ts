@@ -14,6 +14,9 @@ export const EFFORT_LEVELS: EffortLevel[] = ["low", "medium", "high", "xhigh", "
 function normaliseModel(cli: string, model: string): string {
   const m = model.trim().toLowerCase();
   if (cli === "claude") {
+    if (m === "sonnet 1m" || m === "sonnet-1m" || m === "sonnet5[1m]" || m === "sonnet-5[1m]" || m === "sonnet 5 (1m context)" || m === "sonnet 5 (1m)") return "sonnet[1m]";
+    if (m === "opus 1m" || m === "opus-1m" || m === "opus5[1m]" || m === "opus-5[1m]" || m === "opus 5 (1m context)" || m === "opus 5 (1m)") return "opus[1m]";
+    if (m === "fable 1m" || m === "fable-1m" || m === "fable5[1m]" || m === "fable-5[1m]" || m === "fable 5 (1m context)" || m === "fable 5 (1m)") return "fable[1m]";
     // Preserve 1M context tags like opus[1m], sonnet[1m], claude-fable-5[1m]
     if (m.includes("[1m]")) return m;
     const alias = m.replace(/\s+/g, "-");

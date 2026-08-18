@@ -7,6 +7,7 @@ import { SearchAddon } from "xterm-addon-search";
 import { WebglAddon } from "xterm-addon-webgl";
 import {
   Copy,
+  Check,
   Trash2,
   Eraser,
   Maximize2,
@@ -287,7 +288,7 @@ export default function TerminalPane({
           // xterm onto its alpha-blending path and locked out the GPU renderer.
           allowTransparency: false,
           rightClickSelectsWord: true,
-          scrollback: 1000,
+          scrollback: 5000,
         };
 
         terminal = new XTerm(options);
@@ -465,11 +466,15 @@ export default function TerminalPane({
     return () => window.removeEventListener(THEME_CHANGE_EVENT, onTheme);
   }, []);
 
+  const [copied, setCopied] = useState(false);
+
   const handleCopy = () => {
     if (terminalInstance.current) {
       const selection = terminalInstance.current.getSelection();
       if (selection) {
         navigator.clipboard.writeText(selection);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1800);
       }
     }
   };
@@ -477,7 +482,12 @@ export default function TerminalPane({
   const handleClear = () => {
     if (terminalInstance.current) {
       terminalInstance.current.clear();
+      terminalInstance.current.focus();
     }
+  };
+
+  const handleTerminalContainerClick = () => {
+    terminalInstance.current?.focus();
   };
 
 
@@ -551,10 +561,10 @@ export default function TerminalPane({
           <button
             onClick={handleCopy}
             className="p-1.5 rounded-md hover:bg-swarm-border/60 text-swarm-textDim hover:text-swarm-text transition-colors"
-            title="Copy selection"
-            aria-label="Copy selection"
+            title={copied ? "Copied to clipboard!" : "Copy selection"}
+            aria-label={copied ? "Copied to clipboard!" : "Copy selection"}
           >
-            <Copy size={12} />
+            {copied ? <Check size={12} className="text-swarm-gold" /> : <Copy size={12} />}
           </button>
           <button
             onClick={handleClear}
@@ -580,11 +590,10 @@ export default function TerminalPane({
         </div>
       </div>
 
-      {/* terminal content — bg matches the xterm theme so the whole-cell fit
-          remainder on the right/bottom blends in instead of showing a strip
-          (and so the opaque GPU-rendered canvas has something to sit on). */}
+      {/* terminal content */}
       <div
-        className="flex-1 overflow-hidden relative min-h-0 p-2"
+        onClick={handleTerminalContainerClick}
+        className="flex-1 overflow-hidden relative min-h-0 p-2 cursor-text"
         style={{ contain: "layout paint", background: "rgb(var(--swarm-canvas-hi))" }}
       >
         <div ref={terminalRef} className="absolute inset-2 overflow-hidden" />

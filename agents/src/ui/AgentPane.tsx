@@ -286,13 +286,15 @@ function getCliModelPresets(cli: string): CliModelPreset {
       brandName: "Claude Code Models",
       brandColor: "#D97757",
       switchCommand: "/model",
-      defaultModel: "Claude 5 Sonnet",
+      defaultModel: "Opus 5 (1M Context)",
       models: [
-        { id: "claude-5-sonnet", label: "Claude 5 Sonnet (1M Context)", is1M: true, pricing: "$3/$15 Mtok" },
-        { id: "claude-5-opus", label: "Claude 5 Opus (Ultra SOTA)", is1M: true, pricing: "$5/$25 Mtok" },
-        { id: "claude-4-6-thinking", label: "Claude 4.6 Sonnet (Thinking 128k)", is1M: true, pricing: "$3/$15 Mtok" },
-        { id: "claude-3-7-sonnet", label: "Claude 3.7 Sonnet (Hybrid)", is1M: true, pricing: "$3/$15 Mtok" },
-        { id: "claude-3-5-sonnet", label: "Claude 3.5 Sonnet", is1M: false, pricing: "$3/$15 Mtok" },
+        { id: "opus[1m]", label: "Opus 5 (1M Context)", is1M: true, pricing: "$5/$25 Mtok" },
+        { id: "fable[1m]", label: "Fable 5 (1M Context)", is1M: true, pricing: "$4/$20 Mtok" },
+        { id: "sonnet[1m]", label: "Sonnet 5 (1M Context)", is1M: true, pricing: "$3/$15 Mtok" },
+        { id: "fable", label: "Fable 5 (Reasoning)", is1M: true, pricing: "$4/$20 Mtok" },
+        { id: "opus", label: "Opus 5 (Recommended)", is1M: true, pricing: "$5/$25 Mtok" },
+        { id: "sonnet", label: "Sonnet 5 (Routine)", is1M: false, pricing: "$3/$15 Mtok" },
+        { id: "haiku", label: "Haiku 4.5 (Fast)", is1M: false, pricing: "$1/$5 Mtok" },
       ],
     };
   }
@@ -332,10 +334,12 @@ function getCliModelPresets(cli: string): CliModelPreset {
       brandName: "OpenCode Models",
       brandColor: "#A855F7",
       switchCommand: "/model",
-      defaultModel: "Claude 5 Sonnet",
+      defaultModel: "Claude 5 Opus (1M)",
       models: [
-        { id: "anthropic/claude-5-sonnet", label: "Claude 5 Sonnet" },
-        { id: "anthropic/claude-5-opus", label: "Claude 5 Opus" },
+        { id: "anthropic/claude-5-opus", label: "Claude 5 Opus (1M)" },
+        { id: "anthropic/claude-5-fable", label: "Claude 5 Fable (1M)" },
+        { id: "anthropic/claude-5-sonnet", label: "Claude 5 Sonnet (1M)" },
+        { id: "anthropic/claude-5-haiku", label: "Claude 5 Haiku (1M)" },
         { id: "google/gemini-3.7-flash", label: "Gemini 3.7 Flash" },
         { id: "google/gemini-3.6-flash", label: "Gemini 3.6 Flash" },
         { id: "openai/gpt-5-omni", label: "GPT-5 Omni" },
@@ -454,21 +458,29 @@ export default function AgentPane({
     );
   }, [isSlashCommand, commandQuery]);
 
+  const [copied, setCopied] = useState(false);
+
   const handleSelectCommand = (cmd: CommandSuggestion) => {
     if (cmd.syntax && cmd.syntax.includes("<")) {
       setPromptInput(cmd.name + " ");
       setCommandSuggestionsOpen(false);
-      promptTextareaRef.current?.focus();
+      if (promptTextareaRef.current) {
+        promptTextareaRef.current.focus();
+        promptTextareaRef.current.style.height = "auto";
+      }
     } else {
       setPromptInput("");
       setCommandSuggestionsOpen(false);
+      if (promptTextareaRef.current) {
+        promptTextareaRef.current.style.height = "auto";
+      }
       sendTerminal(`\x15${cmd.name}\r`);
     }
   };
 
   // Auto-close dropdowns when clicking anywhere outside or pressing Escape
   useEffect(() => {
-    if (!modelMenuOpen && !effortMenuOpen && !settingsMenuOpen) return;
+    if (!modelMenuOpen && !effortMenuOpen && !settingsMenuOpen && !commandSuggestionsOpen) return;
     const onDown = (e: MouseEvent) => {
       const target = e.target as Node;
       if (modelMenuOpen && !modelMenuRef.current?.contains(target)) {
@@ -480,12 +492,16 @@ export default function AgentPane({
       if (settingsMenuOpen && !settingsMenuRef.current?.contains(target)) {
         setSettingsMenuOpen(false);
       }
+      if (commandSuggestionsOpen && !promptTextareaRef.current?.contains(target)) {
+        setCommandSuggestionsOpen(false);
+      }
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setModelMenuOpen(false);
         setEffortMenuOpen(false);
         setSettingsMenuOpen(false);
+        setCommandSuggestionsOpen(false);
       }
     };
     window.addEventListener("mousedown", onDown);
@@ -494,7 +510,7 @@ export default function AgentPane({
       window.removeEventListener("mousedown", onDown);
       window.removeEventListener("keydown", onKey);
     };
-  }, [modelMenuOpen, effortMenuOpen, settingsMenuOpen]);
+  }, [modelMenuOpen, effortMenuOpen, settingsMenuOpen, commandSuggestionsOpen]);
 
   const sendTerminal = (data: string) => {
     invoke("write_to_terminal", { paneId, data }).catch(console.error);
@@ -505,7 +521,26 @@ export default function AgentPane({
     if (!promptInput.trim()) return;
     const text = promptInput;
     setPromptInput("");
+    setCommandSuggestionsOpen(false);
+    if (promptTextareaRef.current) {
+      promptTextareaRef.current.style.height = "auto";
+    }
     sendTerminal(text + "\r");
+  };
+
+  const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = e.target.value;
+    setPromptInput(val);
+    if (promptTextareaRef.current) {
+      promptTextareaRef.current.style.height = "auto";
+      promptTextareaRef.current.style.height = `${Math.min(140, promptTextareaRef.current.scrollHeight)}px`;
+    }
+    if (val.startsWith("/")) {
+      setCommandSuggestionsOpen(true);
+      setSelectedCommandIndex(0);
+    } else {
+      setCommandSuggestionsOpen(false);
+    }
   };
 
   const handleSelectModel = (modelId: string, modelLabel: string) => {
@@ -525,6 +560,10 @@ export default function AgentPane({
 
   const handleCheckUsage = () => {
     sendTerminal(`\x15/status\r`);
+  };
+
+  const handleTerminalContainerClick = () => {
+    terminalInstance.current?.focus();
   };
 
   // Dismiss the overflow menu on an outside click, Escape, or the pane simply
@@ -1390,11 +1429,16 @@ export default function AgentPane({
 
   const handleCopy = () => {
     const selection = terminalInstance.current?.getSelection();
-    if (selection) navigator.clipboard.writeText(selection);
+    if (selection) {
+      navigator.clipboard.writeText(selection);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    }
   };
 
   const handleClear = () => {
     terminalInstance.current?.clear();
+    terminalInstance.current?.focus();
   };
 
   // Narrow panes used to simply drop these three buttons, so "clear terminal"
@@ -1409,7 +1453,12 @@ export default function AgentPane({
           run: onToggleMaximize,
         }]
       : []),
-    { key: "copy", icon: <Copy size={12} />, label: "Copy selection", run: handleCopy },
+    {
+      key: "copy",
+      icon: copied ? <Check size={12} className="text-swarm-gold" /> : <Copy size={12} />,
+      label: copied ? "Copied to clipboard!" : "Copy selection",
+      run: handleCopy,
+    },
     { key: "clear", icon: <Eraser size={12} />, label: "Clear terminal", run: handleClear },
   ];
 
@@ -1425,8 +1474,8 @@ export default function AgentPane({
               onChange={(e) => onEditChange(e.target.value)}
               onBlur={onRename}
               onKeyDown={(e) => {
-                if (e.key === "Enter") onRename?.();
-                if (e.key === "Escape") onCancelRename?.();
+                if (e.key === 'Enter') onRename?.();
+                if (e.key === 'Escape') onCancelRename?.();
               }}
               onClick={(e) => e.stopPropagation()}
               className="glass-inset text-swarm-text px-2 py-0.5 rounded-md text-xs w-32 focus:outline-none focus:ring-1 focus:ring-swarm-gold"
@@ -1467,13 +1516,13 @@ export default function AgentPane({
                 <RoleBadge role={agent.role} branchName={agent.branchName} />
               )}
               <span className="truncate">{displayName}</span>
-              {/* What this swarm was summoned on, when the caller pinned it. */}
-              {(agent.model || agent.effort) && paneWidth >= 300 && (
+              {/* What this swarm is running — dynamically displays selected model & effort */}
+              {(currentModel || currentEffort) && paneWidth >= 280 && (
                 <span
-                  className="shrink-0 rounded border border-swarm-border/60 px-1 py-px text-micro font-medium text-swarm-textMuted"
-                  title={`Running ${agent.model ?? "the CLI default"}${agent.effort ? ` at ${agent.effort} effort` : ""}`}
+                  className="shrink-0 rounded-md border border-swarm-gold/30 bg-swarm-gold/10 px-1.5 py-0.5 text-[10px] font-mono text-swarm-goldHi font-medium"
+                  title={`Running ${currentModel}${currentEffort ? ` at ${currentEffort} effort` : ""}`}
                 >
-                  {[agent.model, agent.effort].filter(Boolean).join(" · ")}
+                  {[currentModel.replace(" (1M Context)", " 1M").replace(" (1M)", " 1M"), currentEffort].filter(Boolean).join(" · ")}
                 </span>
               )}
             </span>
@@ -1606,22 +1655,23 @@ export default function AgentPane({
         </div>
       </div>
 
-      {/* terminal content — bg matches the xterm theme so the whole-cell fit
-          remainder on the right/bottom blends in instead of showing a strip. */}
       {/* terminal content + bottom prompt bar */}
       <div
         className="flex-1 overflow-hidden relative min-h-0 flex flex-col"
         style={{ contain: "layout paint", background: "rgb(var(--swarm-canvas-hi))" }}
       >
         {/* xterm canvas */}
-        <div className="flex-1 relative min-h-0 p-2">
+        <div
+          onClick={handleTerminalContainerClick}
+          className="flex-1 relative min-h-0 p-2 cursor-text"
+        >
           <div
             ref={terminalRef}
             className={`absolute inset-2 overflow-hidden ${spawnState === "notFound" ? "invisible" : ""}`}
           />
         </div>
 
-        {/* Floating Prompt Bar at the bottom (Matches Screenshot 2) */}
+        {/* Floating Prompt Bar at the bottom */}
         {spawnState === "running" && (
           <div className="relative shrink-0 p-3 pt-0 z-20">
             <div className="relative rounded-2xl border border-white/[0.12] bg-[#0c0e14] p-3 shadow-2xl transition-all focus-within:border-white/[0.22] flex items-stretch gap-3">
@@ -1679,20 +1729,11 @@ export default function AgentPane({
                   </div>
                 )}
 
-                {/* Prompt Text Input */}
+                {/* Prompt Text Input with dynamic auto-growing height */}
                 <textarea
                   ref={promptTextareaRef}
                   value={promptInput}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setPromptInput(val);
-                    if (val.startsWith("/")) {
-                      setCommandSuggestionsOpen(true);
-                      setSelectedCommandIndex(0);
-                    } else {
-                      setCommandSuggestionsOpen(false);
-                    }
-                  }}
+                  onChange={handlePromptChange}
                   onKeyDown={(e) => {
                     if (isSlashCommand && commandSuggestionsOpen && filteredCommands.length > 0) {
                       if (e.key === "ArrowDown") {
@@ -1736,14 +1777,17 @@ export default function AgentPane({
                   <div ref={modelMenuRef} className="relative">
                     <button
                       onClick={() => { setModelMenuOpen(!modelMenuOpen); setEffortMenuOpen(false); setSettingsMenuOpen(false); }}
-                      className="flex items-center gap-1 text-swarm-textMuted hover:text-swarm-text transition-colors"
-                      title={`${cliPreset.brandName} Selector`}
+                      className="flex items-center gap-1.5 text-xs text-swarm-textDim hover:text-swarm-text transition-colors font-medium group"
+                      title={`${cliPreset.brandName}: ${currentModel}`}
                     >
                       {/* Dynamic Brand Glyph */}
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={cliPreset.brandColor} strokeWidth="2.8" strokeLinecap="round" className="shrink-0">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={cliPreset.brandColor} strokeWidth="2.8" strokeLinecap="round" className="shrink-0">
                         <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07l14.14-14.14" />
                       </svg>
-                      <ChevronDown size={13} className="text-swarm-textMuted/70" />
+                      <span className="font-semibold text-swarm-text/90 max-w-[150px] truncate">
+                        {currentModel.replace(" (1M Context)", " 1M").replace(" (1M)", " 1M")}
+                      </span>
+                      <ChevronDown size={12} className="text-swarm-textMuted/70 group-hover:text-swarm-text shrink-0" />
                     </button>
 
                     {modelMenuOpen && (

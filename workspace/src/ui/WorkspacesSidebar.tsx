@@ -1447,35 +1447,35 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
                 )}
               </div>
 
-              {/* Bottom Quick Navigation Links (Matches Screenshot 1) */}
-              <div className="px-3 pt-2 pb-1.5 border-t border-swarm-border/30 flex flex-col gap-0.5 shrink-0">
+              {/* Bottom Quick Navigation Links */}
+              <div className="px-2 pt-2.5 pb-2 border-t border-white/[0.06] flex flex-col gap-1 shrink-0">
                 <button
                   onClick={() => setActiveTab("explorer")}
-                  className="flex h-8 items-center gap-2.5 rounded-lg px-2 text-xs font-semibold tracking-wider transition-colors text-swarm-textMuted hover:bg-white/[0.04] hover:text-swarm-text"
+                  className="flex h-8 items-center gap-2.5 rounded-xl border border-white/[0.04] bg-white/[0.02] px-2.5 text-xs font-semibold tracking-wider transition-all text-swarm-textMuted hover:bg-white/[0.07] hover:border-swarm-gold/30 hover:text-swarm-goldHi"
                 >
-                  <Folder size={14} className="text-swarm-textMuted/80" />
-                  <span className="tracking-widest">EXPLORER</span>
+                  <Folder size={14} className="text-swarm-gold/80" />
+                  <span className="tracking-widest font-mono text-[11px]">EXPLORER</span>
                 </button>
                 <button
                   onClick={() => setActiveTab("search")}
-                  className="flex h-8 items-center gap-2.5 rounded-lg px-2 text-xs font-semibold tracking-wider transition-colors text-swarm-textMuted hover:bg-white/[0.04] hover:text-swarm-text"
+                  className="flex h-8 items-center gap-2.5 rounded-xl border border-white/[0.04] bg-white/[0.02] px-2.5 text-xs font-semibold tracking-wider transition-all text-swarm-textMuted hover:bg-white/[0.07] hover:border-swarm-gold/30 hover:text-swarm-goldHi"
                 >
-                  <GitPullRequest size={14} className="text-swarm-textMuted/80" />
-                  <span className="tracking-widest">ISSUES & PRS</span>
+                  <GitPullRequest size={14} className="text-amber-400/80" />
+                  <span className="tracking-widest font-mono text-[11px]">ISSUES & PRS</span>
                 </button>
                 <button
                   onClick={() => setBoardOpen(!boardOpen)}
-                  className={`flex h-8 items-center gap-2.5 rounded-lg px-2 text-xs font-semibold tracking-wider transition-colors ${
+                  className={`flex h-8 items-center gap-2.5 rounded-xl px-2.5 text-xs font-semibold tracking-wider transition-all ${
                     boardOpen
-                      ? "bg-swarm-gold/15 text-swarm-gold border border-swarm-gold/30"
-                      : "text-swarm-textMuted hover:bg-white/[0.04] hover:text-swarm-text"
+                      ? "bg-swarm-gold/15 text-swarm-gold border border-swarm-gold/40 shadow-sm"
+                      : "border border-white/[0.04] bg-white/[0.02] text-swarm-textMuted hover:bg-white/[0.07] hover:border-swarm-gold/30 hover:text-swarm-goldHi"
                   }`}
                   title="Toggle TaskComb Pipeline Board"
                 >
-                  <Network size={14} className={boardOpen ? "text-swarm-gold" : "text-swarm-textMuted/80"} />
-                  <span className="tracking-widest">TASKCOMB</span>
+                  <Network size={14} className={boardOpen ? "text-swarm-gold" : "text-cyan-400/80"} />
+                  <span className="tracking-widest font-mono text-[11px]">TASKCOMB</span>
                   {activeWorkspace?.taskCards && activeWorkspace.taskCards.length > 0 && (
-                    <span className="ml-auto rounded-full bg-white/[0.08] px-1.5 py-0.5 text-[10px] text-swarm-textDim font-mono">
+                    <span className="ml-auto rounded-full bg-swarm-gold/20 text-swarm-goldHi px-2 py-0.5 text-[10px] font-mono border border-swarm-gold/30">
                       {activeWorkspace.taskCards.length}
                     </span>
                   )}
@@ -1627,13 +1627,13 @@ function ProjectGroup({
   };
 
   return (
-    <div className="px-2 py-1">
-      {/* Outer WorkHive Rounded Card (Matches Screenshot 1) */}
+    <div className="px-1.5 py-1">
+      {/* Outer WorkHive Rounded Card */}
       <div
-        className={`rounded-2xl border transition-all p-3 ${
+        className={`rounded-2xl border transition-all p-3 shadow-md ${
           isActive
-            ? "border-white/[0.14] bg-[#141722]/90 shadow-md ring-1 ring-white/[0.05]"
-            : "border-white/[0.07] bg-[#11131c]/60 hover:border-white/[0.12]"
+            ? "border-swarm-gold/40 bg-gradient-to-b from-[#151926] to-[#0e111a] ring-1 ring-swarm-gold/25 shadow-black/60"
+            : "border-white/[0.07] bg-[#10121a]/70 hover:border-white/[0.14] hover:bg-[#131622]/80"
         }`}
         onClick={() => { if (!isRenaming) onActivate(); }}
       >
@@ -1642,10 +1642,10 @@ function ProjectGroup({
           <div className="flex items-center gap-1.5 min-w-0">
             <button
               onClick={(e) => { e.stopPropagation(); setCollapsed(!collapsed); }}
-              className="text-swarm-textMuted hover:text-swarm-text transition-colors p-0.5 -ml-1"
+              className="text-swarm-textMuted hover:text-swarm-text transition-colors p-0.5 -ml-0.5 rounded hover:bg-white/[0.06]"
             >
               <ChevronDown
-                size={16}
+                size={15}
                 className={`transition-transform duration-150 ${collapsed ? "-rotate-90" : ""}`}
               />
             </button>
@@ -1656,26 +1656,26 @@ function ProjectGroup({
                 onChange={(e) => onEditChange(e.target.value)}
                 onBlur={onCommitRename}
                 onKeyDown={(e) => { if (e.key === "Enter") onCommitRename(); if (e.key === "Escape") onCancelRename(); }}
-                className="bg-transparent border-b border-swarm-gold text-sm font-bold text-swarm-text outline-none"
+                className="bg-transparent border-b border-swarm-gold text-sm font-bold text-swarm-text outline-none font-sans"
               />
             ) : (
-              <span className="text-sm font-bold text-swarm-text truncate tracking-tight" onDoubleClick={onStartRename}>
+              <span className="text-sm font-bold text-swarm-text truncate tracking-tight font-sans" onDoubleClick={onStartRename}>
                 {ws.name}
               </span>
             )}
           </div>
 
-          <div className="flex items-center gap-1 opacity-70 hover:opacity-100">
+          <div className="flex items-center gap-1 opacity-80 hover:opacity-100">
             <button
               onClick={(e) => { e.stopPropagation(); onMenu(e); }}
-              className="size-5 flex items-center justify-center rounded text-swarm-textMuted hover:text-swarm-text hover:bg-white/[0.08]"
+              className="size-5 flex items-center justify-center rounded-lg text-swarm-textMuted hover:text-swarm-text hover:bg-white/[0.08] transition-colors"
               title="WorkHive menu"
             >
               <MoreHorizontal size={13} />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); if (noRepo) { bindRepo(); return; } setAdding(!adding); setError(null); }}
-              className="size-5 flex items-center justify-center rounded text-swarm-textMuted hover:text-swarm-goldHi hover:bg-white/[0.08]"
+              className="size-5 flex items-center justify-center rounded-lg text-swarm-textMuted hover:text-swarm-goldHi hover:bg-white/[0.08] transition-colors"
               title={noRepo ? "Bind folder" : "New tree"}
             >
               {noRepo ? <FolderPlus size={13} /> : <Plus size={13} />}
@@ -1685,7 +1685,7 @@ function ProjectGroup({
 
         {/* Missing folder notice */}
         {missing && (
-          <div className="mb-2 flex h-6 items-center gap-1.5 rounded bg-swarm-err/10 px-2 text-[10px] text-swarm-err">
+          <div className="mb-2 flex h-6 items-center gap-1.5 rounded-lg bg-swarm-err/10 border border-swarm-err/30 px-2 text-[10px] text-swarm-err font-mono">
             <span className="min-w-0 flex-1 truncate" title={ws.boundProjectPath}>Folder missing from disk</span>
             <button
               onClick={(e) => { e.stopPropagation(); bindRepo(); }}
@@ -1705,7 +1705,7 @@ function ProjectGroup({
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") submit(); if (e.key === "Escape") { setAdding(false); setName(""); } }}
               placeholder="branch-name"
-              className="h-6 min-w-0 flex-1 rounded border border-swarm-border/50 bg-black/30 px-2 text-mini text-swarm-text outline-none focus:border-swarm-gold/50"
+              className="h-6 min-w-0 flex-1 rounded-lg border border-swarm-gold/40 bg-black/50 px-2 text-mini text-swarm-text outline-none focus:ring-1 focus:ring-swarm-gold/30"
             />
             <button onClick={submit} disabled={busy || !name.trim()} className="flex size-6 shrink-0 items-center justify-center rounded text-swarm-goldHi hover:bg-swarm-gold/15 disabled:opacity-40">
               {busy ? <LoaderCircle className="size-3 animate-spin" /> : <Check className="size-3" />}
@@ -1716,28 +1716,28 @@ function ProjectGroup({
           </div>
         )}
 
-        {error && <div className="mb-2 text-[10px] text-swarm-err break-words">{error}</div>}
+        {error && <div className="mb-2 text-[10px] text-swarm-err break-words font-mono">{error}</div>}
 
-        {/* TREES Section (Matches Screenshot 1) */}
+        {/* TREES Section */}
         {!collapsed && (
           <div>
-            <div className="text-[10px] font-bold tracking-widest text-swarm-textMuted/60 uppercase mb-1.5 pl-0.5">
+            <div className="text-[10px] font-bold tracking-widest text-swarm-textMuted/60 uppercase mb-1.5 pl-0.5 font-mono">
               TREES
             </div>
 
             {/* Tree Inner Box */}
-            <div className="rounded-xl bg-[#0c0e14]/90 border border-white/[0.06] p-2.5 flex flex-col gap-2 shadow-inner">
+            <div className="rounded-xl bg-black/60 border border-white/[0.06] p-2.5 flex flex-col gap-2 shadow-inner">
               {/* Primary tree */}
               <div
                 onClick={noRepo ? bindRepo : onActivate}
                 className="flex flex-col gap-1 cursor-pointer group/primary"
               >
                 <div className="flex items-center gap-2">
-                  <span className={`size-2 rounded-full shrink-0 ${hasActive ? "bg-swarm-ok animate-pulse" : "bg-swarm-textMuted/40"}`} />
+                  <span className={`size-2 rounded-full shrink-0 ${hasActive ? "bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]" : "bg-swarm-textMuted/40"}`} />
                   <span className="text-xs font-bold text-swarm-text group-hover/primary:text-swarm-goldHi transition-colors">
                     primary
                   </span>
-                  <span className="rounded bg-white/[0.07] px-1.5 py-0.5 text-[10px] font-medium text-swarm-textMuted border border-white/[0.04] truncate max-w-[110px]">
+                  <span className="rounded-md bg-white/[0.07] px-1.5 py-0.5 text-[10px] font-medium text-swarm-textMuted border border-white/[0.06] truncate max-w-[110px] font-mono">
                     {repoName || ws.name}
                   </span>
                 </div>
@@ -1756,10 +1756,10 @@ function ProjectGroup({
                       <span className="text-xs font-semibold text-swarm-text truncate">{t.name}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <button onClick={() => merge(t.id)} className="text-swarm-textMuted hover:text-swarm-goldHi p-0.5" title="Merge into main">
+                      <button onClick={() => merge(t.id)} className="text-swarm-textMuted hover:text-swarm-goldHi p-0.5 rounded hover:bg-white/[0.06]" title="Merge into main">
                         <GitMerge size={11} />
                       </button>
-                      <button onClick={() => remove(t.id)} className="text-swarm-textMuted hover:text-swarm-err p-0.5" title="Remove tree">
+                      <button onClick={() => remove(t.id)} className="text-swarm-textMuted hover:text-swarm-err p-0.5 rounded hover:bg-white/[0.06]" title="Remove tree">
                         <Trash2 size={11} />
                       </button>
                     </div>
@@ -1966,9 +1966,9 @@ function ActiveWorkspaceDetail({
       />
 
       {!agentsCollapsed && (
-        <div className="min-h-0 shrink overflow-y-auto overflow-x-hidden scrollbar-sleek px-1 pb-2 flex flex-col gap-0.5 max-h-[48%]">
+        <div className="min-h-0 shrink overflow-y-auto overflow-x-hidden scrollbar-sleek px-1 pb-2 flex flex-col gap-1 max-h-[48%]">
           {mine.length === 0 ? (
-            <p className="px-2 py-1 text-[11px] text-swarm-textMuted/50 italic">
+            <p className="px-2 py-1 text-[11px] text-swarm-textMuted/50 italic font-mono">
               No agents running
             </p>
           ) : (
@@ -1976,24 +1976,24 @@ function ActiveWorkspaceDetail({
               const status = statuses[a.id] ?? "idle";
               const label = a.customName || a.cliName;
               const brand = cliBrand(a.cli);
-              const isRunning = status === "running";
+              const isRunning = status === "running" || status === "launching";
               return (
                 <div
                   key={a.id}
-                  className="group flex h-7 items-center gap-2 rounded-[5px] px-2 text-xs text-swarm-textDim transition-colors hover:bg-white/[0.04] hover:text-swarm-text"
+                  className="group flex h-8 items-center gap-2 rounded-xl border border-white/[0.04] bg-white/[0.02] px-2.5 text-xs text-swarm-textDim transition-all hover:bg-white/[0.06] hover:border-white/[0.1] hover:text-swarm-text"
                   title={`${label}\n${a.cliName}${a.model ? ` · ${a.model}` : ""}\n${status}`}
                 >
-                  <span className={`size-1.5 shrink-0 rounded-full transition-all ${
-                    isRunning ? "bg-swarm-ok animate-pulse" : STATUS_DOT_CLASS[status]
+                  <span className={`size-2 shrink-0 rounded-full transition-all ${
+                    isRunning ? "bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]" : "bg-slate-500/50"
                   }`} />
                   {brand ? (
-                    <BrandGlyph brand={brand} size={12} className="shrink-0 opacity-80 group-hover:opacity-100" />
+                    <BrandGlyph brand={brand} size={13} className="shrink-0 opacity-80 group-hover:opacity-100" />
                   ) : (
-                    <AgentMark size={12} className="shrink-0 text-swarm-textMuted/70" />
+                    <AgentMark size={13} className="shrink-0 text-swarm-textMuted/70" />
                   )}
                   <span className="min-w-0 shrink truncate font-medium text-swarm-text text-xs">{label}</span>
                   {a.isLead && (
-                    <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-swarm-goldHi/80">
+                    <span className="inline-flex items-center gap-0.5 rounded bg-swarm-gold/20 px-1 py-0.5 text-[9px] font-bold text-swarm-goldHi uppercase">
                       <LeadCrown size={8} />
                       lead
                     </span>
@@ -2003,8 +2003,10 @@ function ActiveWorkspaceDetail({
                       {a.model}
                     </span>
                   )}
-                  <span className={`ml-auto shrink-0 text-[10px] font-medium capitalize ${
-                    isRunning ? "text-swarm-ok" : "text-swarm-textMuted/50"
+                  <span className={`ml-auto shrink-0 text-[10px] font-mono px-2 py-0.5 rounded-md ${
+                    isRunning
+                      ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-medium"
+                      : "text-swarm-textMuted/60 bg-white/[0.02]"
                   }`}>
                     {status}
                   </span>

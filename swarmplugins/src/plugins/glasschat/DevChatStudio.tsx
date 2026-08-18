@@ -131,8 +131,13 @@ const INSTALLED_CLIS: InstalledCliOption[] = [
 ];
 
 const DEV_MODELS = [
-  { id: "claude-5-opus", name: "Claude 5 Opus", badge: "Ultra SOTA", icon: Cpu, cli: "claude", brandColor: "#D97757" },
-  { id: "claude-5-sonnet", name: "Claude 5 Sonnet", badge: "Next-Gen 1M", icon: Cpu, cli: "claude", brandColor: "#D97757" },
+  { id: "opus[1m]", name: "Opus 5 (1M Context)", badge: "Ultra SOTA 1M", icon: Cpu, cli: "claude", brandColor: "#D97757" },
+  { id: "fable[1m]", name: "Fable 5 (1M Context)", badge: "Ultra Reasoning 1M", icon: BrainCircuit, cli: "claude", brandColor: "#D97757" },
+  { id: "sonnet[1m]", name: "Sonnet 5 (1M Context)", badge: "Next-Gen 1M", icon: Cpu, cli: "claude", brandColor: "#D97757" },
+  { id: "fable", name: "Fable 5", badge: "CoT Agent", icon: BrainCircuit, cli: "claude", brandColor: "#D97757" },
+  { id: "opus", name: "Opus 5 (Default)", badge: "Ultra SOTA", icon: Cpu, cli: "claude", brandColor: "#D97757" },
+  { id: "sonnet", name: "Sonnet 5", badge: "Routine", icon: Cpu, cli: "claude", brandColor: "#D97757" },
+  { id: "haiku", name: "Haiku 4.5", badge: "Fast", icon: Cpu, cli: "claude", brandColor: "#D97757" },
   { id: "claude-4-6-thinking", name: "Claude 4.6 Sonnet (Thinking)", badge: "Deep CoT", icon: BrainCircuit, cli: "claude", brandColor: "#D97757" },
   { id: "gemini-3-7-flash", name: "Gemini 3.7 Flash", badge: "Ultra Realtime", icon: Zap, cli: "agy", brandColor: "#4285F4" },
   { id: "gemini-3-6-flash", name: "Gemini 3.6 Flash", badge: "1M Context", icon: Zap, cli: "agy", brandColor: "#4285F4" },
@@ -475,8 +480,10 @@ export function DevChatStudio({
   const speechRecRef = useRef<any>(null);
 
   const openVoiceStudio = async () => {
-    setShowVoiceModal(true);
+    // 1. CLEAR previous typed input so it never accidentally leaks or gets sent
+    setInput("");
     setVoiceTranscript("");
+    setShowVoiceModal(true);
     setVoiceStatus("listening");
 
     try {
@@ -528,7 +535,6 @@ export function DevChatStudio({
           };
 
           rec.onend = () => {
-            // Keep active if user still has voice bar open
             if (mediaStreamRef.current?.active) {
               try { rec.start(); } catch (_) {}
             }
@@ -566,6 +572,8 @@ export function DevChatStudio({
       speechRecRef.current = null;
     }
 
+    const currentCapturedVoice = (voiceTranscript || "").trim();
+
     const recorder = mediaRecorderRef.current;
     if (recorder && recorder.state !== "inactive") {
       recorder.onstop = async () => {
@@ -573,61 +581,68 @@ export function DevChatStudio({
           const audioBlob = new Blob(audioChunksRef.current, { type: audioChunksRef.current[0]?.type || "audio/webm" });
           mediaStreamRef.current?.getTracks().forEach((t) => t.stop());
 
-          const buf = await audioBlob.arrayBuffer();
-          const ctx = new AudioContext();
-          const decoded = await ctx.decodeAudioData(buf);
-          ctx.close();
-
-          const targetRate = 16000;
-          const mono = downmixMono(decoded);
-          const resampled = resampleLinear(mono, decoded.sampleRate, targetRate);
-          const wav = encodeWav16(resampled, targetRate);
-          const wavB64 = arrayBufferToBase64(wav);
-
-          const tauri = typeof window !== "undefined" ? (window as any).__TAURI_INTERNALS__ || (window as any).__TAURI__ : null;
           let textResult = "";
+          try {
+            const buf = await audioBlob.arrayBuffer();
+            const ctx = new AudioContext();
+            const decoded = await ctx.decodeAudioData(buf);
+            ctx.close();
 
-          if (tauri?.invoke) {
-            try {
-              const status: any = await tauri.invoke("swarm_voice_status");
-              if (!status?.has_binary || !status?.installed_models?.length) {
-                await tauri.invoke("swarm_voice_install", { model: "base.en" });
-              }
-            } catch (_) {}
+            const targetRate = 16000;
+            const mono = downmixMono(decoded);
+            const resampled = resampleLinear(mono, decoded.sampleRate, targetRate);
+            const wav = encodeWav16(resampled, targetRate);
+            const wavB64 = arrayBufferToBase64(wav);
 
-            const wavPath = await tauri.invoke("swarm_voice_save_wav", { dataB64: wavB64 });
-            const rawText: string = await tauri.invoke("swarm_voice_transcribe", { wavPath, model: "base.en" });
-            textResult = cleanWhisperTranscript(rawText);
-          }
+            const tauri = typeof window !== "undefined" ? (window as any).__TAURI_INTERNALS__ || (window as any).__TAURI__ : null;
+            if (tauri?.invoke) {
+              try {
+                const status: any = await tauri.invoke("swarm_voice_status");
+                if (!status?.has_binary || !status?.installed_models?.length) {
+                  await tauri.invoke("swarm_voice_install", { model: "base.en" });
+                }
+              } catch (_) {}
 
-          const finalText = (textResult || voiceTranscript || "").trim();
+              const wavPath = await tauri.invoke("swarm_voice_save_wav", { dataB64: wavB64 });
+              const rawText: string = await tauri.invoke("swarm_voice_transcribe", { wavPath, model: "base.en" });
+              textResult = cleanWhisperTranscript(rawText);
+            }
+          } catch (_) {}
+
+          const finalText = (textResult || currentCapturedVoice).trim();
           if (finalText) {
-            setInput(finalText);
+            setInput("");
             setShowVoiceModal(false);
             setVoiceStatus("idle");
             executeSend(finalText);
           } else {
-            const fallbackPrompt = "Best website for UI components";
-            setInput(fallbackPrompt);
-            setShowVoiceModal(false);
+            // Nothing was spoken - don't send garbage or old messages
             setVoiceStatus("idle");
-            executeSend(fallbackPrompt);
+            setShowVoiceModal(false);
           }
         } catch (e) {
-          const fallbackText = voiceTranscript.trim() || "Best website for UI components";
-          setInput(fallbackText);
-          setShowVoiceModal(false);
-          setVoiceStatus("idle");
-          executeSend(fallbackText);
+          if (currentCapturedVoice) {
+            setInput("");
+            setShowVoiceModal(false);
+            setVoiceStatus("idle");
+            executeSend(currentCapturedVoice);
+          } else {
+            setVoiceStatus("idle");
+            setShowVoiceModal(false);
+          }
         }
       };
       recorder.stop();
     } else {
-      const finalText = voiceTranscript.trim() || "Best website for UI components";
-      setInput(finalText);
-      setShowVoiceModal(false);
-      setVoiceStatus("idle");
-      executeSend(finalText);
+      if (currentCapturedVoice) {
+        setInput("");
+        setShowVoiceModal(false);
+        setVoiceStatus("idle");
+        executeSend(currentCapturedVoice);
+      } else {
+        setVoiceStatus("idle");
+        setShowVoiceModal(false);
+      }
     }
   };
 
