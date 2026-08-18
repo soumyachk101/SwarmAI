@@ -2,16 +2,35 @@
 node_modules
 /node_modules
 .pnpm-store
+.pnpm-debug.log*
 
+# AI Agent IDE configs & local states
 .claude/
 .agents/
 .cursor/
+.playwright-mcp/
+.thekedar/
 
-
-# Build outputs
+# Build outputs & Bundles
 dist
 .next
 out
+target
+/target
+swarm/src-tauri/target/
+
+# Release binary installers (compiled artifacts should be distributed via GitHub Releases, not git tree)
+releases/**/*.dmg
+releases/**/*.exe
+releases/**/*.msi
+releases/**/*.deb
+releases/**/*.app
+releases/**/*.zip
+*.dmg
+*.exe
+*.msi
+*.deb
+*.app
 
 # Turbo cache (local, machine-specific, regenerated on every build)
 .turbo
@@ -20,47 +39,45 @@ out
 # TypeScript incremental build cache
 *.tsbuildinfo
 
-# Pheromone
+# Pheromone local database & state
 .pheromone/
 pheromone.db
 
-# Environment
+# Environment & Secrets
 .env
 .env.local
 .env.*.local
+*.pem
+*.key
 
-# IDE
+# IDE & Editor
 .vscode
 .idea
 *.swp
 *.swo
 
-# OS
+# OS & accidental local directories
 .DS_Store
 Thumbs.db
-.thekedar/
+/Users/
 
 # Logs
 *.log
 npm-debug.log*
 pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Testing
-coverage
-.playwright
+# Testing & Coverage
+coverage/
+.nyc_output/
+.playwright/
 
-# Rust (for Hive)
-target
-Cargo.lock
-AGENTS.md
-AGENTS1.md
-TESTCASE.md
-MIGRATION_REPORT.md
-/orca
-SIMILAR.md
-TESTAGENTS.md
-SECURITY.md
-MODES.md
-/hiveory-landing-page
-Glasschat.md
-/landing-page
+# Temporary / Scratch scripts
+fix*.js
+fix*.rb
+do_fix.js
+fixed_func.rs
+insert_launchctl.rb
+new_block.txt
+*.tmp

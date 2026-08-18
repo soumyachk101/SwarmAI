@@ -46,8 +46,18 @@ describe('WhisperCppEngine', () => {
 
   it('transcribe rejects on execFile error', async () => {
     const { execFile } = await import('node:child_process');
+    const { getBinaryPath, getModelPath } = await import('../src/engine/model-cache.js');
     const wavPath = path.join(testDir, 'test.wav');
     fs.writeFileSync(wavPath, Buffer.alloc(1024));
+
+    // Ensure mock binary and model exist to avoid network download in tests
+    const binPath = getBinaryPath(testDir);
+    fs.mkdirSync(path.dirname(binPath), { recursive: true });
+    fs.writeFileSync(binPath, 'dummy-bin');
+
+    const modelPath = getModelPath(testDir, 'tiny.en');
+    fs.mkdirSync(path.dirname(modelPath), { recursive: true });
+    fs.writeFileSync(modelPath, 'dummy-model');
 
     vi.mocked(execFile).mockImplementation((cmd: string, args: readonly string[] | undefined, options: any, callback?: (error: Error | null, stdout: string, stderr: string) => void) => {
       if (callback) callback(new Error('binary not found'), '', '');
