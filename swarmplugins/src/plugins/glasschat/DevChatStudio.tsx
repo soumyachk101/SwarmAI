@@ -471,7 +471,9 @@ export function DevChatStudio({
     setAudioBars([15, 25, 40, 60, 45, 30, 20, 35, 55, 70, 45, 25]);
   };
 
-  // Open & Start Voice Mode
+  // Open & Start Voice Mode with robust multi-engine detection
+  const speechRecRef = useRef<any>(null);
+
   const openVoiceStudio = async () => {
     setShowVoiceModal(true);
     setVoiceTranscript("");
@@ -484,34 +486,58 @@ export function DevChatStudio({
 
       startAudioVisualizer(stream);
 
-      const recorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = recorder;
+      // 1. Initialize MediaRecorder for Whisper WAV
+      try {
+        const recorder = new MediaRecorder(stream);
+        mediaRecorderRef.current = recorder;
+        recorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) {
+            audioChunksRef.current.push(e.data);
+          }
+        };
+        recorder.start(100);
+      } catch (_) {}
 
-      recorder.ondataavailable = (e) => {
-        if (e.data && e.data.size > 0) {
-          audioChunksRef.current.push(e.data);
-        }
-      };
-
-      recorder.start(100);
-
-      // WebSpeech live preview fallback
+      // 2. Initialize WebSpeech Live Speech Recognition
       const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (SpeechRec) {
         try {
           const rec = new SpeechRec();
+          speechRecRef.current = rec;
           rec.continuous = true;
           rec.interimResults = true;
-          rec.lang = "en-US";
+          rec.maxAlternatives = 1;
+          rec.lang = navigator.language || "en-US";
+
           rec.onresult = (e: any) => {
-            let t = "";
+            let full = "";
             for (let i = 0; i < e.results.length; i++) {
-              t += e.results[i][0].transcript;
+              const res = e.results[i];
+              if (res && res[0]) {
+                full += res[0].transcript + " ";
+              }
             }
-            if (t.trim()) setVoiceTranscript(t.trim());
+            const cleaned = full.trim();
+            if (cleaned) {
+              setVoiceTranscript(cleaned);
+            }
           };
+
+          rec.onerror = (e: any) => {
+            console.warn("WebSpeech recognition error:", e);
+          };
+
+          rec.onend = () => {
+            // Keep active if user still has voice bar open
+            if (mediaStreamRef.current?.active) {
+              try { rec.start(); } catch (_) {}
+            }
+          };
+
           rec.start();
-        } catch (_) {}
+        } catch (e) {
+          console.warn("SpeechRec start error:", e);
+        }
       }
     } catch (err) {
       console.warn("Direct microphone error, using visualizer fallback:", err);
@@ -531,6 +557,14 @@ export function DevChatStudio({
   const finishVoiceStudio = async () => {
     setVoiceStatus("processing");
     stopAudioVisualizer();
+
+    if (speechRecRef.current) {
+      try {
+        speechRecRef.current.onend = null;
+        speechRecRef.current.stop();
+      } catch (_) {}
+      speechRecRef.current = null;
+    }
 
     const recorder = mediaRecorderRef.current;
     if (recorder && recorder.state !== "inactive") {
@@ -566,13 +600,21 @@ export function DevChatStudio({
             textResult = cleanWhisperTranscript(rawText);
           }
 
-          const finalText = textResult || voiceTranscript || "Best website batao UI components ke liye";
-          setInput(finalText);
-          setShowVoiceModal(false);
-          setVoiceStatus("idle");
-          executeSend(finalText);
+          const finalText = (textResult || voiceTranscript || "").trim();
+          if (finalText) {
+            setInput(finalText);
+            setShowVoiceModal(false);
+            setVoiceStatus("idle");
+            executeSend(finalText);
+          } else {
+            const fallbackPrompt = "Best website for UI components";
+            setInput(fallbackPrompt);
+            setShowVoiceModal(false);
+            setVoiceStatus("idle");
+            executeSend(fallbackPrompt);
+          }
         } catch (e) {
-          const fallbackText = voiceTranscript || "Best website batao UI components ke liye";
+          const fallbackText = voiceTranscript.trim() || "Best website for UI components";
           setInput(fallbackText);
           setShowVoiceModal(false);
           setVoiceStatus("idle");
@@ -581,7 +623,7 @@ export function DevChatStudio({
       };
       recorder.stop();
     } else {
-      const finalText = voiceTranscript || "Best website batao UI components ke liye";
+      const finalText = voiceTranscript.trim() || "Best website for UI components";
       setInput(finalText);
       setShowVoiceModal(false);
       setVoiceStatus("idle");
@@ -590,6 +632,13 @@ export function DevChatStudio({
   };
 
   const closeVoiceStudio = () => {
+    if (speechRecRef.current) {
+      try {
+        speechRecRef.current.onend = null;
+        speechRecRef.current.stop();
+      } catch (_) {}
+      speechRecRef.current = null;
+    }
     stopAudioVisualizer();
     mediaStreamRef.current?.getTracks().forEach((t) => t.stop());
     setShowVoiceModal(false);
@@ -1092,166 +1141,7 @@ export function DevChatStudio({
 
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#0d0f14] font-sans select-text">
-      {/* Dynamic Full Voice Studio Overlay (ChatGPT Voice & Gemini Live SOTA Style) */}
-      {showVoiceModal && (
-        <div className="absolute inset-0 z-[150] flex flex-col items-center justify-between bg-[#080a0f]/95 backdrop-blur-3xl p-6 animate-fade-in select-none">
-          {/* Top Bar */}
-          <div className="flex w-full items-center justify-between border-b border-white/[0.06] pb-3.5">
-            <div className="flex items-center gap-3">
-              <div className="relative flex items-center justify-center">
-                <span className="size-3 rounded-full bg-emerald-400 animate-ping absolute opacity-75" />
-                <span className="size-2.5 rounded-full bg-emerald-400 relative" />
-              </div>
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-semibold uppercase tracking-wider text-swarm-goldHi">
-                    {voiceStatus === "processing" ? "Transcribing Voice" : `Live Voice · ${activeModel.name}`}
-                  </span>
-                  <span className="rounded-full bg-swarm-gold/15 px-2 py-0.5 text-[10px] font-mono text-swarm-gold font-medium border border-swarm-gold/30">
-                    {voiceStatus === "processing" ? "WHISPER STT" : "STUDIO LIVE"}
-                  </span>
-                </div>
-                <span className="text-[11px] text-swarm-textMuted/70 font-mono">
-                  {voiceStatus === "processing" ? "Synthesizing deep reasoning..." : "Microphone active · Speak naturally"}
-                </span>
-              </div>
-            </div>
 
-            <button
-              onClick={closeVoiceStudio}
-              className="flex size-8 items-center justify-center rounded-full bg-white/[0.06] border border-white/[0.08] text-swarm-textMuted hover:bg-white/[0.12] hover:text-white transition-all shadow-md"
-              title="Close Voice Mode"
-            >
-              <X size={14} />
-            </button>
-          </div>
-
-          {/* Center Dynamic Futuristic Glowing Plasma Orb & Fluid Waveform */}
-          <div className="flex flex-col items-center justify-center my-auto text-center max-w-lg w-full space-y-6">
-            <div className="relative flex items-center justify-center py-4">
-              {/* Outer Chromatic Pulsing Aura Glows */}
-              <div
-                className="absolute size-64 rounded-full opacity-35 blur-3xl animate-pulse"
-                style={{
-                  background:
-                    activeModel.brandColor
-                      ? `radial-gradient(circle, ${activeModel.brandColor} 0%, #8b5cf6 40%, transparent 70%)`
-                      : "radial-gradient(circle, #f59e0b 0%, #ec4899 40%, transparent 70%)",
-                }}
-              />
-              <div className="absolute size-48 rounded-full border border-swarm-gold/20 animate-ping [animation-duration:3.5s]" />
-
-              {/* Rotating Futuristic Particle Halo Rings */}
-              <div className="absolute size-56 rounded-full border border-dashed border-cyan-400/25 animate-[spin_16s_linear_infinite]" />
-              <div className="absolute size-44 rounded-full border border-dotted border-amber-400/30 animate-[spin_10s_linear_infinite_reverse]" />
-
-              {/* Glassmorphic Central Visualizer Stage */}
-              <div className="relative z-10 flex flex-col items-center justify-center px-8 py-5 rounded-3xl bg-black/60 border border-white/[0.12] shadow-2xl backdrop-blur-2xl">
-                {/* 24-Band Symmetrical Audio Spectrum */}
-                <div className="flex items-center justify-center gap-1.5 h-24 mb-3">
-                  {audioBars.concat([...audioBars].reverse()).slice(0, 24).map((height, idx) => (
-                    <div
-                      key={idx}
-                      className="w-1.5 rounded-full bg-gradient-to-t from-cyan-500 via-amber-400 to-rose-400 transition-all duration-75 shadow-lg"
-                      style={{
-                        height: `${Math.max(10, height)}px`,
-                        opacity: 0.85 + (height / 85) * 0.15,
-                        boxShadow: `0 0 ${Math.max(4, height / 5)}px rgba(245, 158, 11, 0.5)`,
-                      }}
-                    />
-                  ))}
-                </div>
-
-                {/* Live Fluid Sine Wave Curve (SVG Ribbon) */}
-                <div className="w-full max-w-[280px] overflow-hidden opacity-80">
-                  <svg viewBox="0 0 300 30" className="w-full h-6 stroke-swarm-gold fill-none">
-                    <path
-                      d={`M 0 15 Q 75 ${15 - (audioBars[2] || 15) * 0.3} 150 15 T 300 15`}
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      className="transition-all duration-100"
-                    />
-                    <path
-                      d={`M 0 15 Q 75 ${15 + (audioBars[5] || 20) * 0.25} 150 15 T 300 15`}
-                      strokeWidth="1.5"
-                      stroke="rgba(56, 189, 248, 0.7)"
-                      strokeLinecap="round"
-                      className="transition-all duration-100"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            {/* Transcript Preview Box */}
-            <div className="space-y-2.5 px-4 w-full">
-              <div className="flex items-center justify-between text-micro font-mono text-swarm-textMuted px-1">
-                <span className="flex items-center gap-1.5">
-                  <Volume2 size={12} className="text-swarm-gold animate-pulse" />
-                  <span>{voiceStatus === "processing" ? "Processing transcription…" : "Live Audio Feed"}</span>
-                </span>
-                <span>{activeModel.name}</span>
-              </div>
-
-              <div className="min-h-[56px] rounded-2xl bg-white/[0.03] border border-white/[0.08] p-3.5 text-xs text-swarm-text font-medium leading-relaxed shadow-inner backdrop-blur-md">
-                {voiceTranscript ? (
-                  <span className="text-swarm-goldHi">"{voiceTranscript}"</span>
-                ) : (
-                  <span className="italic text-swarm-textMuted/50">Speak your query, instructions, or code requirements…</span>
-                )}
-              </div>
-
-              {/* Quick Prompt Suggestions */}
-              <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
-                {[
-                  "Best website for UI components",
-                  "Explain workspace architecture",
-                  "Review uncommitted git diff",
-                ].map((prompt, pIdx) => (
-                  <button
-                    key={pIdx}
-                    onClick={() => {
-                      setVoiceTranscript(prompt);
-                    }}
-                    className="rounded-full bg-white/[0.04] border border-white/[0.08] px-2.5 py-1 text-[11px] text-swarm-textMuted hover:text-swarm-gold hover:border-swarm-gold/40 hover:bg-swarm-gold/10 transition-all font-mono"
-                  >
-                    + {prompt}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Action Controls */}
-          <div className="flex items-center gap-3.5 mb-2 w-full max-w-sm justify-center">
-            <button
-              onClick={closeVoiceStudio}
-              className="flex-1 flex items-center justify-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.06] py-2.5 text-xs font-medium text-swarm-text hover:bg-white/[0.1] transition-all shadow-md"
-            >
-              <X size={13} />
-              <span>Cancel</span>
-            </button>
-
-            <button
-              onClick={finishVoiceStudio}
-              disabled={voiceStatus === "processing"}
-              className="flex-[1.5] flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-500 via-swarm-gold to-amber-400 py-2.5 text-xs font-semibold text-swarm-canvas hover:brightness-110 active:scale-[0.98] transition-all shadow-xl shadow-swarm-gold/30"
-            >
-              {voiceStatus === "processing" ? (
-                <>
-                  <Loader2 size={14} className="animate-spin" />
-                  <span>Thinking…</span>
-                </>
-              ) : (
-                <>
-                  <Send size={13} />
-                  <span>Done & Execute</span>
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Solid, Opaque Header Bar */}
       <div className="relative z-30 flex shrink-0 items-center justify-between border-b border-white/[0.08] bg-[#13151b] px-3.5 py-2 shadow-sm">
@@ -1664,95 +1554,183 @@ export function DevChatStudio({
           </div>
         )}
 
-        <div className="relative flex flex-col rounded-2xl border border-white/[0.10] bg-[#14161d] focus-within:border-swarm-gold/60 focus-within:ring-1 focus-within:ring-swarm-gold/30 transition-all shadow-xl">
-          <textarea
-            ref={textareaRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onKeyUp={(e) => {
-              e.stopPropagation();
-              e.nativeEvent.stopImmediatePropagation();
-            }}
-            onKeyPress={(e) => {
-              e.stopPropagation();
-              e.nativeEvent.stopImmediatePropagation();
-            }}
-            placeholder={
-              execMode === "cli"
-                ? `Execute task with ${activeCli.name} (${activeCli.command})…`
-                : `Ask ${activeModel.name} anything…`
-            }
-            rows={2}
-            className="w-full resize-none bg-transparent px-3.5 pt-3 pb-1 text-xs text-swarm-text outline-none placeholder:text-swarm-textMuted/40 font-sans"
-          />
+        {showVoiceModal ? (
+          /* Slick Inline Voice Bar (Non-blocking bottom floating audio ribbon) */
+          <div className="relative flex flex-col gap-2 rounded-2xl border border-swarm-gold/40 bg-gradient-to-b from-[#161924]/95 to-[#0f121a]/95 p-3 shadow-2xl backdrop-blur-2xl animate-scale-in">
+            {/* Top Bar Line: Live Pulse + 16-Band Equalizer + Quick Actions */}
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="relative flex size-2.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex size-2.5 rounded-full bg-emerald-500" />
+                </span>
+                <div className="flex flex-col">
+                  <span className="font-mono text-mini font-semibold text-swarm-goldHi uppercase tracking-wider">
+                    {voiceStatus === "processing" ? "Transcribing…" : "Listening"}
+                  </span>
+                  <span className="text-[10px] text-swarm-textMuted font-mono">
+                    {activeModel.name}
+                  </span>
+                </div>
+              </div>
 
-          <div className="flex items-center justify-between px-3 py-2 border-t border-white/[0.04]">
-            {/* Quick Context Attachment Menu */}
-            <div className="flex items-center gap-1.5 relative">
-              <button
-                onClick={() => setShowAttachMenu(!showAttachMenu)}
-                className="flex items-center gap-1 rounded-lg bg-white/[0.04] border border-white/[0.08] px-2 py-1 text-micro text-swarm-textMuted hover:text-swarm-gold hover:border-swarm-gold/40 transition-colors"
-                title="Attach Context to Prompt"
-              >
-                <Paperclip size={11} />
-                <span>Attach</span>
-              </button>
-
-              {showAttachMenu && (
-                <>
-                  <div className="fixed inset-0 z-[90]" onClick={() => setShowAttachMenu(false)} />
+              {/* 16-Band Animated Symmetrical Frequency Bars */}
+              <div className="flex items-center justify-center gap-1 h-8 px-3 rounded-full bg-black/60 border border-white/[0.08] shadow-inner">
+                {audioBars.concat([...audioBars].reverse()).slice(0, 16).map((h, idx) => (
                   <div
-                    className="absolute left-0 bottom-full mb-1.5 z-[100] w-52 rounded-xl border border-white/[0.12] p-1.5 shadow-2xl animate-scale-in"
-                    style={{ backgroundColor: "#151821", opacity: 1, zIndex: 100 }}
-                  >
-                    <div className="px-2 py-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
-                      Add Context to Prompt
-                    </div>
-                    <button
-                      onClick={handleAttachGitDiff}
-                      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text transition-colors"
-                    >
-                      <GitBranch size={13} className="text-swarm-gold" />
-                      <span>Attach Git Diff</span>
-                    </button>
-                    <button
-                      onClick={handleAttachProjectTree}
-                      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text transition-colors"
-                    >
-                      <FolderTree size={13} className="text-swarm-gold" />
-                      <span>Attach Project Tree</span>
-                    </button>
-                  </div>
-                </>
-              )}
+                    key={idx}
+                    className="w-1 rounded-full bg-gradient-to-t from-cyan-500 via-amber-400 to-rose-400 transition-all duration-75"
+                    style={{ height: `${Math.max(4, Math.min(24, Math.round(h / 3)))}px` }}
+                  />
+                ))}
+              </div>
 
-              <span className="text-micro text-swarm-textMuted font-mono">
-                {activeModel.name} · Shift+Enter for new line
-              </span>
+              {/* Action Buttons */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={closeVoiceStudio}
+                  className="flex size-7 items-center justify-center rounded-xl bg-white/[0.06] text-swarm-textMuted hover:bg-white/[0.12] hover:text-white transition-colors"
+                  title="Cancel Voice Mode"
+                >
+                  <X size={13} />
+                </button>
+                <button
+                  onClick={finishVoiceStudio}
+                  disabled={voiceStatus === "processing"}
+                  className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 via-swarm-gold to-amber-400 px-3.5 py-1.5 text-xs font-semibold text-swarm-canvas hover:brightness-110 shadow-md shadow-swarm-gold/25 transition-all"
+                >
+                  {voiceStatus === "processing" ? (
+                    <Loader2 size={13} className="animate-spin" />
+                  ) : (
+                    <>
+                      <Send size={12} />
+                      <span>Done</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
 
-            <div className="flex items-center gap-1.5">
-              {/* Interactive Voice Mode Trigger Button */}
-              <button
-                onClick={openVoiceStudio}
-                className="flex size-7 items-center justify-center rounded-xl bg-white/[0.06] text-swarm-textMuted hover:text-swarm-gold hover:bg-swarm-gold/15 transition-all shadow-md"
-                title="Launch Interactive Voice Mode"
-              >
-                <Mic size={13} />
-              </button>
+            {/* Live Speech Recognition Transcript Box */}
+            <div className="rounded-xl bg-black/40 border border-white/[0.06] px-3 py-2 text-xs font-medium text-swarm-text flex items-center justify-between min-h-[38px] shadow-inner">
+              {voiceTranscript ? (
+                <span className="text-swarm-goldHi truncate max-w-[85%] font-sans font-medium">"{voiceTranscript}"</span>
+              ) : (
+                <span className="italic text-swarm-textMuted/50 text-mini">Listening to your microphone… speak now or click a prompt below</span>
+              )}
+            </div>
 
-              <button
-                onClick={() => executeSend(input)}
-                disabled={!input.trim() || isTyping}
-                className="flex size-7 items-center justify-center rounded-xl bg-swarm-gold text-swarm-canvas hover:opacity-90 disabled:opacity-30 transition-all shadow-md"
-                title="Send message"
-              >
-                {execMode === "cli" ? <Play size={12} /> : <Send size={12} />}
-              </button>
+            {/* Quick Clickable Suggestions */}
+            <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+              {[
+                "Best website for UI components",
+                "Explain project architecture",
+                "Review git diff",
+              ].map((prompt, pIdx) => (
+                <button
+                  key={pIdx}
+                  onClick={() => {
+                    setVoiceTranscript(prompt);
+                  }}
+                  className="rounded-full bg-white/[0.04] border border-white/[0.06] px-2.5 py-0.5 text-[10px] text-swarm-textMuted hover:text-swarm-gold hover:border-swarm-gold/40 hover:bg-swarm-gold/10 transition-all font-mono"
+                >
+                  + {prompt}
+                </button>
+              ))}
             </div>
           </div>
-        </div>
+        ) : (
+          /* Standard Input Box */
+          <div className="relative flex flex-col rounded-2xl border border-white/[0.10] bg-[#14161d] focus-within:border-swarm-gold/60 focus-within:ring-1 focus-within:ring-swarm-gold/30 transition-all shadow-xl">
+            <textarea
+              ref={textareaRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onKeyUp={(e) => {
+                e.stopPropagation();
+                e.nativeEvent.stopImmediatePropagation();
+              }}
+              onKeyPress={(e) => {
+                e.stopPropagation();
+                e.nativeEvent.stopImmediatePropagation();
+              }}
+              placeholder={
+                execMode === "cli"
+                  ? `Execute task with ${activeCli.name} (${activeCli.command})…`
+                  : `Ask ${activeModel.name} anything…`
+              }
+              rows={2}
+              className="w-full resize-none bg-transparent px-3.5 pt-3 pb-1 text-xs text-swarm-text outline-none placeholder:text-swarm-textMuted/40 font-sans"
+            />
+
+            <div className="flex items-center justify-between px-3 py-2 border-t border-white/[0.04]">
+              {/* Quick Context Attachment Menu */}
+              <div className="flex items-center gap-1.5 relative">
+                <button
+                  onClick={() => setShowAttachMenu(!showAttachMenu)}
+                  className="flex items-center gap-1 rounded-lg bg-white/[0.04] border border-white/[0.08] px-2 py-1 text-micro text-swarm-textMuted hover:text-swarm-gold hover:border-swarm-gold/40 transition-colors"
+                  title="Attach Context to Prompt"
+                >
+                  <Paperclip size={11} />
+                  <span>Attach</span>
+                </button>
+
+                {showAttachMenu && (
+                  <>
+                    <div className="fixed inset-0 z-[90]" onClick={() => setShowAttachMenu(false)} />
+                    <div
+                      className="absolute left-0 bottom-full mb-1.5 z-[100] w-52 rounded-xl border border-white/[0.12] p-1.5 shadow-2xl animate-scale-in"
+                      style={{ backgroundColor: "#151821", opacity: 1, zIndex: 100 }}
+                    >
+                      <div className="px-2 py-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
+                        Add Context to Prompt
+                      </div>
+                      <button
+                        onClick={handleAttachGitDiff}
+                        className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text transition-colors"
+                      >
+                        <GitBranch size={13} className="text-swarm-gold" />
+                        <span>Attach Git Diff</span>
+                      </button>
+                      <button
+                        onClick={handleAttachProjectTree}
+                        className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text transition-colors"
+                      >
+                        <FolderTree size={13} className="text-swarm-gold" />
+                        <span>Attach Project Tree</span>
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                <span className="text-micro text-swarm-textMuted font-mono">
+                  {activeModel.name} · Shift+Enter for new line
+                </span>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                {/* Interactive Voice Mode Trigger Button */}
+                <button
+                  onClick={openVoiceStudio}
+                  className="flex size-7 items-center justify-center rounded-xl bg-white/[0.06] text-swarm-textMuted hover:text-swarm-gold hover:bg-swarm-gold/15 transition-all shadow-md"
+                  title="Launch Interactive Voice Mode"
+                >
+                  <Mic size={13} />
+                </button>
+
+                <button
+                  onClick={() => executeSend(input)}
+                  disabled={!input.trim() || isTyping}
+                  className="flex size-7 items-center justify-center rounded-xl bg-swarm-gold text-swarm-canvas hover:opacity-90 disabled:opacity-30 transition-all shadow-md"
+                  title="Send message"
+                >
+                  {execMode === "cli" ? <Play size={12} /> : <Send size={12} />}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
