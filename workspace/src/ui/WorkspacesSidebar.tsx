@@ -1255,19 +1255,16 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
   return (
     <div
       ref={sidebarRef}
-      className="relative h-full flex flex-col glass-rail border-r border-swarm-border/50 shrink-0 font-sans antialiased"
+      className="relative h-full flex flex-col bg-[#0b0d13]/95 backdrop-blur-2xl border-r border-white/[0.07] shrink-0 font-sans antialiased select-none"
       // maxWidth in vw, not a JS resize listener: the browser re-clamps on every
       // window resize for free and the user's chosen width survives untouched
       // when the window grows back.
       style={{ width: sidebarWidth, minWidth: MIN_WIDTH, maxWidth: "50vw" }}
     >
-      {/* App row — the window's top-left corner. The mark, the overflow menu
-          and the panel toggles live here rather than over the pane strip,
-          because they act on the app, not on the panes. Supplied by the host:
-          this package must not know what "settings" or "extensions" are. */}
+      {/* App row — top-left corner */}
       {topBar && (
         <div
-          className="flex h-11 shrink-0 items-center gap-0.5 border-b border-swarm-border/40 px-2"
+          className="flex h-11 shrink-0 items-center gap-0.5 border-b border-white/[0.06] bg-white/[0.02] px-2.5"
           data-tauri-drag-region
         >
           {topBar}
@@ -1275,7 +1272,7 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
       )}
 
       {/* Sidebar Sub-Tabs Header (Workspaces, Explorer, Search, DevTools, Fleet) */}
-      <div className="flex items-center border-b border-swarm-border/40 shrink-0 overflow-x-auto scrollbar-none">
+      <div className="flex items-center border-b border-white/[0.06] bg-black/20 shrink-0 overflow-x-auto scrollbar-none px-1 py-0.5">
         {TABS.map((tab) => {
           const Icon = tab.icon;
           const active = activeTab === tab.id;
@@ -1284,10 +1281,10 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
               key={tab.id}
               onClick={() => { setActiveTab(tab.id); setViewer(null); }}
               title={tab.label}
-              className={`flex items-center justify-center gap-1.5 flex-1 min-w-0 h-8 px-1.5 text-mini font-medium transition-colors whitespace-nowrap ${
+              className={`flex items-center justify-center gap-1.5 flex-1 min-w-0 h-8 px-2 rounded-lg text-mini font-medium transition-all whitespace-nowrap ${
                 active
-                  ? "text-swarm-goldHi bg-swarm-gold/[0.06] border-b-2 border-swarm-gold"
-                  : "text-swarm-textMuted hover:text-swarm-textDim hover:bg-swarm-border/20"
+                  ? "text-swarm-goldHi bg-swarm-gold/[0.12] border border-swarm-gold/30 shadow-sm"
+                  : "text-swarm-textMuted hover:text-swarm-textDim hover:bg-white/[0.04]"
               }`}
             >
               <Icon className="size-3.5 shrink-0" />
@@ -1296,11 +1293,11 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
           );
         })}
 
-        <div className="flex items-center pr-1 shrink-0">
+        <div className="flex items-center pr-1 shrink-0 gap-0.5 ml-1">
           <button
             onClick={onTogglePin}
-            className={`size-6 flex items-center justify-center rounded transition-colors ${
-              pinned ? "text-swarm-goldHi/70" : "text-swarm-textMuted hover:text-swarm-textDim"
+            className={`size-6 flex items-center justify-center rounded-lg transition-colors ${
+              pinned ? "text-swarm-gold bg-swarm-gold/10" : "text-swarm-textMuted hover:text-swarm-text hover:bg-white/[0.06]"
             }`}
             title={pinned ? "Unpin sidebar" : "Pin sidebar"}
             aria-label={pinned ? "Unpin sidebar" : "Pin sidebar"}
@@ -1311,7 +1308,7 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
           {onClose && (
             <button
               onClick={onClose}
-              className="size-6 flex items-center justify-center rounded text-swarm-textMuted hover:text-swarm-text hover:bg-swarm-border/30 transition-colors"
+              className="size-6 flex items-center justify-center rounded-lg text-swarm-textMuted hover:text-swarm-text hover:bg-white/[0.06] transition-colors"
               title="Close sidebar"
               aria-label="Close sidebar"
             >
@@ -1337,36 +1334,36 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
           /* Workspaces Tab Content */
           <>
             {/* WorkHive Top Action Header (Matches Screenshot 1) */}
-            <div className="flex h-10 shrink-0 items-center justify-between px-3 pt-1 border-b border-swarm-border/20">
+            <div className="flex h-10 shrink-0 items-center justify-between px-3 pt-1 border-b border-white/[0.04] bg-white/[0.01]">
               <button
                 onClick={() => setHideSleeping(!hideSleeping)}
-                className="flex items-center gap-1.5 text-swarm-textMuted hover:text-swarm-text transition-colors text-xs"
+                className="flex items-center gap-1.5 text-swarm-textMuted hover:text-swarm-text transition-colors text-xs font-mono"
                 title={hideSleeping ? "Show all workHives" : "Hide sleeping workHives"}
               >
-                {hideSleeping ? <EyeOff size={14} /> : <Eye size={14} />}
-                <span className="text-xs text-swarm-textMuted font-mono">{visibleWorkspaces.length}</span>
+                {hideSleeping ? <EyeOff size={13} /> : <Eye size={13} />}
+                <span className="text-xs text-swarm-textMuted font-mono font-medium">{visibleWorkspaces.length}</span>
               </button>
 
               <button
                 onClick={handleAdd}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.10] px-3 py-1 text-xs font-medium text-swarm-text transition-all shadow-sm"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-b from-white/[0.1] to-white/[0.04] hover:from-white/[0.14] hover:to-white/[0.06] border border-white/[0.10] px-3 py-1 text-xs font-semibold text-swarm-text transition-all shadow-sm active:scale-[0.98]"
                 title="New WorkHive"
               >
-                <Plus size={13} className="text-swarm-textMuted" />
+                <Plus size={13} className="text-swarm-gold" />
                 <span>New WorkHive</span>
               </button>
             </div>
 
             {/* Filter workHives input */}
             <div className="px-3 py-2">
-              <div className="flex h-8 items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-2.5 focus-within:border-swarm-gold/40 focus-within:ring-1 focus-within:ring-swarm-gold/20 transition-all">
-                <Search size={14} className="text-swarm-textMuted/70 shrink-0" />
+              <div className="flex h-8 items-center gap-2 rounded-xl border border-white/[0.08] bg-black/40 px-2.5 focus-within:border-swarm-gold/50 focus-within:ring-1 focus-within:ring-swarm-gold/20 transition-all shadow-inner">
+                <Search size={13} className="text-swarm-textMuted/70 shrink-0" />
                 <input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Filter workHives..."
                   aria-label="Filter workHives"
-                  className="min-w-0 flex-1 bg-transparent text-xs text-swarm-text outline-none placeholder:text-swarm-textMuted/40"
+                  className="min-w-0 flex-1 bg-transparent text-xs text-swarm-text outline-none placeholder:text-swarm-textMuted/40 font-sans"
                   spellCheck={false}
                 />
                 {searchQuery && (
@@ -1383,7 +1380,7 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
 
             {/* WorkHive Cards List */}
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-sleek px-1 pb-2">
+              <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-sleek px-2 pb-2 space-y-1.5">
                 {visibleWorkspaces.length === 0 ? (
                   searchQuery ? (
                     <EmptyNote

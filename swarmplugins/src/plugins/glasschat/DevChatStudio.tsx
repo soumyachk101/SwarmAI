@@ -1092,75 +1092,141 @@ export function DevChatStudio({
 
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#0d0f14] font-sans select-text">
-      {/* Dynamic Full Voice Studio Overlay (ChatGPT / Gemini Live Style) */}
+      {/* Dynamic Full Voice Studio Overlay (ChatGPT Voice & Gemini Live SOTA Style) */}
       {showVoiceModal && (
-        <div className="absolute inset-0 z-[150] flex flex-col items-center justify-between bg-[#0b0d13]/95 backdrop-blur-2xl p-6 animate-fade-in select-none">
+        <div className="absolute inset-0 z-[150] flex flex-col items-center justify-between bg-[#080a0f]/95 backdrop-blur-3xl p-6 animate-fade-in select-none">
           {/* Top Bar */}
-          <div className="flex w-full items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="size-2.5 rounded-full bg-rose-500 animate-ping" />
-              <span className="font-mono text-xs font-semibold uppercase tracking-wider text-swarm-gold">
-                {voiceStatus === "processing" ? "Transcribing Voice" : `Live Voice with ${activeModel.name}`}
-              </span>
-            </div>
-            <button
-              onClick={closeVoiceStudio}
-              className="flex size-8 items-center justify-center rounded-full bg-white/[0.08] text-swarm-textMuted hover:bg-white/[0.15] hover:text-white transition-colors"
-              title="Close Voice Mode"
-            >
-              <X size={15} />
-            </button>
-          </div>
-
-          {/* Center Dynamic Glowing Soundwave Orb */}
-          <div className="flex flex-col items-center justify-center my-auto text-center max-w-md space-y-6">
-            <div className="relative flex items-center justify-center">
-              {/* Outer Pulsing Aura Rings */}
-              <div
-                className="absolute size-44 rounded-full opacity-30 blur-2xl animate-pulse"
-                style={{
-                  background:
-                    activeModel.brandColor
-                      ? `radial-gradient(circle, ${activeModel.brandColor}, transparent 70%)`
-                      : "radial-gradient(circle, #f59e0b, transparent 70%)",
-                }}
-              />
-              <div className="absolute size-36 rounded-full border border-swarm-gold/30 animate-ping [animation-duration:3s]" />
-
-              {/* Glowing Soundwave Bars */}
-              <div className="relative z-10 flex items-center justify-center gap-1.5 h-28 px-6 py-4 rounded-3xl bg-black/60 border border-white/[0.12] shadow-2xl backdrop-blur-xl">
-                {audioBars.map((height, idx) => (
-                  <div
-                    key={idx}
-                    className="w-1.5 rounded-full bg-gradient-to-t from-swarm-gold via-amber-400 to-rose-400 transition-all duration-75 shadow-lg shadow-swarm-gold/20"
-                    style={{ height: `${height}px` }}
-                  />
-                ))}
+          <div className="flex w-full items-center justify-between border-b border-white/[0.06] pb-3.5">
+            <div className="flex items-center gap-3">
+              <div className="relative flex items-center justify-center">
+                <span className="size-3 rounded-full bg-emerald-400 animate-ping absolute opacity-75" />
+                <span className="size-2.5 rounded-full bg-emerald-400 relative" />
+              </div>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs font-semibold uppercase tracking-wider text-swarm-goldHi">
+                    {voiceStatus === "processing" ? "Transcribing Voice" : `Live Voice · ${activeModel.name}`}
+                  </span>
+                  <span className="rounded-full bg-swarm-gold/15 px-2 py-0.5 text-[10px] font-mono text-swarm-gold font-medium border border-swarm-gold/30">
+                    {voiceStatus === "processing" ? "WHISPER STT" : "STUDIO LIVE"}
+                  </span>
+                </div>
+                <span className="text-[11px] text-swarm-textMuted/70 font-mono">
+                  {voiceStatus === "processing" ? "Synthesizing deep reasoning..." : "Microphone active · Speak naturally"}
+                </span>
               </div>
             </div>
 
-            {/* Transcript Preview */}
-            <div className="space-y-2 px-4">
-              <p className="font-mono text-xs text-swarm-textMuted tracking-wide">
-                {voiceStatus === "processing"
-                  ? "Transcribing with Whisper STT engine…"
-                  : "Listening to your voice…"}
-              </p>
-              <div className="min-h-[48px] rounded-2xl bg-white/[0.04] border border-white/[0.06] p-3 text-xs text-swarm-text font-medium leading-relaxed shadow-inner">
+            <button
+              onClick={closeVoiceStudio}
+              className="flex size-8 items-center justify-center rounded-full bg-white/[0.06] border border-white/[0.08] text-swarm-textMuted hover:bg-white/[0.12] hover:text-white transition-all shadow-md"
+              title="Close Voice Mode"
+            >
+              <X size={14} />
+            </button>
+          </div>
+
+          {/* Center Dynamic Futuristic Glowing Plasma Orb & Fluid Waveform */}
+          <div className="flex flex-col items-center justify-center my-auto text-center max-w-lg w-full space-y-6">
+            <div className="relative flex items-center justify-center py-4">
+              {/* Outer Chromatic Pulsing Aura Glows */}
+              <div
+                className="absolute size-64 rounded-full opacity-35 blur-3xl animate-pulse"
+                style={{
+                  background:
+                    activeModel.brandColor
+                      ? `radial-gradient(circle, ${activeModel.brandColor} 0%, #8b5cf6 40%, transparent 70%)`
+                      : "radial-gradient(circle, #f59e0b 0%, #ec4899 40%, transparent 70%)",
+                }}
+              />
+              <div className="absolute size-48 rounded-full border border-swarm-gold/20 animate-ping [animation-duration:3.5s]" />
+
+              {/* Rotating Futuristic Particle Halo Rings */}
+              <div className="absolute size-56 rounded-full border border-dashed border-cyan-400/25 animate-[spin_16s_linear_infinite]" />
+              <div className="absolute size-44 rounded-full border border-dotted border-amber-400/30 animate-[spin_10s_linear_infinite_reverse]" />
+
+              {/* Glassmorphic Central Visualizer Stage */}
+              <div className="relative z-10 flex flex-col items-center justify-center px-8 py-5 rounded-3xl bg-black/60 border border-white/[0.12] shadow-2xl backdrop-blur-2xl">
+                {/* 24-Band Symmetrical Audio Spectrum */}
+                <div className="flex items-center justify-center gap-1.5 h-24 mb-3">
+                  {audioBars.concat([...audioBars].reverse()).slice(0, 24).map((height, idx) => (
+                    <div
+                      key={idx}
+                      className="w-1.5 rounded-full bg-gradient-to-t from-cyan-500 via-amber-400 to-rose-400 transition-all duration-75 shadow-lg"
+                      style={{
+                        height: `${Math.max(10, height)}px`,
+                        opacity: 0.85 + (height / 85) * 0.15,
+                        boxShadow: `0 0 ${Math.max(4, height / 5)}px rgba(245, 158, 11, 0.5)`,
+                      }}
+                    />
+                  ))}
+                </div>
+
+                {/* Live Fluid Sine Wave Curve (SVG Ribbon) */}
+                <div className="w-full max-w-[280px] overflow-hidden opacity-80">
+                  <svg viewBox="0 0 300 30" className="w-full h-6 stroke-swarm-gold fill-none">
+                    <path
+                      d={`M 0 15 Q 75 ${15 - (audioBars[2] || 15) * 0.3} 150 15 T 300 15`}
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      className="transition-all duration-100"
+                    />
+                    <path
+                      d={`M 0 15 Q 75 ${15 + (audioBars[5] || 20) * 0.25} 150 15 T 300 15`}
+                      strokeWidth="1.5"
+                      stroke="rgba(56, 189, 248, 0.7)"
+                      strokeLinecap="round"
+                      className="transition-all duration-100"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Transcript Preview Box */}
+            <div className="space-y-2.5 px-4 w-full">
+              <div className="flex items-center justify-between text-micro font-mono text-swarm-textMuted px-1">
+                <span className="flex items-center gap-1.5">
+                  <Volume2 size={12} className="text-swarm-gold animate-pulse" />
+                  <span>{voiceStatus === "processing" ? "Processing transcription…" : "Live Audio Feed"}</span>
+                </span>
+                <span>{activeModel.name}</span>
+              </div>
+
+              <div className="min-h-[56px] rounded-2xl bg-white/[0.03] border border-white/[0.08] p-3.5 text-xs text-swarm-text font-medium leading-relaxed shadow-inner backdrop-blur-md">
                 {voiceTranscript ? (
-                  <span>"{voiceTranscript}"</span>
+                  <span className="text-swarm-goldHi">"{voiceTranscript}"</span>
                 ) : (
-                  <span className="italic text-swarm-textMuted/60">Speak your question or code command…</span>
+                  <span className="italic text-swarm-textMuted/50">Speak your query, instructions, or code requirements…</span>
                 )}
+              </div>
+
+              {/* Quick Prompt Suggestions */}
+              <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
+                {[
+                  "Best website for UI components",
+                  "Explain workspace architecture",
+                  "Review uncommitted git diff",
+                ].map((prompt, pIdx) => (
+                  <button
+                    key={pIdx}
+                    onClick={() => {
+                      setVoiceTranscript(prompt);
+                    }}
+                    className="rounded-full bg-white/[0.04] border border-white/[0.08] px-2.5 py-1 text-[11px] text-swarm-textMuted hover:text-swarm-gold hover:border-swarm-gold/40 hover:bg-swarm-gold/10 transition-all font-mono"
+                  >
+                    + {prompt}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
 
           {/* Bottom Action Controls */}
-          <div className="flex items-center gap-4 mb-2">
+          <div className="flex items-center gap-3.5 mb-2 w-full max-w-sm justify-center">
             <button
               onClick={closeVoiceStudio}
-              className="flex items-center gap-1.5 rounded-full border border-white/[0.12] bg-white/[0.06] px-5 py-2 text-xs font-medium text-swarm-text hover:bg-white/[0.1] transition-all shadow-md"
+              className="flex-1 flex items-center justify-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.06] py-2.5 text-xs font-medium text-swarm-text hover:bg-white/[0.1] transition-all shadow-md"
             >
               <X size={13} />
               <span>Cancel</span>
@@ -1169,7 +1235,7 @@ export function DevChatStudio({
             <button
               onClick={finishVoiceStudio}
               disabled={voiceStatus === "processing"}
-              className="flex items-center gap-2 rounded-full bg-swarm-gold px-6 py-2 text-xs font-semibold text-swarm-canvas hover:opacity-90 transition-all shadow-xl shadow-swarm-gold/30"
+              className="flex-[1.5] flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-500 via-swarm-gold to-amber-400 py-2.5 text-xs font-semibold text-swarm-canvas hover:brightness-110 active:scale-[0.98] transition-all shadow-xl shadow-swarm-gold/30"
             >
               {voiceStatus === "processing" ? (
                 <>
@@ -1179,7 +1245,7 @@ export function DevChatStudio({
               ) : (
                 <>
                   <Send size={13} />
-                  <span>Done & Send</span>
+                  <span>Done & Execute</span>
                 </>
               )}
             </button>
