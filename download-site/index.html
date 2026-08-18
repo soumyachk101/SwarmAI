@@ -12,22 +12,20 @@
   
   <style>
     /* ══════════════════════════════════════════════════════════════
-       SWARM AI — Ultra-Premium Direct Download Experience
-       Inspired by: Linear, Raycast, Cursor, Vercel & Apple
-       Zero Emojis • Pure Custom Vector SVGs • Instant Direct Downloads
+       SWARM AI — Ultra-Premium Direct Download Hub
+       Linear / Cursor / Raycast Aesthetic
+       Zero Emojis • 100% Vector SVGs • Instant Direct Downloads
        ══════════════════════════════════════════════════════════════ */
 
     :root {
-      --bg-void: #030306;
-      --bg-surface: #08080E;
-      --bg-elevated: #0E0E17;
-      --bg-card: rgba(15, 15, 24, 0.75);
-      --bg-card-hover: rgba(22, 22, 36, 0.9);
+      --bg-void: #050508;
+      --bg-surface: #09090F;
+      --bg-card: rgba(14, 14, 22, 0.85);
+      --bg-card-hover: rgba(20, 20, 32, 0.95);
       
-      --border-subtle: rgba(255, 255, 255, 0.06);
-      --border-bright: rgba(255, 255, 255, 0.14);
-      --border-gold: rgba(255, 166, 0, 0.35);
-      --border-gold-subtle: rgba(255, 166, 0, 0.15);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-bright: rgba(255, 255, 255, 0.16);
+      --border-gold: rgba(255, 158, 0, 0.35);
       
       --text-primary: #FFFFFF;
       --text-secondary: #94A3B8;
@@ -41,7 +39,7 @@
       --gold-soft: rgba(255, 158, 0, 0.08);
       
       --emerald: #10B981;
-      --emerald-glow: rgba(16, 185, 129, 0.3);
+      --emerald-soft: rgba(16, 185, 129, 0.12);
       --cyan: #38BDF8;
       --purple: #A855F7;
       
@@ -49,8 +47,8 @@
       --macos-silver: #A2AAAD;
       --linux-gold: #E8B339;
       
-      --radius-2xl: 28px;
-      --radius-xl: 20px;
+      --radius-2xl: 24px;
+      --radius-xl: 18px;
       --radius-lg: 14px;
       --radius-md: 10px;
       --radius-sm: 6px;
@@ -79,8 +77,8 @@
       flex-direction: column;
     }
 
-    /* ─── Ambient Glow Mesh Background ─── */
-    .bg-mesh {
+    /* ─── Ambient Glow Background ─── */
+    .bg-ambient {
       position: fixed;
       inset: 0;
       pointer-events: none;
@@ -88,60 +86,33 @@
       overflow: hidden;
     }
 
-    .mesh-orb {
+    .ambient-glow-top {
       position: absolute;
-      border-radius: 50%;
-      filter: blur(140px);
-      opacity: 0.65;
-    }
-
-    .mesh-orb--top {
-      width: 800px;
-      height: 800px;
-      top: -380px;
+      top: -260px;
       left: 50%;
       transform: translateX(-50%);
-      background: radial-gradient(circle, rgba(255, 166, 0, 0.25) 0%, rgba(232, 93, 4, 0.1) 45%, transparent 70%);
-      animation: float-slow 16s ease-in-out infinite alternate;
-    }
-
-    .mesh-orb--left {
-      width: 600px;
+      width: 900px;
       height: 600px;
-      top: 30%;
-      left: -250px;
-      background: radial-gradient(circle, rgba(255, 183, 3, 0.14) 0%, transparent 70%);
+      background: radial-gradient(ellipse at center, rgba(255, 158, 0, 0.22) 0%, rgba(232, 93, 4, 0.08) 45%, transparent 70%);
+      filter: blur(120px);
     }
 
-    .mesh-orb--right {
-      width: 550px;
-      height: 550px;
-      top: 55%;
-      right: -200px;
-      background: radial-gradient(circle, rgba(255, 110, 0, 0.12) 0%, transparent 70%);
-    }
-
-    @keyframes float-slow {
-      0% { transform: translateX(-50%) translateY(0) scale(1); }
-      100% { transform: translateX(-50%) translateY(30px) scale(1.06); }
-    }
-
-    .bg-grid {
+    .bg-grid-pattern {
       position: fixed;
       inset: 0;
       pointer-events: none;
       z-index: 0;
       background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-      background-size: 56px 56px;
-      mask-image: radial-gradient(ellipse at 50% 30%, black 40%, transparent 80%);
-      -webkit-mask-image: radial-gradient(ellipse at 50% 30%, black 40%, transparent 80%);
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse at 50% 20%, black 40%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse at 50% 20%, black 40%, transparent 80%);
     }
 
-    /* ─── Layout Container ─── */
+    /* ─── Layout ─── */
     .container {
-      max-width: 1240px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 0 24px;
       position: relative;
@@ -149,7 +120,7 @@
       width: 100%;
     }
 
-    /* ─── Navigation Bar ─── */
+    /* ─── Header Navigation ─── */
     header.site-header {
       position: fixed;
       top: 0;
@@ -157,14 +128,14 @@
       right: 0;
       z-index: 100;
       padding: 16px 24px;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.3s ease;
     }
 
     header.site-header.scrolled {
       padding: 12px 24px;
     }
 
-    .nav-pill {
+    .nav-container {
       max-width: 1140px;
       margin: 0 auto;
       display: flex;
@@ -172,18 +143,18 @@
       justify-content: space-between;
       padding: 8px 18px;
       border-radius: 999px;
-      background: rgba(10, 10, 16, 0.7);
+      background: rgba(10, 10, 16, 0.75);
       backdrop-filter: blur(24px) saturate(1.8);
       -webkit-backdrop-filter: blur(24px) saturate(1.8);
       border: 1px solid var(--border-subtle);
-      box-shadow: 0 10px 36px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 10px 36px rgba(0, 0, 0, 0.6);
       transition: all 0.3s ease;
     }
 
-    .site-header.scrolled .nav-pill {
+    .site-header.scrolled .nav-container {
       background: rgba(8, 8, 14, 0.92);
       border-color: var(--border-bright);
-      box-shadow: 0 14px 44px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 14px 44px rgba(0, 0, 0, 0.75);
     }
 
     .brand-link {
@@ -195,30 +166,28 @@
     }
 
     .brand-logo-wrap {
-      width: 36px;
-      height: 36px;
-      border-radius: 11px;
-      background: linear-gradient(135deg, rgba(255, 183, 3, 0.22), rgba(255, 110, 0, 0.1));
-      border: 1px solid var(--border-gold-subtle);
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(255, 183, 3, 0.25), rgba(255, 110, 0, 0.1));
+      border: 1px solid var(--border-gold);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 18px var(--gold-glow);
+      box-shadow: 0 0 16px var(--gold-glow);
     }
 
     .brand-logo-wrap img {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
     }
 
     .brand-name {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
-      font-size: 1.18rem;
+      font-size: 1.15rem;
       letter-spacing: -0.02em;
-      background: linear-gradient(180deg, #FFFFFF 20%, #E2E8F0 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #FFFFFF;
     }
 
     .nav-links {
@@ -230,7 +199,7 @@
     .nav-link {
       color: var(--text-secondary);
       text-decoration: none;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 500;
       transition: color 0.2s ease;
       display: flex;
@@ -246,80 +215,57 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 9px 20px;
+      padding: 8px 18px;
       border-radius: 999px;
       background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-bright) 40%, var(--gold-deep) 100%);
       color: #050508;
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       text-decoration: none;
       border: 1px solid rgba(255, 255, 255, 0.5);
       cursor: pointer;
-      box-shadow: 0 0 24px rgba(255, 158, 0, 0.4);
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 0 20px rgba(255, 158, 0, 0.4);
+      transition: all 0.25s ease;
     }
 
     .nav-cta-btn:hover {
-      transform: translateY(-1px) scale(1.02);
-      box-shadow: 0 0 32px rgba(255, 158, 0, 0.6);
+      transform: translateY(-1px);
+      box-shadow: 0 0 28px rgba(255, 158, 0, 0.6);
     }
 
     /* ══════════════════════════════════════════════════════════════
-       HERO SECTION — ELEVATED & WORLD-CLASS
+       HERO SECTION — ULTRA CLEAN & BALANCED
        ══════════════════════════════════════════════════════════════ */
     section.hero-section {
-      padding-top: 155px;
-      padding-bottom: 75px;
+      padding-top: 140px;
+      padding-bottom: 70px;
       text-align: center;
+      position: relative;
+    }
+
+    .hero-content-wrapper {
+      max-width: 920px;
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
       align-items: center;
-      position: relative;
     }
 
-    /* Floating Emblem Visual Above Headline */
-    .hero-emblem-wrap {
-      width: 72px;
-      height: 72px;
-      border-radius: 22px;
-      background: linear-gradient(135deg, rgba(255, 183, 3, 0.2), rgba(232, 93, 4, 0.15));
-      border: 1px solid var(--border-gold);
-      box-shadow: 0 0 50px rgba(255, 158, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 24px;
-      position: relative;
-      animation: float-emblem 6s ease-in-out infinite;
-    }
-
-    .hero-emblem-wrap img {
-      width: 44px;
-      height: 44px;
-      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6));
-    }
-
-    @keyframes float-emblem {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-8px) rotate(2deg); }
-    }
-
-    /* Glowing Badge Pill */
+    /* Badge Pill */
     .hero-badge-pill {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      padding: 7px 18px;
+      gap: 8px;
+      padding: 6px 16px;
       border-radius: 999px;
       background: rgba(255, 158, 0, 0.08);
-      border: 1px solid var(--border-gold-subtle);
+      border: 1px solid rgba(255, 158, 0, 0.25);
       color: var(--gold-bright);
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       font-weight: 600;
-      letter-spacing: 0.02em;
-      margin-bottom: 22px;
-      box-shadow: 0 0 30px rgba(255, 158, 0, 0.15);
+      margin-bottom: 24px;
+      box-shadow: 0 0 24px rgba(255, 158, 0, 0.12);
       backdrop-filter: blur(16px);
     }
 
@@ -328,106 +274,93 @@
       height: 8px;
       border-radius: 50%;
       background: var(--emerald);
-      box-shadow: 0 0 12px var(--emerald);
+      box-shadow: 0 0 10px var(--emerald);
       display: inline-block;
-      animation: pulse-emerald 2s infinite;
     }
 
-    @keyframes pulse-emerald {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.6; transform: scale(1.2); }
-    }
-
-    /* Main Headline */
+    /* Headline */
     h1.hero-headline {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: clamp(2.6rem, 6vw, 4.8rem);
+      font-size: clamp(2.6rem, 5.5vw, 4.4rem);
       font-weight: 800;
-      line-height: 1.08;
+      line-height: 1.12;
       letter-spacing: -0.04em;
-      max-width: 980px;
-      margin-bottom: 24px;
+      color: #FFFFFF;
+      margin-bottom: 22px;
+      text-wrap: balance;
     }
 
-    .gold-gradient-text {
-      background: linear-gradient(135deg, #FFFFFF 15%, #FFE066 45%, #FFB703 70%, #FB8500 100%);
+    .gold-gradient {
+      background: linear-gradient(135deg, #FFFFFF 20%, #FFE066 50%, #FFB703 75%, #FB8500 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       display: inline-block;
     }
 
     p.hero-subtext {
-      font-size: clamp(1.1rem, 2.2vw, 1.3rem);
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
       color: var(--text-secondary);
-      max-width: 720px;
-      margin-bottom: 42px;
-      font-weight: 400;
+      max-width: 680px;
+      margin-bottom: 38px;
       line-height: 1.65;
+      text-wrap: balance;
     }
 
     p.hero-subtext strong {
-      color: var(--text-primary);
+      color: #FFFFFF;
       font-weight: 600;
     }
 
-    /* ─── Dual Action CTA Bar ─── */
-    .hero-actions-row {
+    /* Dual Action Bar */
+    .hero-actions-bar {
       display: flex;
       align-items: center;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 16px;
-      margin-bottom: 20px;
+      gap: 14px;
+      margin-bottom: 18px;
       width: 100%;
     }
 
     .primary-download-btn {
       display: inline-flex;
       align-items: center;
-      gap: 14px;
-      padding: 16px 36px;
+      gap: 12px;
+      padding: 16px 34px;
       border-radius: 999px;
       background: linear-gradient(135deg, #FFE066 0%, #FFB703 35%, #FB8500 70%, #E85D04 100%);
-      color: #030306;
+      color: #050508;
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.12rem;
+      font-size: 1.1rem;
       font-weight: 800;
       text-decoration: none;
       border: 1px solid rgba(255, 255, 255, 0.45);
       cursor: pointer;
-      box-shadow: 0 12px 38px rgba(255, 158, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 10px 32px rgba(255, 158, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      transition: all 0.25s ease;
     }
 
     .primary-download-btn:hover {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 18px 50px rgba(255, 158, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    }
-
-    .primary-download-btn svg {
-      transition: transform 0.25s ease;
-    }
-
-    .primary-download-btn:hover svg {
-      transform: translateY(2px);
+      transform: translateY(-2px);
+      box-shadow: 0 16px 44px rgba(255, 158, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.8);
     }
 
     .hero-secondary-btn {
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      padding: 16px 26px;
+      padding: 16px 24px;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.04);
       color: var(--text-primary);
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.02rem;
+      font-size: 1rem;
       font-weight: 600;
       text-decoration: none;
       border: 1px solid var(--border-bright);
       cursor: pointer;
       backdrop-filter: blur(16px);
-      transition: all 0.25s ease;
+      transition: all 0.2s ease;
     }
 
     .hero-secondary-btn:hover {
@@ -436,64 +369,64 @@
       transform: translateY(-2px);
     }
 
-    .os-detected-label {
-      font-size: 0.88rem;
+    .os-detected-meta {
+      font-size: 0.86rem;
       color: var(--text-muted);
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 34px;
+      margin-bottom: 40px;
     }
 
-    .os-detected-label span.highlight {
+    .os-detected-meta span.highlight {
       color: var(--gold-bright);
       font-weight: 600;
     }
 
-    /* ─── Trust Proof Strip ─── */
-    .trust-strip {
+    /* Trust Proof Bar */
+    .trust-proof-bar {
       display: flex;
       align-items: center;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 28px;
-      margin-bottom: 50px;
-      padding: 12px 24px;
+      gap: 24px;
+      margin-bottom: 56px;
+      padding: 10px 22px;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid var(--border-subtle);
     }
 
-    .trust-badge {
+    .trust-item {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       font-size: 0.82rem;
       color: var(--text-secondary);
       font-weight: 500;
     }
 
-    .trust-badge svg {
+    .trust-item svg {
       color: var(--gold-bright);
     }
 
     /* ─── Hero Product IDE Window Showcase ─── */
-    .hero-ide-window {
+    .hero-app-showcase {
       width: 100%;
       max-width: 1080px;
-      margin-top: 10px;
+      margin: 0 auto;
       border-radius: var(--radius-2xl);
-      background: rgba(11, 11, 18, 0.85);
+      background: rgba(12, 12, 18, 0.9);
       border: 1px solid var(--border-bright);
-      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.85), 0 0 60px rgba(255, 158, 0, 0.12);
-      backdrop-filter: blur(30px);
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.85), 0 0 50px rgba(255, 158, 0, 0.1);
+      backdrop-filter: blur(28px);
       overflow: hidden;
       text-align: left;
     }
 
-    .ide-title-bar {
-      background: rgba(6, 6, 11, 0.95);
-      padding: 14px 20px;
+    .app-title-bar {
+      background: rgba(8, 8, 12, 0.95);
+      padding: 12px 18px;
       border-bottom: 1px solid var(--border-subtle);
       display: flex;
       align-items: center;
@@ -502,174 +435,172 @@
 
     .window-dots {
       display: flex;
-      gap: 8px;
+      gap: 7px;
     }
 
     .dot {
-      width: 12px;
-      height: 12px;
+      width: 11px;
+      height: 11px;
       border-radius: 50%;
     }
     .dot--red { background: #FF5F56; }
     .dot--yellow { background: #FFBD2E; }
     .dot--green { background: #27C93F; }
 
-    .ide-status-center {
+    .app-workspace-info {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       color: var(--text-secondary);
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .project-pill {
+    .workspace-pill {
       background: rgba(255, 255, 255, 0.05);
-      padding: 3px 10px;
-      border-radius: 6px;
-      color: var(--text-primary);
+      padding: 3px 8px;
+      border-radius: 4px;
+      color: #FFFFFF;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
     }
 
-    .memory-indicator {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    .memory-stat {
       color: var(--gold-bright);
-      font-size: 0.74rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
 
-    .live-status-pill {
-      font-size: 0.74rem;
-      padding: 4px 11px;
+    .app-live-badge {
+      font-size: 0.72rem;
+      padding: 3px 10px;
       border-radius: 999px;
       background: var(--emerald-soft);
       color: var(--emerald);
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
     }
 
-    .ide-body-grid {
+    .app-workspace-body {
       display: grid;
-      grid-template-columns: 290px 1fr;
-      min-height: 320px;
+      grid-template-columns: 280px 1fr;
+      min-height: 310px;
     }
 
-    @media (max-width: 820px) {
-      .ide-body-grid { grid-template-columns: 1fr; }
+    @media (max-width: 800px) {
+      .app-workspace-body { grid-template-columns: 1fr; }
     }
 
-    .ide-agents-sidebar {
-      background: rgba(8, 8, 13, 0.65);
+    .app-agents-sidebar {
+      background: rgba(8, 8, 12, 0.7);
       border-right: 1px solid var(--border-subtle);
-      padding: 18px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
 
-    .agent-card-item {
-      padding: 10px 12px;
+    .agent-row-card {
+      padding: 9px 12px;
       border-radius: var(--radius-md);
-      background: rgba(255, 255, 255, 0.025);
+      background: rgba(255, 255, 255, 0.02);
       border: 1px solid transparent;
       display: flex;
       align-items: center;
       gap: 10px;
       transition: all 0.2s ease;
-      cursor: default;
     }
 
-    .agent-card-item.active {
+    .agent-row-card.active {
       background: var(--gold-soft);
       border-color: var(--border-gold);
     }
 
-    .agent-icon-badge {
-      width: 30px;
-      height: 30px;
-      border-radius: 8px;
+    .agent-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.06);
     }
 
-    .agent-info-wrap {
+    .agent-meta-wrap {
       flex: 1;
       min-width: 0;
     }
 
-    .agent-name-row {
+    .agent-title-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       font-weight: 600;
-      color: var(--text-primary);
+      color: #FFFFFF;
     }
 
-    .agent-role-text {
-      font-size: 0.72rem;
+    .agent-task-desc {
+      font-size: 0.7rem;
       color: var(--text-muted);
     }
 
-    .ide-terminal-console {
-      padding: 22px;
+    .app-terminal-area {
+      padding: 20px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       color: #E2E8F0;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      background: #050509;
+      background: #050508;
     }
 
-    .console-lines {
+    .terminal-log-lines {
       display: flex;
       flex-direction: column;
-      gap: 11px;
+      gap: 10px;
     }
 
-    .c-line {
+    .log-row {
       display: flex;
       gap: 10px;
       line-height: 1.5;
     }
 
-    .c-prefix { color: var(--gold-primary); font-weight: 600; }
-    .c-dim { color: var(--text-muted); }
-    .c-ok { color: var(--emerald); font-weight: 600; }
-    .c-cyan { color: var(--cyan); }
-    .c-purple { color: var(--purple); }
+    .log-lead { color: var(--gold-primary); font-weight: 600; }
+    .log-dim { color: var(--text-muted); }
+    .log-ok { color: var(--emerald); font-weight: 600; }
+    .log-cyan { color: var(--cyan); }
+    .log-purple { color: var(--purple); }
 
     /* ─── Platform Direct Download Grid ─── */
     section.downloads-section {
-      padding: 110px 0 70px;
+      padding: 100px 0 60px;
       position: relative;
     }
 
     .section-header-block {
       text-align: center;
-      margin-bottom: 56px;
+      margin-bottom: 54px;
     }
 
     .section-tag {
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
       color: var(--gold-bright);
       margin-bottom: 12px;
     }
 
     .section-title {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: clamp(2.2rem, 4vw, 3.2rem);
+      font-size: clamp(2rem, 3.8vw, 3rem);
       font-weight: 800;
       letter-spacing: -0.03em;
       color: var(--text-primary);
@@ -677,9 +608,9 @@
     }
 
     .section-description {
-      font-size: 1.1rem;
+      font-size: 1.08rem;
       color: var(--text-secondary);
-      max-width: 640px;
+      max-width: 620px;
       margin: 0 auto;
     }
 
@@ -689,7 +620,7 @@
       gap: 24px;
     }
 
-    @media (max-width: 950px) {
+    @media (max-width: 920px) {
       .platforms-grid { grid-template-columns: 1fr; }
     }
 
@@ -697,7 +628,7 @@
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-2xl);
-      padding: 34px 28px;
+      padding: 32px 26px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -719,10 +650,10 @@
     }
 
     .platform-card:hover {
-      transform: translateY(-6px);
+      transform: translateY(-5px);
       border-color: var(--border-bright);
       background: var(--bg-card-hover);
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
     }
 
     .platform-card--mac:hover::before { background: var(--macos-silver); }
@@ -733,12 +664,12 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
 
     .platform-icon-box {
-      width: 52px;
-      height: 52px;
+      width: 50px;
+      height: 50px;
       border-radius: var(--radius-lg);
       display: flex;
       align-items: center;
@@ -762,23 +693,23 @@
 
     .platform-name {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.55rem;
+      font-size: 1.5rem;
       font-weight: 700;
       color: var(--text-primary);
       margin-bottom: 6px;
     }
 
     .platform-subtitle {
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       color: var(--text-secondary);
-      margin-bottom: 28px;
+      margin-bottom: 26px;
     }
 
     .direct-download-group {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      margin-bottom: 26px;
+      margin-bottom: 24px;
     }
 
     .direct-dl-item {
@@ -803,7 +734,7 @@
 
     .direct-dl-item.highlight {
       background: var(--gold-soft);
-      border-color: var(--border-gold-subtle);
+      border-color: rgba(255, 158, 0, 0.25);
     }
 
     .direct-dl-item.highlight:hover {
@@ -838,7 +769,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      padding-top: 16px;
+      padding-top: 14px;
       border-top: 1px solid var(--border-subtle);
     }
 
@@ -862,7 +793,7 @@
       gap: 22px;
     }
 
-    @media (max-width: 950px) {
+    @media (max-width: 920px) {
       .features-grid { grid-template-columns: 1fr; }
     }
 
@@ -888,7 +819,7 @@
       height: 44px;
       border-radius: var(--radius-md);
       background: var(--gold-soft);
-      border: 1px solid var(--border-gold-subtle);
+      border: 1px solid rgba(255, 158, 0, 0.25);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1052,7 +983,7 @@
       height: 38px;
       border-radius: 50%;
       background: var(--gold-soft);
-      border: 1px solid var(--border-gold-subtle);
+      border: 1px solid rgba(255, 158, 0, 0.25);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1079,17 +1010,15 @@
 </head>
 <body>
 
-  <!-- Ambient Glow & Grid -->
-  <div class="bg-mesh">
-    <div class="mesh-orb mesh-orb--top"></div>
-    <div class="mesh-orb mesh-orb--left"></div>
-    <div class="mesh-orb mesh-orb--right"></div>
+  <!-- Ambient Glow & Background Pattern -->
+  <div class="bg-ambient">
+    <div class="ambient-glow-top"></div>
   </div>
-  <div class="bg-grid"></div>
+  <div class="bg-grid-pattern"></div>
 
   <!-- Header Navigation -->
   <header class="site-header" id="siteHeader">
-    <nav class="nav-pill">
+    <nav class="nav-container">
       <a href="#" class="brand-link">
         <div class="brand-logo-wrap">
           <img src="assets/logo.svg" alt="Swarm AI Logo" />
@@ -1113,192 +1042,188 @@
       </div>
 
       <button class="nav-cta-btn" onclick="triggerAutoDownload()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M20 17v1a2 2 0 0 1-2 2H6a2 2 0 01-2-2v-1"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M20 17v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"/></svg>
         <span>Direct Download</span>
       </button>
     </nav>
   </header>
 
   <!-- ══════════════════════════════════════════════════════════════
-       HERO SECTION
+       HERO SECTION — PROPER, BALANCED & ELEGANT
        ══════════════════════════════════════════════════════════════ -->
   <section class="hero-section">
     <div class="container">
       
-      <!-- Floating Emblem Visual -->
-      <div class="hero-emblem-wrap">
-        <img src="assets/logo.svg" alt="Swarm AI Golden Mark" />
-      </div>
-
-      <!-- Radiant Status Pill -->
-      <div class="hero-badge-pill">
-        <span class="pulse-indicator"></span>
-        <span>Swarm AI v0.1.0 &middot; Autonomous Multi-Agent Desktop &middot; MIT Open Source</span>
-      </div>
-
-      <!-- Grand Impact Headline -->
-      <h1 class="hero-headline">
-        One Human Architect.<br />
-        <span class="gold-gradient-text">A Swarm of Autonomous Agents.</span>
-      </h1>
-
-      <p class="hero-subtext">
-        Coordinate <strong>Claude Code</strong>, <strong>Codex</strong>, and <strong>OpenCode</strong> across isolated git worktrees with <strong>shared persistent memory</strong> &mdash; all inside a blazing-fast native desktop app.
-      </p>
-
-      <!-- Dual Action High-Conversion Bar -->
-      <div class="hero-actions-row">
-        <button class="primary-download-btn" id="heroDownloadBtn" onclick="triggerAutoDownload()">
-          <svg id="heroOsIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 3v12M8 11l4 4 4-4"/><path d="M20 17v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"/>
-          </svg>
-          <span id="heroBtnText">Direct Download for macOS (.dmg)</span>
-        </button>
-
-        <a href="#download" class="hero-secondary-btn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          <span>All Platforms &amp; Formats</span>
-        </a>
-      </div>
-
-      <!-- OS Detection Subtitle -->
-      <div class="os-detected-label">
-        <span>Detected OS: <span class="highlight" id="detectedOsLabel">macOS Universal (Apple Silicon &amp; Intel)</span> &middot; 5.8 MB &middot; Instant Direct Download</span>
-      </div>
-
-      <!-- Trust Proof Strip -->
-      <div class="trust-strip">
-        <div class="trust-badge">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <span>100% Local-First Memory</span>
+      <div class="hero-content-wrapper">
+        <!-- Glowing Pill Badge -->
+        <div class="hero-badge-pill">
+          <span class="pulse-indicator"></span>
+          <span>Swarm AI v0.1.0 &middot; Autonomous Multi-Agent Desktop &middot; MIT Open Source</span>
         </div>
-        <div class="trust-badge">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
-          <span>Zero Merge Conflicts</span>
+
+        <!-- Grand Balanced Headline -->
+        <h1 class="hero-headline">
+          Build software with a <br />
+          <span class="gold-gradient">Swarm of AI Agents</span>
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="hero-subtext">
+          Coordinate <strong>Claude Code, Codex, and OpenCode</strong> in parallel across isolated git worktrees with <strong>shared persistent memory</strong>.
+        </p>
+
+        <!-- Dual Action Download Bar -->
+        <div class="hero-actions-bar">
+          <button class="primary-download-btn" id="heroDownloadBtn" onclick="triggerAutoDownload()">
+            <svg id="heroOsIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v12M8 11l4 4 4-4"/><path d="M20 17v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"/>
+            </svg>
+            <span id="heroBtnText">Direct Download for macOS (.dmg)</span>
+          </button>
+
+          <a href="#download" class="hero-secondary-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>All Platforms &amp; Formats</span>
+          </a>
         </div>
-        <div class="trust-badge">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          <span>Tauri v2 + Rust Core</span>
+
+        <!-- OS Detection Meta -->
+        <div class="os-detected-meta">
+          <span>Detected: <span class="highlight" id="detectedOsLabel">macOS Universal (Apple Silicon &amp; Intel)</span> &middot; 5.8 MB &middot; Instant Direct Download</span>
         </div>
-        <div class="trust-badge">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          <span>No Cloud Lock-in</span>
+
+        <!-- Trust Proof Strip -->
+        <div class="trust-proof-bar">
+          <div class="trust-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>100% Local Memory</span>
+          </div>
+          <div class="trust-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+            <span>Zero Merge Conflicts</span>
+          </div>
+          <div class="trust-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>Tauri v2 + Rust Core</span>
+          </div>
+          <div class="trust-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>MIT Open Source</span>
+          </div>
         </div>
       </div>
 
-      <!-- Interactive Swarm IDE Window Showcase -->
-      <div class="hero-ide-window">
-        <div class="ide-title-bar">
+      <!-- Realistic IDE Window Showcase -->
+      <div class="hero-app-showcase">
+        <div class="app-title-bar">
           <div class="window-dots">
             <div class="dot dot--red"></div>
             <div class="dot dot--yellow"></div>
             <div class="dot dot--green"></div>
           </div>
 
-          <div class="ide-status-center">
-            <div class="project-pill">
+          <div class="app-workspace-info">
+            <div class="workspace-pill">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
-              <span>bridgebench:main (3 worktrees active)</span>
+              <span>bridgebench:main &middot; 3 worktrees active</span>
             </div>
-            <div class="memory-indicator">
+            <div class="memory-stat">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.8c0 0 6.6 7.4 6.6 11.6A6.6 6.6 0 0 1 5.4 14.4C5.4 10.2 12 2.8 12 2.8Z"/></svg>
-              <span>Pheromone: 4,820 tokens in sync</span>
+              <span>Pheromone: 4,820 tokens synced</span>
             </div>
           </div>
 
-          <div class="live-status-pill">
+          <div class="app-live-badge">
             <span class="pulse-indicator"></span>
             <span>Parallel Swarm Active</span>
           </div>
         </div>
 
-        <div class="ide-body-grid">
-          <!-- Sidebar Panes List -->
-          <div class="ide-agents-sidebar">
-            <div class="agent-card-item active">
-              <div class="agent-icon-badge" style="color:#FFB703;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></svg>
+        <div class="app-workspace-body">
+          <div class="app-agents-sidebar">
+            <div class="agent-row-card active">
+              <div class="agent-avatar" style="color:#FFB703;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></svg>
               </div>
-              <div class="agent-info-wrap">
-                <div class="agent-name-row">
+              <div class="agent-meta-wrap">
+                <div class="agent-title-row">
                   <span>Lead Steward</span>
-                  <span style="color:#10B981;font-size:0.68rem;font-weight:700;">ORCHESTRATING</span>
+                  <span style="color:#10B981;font-size:0.65rem;font-weight:700;">ORCHESTRATING</span>
                 </div>
-                <div class="agent-role-text">Task Planner &amp; Router</div>
+                <div class="agent-task-desc">Task Planner &amp; Router</div>
               </div>
             </div>
 
-            <div class="agent-card-item">
-              <div class="agent-icon-badge" style="color:#D97757;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 8 4 4-4 4"/></svg>
+            <div class="agent-row-card">
+              <div class="agent-avatar" style="color:#D97757;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 8 4 4-4 4"/></svg>
               </div>
-              <div class="agent-info-wrap">
-                <div class="agent-name-row">
+              <div class="agent-meta-wrap">
+                <div class="agent-title-row">
                   <span>Claude Code</span>
-                  <span style="color:#38BDF8;font-size:0.68rem;font-weight:700;">BUILDING</span>
+                  <span style="color:#38BDF8;font-size:0.65rem;font-weight:700;">BUILDING</span>
                 </div>
-                <div class="agent-role-text">Branch: feat/auth-tokens</div>
+                <div class="agent-task-desc">Branch: feat/auth-tokens</div>
               </div>
             </div>
 
-            <div class="agent-card-item">
-              <div class="agent-icon-badge" style="color:#A855F7;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <div class="agent-row-card">
+              <div class="agent-avatar" style="color:#A855F7;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
               </div>
-              <div class="agent-info-wrap">
-                <div class="agent-name-row">
+              <div class="agent-meta-wrap">
+                <div class="agent-title-row">
                   <span>OpenCode</span>
-                  <span style="color:#A855F7;font-size:0.68rem;font-weight:700;">ZEN FREE</span>
+                  <span style="color:#A855F7;font-size:0.65rem;font-weight:700;">ZEN FREE</span>
                 </div>
-                <div class="agent-role-text">Branch: feat/api-schema</div>
+                <div class="agent-task-desc">Branch: feat/api-schema</div>
               </div>
             </div>
 
-            <div class="agent-card-item">
-              <div class="agent-icon-badge" style="color:#10B981;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <div class="agent-row-card">
+              <div class="agent-avatar" style="color:#10B981;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               </div>
-              <div class="agent-info-wrap">
-                <div class="agent-name-row">
+              <div class="agent-meta-wrap">
+                <div class="agent-title-row">
                   <span>Lead Stinger</span>
-                  <span style="color:#10B981;font-size:0.68rem;font-weight:700;">SECURITY AUDIT</span>
+                  <span style="color:#10B981;font-size:0.65rem;font-weight:700;">AUDIT PASS</span>
                 </div>
-                <div class="agent-role-text">Zero Vulnerabilities</div>
+                <div class="agent-task-desc">Zero Vulnerabilities</div>
               </div>
             </div>
           </div>
 
-          <!-- Live Terminal Output -->
-          <div class="ide-terminal-console">
-            <div class="console-lines">
-              <div class="c-line">
-                <span class="c-prefix">[Lead Steward]</span>
-                <span>Decomposed human goal &rarr; 3 subtasks dispatched across git worktrees.</span>
+          <div class="app-terminal-area">
+            <div class="terminal-log-lines">
+              <div class="log-row">
+                <span class="log-lead">[Lead Steward]</span>
+                <span>Decomposed goal &rarr; 3 subtasks dispatched to isolated worktrees.</span>
               </div>
-              <div class="c-line">
-                <span class="c-prefix">[Pheromone]</span>
-                <span class="c-dim">Shared project memory synced: architecture.md &bull; schema.prisma &bull; conventions.md</span>
+              <div class="log-row">
+                <span class="log-lead">[Pheromone]</span>
+                <span class="log-dim">Shared project memory synced: architecture.md &bull; schema.prisma &bull; conventions.md</span>
               </div>
-              <div class="c-line">
-                <span class="c-prefix">[Claude Code]</span>
-                <span class="c-cyan">Working on .worktrees/auth-tokens &rarr; writing JWT middleware and RSA verification.</span>
+              <div class="log-row">
+                <span class="log-lead">[Claude Code]</span>
+                <span class="log-cyan">Working on .worktrees/auth-tokens &rarr; writing JWT middleware and RSA verification.</span>
               </div>
-              <div class="c-line">
-                <span class="c-prefix">[OpenCode Zen]</span>
-                <span class="c-purple">Running Nemotron 3.5 Lightning Free &rarr; generated 18 type definitions &amp; unit tests.</span>
+              <div class="log-row">
+                <span class="log-lead">[OpenCode Zen]</span>
+                <span class="log-purple">Running Nemotron 3.5 Lightning Free &rarr; generated 18 type definitions &amp; vitest suite.</span>
               </div>
-              <div class="c-line">
-                <span class="c-prefix">[Stinger Audit]</span>
-                <span class="c-ok">&#10003; Verified: Zero secret leaks in git history &bull; Strict Content-Security-Policy passed.</span>
+              <div class="log-row">
+                <span class="log-lead">[Stinger Audit]</span>
+                <span class="log-ok">&#10003; Verified: Zero secret leaks in git history &bull; Strict CSP verified.</span>
               </div>
-              <div class="c-line">
-                <span class="c-prefix">[SwarmMind]</span>
-                <span class="c-ok">&#10003; Lock Registry clean: All branches merged into main with 0 conflicts.</span>
+              <div class="log-row">
+                <span class="log-lead">[SwarmMind]</span>
+                <span class="log-ok">&#10003; Lock Registry clean: All branches merged into main with 0 conflicts.</span>
               </div>
             </div>
             
-            <div style="font-size:0.76rem; color:var(--text-muted); border-top:1px solid rgba(255,255,255,0.06); padding-top:12px; display:flex; justify-content:space-between; align-items:center;">
-              <span>Native Tauri Engine &middot; Low Memory &middot; Real PTY Terminals</span>
+            <div style="font-size:0.75rem; color:var(--text-muted); border-top:1px solid rgba(255,255,255,0.06); padding-top:12px; display:flex; justify-content:space-between; align-items:center;">
+              <span>Native Tauri Engine &middot; Real PTY Terminals</span>
               <span style="color:var(--gold-bright); font-weight:600;">Autonomous Pipeline Running</span>
             </div>
           </div>
