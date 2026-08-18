@@ -1,0 +1,208 @@
+- generic [active] [ref=f113e1]:
+  - navigation [ref=f113e2]:
+    - generic [ref=f113e3]:
+      - link "S Swarm AI" [ref=f113e4] [cursor=pointer]:
+        - /url: "#"
+        - generic [ref=f113e5]: S
+        - generic [ref=f113e6]: Swarm AI
+      - generic [ref=f113e7]:
+        - link "Download" [ref=f113e8] [cursor=pointer]:
+          - /url: "#download"
+        - link "Requirements" [ref=f113e9] [cursor=pointer]:
+          - /url: "#requirements"
+        - link "Features" [ref=f113e10] [cursor=pointer]:
+          - /url: "#features"
+        - link "GitHub" [ref=f113e11] [cursor=pointer]:
+          - /url: https://github.com/soumyachk101/swarm
+      - generic [ref=f113e12]: v1.0.0
+  - generic [ref=f113e14]:
+    - generic [ref=f113e15]: Free & Open Source
+    - heading "Download Swarm AI" [level=1] [ref=f113e17]
+    - paragraph [ref=f113e18]: A local-first, AI-native desktop environment where multiple coding agents build together, share memory, and never lose context. Available for Windows, macOS, and Linux.
+    - link "Download Now" [ref=f113e19] [cursor=pointer]:
+      - /url: "#download"
+    - generic [ref=f113e23]:
+      - generic [ref=f113e24]:
+        - generic [ref=f113e25]: "13"
+        - generic [ref=f113e26]: Packages
+      - generic [ref=f113e27]:
+        - generic [ref=f113e28]: 10+
+        - generic [ref=f113e29]: AI Agents
+      - generic [ref=f113e30]:
+        - generic [ref=f113e31]: "3"
+        - generic [ref=f113e32]: Platforms
+      - generic [ref=f113e33]:
+        - generic [ref=f113e34]: 100%
+        - generic [ref=f113e35]: Local-First
+  - generic [ref=f113e37]:
+    - generic [ref=f113e38]: Get Started
+    - generic [ref=f113e39]: Choose Your Platform
+    - generic [ref=f113e40]: Download the installer for your operating system. Swarm AI runs natively on Windows, macOS, and Linux.
+    - generic [ref=f113e41]:
+      - generic [ref=f113e42]:
+        - generic [ref=f113e50]:
+          - generic [ref=f113e51]: Windows
+          - generic [ref=f113e52]: Windows 10 / 11 (x64)
+        - generic [ref=f113e53]:
+          - link "NSIS Installer .exe — Recommended →" [ref=f113e54] [cursor=pointer]:
+            - /url: https://github.com/soumyachk101/swarm/releases/latest
+            - generic [ref=f113e59]:
+              - generic [ref=f113e60]: NSIS Installer
+              - generic [ref=f113e61]: .exe — Recommended
+            - generic [ref=f113e62]: →
+          - link "MSI Package .msi — Enterprise →" [ref=f113e63] [cursor=pointer]:
+            - /url: https://github.com/soumyachk101/swarm/releases/latest
+            - generic [ref=f113e68]:
+              - generic [ref=f113e69]: MSI Package
+              - generic [ref=f113e70]: .msi — Enterprise
+            - generic [ref=f113e71]: →
+      - generic [ref=f113e72]:
+        - generic [ref=f113e78]:
+          - generic [ref=f113e79]: macOS
+          - generic [ref=f113e80]: macOS 12+ (Apple Silicon & Intel)
+        - generic [ref=f113e81]:
+          - link "Disk Image .dmg — Universal Binary →" [ref=f113e82] [cursor=pointer]:
+            - /url: https://github.com/soumyachk101/swarm/releases/latest
+            - generic [ref=f113e87]:
+              - generic [ref=f113e88]: Disk Image
+              - generic [ref=f113e89]: .dmg — Universal Binary
+            - generic [ref=f113e90]: →
+          - link "macOS App .app — Drag to Applications →" [ref=f113e91] [cursor=pointer]:
+            - /url: https://github.com/soumyachk101/swarm/releases/latest
+            - generic [ref=f113e96]:
+              - generic [ref=f113e97]: macOS App
+              - generic [ref=f113e98]: .app — Drag to Applications
+            - generic [ref=f113e99]: →
+      - generic [ref=f113e100]:
+        - generic [ref=f113e108]:
+          - generic [ref=f113e109]: Linux
+          - generic [ref=f113e110]: Ubuntu, Debian, Fedora, Arch & more
+        - generic [ref=f113e111]:
+          - link "AppImage Portable — Any distro →" [ref=f113e112] [cursor=pointer]:
+            - /url: https://github.com/soumyachk101/swarm/releases/latest
+            - generic [ref=f113e117]:
+              - generic [ref=f113e118]: AppImage
+              - generic [ref=f113e119]: Portable — Any distro
+            - generic [ref=f113e120]: →
+          - link "Debian Package .deb — Debian/Ubuntu →" [ref=f113e121] [cursor=pointer]:
+            - /url: https://github.com/soumyachk101/swarm/releases/latest
+            - generic [ref=f113e126]:
+              - generic [ref=f113e127]: Debian Package
+              - generic [ref=f113e128]: .deb — Debian/Ubuntu
+            - generic [ref=f113e129]: →
+  - generic [ref=f113e131]:
+    - generic [ref=f113e132]: System Requirements
+    - generic [ref=f113e133]: What You'll Need
+    - generic [ref=f113e134]: Minimum specs to run Swarm AI smoothly.
+    - generic [ref=f113e135]:
+      - generic [ref=f113e136]:
+        - heading "Windows" [level=3] [ref=f113e137]
+        - list [ref=f113e139]:
+          - listitem [ref=f113e140]:
+            - generic [ref=f113e141]: ✓
+            - strong [ref=f113e142]: "OS:"
+            - text: Windows 10 (22H2+) or Windows 11
+          - listitem [ref=f113e143]:
+            - generic [ref=f113e144]: ✓
+            - strong [ref=f113e145]: "Architecture:"
+            - text: x64 (Intel/AMD)
+          - listitem [ref=f113e146]:
+            - generic [ref=f113e147]: ✓
+            - strong [ref=f113e148]: "Runtime:"
+            - text: WebView2 Runtime (preinstalled on Win 10/11)
+          - listitem [ref=f113e149]:
+            - generic [ref=f113e150]: ✓
+            - strong [ref=f113e151]: "RAM:"
+            - text: 8 GB minimum, 16 GB recommended
+          - listitem [ref=f113e152]:
+            - generic [ref=f113e153]: ✓
+            - strong [ref=f113e154]: "Disk:"
+            - text: 500 MB free space
+      - generic [ref=f113e155]:
+        - heading "macOS" [level=3] [ref=f113e156]
+        - list [ref=f113e158]:
+          - listitem [ref=f113e159]:
+            - generic [ref=f113e160]: ✓
+            - strong [ref=f113e161]: "OS:"
+            - text: macOS 12 Monterey or later
+          - listitem [ref=f113e162]:
+            - generic [ref=f113e163]: ✓
+            - strong [ref=f113e164]: "Chip:"
+            - text: Apple Silicon (M1/M2/M3) or Intel
+          - listitem [ref=f113e165]:
+            - generic [ref=f113e166]: ✓
+            - strong [ref=f113e167]: "Build Tools:"
+            - text: Xcode Command Line Tools
+          - listitem [ref=f113e168]:
+            - generic [ref=f113e169]: ✓
+            - strong [ref=f113e170]: "RAM:"
+            - text: 8 GB minimum, 16 GB recommended
+          - listitem [ref=f113e171]:
+            - generic [ref=f113e172]: ✓
+            - strong [ref=f113e173]: "Disk:"
+            - text: 500 MB free space
+      - generic [ref=f113e174]:
+        - heading "Linux" [level=3] [ref=f113e175]
+        - list [ref=f113e177]:
+          - listitem [ref=f113e178]:
+            - generic [ref=f113e179]: ✓
+            - strong [ref=f113e180]: "Distros:"
+            - text: Ubuntu 20.04+, Debian 11+, Fedora 35+, Arch
+          - listitem [ref=f113e181]:
+            - generic [ref=f113e182]: ✓
+            - strong [ref=f113e183]: "Dependencies:"
+            - text: webkit2gtk, libssl-dev, build-essential
+          - listitem [ref=f113e184]:
+            - generic [ref=f113e185]: ✓
+            - strong [ref=f113e186]: "Architecture:"
+            - text: x64 or ARM64
+          - listitem [ref=f113e187]:
+            - generic [ref=f113e188]: ✓
+            - strong [ref=f113e189]: "RAM:"
+            - text: 8 GB minimum, 16 GB recommended
+          - listitem [ref=f113e190]:
+            - generic [ref=f113e191]: ✓
+            - strong [ref=f113e192]: "Disk:"
+            - text: 500 MB free space
+  - generic [ref=f113e194]:
+    - generic [ref=f113e195]: Why Swarm AI
+    - generic [ref=f113e196]: Built Different
+    - generic [ref=f113e197]: Everything you need to code with AI, in one native desktop app.
+    - generic [ref=f113e198]:
+      - generic [ref=f113e199]:
+        - generic [ref=f113e200]: 🧠
+        - heading "Shared Project Memory" [level=3] [ref=f113e201]
+        - paragraph [ref=f113e202]: Pheromone gives every agent the same project context. Switch tools — never lose context.
+      - generic [ref=f113e203]:
+        - generic [ref=f113e204]: 🎯
+        - heading "Parallel Agents" [level=3] [ref=f113e205]
+        - paragraph [ref=f113e206]: Lead dispatches multiple agents across git worktrees. Build, review, test — all at once.
+      - generic [ref=f113e207]:
+        - generic [ref=f113e208]: 🔍
+        - heading "Hybrid Search" [level=3] [ref=f113e209]
+        - paragraph [ref=f113e210]: SQLite FTS5 + 384-dim embeddings with RRF ranking. Find anything in your project instantly.
+      - generic [ref=f113e211]:
+        - generic [ref=f113e212]: 🎤
+        - heading "10+ CLI Agents" [level=3] [ref=f113e213]
+        - paragraph [ref=f113e214]: Claude Code, Codex, Aider, OpenCode, Cursor, Cline, Kiro and more — all in one place.
+      - generic [ref=f113e215]:
+        - generic [ref=f113e216]: 🎙️
+        - heading "Local Voice Dictation" [level=3] [ref=f113e217]
+        - paragraph [ref=f113e218]: Whisper.cpp offline speech-to-text. No API calls, no network — fully private voice control.
+      - generic [ref=f113e219]:
+        - generic [ref=f113e220]: 🛠️
+        - heading "Native Desktop" [level=3] [ref=f113e221]
+        - paragraph [ref=f113e222]: Built with Tauri v2 + Rust. One binary, full PTY, filesystem, git, and browser control.
+  - contentinfo [ref=f113e223]:
+    - generic [ref=f113e225]:
+      - generic [ref=f113e226]:
+        - generic [ref=f113e227]: S
+        - text: Swarm AI
+      - generic [ref=f113e228]:
+        - link "GitHub" [ref=f113e229] [cursor=pointer]:
+          - /url: https://github.com/soumyachk101/swarm
+        - link "License" [ref=f113e230] [cursor=pointer]:
+          - /url: https://github.com/soumyachk101/swarm/blob/main/LICENSE
+        - link "Powered by Tauri" [ref=f113e231] [cursor=pointer]:
+          - /url: https://tauri.app
+      - generic [ref=f113e232]: Swarm AI by Soumya Chakraborty · Personal, non-commercial use only.

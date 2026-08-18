@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <title>Swarm AI — Download</title>
+ <meta name="description" content="Download Swarm AI — the local-first, AI-native desktop environment. Available for Windows, macOS, and Linux." />
+ <link rel="preconnect" href="https://fonts.googleapis.com" />
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+ <style>
+ /* ═══════════════════════════════════════
+ SWARM AI — Premium Download Experience
+ Inspired by: Cursor, Linear, Arc, Raycast
+ ═══════════════════════════════════════ */
+
+ :root {
+ --bg-primary: #050505;
+ --bg-elevated: #0c0c10;
+ --bg-card: #111116;
+ --bg-card-hover: #18181f;
+ --border: rgba(255,255,255,0.06);
+ --border-hover: rgba(255,255,255,0.12);
+ --text-primary: #f5f5f7;
+ --text-secondary: #a1a1aa;
+ --text-muted: #52525b;
+ --accent: #FF6B00;
+ --accent-bright: #FF8533;
+ --accent-glow: rgba(255,107,0,0.35);
+ --accent-soft: rgba(255,107,0,0.08);
+ --accent-soft-hover: rgba(255,107,0,0.14);
+ --windows: #0078d4;
+ --macos: #a2aaad;
+ --linux: #e8b339;
+ --radius-lg: 20px;
+ --radius-md: 14px;
+ --radius-sm: 10px;
+ }
+
+ *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+ html {
+ scroll-behavior: smooth;
+ -webkit-font-smoothing: antialiased;
+ -moz-osx-font-smoothing: grayscale;
+ }
+
+ body {
+ font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+ background: var(--bg-primary);
+ color: var(--text-primary);
+ line-height: 1.6;
+ overflow-x: hidden;
+ cursor: default;
+ }
+
+ /* ─── Noise Texture Overlay ─── */
+ body::before {
+ content: '';
+ position: fixed; inset: 0; z-index: 9999;
+ pointer-events: none;
+ opacity: 0.025;
+ background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+ background-repeat: repeat;
+ background-size: 256px 256px;
+ }
+
+ /* ─── Animated Background ─── */
+ .bg-mesh {
+ position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+ }
+ .bg-mesh .orb {
+ position: absolute; border-radius: 50%; filter: blur(100px);
+ }
+ .bg-mesh .orb--1 {
+ width: 700px; height: 700px; top: -300px; right: -150px;
+ background: radial-gradient(circle, rgba(255,107,0,0.15) 0%, transparent 70%);
+ animation: float-orb 20s ease-in-out infinite;
+ }
+ .bg-mesh .orb--2 {
+ width: 500px; height: 500px; bottom: -200px; left: -100px;
+ background: radial-gradient(circle, rgba(255,107,0,0.08) 0%, transparent 70%);
+ animation: float-orb 25s ease-in-out infinite reverse;
+ }
+ .bg-mesh .orb--3 {
+ width: 400px; height: 400px; top: 50%; left: 50%;
+ background: radial-gradient(circle, rgba(255,140,60,0.06) 0%, transparent 70%);
+ animation: float-orb 18s ease-in-out infinite 5s;
+ }
+ .bg-grid {
+ position: fixed; inset: 0; z-index: 0; pointer-events: none;
+ background-image:
+ linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+ linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+ background-size: 80px 80px;
+ mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+ -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+ }
+
+ @keyframes float-orb {
+ 0%, 100% { transform: translate(0, 0) scale(1); }
+ 25% { transform: translate(60px, -40px) scale(1.1); }
+ 50% { transform: translate(-30px, 60px) scale(0.95); }
+ 75% { transform: translate(-50px, -30px) scale(1.05); }
+ }
+
+ /* ─── Layout ─── */
+ .container {
+ max-width: 1200px; margin: 0 auto; padding: 0 24px;
+ position: relative; z-index: 1;
+ }
+
+ /* ─── Cursor Glow Follower ─── */
+ .cursor-glow {
+ position: fixed; width: 400px; height: 400px;
+ border-radius: 50%; pointer-events: none; z-index: 0;
+ background: radial-gradient(circle, rgba(255,107,0,0.06) 0%, transparent 70%);
+ transform: translate(-50%, -50%);
+ transition: opacity 0.3s;
+ opacity: 0;
+ }
+ body:hover .cursor-glow { opacity: 1; }
+
+ /* ─── Navigation ─── */
+ nav {
+ position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+ padding: 0 24px;
+ background: rgba(5,5,5,0.7);
+ backdrop-filter: blur(24px) saturate(1.5);
+ border-bottom: 1px solid var(--border);
+ transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+ }
+ nav.scrolled {
+ background: rgba(5,5,5,0.92);
+ border-bottom-color: var(--border-hover);
+ }
+ .nav-inner {
+ max-width: 1200px; margin: 0 auto; height: 60px;
+ display: flex; align-items: center; justify-content: space-between;
+ }
+ .nav-brand {
+ display: flex; align-items: center; gap: 10px;
+ text-decoration: none; color: var(--text-primary);
+ transition: opacity 0.2s;
+ }
+ .nav-brand:hover { opacity: 0.8; }
+ .nav-logo {
+ width: 32px; height: 32px; border-radius: 9px;
+ background: linear-gradient(135deg, var(--accent), #ff8533);
+ display: flex; align-items: center; justify-content: center;
+ font-weight: 900; font-size: 13px; color: #fff;
+ box-shadow: 0 0 20px var(--accent-glow);
+ }
+ .nav-brand-name {
+ font-family: 'Space Grotesk', sans-serif;
+ font-weight: 600; font-size: 15px; letter-spacing: -0.02em;
+ }
+ .nav-links { display: flex; gap: 8px; align-items: center; }
+ .nav-links a {
+ color: var(--text-secondary); text-decoration: none; font-size: 13px;
+ font-weight: 500; padding: 6px 14px; border-radius: 8px;
+ transition: all 0.2s;
+ }
+ .nav-links a:hover {
+ color: var(--text-primary); background: rgba(255,255,255,0.05);
+ }
+ .nav-version {
+ font-family: 'JetBrains Mono', monospace; font-size: 11px;
+ padding: 4px 10px; border-radius: 6px;
+ background: var(--accent-soft); color: var(--accent);
+ border: 1px solid rgba(255,107,0,0.15);
+ }
+
+ /* ─── Hero ─── */
+ .hero {
+ padding: 180px 0 120px;
+ text-align: center;
+ position: relative;
+ }
+ .hero-visual {
+ position: relative; width: 100%; max-width: 900px;
+ margin: 0 auto 48px;
+ height: 340px;
+ }
+ .hero-orb-group {
+ position: absolute; inset: 0;
+ display: flex; align-items: center; justify-content: center; gap: 80px;
+ }
+ .hero-orb {
+ width: 140px; height: 140px; border-radius: 36px;
+ display: flex; align-items: center; justify-content: center;
+ font-size: 56px;
+ background: var(--bg-card);
+ border: 1px solid var(--border);
+ box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+ animation: float 6s ease-in-out infinite;
+ position: relative;
+ }
+ .hero-orb::after {
+ content: ''; position: absolute; inset: -1px;
+ border-radius: 37px; padding: 1px;
+ background: linear-gradient(135deg, rgba(255,107,0,0.3), transparent 60%);
+ -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+ mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+ -webkit-mask-composite: xor; mask-composite: exclude;
+ }
+ .hero-orb:nth-child(1) { animation-delay: 0s; }
+ .hero-orb:nth-child(2) { animation-delay: -2s; transform: scale(1.15); z-index: 2; }
+ .hero-orb:nth-child(3) { animation-delay: -4s; }
+ .hero-orb:nth-child(2)::after {
+ background: linear-gradient(135deg, rgba(255,107,0,0.5), transparent 60%);
+ }
+
+ .hero-orbit-ring {
+ position: absolute; top: 50%; left: 50%;
+ width: 400px; height: 400px;
+ margin: -200px 0 0 -200px;
+ border: 1px dashed rgba(255,107,0,0.08);
+ border-radius: 50%;
+ animation: spin-slow 40s linear infinite;
+ }
+ .hero-orbit-dot {
+ position: absolute; width: 8px; height: 8px;
+ background: var(--accent); border-radius: 50%;
+ box-shadow: 0 0 15px var(--accent-glow);
+ }
+ .hero-orbit-dot--1 { top: 0; left: 50%; margin: -4px 0 0 -4px; }
+ .hero-orbit-dot--2 { bottom: 20%; right: 0; margin: 0 -4px 0 0; }
+ .hero-orbit-dot--3 { bottom: 0; left: 30%; margin: 0 0 -4px 0; }
+
+ @keyframes float {
+ 0%, 100% { transform: translateY(0); }
+ 50% { transform: translateY(-16px); }
+ }
+ @keyframes spin-slow {
+ from { transform: rotate(0deg); }
+ to { transform: rotate(360deg); }
+ }
+
+ .hero-badge {
+ display: inline-flex; align-items: center; gap: 8px;
+ padding: 6px 16px 6px 8px; border-radius: 100px;
+ background: var(--accent-soft);
+ border: 1px solid rgba(255,107,0,0.15);
+ color: var(--accent-bright); font-size: 13px; font-weight: 600;
+ margin-bottom: 28px;
+ opacity: 0; animation: reveal-up 0.7s cubic-bezier(0.16,1,0.3,1) 0.1s forwards;
+ }
+ .hero-badge-dot {
+ width: 8px; height: 8px; border-radius: 50%;
+ background: var(--accent);
+ box-shadow: 0 0 10px var(--accent-glow);
+ animation: pulse-dot 2s ease-in-out infinite;
+ }
+
+ .hero-title {
+ font-family: 'Space Grotesk', sans-serif;
+ font-size: clamp(3rem, 7vw, 5.5rem);
+ font-weight: 700;
+ line-height: 1.02;
+ letter-spacing: -0.04em;
+ margin-bottom: 24px;
+ opacity: 0; animation: reveal-up 0.7s cubic-bezier(0.16,1,0.3,1) 0.2s forwards;
+ }
+ .hero-title .gradient-text {
+ background: linear-gradient(135deg, #FF6B00, #FF9A44, #FF6B00);
+ background-size: 200% 200%;
+ -webkit-background-clip: text;
+ background-clip: text;
+ -webkit-text-fill-color: transparent;
+ animation: gradient-shift 4s ease-in-out infinite;
+ }
+ @keyframes gradient-shift {
+ 0%, 100% { background-position: 0% 50%; }
+ 50% { background-position: 100% 50%; }
+ }
+
+ .hero-subtitle {
+ font-size: clamp(1rem, 2vw, 1.2rem);
+ color: var(--text-secondary);
+ max-width: 580px;
+ margin: 0 auto 40px;
+ font-weight: 400; line-height: 1.7;
+ opacity: 0; animation: reveal-up 0.7s cubic-bezier(0.16,1,0.3,1) 0.3s forwards;
+ }
+
+ .hero-cta-row {
+ display: flex; align-items: center; justify-content: center;
+ gap: 14px; flex-wrap: wrap;
+ opacity: 0; animation: reveal-up 0.7s cubic-bezier(0.16,1,0.3,1) 0.4s forwards;
+ }
+ .btn-primary {
+ display: inline-flex; align-items: center; gap: 10px;
+ padding: 15px 34px; border-radius: 14px;
+ background: linear-gradient(135deg, var(--accent), #e85d00);
+ color: #fff; font-size: 15px; font-weight: 600;
+ text-decoration: none; border: none; cursor: pointer;
+ transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+ box-shadow: 0 0 40px rgba(255,107,0,0.25), 0 4px 20px rgba(0,0,0,0.3);
+ position: relative; overflow: hidden;
+ }
+ .btn-primary::before {
+ content: ''; position: absolute; inset: 0;
+ background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+ transform: translateX(-100%) skewX(-15deg);
+ transition: transform 0.6s cubic-bezier(0.4,0,0.2,1);
+ }
+ .btn-primary:hover::before { transform: translateX(100%) skewX(-15deg); }
+ .btn-primary:hover {
+ transform: translateY(-2px) scale(1.02);
+ box-shadow: 0 0 60px rgba(255,107,0,0.35), 0 8px 30px rgba(0,0,0,0.4);
+ }
+ .btn-secondary {
+ display: inline-flex; align-items: center; gap: 10px;
+ padding: 15px 34px; border-radius: 14px;
+ background: rgba(255,255,255,0.04);
+ border: 1px solid var(--border-hover);
+ color: var(--text-primary); font-size: 15px; font-weight: 600;
+ text-decoration: none; cursor: pointer;
+ transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+ }
+ .btn-secondary:hover {
+ background: rgba(255,255,255,0.08);
+ border-color: rgba(255,255,255,0.2);
+ transform: translateY(-2px);
+ }
+
+ .hero-stats {
+ display: flex; justify-content: center; gap: 56px;
+ margin-top: 64px;
+ opacity: 0; animation: reveal-up 0.7s cubic-bezier(0.16,1,0.3,1) 0.5s forwards;
+ }
+ .hero-stat { text-align: center; position: relative; }
+ .hero-stat:not(:last-child)::after {
+ content: ''; position: absolute; right: -28px; top: 50%;
+ transform: translateY(-50%);
+ width: 1px; height: 32px; background: var(--border);
+ }
+ .hero-stat .num {
+ font-family: 'Space Grotesk', sans-serif;
+ font-size: 1.6rem; font-weight: 700;
+ background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+ -webkit-background-clip: text; background-clip: text;
+ -webkit-text-fill-color: transparent;
+ }
+ .hero-stat .lbl {
+ font-size: 0.72rem; color: var(--text-muted);
+ text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px;
+ font-weight: 500;
+ }
+
+ /* ─── Section Common ─── */
+ .section {
+ padding: 100px 0;
+ position: relative;
+ }
+ .section-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+ .section-label {
+ font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+ letter-spacing: 0.14em; color: var(--accent); margin-bottom: 14px;
+ display: flex; align-items: center; gap: 10px;
+ }
+ .section-label::before {
+ content: ''; width: 20px; height: 1px; background: var(--accent);
+ }
+ .section-title {
+ font-family: 'Space Grotesk', sans-serif;
+ font-size: clamp(2rem, 4vw, 3rem);
+ font-weight: 700; letter-spacing: -0.03em;
+ margin-bottom: 14px; line-height: 1.1;
+ }
+ .section-desc {
+ color: var(--text-secondary); font-size: 1rem;
+ max-width: 520px; line-height: 1.7;
+ }
+
+ /* ─── OS Download Cards ─── */
+ .os-grid {
+ display: grid;
+ grid-template-columns: repeat(3, 1fr);
+ gap: 16px;
+ }
+ .os-card {
+ background: var(--bg-card);
+ border: 1px solid var(--border);
+ border-radius: var(--radius-lg);
+ padding: 28px;
+ transition: all 0.5s cubic-bezier(0.4,0,0.2,1);
+ position: relative; overflow: hidden;
+ }
+ .os-card::before {
+ content: ''; position: absolute; top: 0; left: 0; right: 0;
+ height: 2px; background: var(--card-accent);
+ opacity: 0; transition: opacity 0.4s;
+ }
+ .os-card::after {
+ content: ''; position: absolute; inset: 0;
+ background: radial-gradient(ellipse at top, var(--card-accent-glow), transparent 60%);
+ opacity: 0; transition: opacity 0.5s;
+ pointer-events: none;
+ }
+ .os-card:hover {
+ border-color: var(--card-border);
+ transform: translateY(-6px);
+ box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 40px var(--card-accent-glow);
+ }
+ .os-card:hover::before { opacity: 1; }
+ .os-card:hover::after { opacity: 0.04; }
+
+ .os-card--windows { --card-accent: var(--windows); --card-border: rgba(0,120,212,0.3); --card-accent-glow: rgba(0,120,212,0.08); }
+ .os-card--macos { --card-accent: var(--macos); --card-border: rgba(162,170,173,0.3); --card-accent-glow: rgba(162,170,173,0.06); }
+ .os-card--linux { --card-accent: var(--linux); --card-border: rgba(232,179,57,0.3); --card-accent-glow: rgba(232,179,57,0.06); }
+
+ .os-card-header {
+ display: flex; align-items: center; gap: 14px; margin-bottom: 20px;
+ }
+ .os-icon-wrap {
+ width: 48px; height: 48px; border-radius: 13px;
+ display: flex; align-items: center; justify-content: center;
+ background: var(--accent-soft);
+ border: 1px solid var(--border);
+ transition: all 0.3s;
+ }
+ .os-card:hover .os-icon-wrap {
+ border-color: var(--card-border);
+ background: var(--accent-soft-hover);
+ }
+ .os-card-name {
+ font-family: 'Space Grotesk', sans-serif;
+ font-size: 1.1rem; font-weight: 600;
+ }
+ .os-card-ver {
+ font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;
+ font-family: 'JetBrains Mono', monospace;
+ }
+
+ .dl-list { display: flex; flex-direction: column; gap: 8px; }
+ .dl-item {
+ display: flex; align-items: center; gap: 12px;
+ padding: 12px 14px; border-radius: var(--radius-sm);
+ background: var(--bg-elevated);
+ border: 1px solid transparent;
+ text-decoration: none; color: var(--text-primary);
+ transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+ cursor: pointer; position: relative; overflow: hidden;
+ }
+ .dl-item::before {
+ content: ''; position: absolute; inset: 0;
+ background: linear-gradient(135deg, transparent, rgba(255,255,255,0.02));
+ opacity: 0; transition: opacity 0.3s;
+ }
+ .dl-item:hover {
+ border-color: var(--border-hover);
+ background: var(--bg-card-hover);
+ transform: translateX(4px);
+ }
+ .dl-item:hover::before { opacity: 1; }
+
+ .dl-item-icon {
+ width: 36px; height: 36px; border-radius: 9px;
+ display: flex; align-items: center; justify-content: center;
+ background: var(--accent-soft);
+ flex-shrink: 0;
+ transition: all 0.3s;
+ }
+ .os-card:hover .dl-item-icon {
+ background: var(--accent-soft-hover);
+ }
+
+ .dl-item-body { flex: 1; min-width: 0; }
+ .dl-item-format {
+ font-size: 0.85rem; font-weight: 600;
+ }
+ .dl-item-size {
+ font-size: 0.72rem; color: var(--text-muted);
+ font-family: 'JetBrains Mono', monospace; margin-top: 1px;
+ }
+ .dl-item-arrow {
+ color: var(--text-muted); font-size: 16px; flex-shrink: 0;
+ opacity: 0; transform: translateX(-8px);
+ transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+ }
+ .dl-item:hover .dl-item-arrow {
+ opacity: 1; transform: translateX(0);
+ color: var(--accent);
+ }
+
+ /* ─── Architecture Pill Strip ─── */
+ .arch-pills {
+ display: flex; gap: 8px; margin-top: 28px;
+ padding-top: 20px; border-top: 1px solid var(--border);
+ }
+ .arch-pill {
+ font-family: 'JetBrains Mono', monospace;
+ font-size: 0.7rem; font-weight: 500;
+ padding: 4px 10px; border-radius: 6px;
+ background: rgba(255,255,255,0.03);
+ color: var(--text-muted);
+ border: 1px solid var(--border);
+ }
+
+ /* ─── Terminal Showcase ─── */
+ .terminal-section {
+ padding: 100px 0;
+ }
+ .terminal-grid {
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+ gap: 60px; align-items: center;
+ }
+ .terminal-visual {
+ position: relative; border-radius: var(--radius-lg);
+ background: var(--bg-card);
+ border: 1px solid var(--border);
+ overflow: hidden;
+ box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+ }
+ .terminal-bar {
+ display: flex; align-items: center; gap: 8px;
+ padding: 14px 18px; background: var(--bg-elevated);
+ border-bottom: 1px solid var(--border);
+ }
+ .terminal-dot {
+ width: 12px; height: 12px; border-radius: 50%;
+ }
+ .terminal-dot--r { background: #ff5f57; }
+ .terminal-dot--y { background: #febc2e; }
+ .terminal-dot--g { background: #28c840; }
+ .terminal-title {
+ font-family: 'JetBrains Mono', monospace;
+ font-size: 0.72rem; color: var(--text-muted);
+ margin-left: 12px;
+ }
+ .terminal-body {
+ padding: 20px 22px;
+ font-family: 'JetBrains Mono', monospace;
+ font-size: 0.82rem; line-height: 1.8;
+ color: var(--text-secondary);
+ overflow: hidden;
+ }
+ .terminal-line { opacity: 0; animation: terminal-appear 0.5s ease forwards; }
+ .terminal-line:nth-child(1) { animation-delay: 0.5s; }
+ .terminal-line:nth-child(2) { animation-delay: 1.2s; }
+ .terminal-line:nth-child(3) { animation-delay: 1.9s; }
+ .terminal-line:nth-child(4) { animation-delay: 2.6s; }
+ .terminal-line:nth-child(5) { animation-delay: 3.3s; }
+ .terminal-line:nth-child(6) { animation-delay: 4.0s; }
+ @keyframes terminal-appear {
+ from { opacity: 0; transform: translateY(6px); }
+ to { opacity: 1; transform: translateY(0); }
+ }
+ .t-prompt { color: var(--accent); }
+ .t-cmd { color: var(--text-primary); }
+ .t-flag { color: #7dd3fc; }
+ .t-comment { color: var(--text-muted); }
+ .t-success { color: #4ade80; }
+ .t-json-key { color: #c084fc; }
+ .t-json-val { color: #fbbf24; }
+
+ .terminal-content h2 {
+ font-family: 'Space Grotesk', sans-serif;
+ font-size: clamp(1.6rem, 3vw, 2.2rem);
+ font-weight: 700; letter-spacing: -0.03em;
+ margin-bottom: 16px; line-height: 1.2;
+ }
+ .terminal-content p {
+ color: var(--text-secondary); font-size: 0.95rem;
+ line-height: 1.7; margin-bottom: 20px;
+ }
+ .terminal-content .feature-list {
+ list-style: none; display: flex; flex-direction: column; gap: 10px;
+ }
+ .terminal-content .feature-list li {
+ display: flex; align-items: center; gap: 10px;
+ font-size: 0.9rem; color: var(--text-secondary);
+ }
+ .feature-check {
+ width: 20px; height: 20px; border-radius: 6px;
+ background: var(--accent-soft);
+ display: flex; align-items: center; justify-content: center;
+ color: var(--accent); font-size: 11px; font-weight: 700;
+ flex-shrink: 0;
+ }
+
+ /* ─── Features Grid ─── */
+ .features-grid {
+ display: grid;
+ grid-template-columns: repeat(3, 1fr);
+ gap: 14px;
+ margin-top: 48px;
+ }
+ .feature-card {
+ background: var(--bg-card);
+ border: 1px solid var(--border);
+ border-radius: var(--radius-lg);
+ padding: 28px;
+ transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+ position: relative; overflow: hidden;
+ }
+ .feature-card::before {
+ content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+ background: linear-gradient(90deg, transparent, rgba(255,107,0,0.3), transparent);
+ opacity: 0; transition: opacity 0.4s;
+ }
+ .feature-card:hover {
+ border-color: var(--border-hover);
+ transform: translateY(-4px);
+ box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+ }
+ .feature-card:hover::before { opacity: 1; }
+ .feature-icon {
+ width: 42px; height: 42px; border-radius: 11px;
+ background: var(--accent-soft);
+ border: 1px solid rgba(255,107,0,0.1);
+ display: flex; align-items: center; justify-content: center;
+ font-size: 20px; margin-bottom: 16px;
+ transition: all 0.3s;
+ }
+ .feature-card:hover .feature-icon {
+ background: var(--accent-soft-hover);
+ border-color: rgba(255,107,0,0.2);
+ transform: scale(1.05);
+ }
+ .feature-card h3 {
+ font-family: 'Space Grotesk', sans-serif;
+ font-size: 0.95rem; font-weight: 600; margin-bottom: 8px;
+ }
+ .feature-card p {
+ font-size: 0.82rem; color: var(--text-muted); line-height: 1.65;
+ }
+
+ /* ─── Social Proof / Trust ─── */
+ .trust-bar {
+ display: flex; align-items: center; justify-content: center;
+ gap: 48px; padding: 40px 0;
+ opacity: 0; animation: reveal-up 0.7s cubic-bezier(0.16,1,0.3,1) 0.6s forwards;
+ }
+ .trust-item {
+ font-size: 0.8rem; color: var(--text-muted);
+ display: flex; align-items: center; gap: 8px;
+ font-weight: 500;
+ }
+ .trust-star { color: var(--accent); font-size: 14px; }
+
+ /* ─── Install Steps ─── */
+ .steps-grid {
+ display: grid;
+ grid-template-columns: repeat(4, 1fr);
+ gap: 16px;
+ margin-top: 40px;
+ }
+ .step-card {
+ background: var(--bg-card); border: 1px solid var(--border);
+ border-radius: var(--radius-lg); padding: 24px;
+ text-align: center;
+ transition: all 0.3s;
+ }
+ .step-card:hover {
+ border-color: var(--border-hover);
+ transform: translateY(-3px);
+ }
+ .step-num {
+ font-family: 'Space Grotesk', sans-serif;
+ font-size: 2rem; font-weight: 700;
+ background: linear-gradient(135deg, var(--accent), #ff8533);
+ -webkit-background-clip: text; background-clip: text;
+ -webkit-text-fill-color: transparent;
+ margin-bottom: 10px;
+ }
+ .step-card h4 {
+ font-size: 0.9rem; font-weight: 600; margin-bottom: 6px;
+ }
+ .step-card p {
+ font-size: 0.78rem; color: var(--text-muted); line-height: 1.6;
+ }
+
+ /* ─── Footer ─── */
+ footer {
+ border-top: 1px solid var(--border);
+ padding: 48px 0 32px;
+ position: relative; z-index: 1;
+ }
+ .footer-inner {
+ max-width: 1200px; margin: 0 auto; padding: 0 24px;
+ display: flex; justify-content: space-between; align-items: center;
+ flex-wrap: wrap; gap: 20px;
+ }
+ .footer-brand {
+ display: flex; align-items: center; gap: 10px;
+ font-weight: 600; font-size: 0.9rem;
+ }
+ .footer-links { display: flex; gap: 24px; }
+ .footer-links a {
+ color: var(--text-muted); text-decoration: none;
+ font-size: 0.82rem; transition: color 0.2s; font-weight: 500;
+ }
+ .footer-links a:hover { color: var(--text-primary); }
+ .footer-copy {
+ width: 100%; text-align: center;
+ font-size: 0.72rem; color: var(--text-muted); margin-top: 24px;
+ padding-top: 24px; border-top: 1px solid var(--border);
+ }
+
+ /* ─── Scroll Reveal ─── */
+ .reveal {
+ opacity: 0; transform: translateY(30px);
+ transition: all 0.8s cubic-bezier(0.16,1,0.3,1);
+ }
+ .reveal.visible {
+ opacity: 1; transform: translateY(0);
+ }
+ .reveal-delay-1 { transition-delay: 0.1s; }
+ .reveal-delay-2 { transition-delay: 0.2s; }
+ .reveal-delay-3 { transition-delay: 0.3s; }
+
+ /* ─── Animations ─── */
+ @keyframes reveal-up {
+ from { opacity: 0; transform: translateY(24px); }
+ to { opacity: 1; transform: translateY(0); }
+ }
+ @keyframes pulse-dot {
+ 0%, 100% { opacity: 1; transform: scale(1); }
+ 50% { opacity: 0.5; transform: scale(0.8); }
+ }
+
+ /* ─── Scrollbar ─── */
+ ::-webkit-scrollbar { width: 6px; }
+ ::-webkit-scrollbar-track { background: var(--bg-primary); }
+ ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+ ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+ /* ─── Responsive ─── */
+ @media (max-width: 1024px) {
+ .os-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+ .terminal-grid { grid-template-columns: 1fr; }
+ .features-grid { grid-template-columns: repeat(2, 1fr); }
+ .steps-grid { grid-template-columns: repeat(2, 1fr); }
+ }
+ @media (max-width: 768px) {
+ .nav-links { display: none; }
+ .hero { padding: 130px 0 80px; }
+ .hero-orbit-ring { display: none; }
+ .hero-orb-group { gap: 24px; }
+ .hero-orb { width: 100px; height: 100px; font-size: 36px; border-radius: 24px; }
+ .hero-orb:nth-child(2) { transform: scale(1.05); }
+ .hero-stats { gap: 20px; flex-wrap: wrap; }
+ .hero-stat::after { display: none; }
+ .features-grid { grid-template-columns: 1fr; }
+ .steps-grid { grid-template-columns: 1fr; }
+ .footer-inner { flex-direction: column; text-align: center; }
+ .footer-links { justify-content: center; }
+ .trust-bar { gap: 20px; flex-wrap: wrap; }
+ }
+ </style>
+</head>
+<body>
+
+ <!-- Cursor Glow -->
+ <div class="cursor-glow" id="cursorGlow"></div>
+
+ <!-- Background Effects -->
+ <div class="bg-mesh">
+ <div class="orb orb--1"></div>
+ <div class="orb orb--2"></div>
+ <div class="orb orb--3"></div>
+ </div>
+ <div class="bg-grid"></div>
+
+ <!-- Navigation -->
+ <nav id="nav">
+ <div class="nav-inner">
+ <a href="#" class="nav-brand">
+ <div class="nav-logo">S</div>
+ <span class="nav-brand-name">Swarm AI</span>
+ </a>
+ <div class="nav-links">
+ <a href="#download">Download</a>
+ <a href="#features">Features</a>
+ <a href="#terminal">How it Works</a>
+ <a href="https://github.com/soumyachk101/swarm" target="_blank" rel="noopener">GitHub</a>
+ </div>
+ <div class="nav-version">v1.0.0</div>
+ </div>
+ </nav>
+
+ <!-- Hero -->
+ <section class="hero">
+ <div class="container">
+ <div class="hero-visual">
+ <div class="hero-orbit-ring">
+ <div class="hero-orbit-dot hero-orbit-dot--1"></div>
+ <div class="hero-orbit-dot hero-orbit-dot--2"></div>
+ <div class="hero-orbit-dot hero-orbit-dot--3"></div>
+ </div>
+ <div class="hero-orb-group">
+ <div class="hero-orb">&#x1F4BB;</div>
+ <div class="hero-orb">&#x1F4BB;</div>
+ <div class="hero-orb">&#x1F4BB;</div>
+ </div>
+ </div>
+
+ <div class="hero-badge">
+ <span class="hero-badge-dot"></span>
+ Free &amp; Open Source — MIT License
+ </div>
+
+ <h1 class="hero-title">
+ Download <span class="gradient-text">Swarm AI</span>
+ </h1>
+
+ <p class="hero-subtitle">
+ A local-first, AI-native desktop environment where multiple coding agents
+ build together, share memory, and never lose context.
+ </p>
+
+ <div class="hero-cta-row">
+ <a href="#download" class="btn-primary">
+ <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M20 17v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"/></svg>
+ Download Now
+ </a>
+ <a href="https://github.com/soumyachk101/swarm" target="_blank" rel="noopener" class="btn-secondary">
+ <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.1.39-1.99 1.03-2.69-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0112 6.8c.85.004 1.71.11 2.52.34 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.69 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.16.58.67.5A10.01 10.01 0 0022 12c0-5.523-4.477-10-10-10z"/></svg>
+ View Source
+ </a>
+ </div>
+
+ <div class="trust-bar">
+ <div class="trust-item">
+ <span class="trust-star">&#9733;</span>
+ <span>6+ Stars</span>
+ </div>
+ <div class="trust-item">
+ <span class="trust-star">&#9733;</span>
+ <span>Open Source</span>
+ </div>
+ <div class="trust-item">
+ <span class="trust-star">&#9733;</span>
+ <span>Local-First</span>
+ </div>
+ <div class="trust-item">
+ <span class="trust-star">&#9733;</span>
+ <span>MIT License</span>
+ </div>
+ </div>
+ </div>
+ </section>
+
+ <!-- Downloads -->
+ <section class="section" id="download">
+ <div class="section-inner">
+ <div class="section-label">Get Started</div>
+ <div class="section-title">Choose Your Platform</div>
+ <div class="section-desc">Native installers for every major OS. One setup, full power.</div>
+
+ <div class="os-grid">
+
+ <!-- Windows -->
+ <div class="os-card os-card--windows reveal">
+ <div class="os-card-header">
+ <div class="os-icon-wrap">
+ <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="1.5" fill="#0078d4"/><rect x="13" y="3" width="8" height="8" rx="1.5" fill="#0078d4"/><rect x="3" y="13" width="8" height="8" rx="1.5" fill="#0078d4"/><rect x="13" y="13" width="8" height="8" rx="1.5" fill="#0078d4"/></svg>
+ </div>
+ <div>
+ <div class="os-card-name">Windows</div>
+ <div class="os-card-ver">Win 10 / 11 (x64)</div>
+ </div>
+ </div>
+ <div class="dl-list">
+ <a class="dl-item" href="https://github.com/soumyachk101/swarm/releases/latest" target="_blank" rel="noopener">
+ <div class="dl-item-icon">
+ <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0078d4" stroke-width="2"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M20 17v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"/></svg>
+ </div>
+ <div class="dl-item-body">
+ <div class="dl-item-format">NSIS Installer</div>
+ <div class="dl-item-size">.exe — Recommended</div>
+ </div>
+ <span class="dl-item-arrow">&rarr;</span>
+ </a>
+ <a class="dl-item" href="https://github.com/soumyachk101/swarm/releases/latest" target="_blank" rel="noopener">
+ <div class="dl-item-icon">
+ <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0078d4" stroke-width="2"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M20 17v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"/></svg>
+ </div>
+ <div class="dl-item-body">
+ <div class="dl-item-format">MSI Package</div>
+ <div class="dl-item-size">.msi — Enterprise</div>
+ </div>
+ <span class="dl-item-arrow">&rarr;</span>
+ </a>
+ </div>
+ <div class="arch-pills">
+ <span class="arch-pill">x64</span>
+ <span class="arch-pill">ARM64</span>
+ <span class="arch-pill">WebView2</span>
+ </div>
+ </div>
+
+ <!-- macOS -->
+ <div class="os-card os-card--macos reveal reveal-delay-1">
+ <div class="os-card-header">
+ <div class="os-icon-wrap">
+ <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.21-1.98 1.07-3.11-1.05.05-2.31.7-3.06 1.56-.64.74-1.19 1.97-1.04 3.1 1.18.09 2.36-.68 3.03-1.55" stroke="#a2aaad" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+ </div>
+ <div>
+ <div class="os-card-name">macOS</div>
+ <div class="os-card-ver">macOS 12+ (Apple Silicon &amp; Intel)</div>
+ </div>
+ </div>
+ <div class="dl-list">
+ <a class="dl-item" href="https://github.com/soumyachk101/swarm/releases/latest" target="_blank" rel="noopener">
+ <div class="dl-item-icon">
+ <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a2aaad" stroke-width="2"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M20 17v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"/></svg>
+ </div>
+ <div class="dl-item-body">
+ <div class="dl-item-format">Disk Image</div>
+ <div class="dl-item-size">.dmg — Universal Binary</div>
+ </div>
+ <span class="dl-item-arrow">&rarr;</span>
+ </a>
+ <a class="dl-item" href="https://github.com/soumyachk101/swarm/releases/latest" target="_blank" rel="noopener">
+ <div class="dl-item-icon">
+ <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a2aaad" stroke-width="2"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M20 17v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"/></svg>
+ </div>
+ <div class="dl-item-body">
+ <div class="dl-item-format">macOS App</div>
+ <div class="dl-item-size">.app — Drag to Applications</div>
+ </div>
+ <span class="dl-item-arrow">&rarr;</span>
+ </a>
+ </div>
+ <div class="arch-pills">
+ <span class="arch-pill">Apple Silicon</span>
+ <span class="arch-pill">Intel</span>
+ <span class="arch-pill">Universal</span>
+ </div>
+ </div>
+
+ <!-- Linux -->
+ <div class="os-card os-card--linux reveal reveal-delay-2">
+ <div class="os-card-header">
+ <div class="os-icon-wrap">
+ <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="7" stroke="#e8b339" stroke-width="1.5"/><circle cx="9" cy="10.5" r="1.5" fill="#e8b339"/><circle cx="15" cy="10.5" r="1.5" fill="#e8b339"/><path d="M9 15c.7.9 1.7 1.5 3 1.5s2.3-.6 3-1.5" stroke="#e8b339" stroke-width="1.5" stroke-linecap="round"/></svg>
+ </div>
+ <div>
+ <div class="os-card-name">Linux</div>
+ <div class="os-card-ver">Ubuntu, Debian, Fedora, Arch &amp; more</div>
+ </div>
+ </div>
+ <div class="dl-list">
+ <a class="dl-item" href="https://github.com/soumyachk101/swarm/releases/latest" target="_blank" rel="noopener">
+ <div class="dl-item-icon">
+ <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e8b339" stroke-width="2"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M20 17v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"/></svg>
+ </div>
+ <div class="dl-item-body">
+ <div class="dl-item-format">AppImage</div>
+ <div class="dl-item-size">Portable — Any distro</div>
+ </div>
+ <span class="dl-item-arrow">&rarr;</span>
+ </a>
+ <a class="dl-item" href="https://github.com/soumyachk101/swarm/releases/latest" target="_blank" rel="noopener">
+ <div class="dl-item-icon">
+ <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e8b339" stroke-width="2"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M20 17v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1"/></svg>
+ </div>
+ <div class="dl-item-body">
+ <div class="dl-item-format">Debian Package</div>
+ <div class="dl-item-size">.deb — Debian/Ubuntu</div>
+ </div>
+ <span class="dl-item-arrow">&rarr;</span>
+ </a>
+ </div>
+ <div class="arch-pills">
+ <span class="arch-pill">x64</span>
+ <span class="arch-pill">ARM64</span>
+ <span class="arch-pill">Flatpak</span>
+ </div>
+ </div>
+
+ </div>
+ </div>
+ </section>
+
+ <!-- Terminal Showcase -->
+ <section class="terminal-section" id="terminal">
+ <div class="section-inner">
+ <div class="terminal-grid">
+ <div class="terminal-visual reveal">
+ <div class="terminal-bar">
+ <div class="terminal-dot terminal-dot--r"></div>
+ <div class="terminal-dot terminal-dot--y"></div>
+ <div class="terminal-dot terminal-dot--g"></div>
+ <div class="terminal-title">swarm — install</div>
+ </div>
+ <div class="terminal-body">
+ <div class="terminal-line"><span class="t-comment"># Install Swarm AI globally</span></div>
+ <div class="terminal-line"><span class="t-prompt">$</span> <span class="t-cmd">npm install</span> <span class="t-flag">-g</span> <span class="t-flag">@swarm-ai/cli</span></div>
+ <div class="terminal-line">&nbsp;</div>
+ <div class="terminal-line"><span class="t-success">&#10003; Installed v1.0.0</span></div>
+ <div class="terminal-line"><span class="t-comment"># Initialize in your project</span></div>
+ <div class="terminal-line"><span class="t-prompt">$</span> <span class="t-cmd">swarm init</span> <span class="t-flag">--agents</span> <span class="t-flag">10</span></div>
+ <div class="terminal-line">&nbsp;</div>
+ <div class="terminal-line"><span class="t-success">&#10003; 10 agents ready</span> <span class="t-comment">— Lead dispatched</span></div>
+ </div>
+ </div>
+ <div class="terminal-content reveal reveal-delay-1">
+ <div class="section-label">How it Works</div>
+ <h2>One command.<br/>Full swarm, ready.</h2>
+ <p>Swarm AI gives you a complete multi-agent development environment. No config hell, no API setup. Just install and start building.</p>
+ <ul class="feature-list">
+ <li><span class="feature-check">&#10003;</span> Install once, works on any project</li>
+ <li><span class="feature-check">&#10003;</span> 10+ AI agents pre-configured</li>
+ <li><span class="feature-check">&#10003;</span> Shared memory across all agents</li>
+ <li><span class="feature-check">&#10003;</span> Git worktrees for parallel work</li>
+ <li><span class="feature-check">&#10003;</span> Voice control with Whisper</li>
+ </ul>
+ </div>
+ </div>
+ </div>
+ </section>
+
+ <!-- Features -->
+ <section class="section" id="features">
+ <div class="section-inner">
+ <div class="section-label">Why Swarm AI</div>
+ <div class="section-title">Built for the future<br/>of coding</div>
+ <div class="section-desc">Every feature is designed to make you ship faster, think bigger, and never lose context.</div>
+
+ <div class="features-grid">
+ <div class="feature-card reveal">
+ <div class="feature-icon">&#x1F9E0;</div>
+ <h3>Shared Project Memory</h3>
+ <p>Pheromone gives every agent the same project context. Switch tools — never lose context.</p>
+ </div>
+ <div class="feature-card reveal reveal-delay-1">
+ <div class="feature-icon">&#x1F3AF;</div>
+ <h3>Parallel Agents</h3>
+ <p>Lead dispatches multiple agents across git worktrees. Build, review, test — all at once.</p>
+ </div>
+ <div class="feature-card reveal reveal-delay-2">
+ <div class="feature-icon">&#x1F50D;</div>
+ <h3>Hybrid Search</h3>
+ <p>SQLite FTS5 + 384-dim embeddings with RRF ranking. Find anything in your project instantly.</p>
+ </div>
+ <div class="feature-card reveal reveal-delay-3">
+ <div class="feature-icon">&#x1F3A4;</div>
+ <h3>10+ CLI Agents</h3>
+ <p>Claude Code, Codex, Aider, OpenCode, Cursor, Cline, Kiro and more — all in one place.</p>
+ </div>
+ <div class="feature-card reveal reveal-delay-1">
+ <div class="feature-icon">&#x1F399;&#xFE0F;</div>
+ <h3>Local Voice Dictation</h3>
+ <p>Whisper.cpp offline speech-to-text. No API calls, no network — fully private voice control.</p>
+ </div>
+ <div class="feature-card reveal reveal-delay-2">
+ <div class="feature-icon">&#x1F6E0;&#xFE0F;</div>
+ <h3>Native Desktop</h3>
+ <p>Built with Tauri v2 + Rust. One binary, full PTY, filesystem, git, and browser control.</p>
+ </div>
+ </div>
+ </div>
+ </section>
+
+ <!-- How to Install -->
+ <section class="section" id="install">
+ <div class="section-inner">
+ <div class="section-label">Get Started</div>
+ <div class="section-title">Up and running<br/>in 60 seconds</div>
+ <div class="section-desc">From download to first agent in under a minute.</div>
+
+ <div class="steps-grid">
+ <div class="step-card reveal">
+ <div class="step-num">01</div>
+ <h4>Download</h4>
+ <p>Grab the installer for your OS. No account needed.</p>
+ </div>
+ <div class="step-card reveal reveal-delay-1">
+ <div class="step-num">02</div>
+ <h4>Install</h4>
+ <p>Run the installer. Swarm AI sets up everything automatically.</p>
+ </div>
+ <div class="step-card reveal reveal-delay-2">
+ <div class="step-num">03</div>
+ <h4>Connect</h4>
+ <p>Add your API keys. Supports all major providers out of the box.</p>
+ </div>
+ <div class="step-card reveal reveal-delay-3">
+ <div class="step-num">04</div>
+ <h4>Build</h4>
+ <p>Dispatch agents, start coding. Your AI team is ready.</p>
+ </div>
+ </div>
+ </div>
+ </section>
+
+ <!-- Footer -->
+ <footer>
+ <div class="footer-inner">
+ <div class="footer-brand">
+ <div class="nav-logo" style="width:28px;height:28px;border-radius:8px;font-size:12px;">S</div>
+ Swarm AI
+ </div>
+ <div class="footer-links">
+ <a href="https://github.com/soumyachk101/swarm" target="_blank" rel="noopener">GitHub</a>
+ <a href="https://github.com/soumyachk101/swarm/blob/main/LICENSE" target="_blank" rel="noopener">License</a>
+ <a href="https://tauri.app" target="_blank" rel="noopener">Powered by Tauri</a>
+ </div>
+ <div class="footer-copy">
+ Swarm AI by Soumya Chakraborty &middot; Personal, non-commercial use only.
+ </div>
+ </div>
+ </footer>
+
+ <script>
+ /* ─── Cursor Glow Follower ─── */
+ const glow = document.getElementById('cursorGlow');
+ let mouseX = 0, mouseY = 0, glowX = 0, glowY = 0;
+
+ document.addEventListener('mousemove', (e) => {
+ mouseX = e.clientX; mouseY = e.clientY;
+ });
+
+ function animateGlow() {
+ glowX += (mouseX - glowX) * 0.08;
+ glowY += (mouseY - glowY) * 0.08;
+ glow.style.left = glowX + 'px';
+ glow.style.top = glowY + 'px';
+ requestAnimationFrame(animateGlow);
+ }
+ animateGlow();
+
+ /* ─── Nav Scroll State ─── */
+ const nav = document.getElementById('nav');
+ window.addEventListener('scroll', () => {
+ nav.classList.toggle('scrolled', window.scrollY > 20);
+ });
+
+ /* ─── Scroll Reveal (Intersection Observer) ─── */
+ const revealEls = document.querySelectorAll('.reveal');
+ const observer = new IntersectionObserver((entries) => {
+ entries.forEach(entry => {
+ if (entry.isIntersecting) {
+ entry.target.classList.add('visible');
+ observer.unobserve(entry.target);
+ }
+ });
+ }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+ revealEls.forEach(el => observer.observe(el));
+
+ /* ─── Smooth Anchor Scroll ─── */
+ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+ anchor.addEventListener('click', function (e) {
+ e.preventDefault();
+ const target = document.querySelector(this.getAttribute('href'));
+ if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+ });
+ });
+
+ /* ─── Parallax orbs on scroll ─── */
+ window.addEventListener('scroll', () => {
+ const scrollY = window.scrollY;
+ document.querySelector('.bg-mesh .orb--1').style.transform = `translateY(${scrollY * 0.03}px)`;
+ document.querySelector('.bg-mesh .orb--2').style.transform = `translateY(${scrollY * -0.02}px)`;
+ }, { passive: true });
+ </script>
+</body>
+</html>

@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Oscraft - Download Free Software for Windows, Mac & Linux</title>
+ <meta name="description" content="Download 100% genuine, full-version software for Windows, macOS, and Linux. Free downloads, no cracks, no malware. Get antivirus, media tools, utilities, browsers, and more.">
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="css/style.css">
+ <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬇</text></svg>">
+</head>
+<body>
+ <!-- Navigation -->
+ <nav class="navbar" id="navbar">
+ <div class="container">
+ <a href="#" class="nav-logo">
+ <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+ <rect width="40" height="40" rx="10" fill="url(#logoGrad)"/>
+ <path d="M12 20L17 25L28 14" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+ <defs><linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40"><stop stop-color="#6366F1"/><stop offset="1" stop-color="#8B5CF6"/></linearGradient></defs>
+ </svg>
+ <span>Oscraft</span>
+ </a>
+ <div class="nav-links" id="navLinks">
+ <a href="#categories">Categories</a>
+ <a href="#featured">Featured</a>
+ <a href="#trending">Trending</a>
+ <a href="#latest">Latest</a>
+ </div>
+ <div class="nav-actions">
+ <div class="os-filter" id="osFilter">
+ <button class="os-btn active" data-os="all">
+ <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+ </button>
+ <button class="os-btn" data-os="windows" title="Windows">
+ <svg viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+ </button>
+ <button class="os-btn" data-os="mac" title="macOS">
+ <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.21-1.96 1.07-3.11-1.05.05-2.31.71-3.06 1.55-.67.76-1.19 1.99-1.04 3.14 1.18.09 2.36-.77 3.03-1.58"/></svg>
+ </button>
+ <button class="os-btn" data-os="linux" title="Linux">
+ <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.505.178c-2.623 0-4.575 2.088-5.255 5.15-.39-.063-.755.13-.96.555-.36.738-.746 1.79-1.048 3.068-.72.386-1.093.74-1.093 1.015 0 .275.373.63 1.093 1.015.303 1.278.689 2.33 1.048 3.068.205.424.57.618.96.555.682 3.062 2.633 5.15 5.256 5.15 2.876 0 4.95-2.362 5.345-5.574.05-.398.04-.759-.06-1.06.237-.163.426-.366.553-.6.635-1.168 1.146-2.523 1.52-4.033.32-.27.754-.37 1.167-.247.588.176 1.043.587 1.254 1.143.127.333.32.652.588.907.14.132.233.3.27.483.073.358.365.612.732.612.065 0 .13-.01.196-.034a.74.74 0 0 0 .37-.949C20.958 2.177 16.792.178 12.505.178zM8.528 7.707a1.086 1.086 0 0 0 .971-.653 8.025 8.025 0 0 1 2.558-3.56 1.09 1.09 0 0 0 .3-1.456A9.93 9.93 0 0 0 12.505 0C9.55 0 7.11 1.686 6.03 4.007a1.09 1.09 0 0 0 .178 1.09 1.09 1.09 0 0 0 .938.5c.148.012.29.037.43.063a6.988 6.988 0 0 1 1.053.257c-.171-.014-.343-.022-.516-.022-.723 0-1.425.087-2.098.249.167.3.3.616.393.942"/></svg>
+ </button>
+ </div>
+ <button class="search-toggle" id="searchToggle" aria-label="Search">
+ <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+ </button>
+ </div>
+ </div>
+ </nav>
+
+ <!-- Search Overlay -->
+ <div class="search-overlay" id="searchOverlay">
+ <div class="search-container">
+ <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+ <input type="text" id="searchInput" placeholder="Search software, apps, tools..." autocomplete="off">
+ <kbd>ESC</kbd>
+ </div>
+ <div class="search-suggestions" id="searchSuggestions">
+ <div class="search-section">
+ <span class="search-section-title">Popular</span>
+ <div class="search-tags">
+ <span class="search-tag">Photoshop</span>
+ <span class="search-tag">VS Code</span>
+ <span class="search-tag">Chrome</span>
+ <span class="search-tag">VLC</span>
+ <span class="search-tag">Notion</span>
+ </div>
+ </div>
+ <div class="search-section">
+ <span class="search-section-title">Categories</span>
+ <div class="search-tags">
+ <span class="search-tag">Antivirus</span>
+ <span class="search-tag">Video Editor</span>
+ <span class="search-tag">VPN</span>
+ <span class="search-tag">Browser</span>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- Hero Section -->
+ <header class="hero">
+ <div class="hero-bg">
+ <div class="hero-grid"></div>
+ <div class="hero-glow"></div>
+ </div>
+ <div class="container hero-content">
+ <div class="hero-badge">
+ <span class="pulse-dot"></span>
+ Trusted by 2M+ users worldwide
+ </div>
+ <h1 class="hero-title">
+ Download <span class="gradient-text">Premium Software</span><br>
+ That Actually Works
+ </h1>
+ <p class="hero-subtitle">100% genuine, full-version software for Windows, macOS & Linux. No cracks, no malware, no hassle. Curated from official sources.</p>
+ <div class="hero-stats">
+ <div class="stat">
+ <span class="stat-number">500+</span>
+ <span class="stat-label">Apps</span>
+ </div>
+ <div class="stat-divider"></div>
+ <div class="stat">
+ <span class="stat-number">3</span>
+ <span class="stat-label">Platforms</span>
+ </div>
+ <div class="stat-divider"></div>
+ <div class="stat">
+ <span class="stat-number">100%</span>
+ <span class="stat-label">Safe</span>
+ </div>
+ </div>
+ <div class="hero-search">
+ <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+ <input type="text" placeholder="Find any software..." id="heroSearch">
+ <button class="hero-search-btn">Search</button>
+ </div>
+ </div>
+ <div class="hero-wave">
+ <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,64 C480,150 960,-20 1440,64 L1440,120 L0,120 Z" fill="currentColor"/></svg>
+ </div>
+ </header>
+
+ <main>
+ <!-- Trust Bar -->
+ <section class="trust-section">
+ <div class="container">
+ <div class="trust-items">
+ <div class="trust-item">
+ <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+ <span>100% Malware-Free</span>
+ </div>
+ <div class="trust-item">
+ <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+ <span>Verified Sources</span>
+ </div>
+ <div class="trust-item">
+ <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+ <span>Direct Downloads</span>
+ </div>
+ <div class="trust-item">
+ <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+ <span>Community Tested</span>
+ </div>
+ </div>
+ </div>
+ </section>
+
+ <!-- Categories Section -->
+ <section class="categories-section" id="categories">
+ <div class="container">
+ <div class="section-header">
+ <span class="section-label">Browse by Category</span>
+ <h2 class="section-title">Find What You Need</h2>
+ <p class="section-subtitle">Explore our curated collection across all major software categories</p>
+ </div>
+ <div class="categories-grid">
+ <a href="#" class="category-card" data-category="antivirus">
+ <div class="category-icon" style="background: linear-gradient(135deg, #EF4444, #DC2626);">
+ <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+ </div>
+ <span class="category-name">Antivirus & Security</span>
+ <span class="category-count">32 apps</span>
+ <svg class="category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+ </a>
+ <a href="#" class="category-card" data-category="media">
+ <div class="category-icon" style="background: linear-gradient(135deg, #8B5CF6, #7C3AED);">
+ <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+ </div>
+ <span class="category-name">Media & Players</span>
+ <span class="category-count">48 apps</span>
+ <svg class="category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+ </a>
+ <a href="#" class="category-card" data-category="browsers">
+ <div class="category-icon" style="background: linear-gradient(135deg, #3B82F6, #2563EB);">
+ <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+ </div>
+ <span class="category-name">Browsers</span>
+ <span class="category-count">15 apps</span>
+ <svg class="category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+ </a>
+ <a href="#" class="category-card" data-category="utilities">
+ <div class="category-icon" style="background: linear-gradient(135deg, #10B981, #059669);">
+ <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+ </div>
+ <span class="category-name">Utilities & Tools</span>
+ <span class="category-count">64 apps</span>
+ <svg class="category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+ </a>
+ <a href="#" class="category-card" data-category="creative">
+ <div class="category-icon" style="background: linear-gradient(135deg, #EC4899, #DB2777);">
+ <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+ </div>
+ <span class="category-name">Creative & Design</span>
+ <span class="category-count">41 apps</span>
+ <svg class="category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+ </a>
+ <a href="#" class="category-card" data-category="vpn">
+ <div class="category-icon" style="background: linear-gradient(135deg, #06B6D4, #0891B2);">
+ <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+ </div>
+ <span class="category-name">VPN & Network</span>
+ <span class="category-count">22 apps</span>
+ <svg class="category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+ </a>
+ <a href="#" class="category-card" data-category="development">
+ <div class="category-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+ <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+ </div>
+ <span class="category-name">Development</span>
+ <span class="category-count">55 apps</span>
+ <svg class="category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+ </a>
+ <a href="#" class="category-card" data-category="productivity">
+ <div class="category-icon" style="background: linear-gradient(135deg, #6366F1, #4F46E5);">
+ <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+ </div>
+ <span class="category-name">Productivity</span>
+ <span class="category-count">38 apps</span>
+ <svg class="category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9.2-9.2M17 17V7H7"/></svg>
+ </a>
+ </div>
+ </div>
+ </section>
+
+ <!-- Featured / Trending -->
+ <section class="featured-section" id="featured">
+ <div class="container">
+ <div class="section-header">
+ <span class="section-label">Editor's Choice</span>
+ <h2 class="section-title">Trending This Week</h2>
+ <p class="section-subtitle">The most downloaded apps across all platforms</p>
+ </div>
+ <div class="featured-scroll">
+ <!-- Featured Card 1 -->
+ <div class="software-card featured-card" data-os="windows mac linux">
+ <div class="card-badge hot">HOT</div>
+ <div class="card-logo" style="background: linear-gradient(135deg, #1a1a2e, #16213e);">
+ <svg width="48" height="48" viewBox="0 0 24 24" fill="none"><path d="M23.643 4.937c-.835.37-1.732.62-2.675.733a4.67 4.67 0 0 0 2.048-2.578 9.3 9.3 0 0 1-2.952 1.128 4.66 4.66 0 0 0-7.938 4.25 13.23 13.23 0 0 1-9.6-4.868 4.66 4.66 0 0 0 1.443 6.216 4.62 4.62 0 0 1-2.11-.583v.06a4.66 4.66 0 0 0 3.737 4.568 4.692 4.692 0 0 1-2.105.08 4.661 4.661 0 0 0 4.353 3.234 9.348 9.348 0 0 1-5.786 1.995c-.376 0-.747-.022-1.112-.065a13.214 13.214 0 0 0 7.164 2.096c8.607 0 13.327-7.13 13.327-13.327 0-.203-.005-.406-.014-.607a9.508 9.508 0 0 0 2.334-2.429z" fill="#fff"/></svg>
+ </div>
+ <div class="card-body">
+ <h3 class="card-title">Google Chrome</h3>
+ <p class="card-desc">Fast, secure, and free web browser from Google</p>
+ <div class="card-meta">
+ <span class="card-category">Browsers</span>
+ <div class="card-ratings">
+ <svg width="14" height="14" viewBox="0 0 24 24" fill="#FBBF24" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+ <span>4.5</span>
+ </div>
+ </div>
+ </div>
+ <div class="card-actions">
+ <span class="card-version">v137.0</span>
+ <button class="download-btn">
+ <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+ Download
+ </button>
+ </div>
+ </div>
+
+ <!-- Featured Card 2 -->
+ <div class="software-card featured-card" data-os="windows mac">
+ <div class="card-badge popular">TOP</div>
+ <div class="card-logo" style="background: linear-gradient(135deg, #1B1464, #0D2137);">
+ <svg width="48" height="48" viewBox="0 0 24 24" fill="none"><path d="M13.5 2c-.3 1.8-1.5 3.6-3.2 5.2-2.2 2.1-3.9 3.9-4.1 5.2-.2 1.6 1.1 2.9 3.2 3.5 1.3.4 2.4.5 3.2.3 1.3-.3 2.3-1.1 3.4-2.7.2-.3.5-.6.8-.6.2 0 .5.1.7.3.2.2.3.5.2.7-.5 1.2-1.1 2.5-2 3.3-.8.8-1.8 1.2-3 1.1-1.5-.1-2.7-.8-3.5-2-1.3-1.8-1.4-3.4-.1-5 .5-.6 1.2-1.1 2.1-1.6.2-.1.4-.2.6-.2.2 0 .3.1.5.3.2.2.3.5.2.8-.1.3-.3.7-.4 1zM14.7 6.1c.4-2.1 1.6-3.6 3.3-4.4.2 1.2.1 2.2-.3 3.2-.8 2-2.6 3.4-4.3 3.4-.3 0-.6 0-.9-.1-.1-.2-.1-.5 0-.7.2-.2.5-.3.8-.2.6.1 1.2.2 1.7.1.2-.2.5-.3.8-.3.8 0 1.4-.7 1.5-1.5.2-1.7-.9-3.3-2.8-3.9-.5-.2-1-.2-1.5-.2-.8.1-1.5.3-2.2.7-.1 0-.2.1-.3.2-.1.1-.1.2 0 .3.1.1.2.2.3.2.1 0 .2 0 .3-.1 0 0 0 0 0 0 0 0 0 0 0 0zm1.8 4.3c-.6.3-1.2.6-1.6 1.1-.5.5-.7 1.2-.6 2 .1 1.5 1.2 2.8 2.8 3.4 1.6.6 3.3.3 4.6-.6.5-.4 1-.9 1.4-1.5.1-.1.1-.2 0-.4-.1-.1-.2-.2-.4-.2-.3 0-.6.1-.9.3-.6.4-1.2.6-1.9.6-1 0-1.9-.5-2.3-1.4-.3-.6-.3-1.3 0-1.9.3-.6.9-1 1.6-1.1.5-.1 1 0 1.4.3.4-.3.9-.5 1.5-.5.8 0 1.5.3 2 .8.1.1.2.1.3 0 .1-.1.2-.2.2-.4 0-.5-.3-.9-.8-1.1-.7-.4-1.5-.6-2.3-.6-1.1 0-2.1.3-2.9.8z" fill="#00A4EF"/></svg>
+ </div>
+ <div class="card-body">
+ <h3 class="card-title">Microsoft Visual Studio Code</h3>
+ <p class="card-desc">Lightweight but powerful source code editor</p>
+ <div class="card-meta">
+ <span class="card-category">Development</span>
+ <div class="card-ratings">
+ <svg width="14" height="14" viewBox="0 0 24 24" fill="#FBBF24" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+ <span>4.8</span>
+ </div>
+ </div>
+ </div>
+ <div class="card-actions">
+ <span class="card-version">v1.95</span>
+ <button class="download-btn">
+ <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+ Download
+ </button>
+ </div>
+ </div>
+
+ <!-- Featured Card 3 -->
+ <div class="software-card featured-card" data-os="windows mac">
+ <div class="card-logo" style="background: linear-gradient(135deg, #FF6B35, #E85D3A);">
+ <svg width="48" height="48" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#fff"/></svg>
+ </div>
+ <div class="card-body">
+ <h3 class="card-title">VLC Media Player</h3>
+ <p class="card-desc">Free, open source multimedia player supporting every format</p>
+ <div class="card-meta">
+ <span class="card-category">Media & Players</span>
+ <div class="card-ratings">
+ <svg width="14" height="14" viewBox="0 0 24 24" fill="#FBBF24" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+ <span>4.7</span>
+ </div>
+ </div>
+ </div>
+ <div class="card-actions">
+ <span class="card-version">v3.0.21</span>
+ <button class="download-btn">
+ <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+ Download
+ </button>
+ </div>
+ </div>
+
+ <!-- Featured Card 4 -->
+ <div class="software-card featured-card" data-os="windows mac linux">
+ <div class="card-logo" style="background: linear-gradient(135deg, #1F6FEB, #116329);">
+ <svg width="48" height="48" viewBox="0 0 24 24" fill="none"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" fill="#fff"/></svg>
+ </div>
+ <div class="card-body">
+ <h3 class="card-title">GitHub Desktop</h3>
+ <p class="card-desc">Focus on what matters instead of fighting with Git</p>
+ <div class="card-meta">
+ <span class="card-category">Development</span>
+ <div class="card-ratings">
+ <svg width="14" height="14" viewBox="0 0 24 24" fill="#FBBF24" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+ <span>4.6</span>
+ </div>
+ </div>
+ </div>
+ <div class="card-actions">
+ <span class="card-version">v3.4</span>
+ <button class="download-btn">
+ <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+ Download
+ </button>
+ </div>
+ </div>
+
+ <!-- Featured Card 5 -->
+ <div class="software-card featured-card" data-os="windows">
+ <div class="card-badge trending">NEW</div>
+ <div class="card-logo" style="background: linear-gradient(135deg, #7B2FF7, #4F46E5);">
+ <svg width="48" height="48" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#fff"/></svg>
+ </div>
+ <div class="card-body">
+ <h3 class="card-title">Adobe Photoshop</h3>
+ <p class="card-desc">Industry-standard image editing and graphic design software</p>
+ <div class="card-meta">
+ <span class="card-category">Creative & Design</span>
+ <div class="card-ratings">
+ <svg width="14" height="14" viewBox="0 0 24 24" fill="#FBBF24" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+ <span>4.9</span>
+ </div>
+ </div>
+ </div>
+ <div class="card-actions">
+ <span class="card-version">v2025</span>
+ <button class="download-btn">
+ <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+ Download
+ </button>
+ </div>
+ </div>
+
+ <!-- Featured Card 6 -->
+ <div class="software-card featured-card" data-os="windows mac">
+ <div class="card-logo" style="background: linear-gradient(135deg, #1DA1F2, #0D8BD9);">
+ <svg width="48" height="48" viewBox="0 0 24 24" fill="none"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="#fff"/></svg>
+ </div>
+ <div class="card-body">
+ <h3 class="card-title">Discord</h3>
+ <p class="card-desc">Voice, video, and text chat for communities and gaming</p>
+ <div class="card-meta">
+ <span class="card-category">Communication</span>
+ <div class="card-ratings">
+ <svg width="14" height="14" viewBox="0 0 24 24" fill="#FBBF24" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+ <span>4.6</span>
+ </div>
+ </div>
+ </div>
+ <div class="card-actions">
+ <span class="card-version">v0.303</span>
+ <button class="download-btn">
+ <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+ Download
+ </button>
+ </div>
+ </div>
+ </div>
+ </div>
+ </section>
+
+ <!-- All Software Grid -->
+ <section class="software-section" id="latest">
+ <div class="container">
+ <div class="section-header">
+ <span class="section-label">All Software</span>
+ <h2 class="section-title">Latest Downloads</h2>
+ <p class="section-subtitle">Fresh picks from our extensive software library</p>
+ </div>
+ <div class="software-grid" id="softwareGrid">
+ <!-- Software items injected by JS -->
+ </div>
+ <div class="load-more-wrap">
+ <button class="load-more-btn" id="loadMoreBtn">Load More Software</button>
+ </div>
+ </div>
+ </section>
+
+ <!-- Why Choose Us -->
+ <section class="why-section">
+ <div class="container">
+ <div class="section-header">
+ <span class="section-label">Why Oscraft</span>
+ <h2 class="section-title">Built Different</h2>
+ <p class="section-subtitle">We don't just host downloads — we earn your trust</p>
+ </div>
+ <div class="why-grid">
+ <div class="why-card">
+ <div class="why-icon">
+ <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+ </div>
+ <h3>100% Safe Downloads</h3>
+ <p>Every file is scanned with multiple antivirus engines before we list it. We never host cracked or modified software.</p>
+ </div>
+ <div class="why-card">
+ <div class="why-icon">
+ <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+ </div>
+ <h3>Always Up-to-Date</h3>
+ <p>We track the latest versions across all software categories. Our database refreshes daily with new releases.</p>
+ </div>
+ <div class="why-card">
+ <div class="why-icon">
+ <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+ </div>
+ <h3>Direct & Fast</h3>
+ <p>No waiting rooms, no fake download buttons, no ad chains. Get the genuine installer from official sources.</p>
+ </div>
+ <div class="why-card">
+ <div class="why-icon">
+ <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+ </div>
+ <h3>Community Driven</h3>
+ <p>Join 2 million+ users who contribute reviews, report issues, and help us maintain the highest standards.</p>
+ </div>
+ <div class="why-card">
+ <div class="why-icon">
+ <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+ </div>
+ <h3>Multi-Platform</h3>
+ <p>Whether you're on Windows, macOS, or Linux — we've got genuine software for your platform of choice.</p>
+ </div>
+ <div class="why-card">
+ <div class="why-icon">
+ <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+ </div>
+ <h3>No Registration Required</h3>
+ <p>Just browse, find what you need, and download. No accounts, no email verification, no nonsense.</p>
+ </div>
+ </div>
+ </div>
+ </section>
+
+ <!-- OS Support Banner -->
+ <section class="os-banner">
+ <div class="container">
+ <div class="os-banner-content">
+ <h2>Your OS, <span class="gradient-text">Your Software</span></h2>
+ <p>Dedicated sections for every operating system with platform-optimized downloads</p>
+ <div class="os-banner-btns">
+ <a href="#" class="os-banner-btn windows-btn">
+ <svg viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+ Windows
+ </a>
+ <a href="#" class="os-banner-btn mac-btn">
+ <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.21-1.96 1.07-3.11-1.05.05-2.31.71-3.06 1.55-.67.76-1.19 1.99-1.04 3.14 1.18.09 2.36-.77 3.03-1.58"/></svg>
+ macOS
+ </a>
+ <a href="#" class="os-banner-btn linux-btn">
+ <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.505.178c-2.623 0-4.575 2.088-5.255 5.15-.39-.063-.755.13-.96.555-.36.738-.746 1.79-1.048 3.068-.72.386-1.093.74-1.093 1.015 0 .275.373.63 1.093 1.015.303 1.278.689 2.33 1.048 3.068.205.424.57.618.96.555.682 3.062 2.633 5.15 5.256 5.15 2.876 0 4.95-2.362 5.345-5.574.05-.398.04-.759-.06-1.06.237-.163.426-.366.553-.6.635-1.168 1.146-2.523 1.52-4.033.32-.27.754-.37 1.167-.247.588.176 1.043.587 1.254 1.143.127.333.32.652.588.907.14.132.233.3.27.483.073.358.365.612.732.612.065 0 .13-.01.196-.034a.74.74 0 0 0 .37-.949C20.958 2.177 16.792.178 12.505.178zM8.528 7.707a1.086 1.086 0 0 0 .971-.653 8.025 8.025 0 0 1 2.558-3.56 1.09 1.09 0 0 0 .3-1.456A9.93 9.93 0 0 0 12.505 0C9.55 0 7.11 1.686 6.03 4.007a1.09 1.09 0 0 0 .178 1.09 1.09 1.09 0 0 0 .938.5c.148.012.29.037.43.063a6.988 6.988 0 0 1 1.053.257c-.171-.014-.343-.022-.516-.022-.723 0-1.425.087-2.098.249.167.3.3.616.393.942"/></svg>
+ Linux
+ </a>
+ </div>
+ </div>
+ </div>
+ </section>
+ </main>
+
+ <!-- Footer -->
+ <footer class="footer">
+ <div class="container">
+ <div class="footer-grid">
+ <div class="footer-brand">
+ <a href="#" class="nav-logo">
+ <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+ <rect width="40" height="40" rx="10" fill="url(#logoGrad2)"/>
+ <path d="M12 20L17 25L28 14" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+ <defs><linearGradient id="logoGrad2" x1="0" y1="0" x2="40" y2="40"><stop stop-color="#6366F1"/><stop offset="1" stop-color="#8B5CF6"/></linearGradient></defs>
+ </svg>
+ <span>Oscraft</span>
+ </a>
+ <p class="footer-desc">Your trusted source for genuine, full-version software downloads. Safe, fast, and free.</p>
+ <div class="footer-social">
+ <a href="#" aria-label="Twitter" class="social-link">
+ <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+ </a>
+ <a href="#" aria-label="GitHub" class="social-link">
+ <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+ </a>
+ </div>
+ </div>
+ <div class="footer-links">
+ <h4>Browse</h4>
+ <a href="#">Windows Software</a>
+ <a href="#">Mac Software</a>
+ <a href="#">Linux Software</a>
+ <a href="#">All Categories</a>
+ </div>
+ <div class="footer-links">
+ <h4>Categories</h4>
+ <a href="#">Antivirus</a>
+ <a href="#">Browsers</a>
+ <a href="#">Media Players</a>
+ <a href="#">Development Tools</a>
+ </div>
+ <div class="footer-links">
+ <h4>Company</h4>
+ <a href="#">About Us</a>
+ <a href="#">Contact</a>
+ <a href="#">Privacy Policy</a>
+ <a href="#">Terms of Service</a>
+ </div>
+ </div>
+ <div class="footer-bottom">
+ <p>&copy; 2026 Oscraft. All rights reserved.</p>
+ </div>
+ </div>
+ </footer>
+
+ <script src="js/main.js"></script>
+</body>
+</html>
