@@ -20,6 +20,7 @@ import {
   Gauge,
   Sparkles,
   ChevronDown,
+  ArrowRightLeft,
 } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
@@ -440,12 +441,15 @@ export default function AgentPane({
   const [modelMenuOpen, setModelMenuOpen] = useState(false);
   const [effortMenuOpen, setEffortMenuOpen] = useState(false);
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
+  const [handoffMenuOpen, setHandoffMenuOpen] = useState(false);
+  const [handoffSuccess, setHandoffSuccess] = useState<string | null>(null);
   const [currentModel, setCurrentModel] = useState(agent.model || cliPreset.defaultModel);
   const [currentEffort, setCurrentEffort] = useState(agent.effort || "Max");
 
   const modelMenuRef = useRef<HTMLDivElement>(null);
   const effortMenuRef = useRef<HTMLDivElement>(null);
   const settingsMenuRef = useRef<HTMLDivElement>(null);
+  const handoffMenuRef = useRef<HTMLDivElement>(null);
 
   const isSlashCommand = promptInput.startsWith("/") && !promptInput.includes("\n");
   const commandQuery = isSlashCommand ? promptInput.split(" ")[0].toLowerCase() : "";
@@ -480,7 +484,7 @@ export default function AgentPane({
 
   // Auto-close dropdowns when clicking anywhere outside or pressing Escape
   useEffect(() => {
-    if (!modelMenuOpen && !effortMenuOpen && !settingsMenuOpen && !commandSuggestionsOpen) return;
+    if (!modelMenuOpen && !effortMenuOpen && !settingsMenuOpen && !commandSuggestionsOpen && !handoffMenuOpen) return;
     const onDown = (e: MouseEvent) => {
       const target = e.target as Node;
       if (modelMenuOpen && !modelMenuRef.current?.contains(target)) {
@@ -492,6 +496,9 @@ export default function AgentPane({
       if (settingsMenuOpen && !settingsMenuRef.current?.contains(target)) {
         setSettingsMenuOpen(false);
       }
+      if (handoffMenuOpen && !handoffMenuRef.current?.contains(target)) {
+        setHandoffMenuOpen(false);
+      }
       if (commandSuggestionsOpen && !promptTextareaRef.current?.contains(target)) {
         setCommandSuggestionsOpen(false);
       }
@@ -501,6 +508,7 @@ export default function AgentPane({
         setModelMenuOpen(false);
         setEffortMenuOpen(false);
         setSettingsMenuOpen(false);
+        setHandoffMenuOpen(false);
         setCommandSuggestionsOpen(false);
       }
     };
@@ -510,7 +518,7 @@ export default function AgentPane({
       window.removeEventListener("mousedown", onDown);
       window.removeEventListener("keydown", onKey);
     };
-  }, [modelMenuOpen, effortMenuOpen, settingsMenuOpen, commandSuggestionsOpen]);
+  }, [modelMenuOpen, effortMenuOpen, settingsMenuOpen, commandSuggestionsOpen, handoffMenuOpen]);
 
   const sendTerminal = (data: string) => {
     invoke("write_to_terminal", { paneId, data }).catch(console.error);
@@ -605,6 +613,22 @@ export default function AgentPane({
   );
   const promoteToLead = useAgentsStore((s) => s.promoteToLead);
   const demoteLead = useAgentsStore((s) => s.demoteLead);
+  const allAgents = useAgentsStore((s) => s.agents);
+  const otherAgents = allAgents.filter(
+    (a) => a.id !== agent.id && (!agent.workspaceId || a.workspaceId === agent.workspaceId)
+  );
+
+  const handleHandoff = (targetAgent: (typeof allAgents)[0]) => {
+    setHandoffMenuOpen(false);
+    const targetName = targetAgent.customName || targetAgent.cliName || targetAgent.cli;
+    setHandoffSuccess(targetName);
+    setTimeout(() => setHandoffSuccess(null), 3000);
+
+    const sourceName = agent.customName || agent.cliName || agent.cli;
+    const handoffPayload = `\x15[Swarm Handoff from ${sourceName}]: Continuing task. Let's proceed with current workspace goals.\r`;
+    invoke("write_to_terminal", { paneId: targetAgent.id, data: handoffPayload }).catch(console.error);
+  };
+
   const isLead = leadId === agent.id;
   const leadTaken = leadId !== null && !isLead;
   // The spawn effect is long-lived; read the crown through a ref so promoting
@@ -1573,6 +1597,58 @@ export default function AgentPane({
           >
             <RefreshCw size={12} className={syncing ? "animate-spin" : ""} />
           </button>
+          {/* Instant Swarm Handoff */}
+          <div className="relative" ref={handoffMenuRef}>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setHandoffMenuOpen((v) => !v);
+              }}
+              disabled={otherAgents.length === 0}
+              className={`p-1.5 rounded-md transition-colors ${
+                handoffMenuOpen
+                  ? "bg-swarm-gold/20 text-swarm-goldHi"
+                  : otherAgents.length === 0
+                    ? "text-swarm-textMuted/30 cursor-not-allowed"
+                    : "text-swarm-textDim hover:bg-swarm-border/60 hover:text-swarm-gold"
+              }`}
+              title={
+                otherAgents.length === 0
+                  ? "No other running agents to handoff to"
+                  : "Instant Swarm Handoff — transfer context to another agent"
+              }
+              aria-label="Handoff to agent"
+            >
+              <ArrowRightLeft size={12} />
+            </button>
+            {handoffSuccess && (
+              <span className="absolute right-0 top-full mt-1 z-40 rounded-md bg-emerald-950/90 border border-emerald-500/50 px-2 py-1 text-[10px] text-emerald-400 whitespace-nowrap animate-fade-in font-medium">
+                Handed off to {handoffSuccess}!
+              </span>
+            )}
+            {handoffMenuOpen && (
+              <div
+                role="menu"
+                onMouseDown={(e) => e.stopPropagation()}
+                className="glass-hi absolute right-0 top-full z-40 mt-1 w-52 rounded-xl border border-white/10 p-1.5 shadow-2xl backdrop-blur-xl"
+              >
+                <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-swarm-textMuted border-b border-white/[0.06] mb-1">
+                  Instant Swarm Handoff
+                </div>
+                {otherAgents.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => handleHandoff(t)}
+                    className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs text-swarm-text hover:bg-swarm-gold/15 hover:text-swarm-goldHi transition-colors"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                    <span className="truncate font-medium flex-1">{t.customName || t.cliName || t.cli}</span>
+                    <span className="text-[10px] text-swarm-textMuted shrink-0 font-mono">{t.cli}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           {/* Hairline between "what this agent IS" (crown, shared-mind sync)
               and "what this pane DOES" (view controls). Six identically styled
               icons in one undivided row read as a single blob when you're

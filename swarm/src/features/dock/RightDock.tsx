@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Sparkles, MessageSquare, GitBranch, X, Plus, Minus, Check, ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
+import { Sparkles, MessageSquare, GitBranch, X, Plus, Minus, Check, ArrowDownToLine, ArrowUpFromLine, Terminal, Copy, GitPullRequest } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 import { LeadPanel, LeadModeSelect } from "@swarm/lead/ui";
 import { LeadCrown } from "@swarm/board";
@@ -10,7 +10,7 @@ import { useProjectStore } from "@swarm/workspace";
 import { useAgentsStore } from "@swarm/agents/ui";
 import { getActiveProjectPath } from "@swarm/workspace";
 
-type DockTab = "chat" | "glasschat" | "git";
+type DockTab = "chat" | "glasschat" | "git" | "snippets";
 
 interface Props {
  projectPath: string | null;
@@ -160,6 +160,31 @@ function GitPanel({
  const [busy, setBusy] = useState(false);
  const [note, setNote] = useState<string | null>(null);
  const [loaded, setLoaded] = useState(false);
+ const agents = useAgentsStore((s) => s.agents);
+ const targetAgent = agents.find((a) => a.isLead) || agents[0];
+
+ const handleAIReview = async () => {
+   if (!projectPath || !targetAgent) return;
+   setBusy(true);
+   setNote(null);
+   try {
+     const diffText = await invoke<string>("run_command", {
+       command: "git",
+       args: ["-C", projectPath, "diff", "HEAD"],
+     });
+     if (!diffText.trim()) {
+       setNote("No changes to review.");
+       return;
+     }
+     const reviewPrompt = `\x15Please review the following git diff for bugs, security, and edge cases:\n\`\`\`diff\n${diffText.slice(0, 3000)}\n\`\`\`\r`;
+     await invoke("write_to_terminal", { paneId: targetAgent.id, data: reviewPrompt });
+     setNote(`AI Review sent to ${targetAgent.customName || targetAgent.cliName || targetAgent.cli}!`);
+   } catch (e: any) {
+     setNote(String(e?.message ?? e));
+   } finally {
+     setBusy(false);
+   }
+ };
 
  const refresh = useCallback(async () => {
  if (!projectPath) return;
@@ -279,7 +304,7 @@ function GitPanel({
  </span>
  </div>
 
- <div className="mt-2 flex items-center gap-1">
+ <div className="mt-2 flex items-center gap-1.5">
  <button
  disabled={busy}
  onClick={doPull}
@@ -295,6 +320,15 @@ function GitPanel({
  title="Push to remote"
  >
  <ArrowUpFromLine className="size-3" />
+ </button>
+ <button
+ disabled={busy || !targetAgent}
+ onClick={handleAIReview}
+ className="ml-auto flex items-center gap-1 rounded-md bg-swarm-gold/10 border border-swarm-gold/30 px-2 py-1 text-[10px] font-bold text-swarm-goldHi hover:bg-swarm-gold/20 transition-colors disabled:opacity-30"
+ title={targetAgent ? `Dispatch diff to ${targetAgent.cliName} for AI review` : "Summon an agent first"}
+ >
+ <Sparkles className="size-3" />
+ <span>AI Review</span>
  </button>
  </div>
 
@@ -355,11 +389,187 @@ function GitPanel({
  );
 }
 
+// ── Snippets / Scratchpad Panel ────────────────────────────────
+interface Snippet {
+  id: string;
+  title: string;
+  category: "Git" | "Build" | "AI" | "Clean" | "Custom";
+  code: string;
+}
+
+const DEFAULT_SNIPPETS: Snippet[] = [
+  { id: "s1", title: "Git Status & Short Diff", category: "Git", code: "git status -s && git diff --stat" },
+  { id: "s2", title: "Git Pull & Rebase", category: "Git", code: "git pull --rebase" },
+  { id: "s3", title: "Full Build & Typecheck", category: "Build", code: "pnpm build && pnpm typecheck" },
+  { id: "s4", title: "Clean Build Artifacts", category: "Clean", code: "rm -rf dist target/release/bundle/macos" },
+  { id: "s5", title: "Deep AI Code Review", category: "AI", code: "Review recent changes, check edge cases, security implications, and memory safety." },
+  { id: "s6", title: "Prepare PR & Changelog", category: "AI", code: "Summarize all staged changes and draft a comprehensive PR description with breaking changes." },
+];
+
+function SnippetsPanel() {
+  const [snippets, setSnippets] = useState<Snippet[]>(() => {
+    try {
+      const saved = localStorage.getItem("swarm_snippets");
+      return saved ? JSON.parse(saved) : DEFAULT_SNIPPETS;
+    } catch {
+      return DEFAULT_SNIPPETS;
+    }
+  });
+  const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [injectedId, setInjectedId] = useState<string | null>(null);
+  const [showAdd, setShowAdd] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newCode, setNewCode] = useState("");
+
+  const agents = useAgentsStore((s) => s.agents);
+  const targetAgent = agents.find((a) => a.isLead) || agents[0];
+
+  const handleCopy = (s: Snippet) => {
+    navigator.clipboard.writeText(s.code);
+    setCopiedId(s.id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleInject = (s: Snippet) => {
+    if (!targetAgent) return;
+    invoke("write_to_terminal", { paneId: targetAgent.id, data: s.code + "\r" }).catch(console.error);
+    setInjectedId(s.id);
+    setTimeout(() => setInjectedId(null), 2000);
+  };
+
+  const handleAdd = () => {
+    if (!newTitle.trim() || !newCode.trim()) return;
+    const next: Snippet[] = [
+      ...snippets,
+      { id: "custom-" + Date.now(), title: newTitle.trim(), category: "Custom", code: newCode.trim() },
+    ];
+    setSnippets(next);
+    localStorage.setItem("swarm_snippets", JSON.stringify(next));
+    setNewTitle("");
+    setNewCode("");
+    setShowAdd(false);
+  };
+
+  const filtered = activeCategory === "All" ? snippets : snippets.filter((s) => s.category === activeCategory);
+
+  return (
+    <div className="flex h-full flex-col font-sans">
+      <div className="shrink-0 border-b border-swarm-border/30 p-2.5 space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold uppercase tracking-wider text-swarm-text">Command Scratchpad</span>
+          <button
+            onClick={() => setShowAdd(!showAdd)}
+            className="flex items-center gap-1 rounded-md bg-swarm-gold/10 px-2 py-0.5 text-micro font-medium text-swarm-goldHi hover:bg-swarm-gold/20 transition-colors"
+          >
+            <Plus className="size-3" />
+            <span>Add Snippet</span>
+          </button>
+        </div>
+
+        {/* Categories */}
+        <div className="flex flex-wrap gap-1">
+          {["All", "Git", "Build", "AI", "Clean", "Custom"].map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`rounded-md px-2 py-0.5 text-[10px] font-medium transition-colors ${
+                activeCategory === cat
+                  ? "bg-swarm-gold text-black font-bold shadow-sm"
+                  : "bg-white/[0.04] text-swarm-textMuted hover:text-swarm-text hover:bg-white/[0.08]"
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {showAdd && (
+        <div className="p-2.5 border-b border-white/[0.06] bg-black/40 space-y-2">
+          <input
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+            placeholder="Snippet Title…"
+            className="w-full rounded-md border border-swarm-border/50 glass-inset px-2 py-1 text-xs text-swarm-text outline-none focus:border-swarm-gold"
+          />
+          <textarea
+            value={newCode}
+            onChange={(e) => setNewCode(e.target.value)}
+            placeholder="Command or Prompt text…"
+            rows={2}
+            className="w-full rounded-md border border-swarm-border/50 glass-inset px-2 py-1 text-xs font-mono text-swarm-text outline-none focus:border-swarm-gold resize-none"
+          />
+          <div className="flex justify-end gap-1.5">
+            <button
+              onClick={() => setShowAdd(false)}
+              className="rounded px-2 py-1 text-micro text-swarm-textMuted hover:text-swarm-text"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleAdd}
+              disabled={!newTitle.trim() || !newCode.trim()}
+              className="rounded bg-swarm-gold px-2.5 py-1 text-micro font-bold text-black disabled:opacity-30"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="flex-1 overflow-y-auto scrollbar-sleek p-2.5 space-y-2">
+        {filtered.map((s) => (
+          <div
+            key={s.id}
+            className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-2.5 transition-all hover:border-swarm-gold/30 hover:bg-white/[0.04] space-y-1.5"
+          >
+            <div className="flex items-center justify-between gap-1.5">
+              <span className="text-xs font-semibold text-swarm-text truncate">{s.title}</span>
+              <span className="shrink-0 rounded bg-white/[0.06] px-1.5 py-px text-[9px] font-mono uppercase text-swarm-goldHi">
+                {s.category}
+              </span>
+            </div>
+            <pre className="overflow-x-auto rounded-lg bg-black/50 p-2 font-mono text-[11px] text-swarm-textDim scrollbar-sleek whitespace-pre-wrap break-all">
+              {s.code}
+            </pre>
+            <div className="flex items-center justify-between pt-0.5">
+              <span className="text-[10px] text-swarm-textMuted font-mono">
+                {targetAgent ? `Target: ${targetAgent.customName || targetAgent.cliName || targetAgent.cli}` : "No agent"}
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => handleCopy(s)}
+                  className="flex items-center gap-1 rounded-md border border-white/[0.08] px-2 py-1 text-[10px] font-medium text-swarm-textMuted hover:text-swarm-text hover:bg-white/[0.05] transition-colors"
+                  title="Copy command"
+                >
+                  {copiedId === s.id ? <Check className="size-3 text-emerald-400" /> : <Copy className="size-3" />}
+                  <span>{copiedId === s.id ? "Copied" : "Copy"}</span>
+                </button>
+                <button
+                  onClick={() => handleInject(s)}
+                  disabled={!targetAgent}
+                  className="flex items-center gap-1 rounded-md bg-swarm-gold/15 border border-swarm-gold/30 px-2 py-1 text-[10px] font-bold text-swarm-goldHi hover:bg-swarm-gold/25 transition-colors disabled:opacity-30"
+                  title={targetAgent ? `Run in ${targetAgent.cliName}` : "Summon an agent first"}
+                >
+                  {injectedId === s.id ? <Check className="size-3 text-emerald-400" /> : <Terminal className="size-3" />}
+                  <span>{injectedId === s.id ? "Injected!" : "Run"}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── Dock Tabs ─────────────────────────────────────────────────
 const TABS: { id: DockTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: "chat", label: "Lead", icon: LeadCrown },
   { id: "glasschat", label: "DevChat", icon: Sparkles },
   { id: "git", label: "Git", icon: GitBranch },
+  { id: "snippets", label: "Snippets", icon: Terminal },
 ];
 
 const RIGHT_DOCK_MIN = 260;
@@ -520,6 +730,7 @@ export default function ADERightDock({ projectPath, onClose }: Props) {
  <GitPanel projectPath={projectPath} onOpen={setViewer} />
  )
  )}
+ {activeTab === "snippets" && <SnippetsPanel />}
  </div>
  </div>
  );

@@ -140,6 +140,23 @@ function Meter({
   );
 }
 
+function estimateCost(r: CliUsage): number {
+  const w = r.weekly;
+  if (!w || !r.has_token_data) return 0;
+  if (r.cli === "claude") {
+    return (
+      (w.input_tokens / 1_000_000) * 3.0 +
+      (w.output_tokens / 1_000_000) * 15.0 +
+      (w.cache_write_tokens / 1_000_000) * 3.75 +
+      (w.cache_read_tokens / 1_000_000) * 0.3
+    );
+  }
+  if (r.cli === "agy") {
+    return (w.input_tokens / 1_000_000) * 0.15 + (w.output_tokens / 1_000_000) * 0.6;
+  }
+  return (w.input_tokens / 1_000_000) * 2.5 + (w.output_tokens / 1_000_000) * 10.0;
+}
+
 /**
  * Plan limits for every agent CLI installed on this machine, read from the
  * transcripts they keep in the user's home directory.
@@ -173,17 +190,23 @@ export default function CliUsagePanel({ onClose }: { onClose?: () => void }) {
     localStorage.setItem(BUDGET_KEY, JSON.stringify(next));
   };
 
+  const totalTokensWeekly = rows.reduce((acc, r) => acc + (r.weekly?.tokens || 0), 0);
+  const totalCostWeekly = rows.reduce((acc, r) => acc + estimateCost(r), 0);
+  const totalMessagesWeekly = rows.reduce((acc, r) => acc + (r.weekly?.messages || 0), 0);
+
   const detailsFor = rows.find((r) => r.installed && USAGE_PAGE[r.cli]);
 
   return (
-    <div className="flex w-[360px] flex-col overflow-hidden rounded-2xl glass-hi glass-sheen shadow-2xl shadow-black/70 font-sans antialiased">
-      <div className="flex items-center gap-2 px-4 pb-2 pt-3.5">
-        <span className="text-xs font-bold uppercase tracking-[0.12em] text-swarm-text">
-          Plan limits
-        </span>
+    <div className="flex w-[380px] flex-col overflow-hidden rounded-2xl glass-hi glass-sheen shadow-2xl shadow-black/80 font-sans antialiased border border-white/[0.12]">
+      <div className="flex items-center gap-2 px-4 pb-2 pt-3.5 border-b border-white/[0.06]">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold uppercase tracking-[0.12em] text-swarm-text">
+            Swarm Token & Budget Mind
+          </span>
+        </div>
         <button
           onClick={refresh}
-          className="ml-auto rounded p-1 text-swarm-textMuted transition-colors hover:bg-swarm-border/40 hover:text-swarm-text"
+          className="ml-auto rounded-lg p-1.5 text-swarm-textMuted transition-colors hover:bg-swarm-border/40 hover:text-swarm-text"
           title="Rescan transcripts"
           aria-label="Rescan transcripts"
         >
@@ -192,7 +215,7 @@ export default function CliUsagePanel({ onClose }: { onClose?: () => void }) {
         {onClose && (
           <button
             onClick={onClose}
-            className="rounded p-1 text-swarm-textMuted transition-colors hover:bg-swarm-border/40 hover:text-swarm-text"
+            className="rounded-lg p-1.5 text-swarm-textMuted transition-colors hover:bg-swarm-border/40 hover:text-swarm-text"
             title="Close"
             aria-label="Close plan limits"
           >
@@ -201,7 +224,29 @@ export default function CliUsagePanel({ onClose }: { onClose?: () => void }) {
         )}
       </div>
 
-      <div className="max-h-[62vh] divide-y divide-swarm-border/30 overflow-y-auto scrollbar-sleek">
+      {/* Aggregate Cost & Metric HUD */}
+      <div className="grid grid-cols-3 gap-2 px-4 py-3 bg-black/40 border-b border-white/[0.06]">
+        <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-2 text-center">
+          <div className="text-[10px] uppercase font-semibold text-swarm-textMuted tracking-wider">Est. Cost</div>
+          <div className="text-sm font-bold font-mono text-emerald-400 mt-0.5">
+            ${totalCostWeekly.toFixed(2)}
+          </div>
+        </div>
+        <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-2 text-center">
+          <div className="text-[10px] uppercase font-semibold text-swarm-textMuted tracking-wider">Weekly Tokens</div>
+          <div className="text-sm font-bold font-mono text-swarm-goldHi mt-0.5">
+            {compact(totalTokensWeekly)}
+          </div>
+        </div>
+        <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-2 text-center">
+          <div className="text-[10px] uppercase font-semibold text-swarm-textMuted tracking-wider">Messages</div>
+          <div className="text-sm font-bold font-mono text-swarm-text mt-0.5">
+            {compact(totalMessagesWeekly)}
+          </div>
+        </div>
+      </div>
+
+      <div className="max-h-[60vh] divide-y divide-swarm-border/30 overflow-y-auto scrollbar-sleek">
         {error && <p className="px-4 py-3 text-mini text-swarm-err">{error}</p>}
         {/* The first scan walks every transcript on disk and can take a second.
             Without this the panel opened as an empty box under a header and
