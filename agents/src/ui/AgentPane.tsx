@@ -652,17 +652,10 @@ export default function AgentPane({
   }, [refitCount]);
 
   const getFontSize = () => {
-    // 0 means "not measured yet", not "tiny". Guessing the smallest font before
-    // the first ResizeObserver callback and then jumping to 14 meant the pty
-    // could be opened at a column count the pane never actually had — and a CLI
-    // draws its welcome box once, for the width it was given at startup.
-    if (paneWidth === 0) return 14;
-    // Floor is 11px, not smaller — below that the terminal stops being
-    // readable, so a cramped multi-pane grid should scroll/clip text rather
-    // than shrink it into illegibility.
-    if (paneWidth < 380) return 11;
+    if (paneWidth === 0) return 13;
+    if (paneWidth < 380) return 12;
     if (paneWidth < 500) return 12;
-    return 14;
+    return 13;
   };
 
   const fontSize = getFontSize();
@@ -1212,11 +1205,12 @@ export default function AgentPane({
           cursorBlink: true,
           cursorStyle: "block",
           fontSize: getFontSize(),
-          fontFamily: '"Geist Mono", "JetBrains Mono", Menlo, Monaco, Consolas, "Courier New", monospace, "Apple Color Emoji"',
+          fontFamily: 'Menlo, Monaco, "SF Mono", "Geist Mono", "JetBrains Mono", Consolas, "Courier New", monospace',
           fontWeight: "400",
-          fontWeightBold: "700",
-          customGlyphs: true,
-          lineHeight: 1.35,
+          fontWeightBold: "600",
+          customGlyphs: false,
+          lineHeight: 1.2,
+          letterSpacing: 0,
           theme: paneXtermTheme(),
           allowTransparency: false,
           rightClickSelectsWord: true,

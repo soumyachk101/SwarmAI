@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   ChevronDown,
   ClipboardList,
@@ -98,15 +98,19 @@ export default function LeadPanel() {
   const workingDir = host.useActiveFolder();
   const [missionInput, setMissionInput] = useState("");
   const [isDispatching, setIsDispatching] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleSummon = (cli: string, name: string) => {
     host.summonLead(activeWsId, cli, name);
   };
 
   /** Send strict orchestration directive to the Lead CLI */
-  const handleDispatchToLead = async () => {
-    if (!missionInput.trim() || !lead) return;
-    const goal = missionInput.trim();
+  const handleDispatchToLead = async (customGoal?: string) => {
+    const goal = (customGoal || missionInput).trim();
+    if (!goal || !lead) {
+      inputRef.current?.focus();
+      return;
+    }
     setMissionInput("");
     setIsDispatching(true);
 
@@ -122,8 +126,13 @@ export default function LeadPanel() {
 
   /** Instant parallel worker spawn via SwarmMind engine */
   const handleInstantParallelDispatch = async () => {
-    if (!missionInput.trim() || !workingDir) return;
     const goal = missionInput.trim();
+    if (!goal) {
+      inputRef.current?.focus();
+      return;
+    }
+    if (!workingDir) return;
+
     setMissionInput("");
     setIsDispatching(true);
 
@@ -217,13 +226,14 @@ export default function LeadPanel() {
         {/* Quick Goal Dispatch Input */}
         <div className="flex items-center gap-1.5 bg-zinc-900/90 border border-zinc-700/50 rounded-lg px-2.5 py-1.5 focus-within:border-amber-500/60 focus-within:ring-1 focus-within:ring-amber-500/30 transition-all">
           <input
+            ref={inputRef}
             type="text"
             value={missionInput}
             onChange={(e) => setMissionInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") handleDispatchToLead();
             }}
-            placeholder="Type or dictate mission (e.g. Build auth API with tests)..."
+            placeholder="Type mission here (e.g. Build premium portfolio UI with animations)..."
             className="w-full bg-transparent text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none"
           />
           <button
@@ -235,21 +245,17 @@ export default function LeadPanel() {
           </button>
           <button
             onClick={handleInstantParallelDispatch}
-            disabled={isDispatching || !missionInput.trim()}
-            className={`flex items-center gap-1 px-2 py-1 rounded text-[11px] font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/30 transition-all shrink-0 ${
-              !missionInput.trim() ? "opacity-40 cursor-not-allowed" : ""
-            }`}
+            disabled={isDispatching}
+            className="flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/30 transition-all shrink-0 cursor-pointer shadow-sm"
             title="Instant parallel dispatch: decompose & launch worker agents in worktrees immediately"
           >
-            <Layers size={12} />
+            <Layers size={12} className="text-cyan-400" />
             <span>Parallel Dispatch</span>
           </button>
           <button
-            onClick={handleDispatchToLead}
-            disabled={isDispatching || !missionInput.trim()}
-            className={`p-1.5 rounded-md bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors shrink-0 ${
-              !missionInput.trim() ? "opacity-40 cursor-not-allowed" : ""
-            }`}
+            onClick={() => handleDispatchToLead()}
+            disabled={isDispatching}
+            className="p-1.5 rounded-md bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors shrink-0 cursor-pointer shadow-sm"
             title="Send mission directive to Lead Agent"
           >
             <Send size={13} />

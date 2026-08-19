@@ -122,7 +122,7 @@ export default function TerminalPane({
   // Same ladder as AgentPane, so a shell pane and an agent pane sitting side by
   // side in the grid read at the same size instead of the shell staying at 14px
   // and wrapping every line. Terminals started at a flat 14px here.
-  const fontSize = paneWidth === 0 ? 14 : paneWidth < 380 ? 11 : paneWidth < 500 ? 12 : 14;
+  const fontSize = paneWidth === 0 ? 13 : paneWidth < 380 ? 12 : paneWidth < 500 ? 12 : 13;
 
   useEffect(() => {
     const t = terminalInstance.current;
@@ -274,18 +274,14 @@ export default function TerminalPane({
         const options: ITerminalOptions = {
           cursorBlink: true,
           cursorStyle: "block",
-          fontSize: 14,
-          fontFamily: '"Geist Mono", Cascadia Code, Consolas, monospace',
+          fontSize,
+          fontFamily: 'Menlo, Monaco, "SF Mono", "Geist Mono", "JetBrains Mono", Consolas, "Courier New", monospace',
           fontWeight: "400",
-          fontWeightBold: "700",
-          // 1 (xterm's own default), but increased to 1.4 to prevent fonts
-          // like Geist Mono from overflowing their cell and overlapping with
-          // box-drawing characters or adjacent lines. xterm customGlyphs (default)
-          // handles box-drawing gaps.
-          lineHeight: 1.4,
+          fontWeightBold: "600",
+          customGlyphs: false,
+          lineHeight: 1.2,
+          letterSpacing: 0,
           theme: paneXtermTheme(),
-          // Opaque on purpose — see paneXtermTheme. Transparency here forced
-          // xterm onto its alpha-blending path and locked out the GPU renderer.
           allowTransparency: false,
           rightClickSelectsWord: true,
           scrollback: 5000,
