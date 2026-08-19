@@ -25,6 +25,14 @@ function normaliseModel(cli: string, model: string): string {
     }
     return model.trim();
   }
+  if (cli === "opencode") {
+    if (m.includes("nemotron")) return "openrouter/nvidia/nemotron-4-340b-instruct";
+    if (m.includes("llama")) return "openrouter/meta-llama/llama-3.3-70b-instruct";
+    if (m.includes("qwen")) return "openrouter/qwen/qwen-2.5-coder-32b-instruct";
+    if (m.includes("deepseek")) return "openrouter/deepseek/deepseek-chat";
+    if (m.includes("/")) return m;
+    return "";
+  }
   return model.trim();
 }
 
@@ -60,9 +68,7 @@ export function modelArgs(
       break;
 
     case "opencode":
-      // Wants provider/model; pass through untouched so the caller stays in
-      // control of which provider is meant.
-      if (m) args.push("--model", m);
+      if (m && m.includes("/")) args.push("-m", m);
       break;
 
     case "aider":

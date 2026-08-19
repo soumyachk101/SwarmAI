@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Server, Puzzle } from "lucide-react";
+import { X, Server, Puzzle, Download } from "lucide-react";
 import ProvidersSection from "./ProvidersSection";
 import ModelsSection from "./ModelsSection";
 
@@ -11,17 +11,20 @@ interface SettingsPageProps {
 
 // Only sections that are actually implemented get a nav entry — a nav item that
 // opens a "coming soon" panel is a dead end.
-type SectionId = "models" | "providers";
+import UpdatesSection from "./UpdatesSection";
+
+type SectionId = "models" | "providers" | "updates";
 
 interface NavItem {
   id: SectionId;
   label: string;
-  icon: typeof Server;
+  icon: any;
 }
 
 const NAV_ITEMS: NavItem[] = [
   { id: "models", label: "Models", icon: Server },
   { id: "providers", label: "Providers", icon: Puzzle },
+  { id: "updates", label: "Updates & Releases", icon: Download },
 ];
 
 export default function SettingsPage({ onClose }: SettingsPageProps) {
@@ -39,6 +42,8 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
     switch (activeSection) {
       case "providers":
         return <ProvidersSection />;
+      case "updates":
+        return <UpdatesSection />;
       case "models":
       default:
         return <ModelsSection />;

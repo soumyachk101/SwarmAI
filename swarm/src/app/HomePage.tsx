@@ -8,6 +8,7 @@ import { SessionHistory } from "@swarm/pheromone/ui";
 import { VoiceHotkeys } from "@swarm/voice/ui";
 import SwarmLogo from "@/shared/SwarmLogo";
 import SettingsPage from "@/features/settings/SettingsPage";
+import UpdateCheckerModal from "@/features/updates/UpdateCheckerModal";
 import { ExtensionsMarketplace } from "@swarm/extension";
 import { Blocks, Gauge } from "lucide-react";
 import { useAgentsStore, CliUsagePanel, setupStorageSync } from "@swarm/agents/ui";
@@ -72,6 +73,7 @@ export default function HomePage() {
   const [windowControlsRef, windowControlsWidth] = useMeasuredWidth(142);
   const [dockRef, dockWidth] = useMeasuredWidth();
   const [showSettings, setShowSettings] = useState(false);
+  const [showUpdates, setShowUpdates] = useState(false);
   const [showExtensions, setShowExtensions] = useState(false);
   const [showUsage, setShowUsage] = useState(false);
   const [showPalette, setShowPalette] = useState(false);
@@ -577,12 +579,14 @@ export default function HomePage() {
 
       {showSettings && <SettingsPage onClose={() => setShowSettings(false)} />}
       {showExtensions && <ExtensionsMarketplace onClose={() => setShowExtensions(false)} />}
+      {showUpdates && <UpdateCheckerModal isOpen={showUpdates} onClose={() => setShowUpdates(false)} />}
       <CommandPalette
         isOpen={showPalette}
         onClose={() => setShowPalette(false)}
         onOpenSettings={() => setShowSettings(true)}
         onOpenExtensions={() => setShowExtensions(true)}
         onOpenFolder={handleOpenFolder}
+        onOpenUpdates={() => setShowUpdates(true)}
       />
 
       {/* Global voice hotkeys: Ctrl+Win (type anywhere) · Ctrl+Alt (Agent). */}

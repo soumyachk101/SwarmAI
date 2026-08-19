@@ -26,6 +26,7 @@ import {
   CheckCircle2,
   Stethoscope,
   Trash2,
+  Download,
 } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 import { useAgentsStore } from "@swarm/agents/ui";
@@ -51,6 +52,7 @@ interface CommandPaletteProps {
   onOpenSettings: () => void;
   onOpenExtensions: () => void;
   onOpenFolder: () => void;
+  onOpenUpdates?: () => void;
 }
 
 export default function CommandPalette({
@@ -59,6 +61,7 @@ export default function CommandPalette({
   onOpenSettings,
   onOpenExtensions,
   onOpenFolder,
+  onOpenUpdates,
 }: CommandPaletteProps) {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -416,7 +419,19 @@ export default function CommandPalette({
         onClose();
       },
     },
-  ], [activeWsId, boardOpen, view, onClose, onOpenSettings, onOpenExtensions, onOpenFolder]);
+    {
+      id: "check-updates",
+      category: "Project",
+      label: "/update",
+      hint: "Check for new SwarmAI DMG & OS release updates",
+      icon: <Download size={16} className="text-emerald-400" />,
+      action: () => {
+        if (onOpenUpdates) onOpenUpdates();
+        else onOpenSettings();
+        onClose();
+      },
+    },
+  ], [activeWsId, boardOpen, view, onClose, onOpenSettings, onOpenExtensions, onOpenFolder, onOpenUpdates]);
 
   const filteredCommands = useMemo(() => {
     if (!query.trim()) return commands;
