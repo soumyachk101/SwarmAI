@@ -5,5 +5,5 @@
 export { default as LeadPanel, LeadModeSelect } from './LeadPanel.js';
 export { useLeadBridge } from './leadBridge.js';
 export { runLeadTool } from './leadTools.js';
-export { setLeadHost, hasLeadHost } from './host.js';
+export { setLeadHost, hasLeadHost, leadHost } from './host.js';
 export type { LeadHost, CrownedSwarm, DispatchOutcome, DispatchedEntry } from './host.js';

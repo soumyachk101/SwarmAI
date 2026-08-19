@@ -32,9 +32,11 @@ import {
   PanelLeft,
   PanelRight,
   Columns3,
+  Mic,
 } from "lucide-react";
 import ThemePicker from "@/shared/ThemePicker";
 import OverflowMenu from "@/shared/OverflowMenu";
+import CommandPalette from "@/shared/CommandPalette";
 
 
 /**
@@ -72,6 +74,7 @@ export default function HomePage() {
   const [showSettings, setShowSettings] = useState(false);
   const [showExtensions, setShowExtensions] = useState(false);
   const [showUsage, setShowUsage] = useState(false);
+  const [showPalette, setShowPalette] = useState(false);
   const [gitStatus, setGitStatus] = useState<{
     branch: string;
     changed: number;
@@ -160,6 +163,11 @@ export default function HomePage() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setShowPalette((prev) => !prev);
+        return;
+      }
       if (e.ctrlKey && e.key === "b") {
         // Let a focused terminal/input keep Ctrl+B (tmux prefix, readline, etc.)
         // instead of the global dock toggle stealing it — same guard used for
@@ -390,6 +398,13 @@ export default function HomePage() {
             buttons instead of ten. */}
         <div className="flex items-center gap-1">
           <button
+            onClick={() => window.dispatchEvent(new CustomEvent("swarm:voice:toggle", { detail: { mode: "lead" } }))}
+            className="p-1.5 rounded-md text-swarm-textMuted hover:text-swarm-gold hover:bg-swarm-border/40 transition-colors"
+            title="Voice Dictation (Click or Win+Alt / Ctrl+Win)"
+          >
+            <Mic size={15} />
+          </button>
+          <button
             onClick={() => toggleRight()}
             className={`p-1.5 rounded-md transition-colors ${
               rightOpen
@@ -562,6 +577,13 @@ export default function HomePage() {
 
       {showSettings && <SettingsPage onClose={() => setShowSettings(false)} />}
       {showExtensions && <ExtensionsMarketplace onClose={() => setShowExtensions(false)} />}
+      <CommandPalette
+        isOpen={showPalette}
+        onClose={() => setShowPalette(false)}
+        onOpenSettings={() => setShowSettings(true)}
+        onOpenExtensions={() => setShowExtensions(true)}
+        onOpenFolder={handleOpenFolder}
+      />
 
       {/* Global voice hotkeys: Ctrl+Win (type anywhere) · Ctrl+Alt (Agent). */}
       <VoiceHotkeys />

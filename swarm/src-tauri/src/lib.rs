@@ -2933,8 +2933,17 @@ fn whisper_binary() -> Option<PathBuf> {
         if path.exists() { return Some(path); }
     }
     if let Some(found) = find_whisper_in(&whisper_bin_dir()) { return Some(found); }
-    for name in ["whisper-cli", "whisper", "main"] {
-        if which_on_path(name).is_some() { return which_on_path(name); }
+    for name in ["whisper-cli", "whisper-cpp", "whisper", "main"] {
+        if let Some(found) = which_on_path(name) { return Some(found); }
+    }
+    for candidate in [
+        "/opt/homebrew/bin/whisper-cli",
+        "/opt/homebrew/bin/whisper-cpp",
+        "/usr/local/bin/whisper-cli",
+        "/usr/local/bin/whisper-cpp",
+    ] {
+        let path = PathBuf::from(candidate);
+        if path.exists() { return Some(path); }
     }
     None
 }

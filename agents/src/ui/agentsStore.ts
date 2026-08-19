@@ -66,6 +66,8 @@ interface AgentsState {
   setMaximizedPane: (paneId: string | null) => void;
   gridLayout: GridLayout;
   setGridLayout: (layout: GridLayout) => void;
+  activePaneId: string | null;
+  setActivePaneId: (paneId: string | null) => void;
   reorderAgents: (fromIndex: number, toIndex: number) => void;
   swapAgents: (fromIndex: number, toIndex: number) => void;
   refitCount: number;
@@ -154,6 +156,8 @@ export const useAgentsStore = create<AgentsState>()(
       // was right for two panes and wrong for every other count.
       gridLayout: "auto",
       setGridLayout: (layout) => set({ gridLayout: layout }),
+      activePaneId: null,
+      setActivePaneId: (paneId) => set({ activePaneId: paneId }),
       reorderAgents: (fromIndex, toIndex) =>
         set((state) => {
           const result = Array.from(state.agents);

@@ -60,6 +60,8 @@ export interface LeadHost {
   LeadPane: ComponentType<{ paneId: string; workingDir: string | null }>;
   /** Launch a Agent in a agent; returns its pane id. */
   launchSwarm(workspaceId: string, cli: string, name: string, args?: string[]): string;
+  /** Summon and crown a new Lead agent with 1-click. */
+  summonLead(workspaceId: string, cli?: string, name?: string): string;
   /** Drive the browser pane and report what it shows. */
   captureBrowser(url?: string): Promise<{ url: string } | null>;
 

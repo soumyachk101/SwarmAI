@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Sparkles, MessageSquare, GitBranch, X, Plus, Minus, Check, ArrowDownToLine, ArrowUpFromLine, Terminal, Copy, GitPullRequest } from "lucide-react";
+import { Sparkles, MessageSquare, GitBranch, X, Plus, Minus, Check, ArrowDownToLine, ArrowUpFromLine, Terminal, Copy, GitPullRequest, FileText } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 import { LeadPanel, LeadModeSelect } from "@swarm/lead/ui";
 import { LeadCrown } from "@swarm/board";
@@ -9,8 +9,9 @@ import { GlassChatEmbed } from "@swarm/plugins";
 import { useProjectStore } from "@swarm/workspace";
 import { useAgentsStore } from "@swarm/agents/ui";
 import { getActiveProjectPath } from "@swarm/workspace";
+import { ReportsPanel } from "@swarm/reports/ui";
 
-type DockTab = "chat" | "glasschat" | "git" | "snippets";
+type DockTab = "chat" | "glasschat" | "git" | "snippets" | "reports";
 
 interface Props {
  projectPath: string | null;
@@ -570,6 +571,7 @@ const TABS: { id: DockTab; label: string; icon: React.ComponentType<{ className?
   { id: "glasschat", label: "DevChat", icon: Sparkles },
   { id: "git", label: "Git", icon: GitBranch },
   { id: "snippets", label: "Snippets", icon: Terminal },
+  { id: "reports", label: "Reports", icon: FileText },
 ];
 
 const RIGHT_DOCK_MIN = 260;
@@ -731,6 +733,7 @@ export default function ADERightDock({ projectPath, onClose }: Props) {
  )
  )}
  {activeTab === "snippets" && <SnippetsPanel />}
+ {activeTab === "reports" && <ReportsPanel projectPath={projectPath ?? undefined} />}
  </div>
  </div>
  );

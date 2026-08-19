@@ -1,11 +1,45 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { Search, Terminal, File, Settings } from "lucide-react";
+import { useState, useEffect, useRef, useMemo } from "react";
+import {
+  Search,
+  Sparkles,
+  Bot,
+  Zap,
+  Terminal,
+  Columns3,
+  PanelLeft,
+  PanelRight,
+  Settings,
+  FolderOpen,
+  Mic,
+  LayoutGrid,
+  ShieldCheck,
+  ClipboardList,
+  Blocks,
+  Activity,
+  Layers,
+  HelpCircle,
+  FileCode2,
+  DollarSign,
+  GitPullRequest,
+  CheckCircle2,
+  Stethoscope,
+  Trash2,
+} from "lucide-react";
+import { invoke } from "@tauri-apps/api/core";
+import { useAgentsStore } from "@swarm/agents/ui";
+import { useWorkspaceStore } from "@swarm/workspace";
+import { useUiStore } from "./uiStore.js";
+import { usePlaneStore } from "@/features/panes/planeStore";
+import { leadHost } from "@swarm/lead/ui";
+import { modelArgs } from "@swarm/agents/cli-configs";
 
-interface Command {
+export interface PaletteCommand {
   id: string;
+  category: "Claude Code (/)" | "OpenCode & AI Tools" | "Summon Agents" | "Lead Orchestration" | "Views & Tools" | "Grid Layouts" | "Project";
   label: string;
+  hint?: string;
   icon: React.ReactNode;
   shortcut?: string;
   action: () => void;
@@ -14,77 +48,398 @@ interface Command {
 interface CommandPaletteProps {
   isOpen: boolean;
   onClose: () => void;
-  onToggleterminal: () => void;
-  onToggleSidebar: () => void;
-  onOpenFile: () => void;
   onOpenSettings: () => void;
+  onOpenExtensions: () => void;
+  onOpenFolder: () => void;
 }
 
 export default function CommandPalette({
   isOpen,
   onClose,
-  onToggleterminal,
-  onToggleSidebar,
-  onOpenFile,
   onOpenSettings,
+  onOpenExtensions,
+  onOpenFolder,
 }: CommandPaletteProps) {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
-  /** Whatever had focus when the palette opened, so closing puts it back. */
   const restoreRef = useRef<HTMLElement | null>(null);
 
-  const commands: Command[] = [
+  const activeWsId = useWorkspaceStore((s) => s.activeWorkspaceId);
+  const addAgent = useAgentsStore((s) => s.addAgent);
+  const setGridLayout = useAgentsStore((s) => s.setGridLayout);
+  const toggleLeft = useUiStore((s) => s.toggleLeft);
+  const setRightOpen = useUiStore((s) => s.setRightOpen);
+  const setBoardOpen = useWorkspaceStore((s) => s.setBoardOpen);
+  const boardOpen = useWorkspaceStore((s) => s.boardOpen);
+  const toggleView = usePlaneStore((s) => s.toggleView);
+  const view = usePlaneStore((s) => s.view);
+
+  const spawnAgent = (cli: string, name: string) => {
+    const id = `swarm-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    addAgent({
+      id,
+      cli,
+      cliName: cli,
+      customName: name,
+      args: modelArgs(cli),
+      workspaceId: activeWsId,
+    });
+    onClose();
+  };
+
+  const writeToActive = (cmd: string) => {
+    const swarms = useAgentsStore.getState();
+    const activePaneId = swarms.activePaneId;
+    const wsPanes = swarms.swarmsOf(activeWsId);
+    const target = activePaneId
+      ? swarms.agents.find((b) => b.id === activePaneId)
+      : wsPanes[0] || swarms.leadOf(activeWsId);
+
+    if (target) {
+      invoke("write_to_terminal", { paneId: target.id, data: cmd + "\r" });
+    }
+    onClose();
+  };
+
+  const commands = useMemo<PaletteCommand[]>(() => [
+    // Real Claude Code Slash Commands
     {
-      id: "toggle-terminal",
-      label: "Toggle terminal",
-      icon: <Terminal size={16} />,
-      shortcut: "Ctrl+`",
+      id: "claude-compact",
+      category: "Claude Code (/)",
+      label: "/compact",
+      hint: "Compact and clear conversation context in Claude Code",
+      icon: <Layers size={16} className="text-amber-400" />,
+      action: () => writeToActive("/compact"),
+    },
+    {
+      id: "claude-cost",
+      category: "Claude Code (/)",
+      label: "/cost",
+      hint: "Display token usage stats and session cost in Claude Code",
+      icon: <DollarSign size={16} className="text-emerald-400" />,
+      action: () => writeToActive("/cost"),
+    },
+    {
+      id: "claude-review",
+      category: "Claude Code (/)",
+      label: "/review",
+      hint: "Review uncommitted git diffs and codebase changes",
+      icon: <CheckCircle2 size={16} className="text-blue-400" />,
+      action: () => writeToActive("/review"),
+    },
+    {
+      id: "claude-init",
+      category: "Claude Code (/)",
+      label: "/init",
+      hint: "Initialize CLAUDE.md architecture guide in current repo",
+      icon: <FileCode2 size={16} className="text-purple-400" />,
+      action: () => writeToActive("/init"),
+    },
+    {
+      id: "claude-pr",
+      category: "Claude Code (/)",
+      label: "/pr",
+      hint: "Draft and create a GitHub Pull Request with changelog",
+      icon: <GitPullRequest size={16} className="text-cyan-400" />,
+      action: () => writeToActive("/pr"),
+    },
+    {
+      id: "claude-bug",
+      category: "Claude Code (/)",
+      label: "/bug",
+      hint: "Deep scan for bugs, regressions, and broken edge cases",
+      icon: <ShieldCheck size={16} className="text-red-400" />,
+      action: () => writeToActive("/bug"),
+    },
+    {
+      id: "claude-doctor",
+      category: "Claude Code (/)",
+      label: "/doctor",
+      hint: "Run diagnostic health check on CLI authentication & MCP",
+      icon: <Stethoscope size={16} className="text-emerald-400" />,
+      action: () => writeToActive("/doctor"),
+    },
+    {
+      id: "claude-help",
+      category: "Claude Code (/)",
+      label: "/help",
+      hint: "Show all available CLI slash commands & flags",
+      icon: <HelpCircle size={16} className="text-zinc-400" />,
+      action: () => writeToActive("/help"),
+    },
+    {
+      id: "claude-clear",
+      category: "Claude Code (/)",
+      label: "/clear",
+      hint: "Clear active terminal screen buffer",
+      icon: <Trash2 size={16} className="text-zinc-400" />,
+      action: () => writeToActive("/clear"),
+    },
+
+    // OpenCode & AI Tools
+    {
+      id: "opencode-zen",
+      category: "OpenCode & AI Tools",
+      label: "/opencode (or /zen)",
+      hint: "Spawn OpenCode Zen with Nemotron Free AI",
+      icon: <Bot size={16} className="text-purple-400" />,
+      action: () => spawnAgent("opencode", "OpenCode"),
+    },
+    {
+      id: "opencode-models",
+      category: "OpenCode & AI Tools",
+      label: "/models",
+      hint: "List and switch active LLM models (OpenCode / Codex)",
+      icon: <Bot size={16} className="text-purple-400" />,
+      action: () => writeToActive("/models"),
+    },
+
+    // Summon Agents
+    {
+      id: "summon-claude",
+      category: "Summon Agents",
+      label: "+ Claude Code",
+      hint: "Opus 5 · Anthropic Coding Agent",
+      icon: <Sparkles size={16} className="text-amber-400" />,
+      action: () => spawnAgent("claude", "Claude Code"),
+    },
+    {
+      id: "summon-opencode",
+      category: "Summon Agents",
+      label: "+ OpenCode Zen",
+      hint: "Nemotron Free · Autonomous Worker",
+      icon: <Bot size={16} className="text-purple-400" />,
+      action: () => spawnAgent("opencode", "OpenCode"),
+    },
+    {
+      id: "summon-codex",
+      category: "Summon Agents",
+      label: "+ Codex CLI",
+      hint: "GPT-5 · OpenAI Core Agent",
+      icon: <Zap size={16} className="text-cyan-400" />,
+      action: () => spawnAgent("codex", "Codex"),
+    },
+    {
+      id: "summon-terminal",
+      category: "Summon Agents",
+      label: "+ Terminal Shell",
+      hint: "Plain PTY terminal (zsh / bash / pwsh)",
+      icon: <Terminal size={16} className="text-emerald-400" />,
+      action: () => spawnAgent("shell", "Terminal"),
+    },
+
+    // Lead Orchestration
+    {
+      id: "lead-summon",
+      category: "Lead Orchestration",
+      label: "/lead steward",
+      hint: "Crown autonomous Lead Steward (Planner & Router)",
+      icon: <Sparkles size={16} className="text-amber-400" />,
       action: () => {
-        onToggleterminal();
+        leadHost().summonLead(activeWsId, "claude", "Claude Lead");
+        onClose();
+      },
+    },
+    {
+      id: "lead-forager",
+      category: "Lead Orchestration",
+      label: "/lead forager",
+      hint: "Switch Lead to Forager (Autonomous Bug Hunter)",
+      icon: <Search size={16} className="text-blue-400" />,
+      action: () => {
+        const lead = leadHost().leadOf(activeWsId);
+        if (lead) {
+          leadHost().setLeadMode(lead.id, "Forager");
+          leadHost().publishRole("Forager");
+        }
+        setRightOpen(true);
+        onClose();
+      },
+    },
+    {
+      id: "lead-stinger",
+      category: "Lead Orchestration",
+      label: "/lead stinger",
+      hint: "Switch Lead to Stinger (Deep Security Auditor)",
+      icon: <ShieldCheck size={16} className="text-emerald-400" />,
+      action: () => {
+        const lead = leadHost().leadOf(activeWsId);
+        if (lead) {
+          leadHost().setLeadMode(lead.id, "Stinger");
+          leadHost().publishRole("Stinger");
+        }
+        setRightOpen(true);
+        onClose();
+      },
+    },
+
+    // Views & Tools
+    {
+      id: "voice-toggle",
+      category: "Views & Tools",
+      label: "/voice",
+      hint: "Start Voice Dictation Island",
+      icon: <Mic size={16} className="text-amber-400" />,
+      shortcut: "Win+Alt",
+      action: () => {
+        window.dispatchEvent(new CustomEvent("swarm:voice:toggle", { detail: { mode: "lead" } }));
+        onClose();
+      },
+    },
+    {
+      id: "toggle-tasks",
+      category: "Views & Tools",
+      label: "/tasks",
+      hint: boardOpen ? "Hide Kanban board" : "Show Kanban board",
+      icon: <Columns3 size={16} className="text-zinc-300" />,
+      action: () => {
+        setBoardOpen(!boardOpen);
+        onClose();
+      },
+    },
+    {
+      id: "toggle-flow",
+      category: "Views & Tools",
+      label: "/flow",
+      hint: view === "flow" ? "Switch to Grid view" : "Switch to infinite Flow canvas",
+      icon: <Activity size={16} className="text-cyan-400" />,
+      action: () => {
+        toggleView();
+        onClose();
+      },
+    },
+    {
+      id: "toggle-lead-dock",
+      category: "Views & Tools",
+      label: "/lead",
+      hint: "Show/hide Lead orchestrator dock",
+      icon: <PanelRight size={16} className="text-zinc-300" />,
+      action: () => {
+        setRightOpen(true);
         onClose();
       },
     },
     {
       id: "toggle-sidebar",
+      category: "Views & Tools",
       label: "Toggle Sidebar",
-      icon: <File size={16} />,
-      shortcut: "Ctrl+B",
+      hint: "Show/hide left navigation sidebar",
+      icon: <PanelLeft size={16} className="text-zinc-300" />,
+      shortcut: "Cmd+B",
       action: () => {
-        onToggleSidebar();
+        toggleLeft();
+        onClose();
+      },
+    },
+
+    // Grid Layouts
+    {
+      id: "layout-auto",
+      category: "Grid Layouts",
+      label: "/layout auto",
+      hint: "Smart responsive grid sizing",
+      icon: <LayoutGrid size={16} className="text-zinc-300" />,
+      action: () => {
+        setGridLayout("auto");
         onClose();
       },
     },
     {
-      id: "open-file",
-      label: "Open File",
-      icon: <File size={16} />,
-      shortcut: "Ctrl+O",
+      id: "layout-grid2x2",
+      category: "Grid Layouts",
+      label: "/layout 2x2",
+      hint: "4 equal quadrants",
+      icon: <Layers size={16} className="text-zinc-300" />,
       action: () => {
-        onOpenFile();
+        setGridLayout("grid2x2");
+        onClose();
+      },
+    },
+    {
+      id: "layout-cols2",
+      category: "Grid Layouts",
+      label: "/layout cols2",
+      hint: "Side-by-side split view",
+      icon: <Columns3 size={16} className="text-zinc-300" />,
+      action: () => {
+        setGridLayout("cols2");
+        onClose();
+      },
+    },
+    {
+      id: "layout-master",
+      category: "Grid Layouts",
+      label: "/layout master",
+      hint: "1 large focus pane + right stack",
+      icon: <LayoutGrid size={16} className="text-zinc-300" />,
+      action: () => {
+        setGridLayout("master");
+        onClose();
+      },
+    },
+
+    // Project & Settings
+    {
+      id: "open-folder",
+      category: "Project",
+      label: "Open Project Folder…",
+      hint: "Switch or add workspace",
+      icon: <FolderOpen size={16} className="text-amber-400" />,
+      shortcut: "Cmd+O",
+      action: () => {
+        onOpenFolder();
+        onClose();
+      },
+    },
+    {
+      id: "open-extensions",
+      category: "Project",
+      label: "Extensions Marketplace",
+      hint: "Install AI tools & Open-VSX packages",
+      icon: <Blocks size={16} className="text-purple-400" />,
+      action: () => {
+        onOpenExtensions();
         onClose();
       },
     },
     {
       id: "open-settings",
-      label: "Open Settings",
-      icon: <Settings size={16} />,
-      shortcut: "Ctrl+,",
+      category: "Project",
+      label: "Settings & API Keys",
+      hint: "Configure models, tokens, and voice",
+      icon: <Settings size={16} className="text-zinc-300" />,
+      shortcut: "Cmd+,",
       action: () => {
         onOpenSettings();
         onClose();
       },
     },
-  ];
+  ], [activeWsId, boardOpen, view, onClose, onOpenSettings, onOpenExtensions, onOpenFolder]);
 
-  const filteredCommands = commands.filter((cmd) =>
-    cmd.label.toLowerCase().includes(query.toLowerCase()),
-  );
+  const filteredCommands = useMemo(() => {
+    if (!query.trim()) return commands;
+    const q = query.toLowerCase().trim();
+    // Support typing "+" to list summon commands
+    if (q === "+") {
+      return commands.filter((cmd) => cmd.category === "Summon Agents");
+    }
+    // Support typing "/" to list all slash commands
+    if (q === "/") {
+      return commands.filter((cmd) => cmd.label.startsWith("/"));
+    }
+    const cleanQ = q.startsWith("/") ? q.slice(1) : q.startsWith("+") ? q.slice(1).trim() : q;
+    return commands.filter(
+      (cmd) =>
+        cmd.label.toLowerCase().includes(q) ||
+        cmd.label.toLowerCase().includes(cleanQ) ||
+        cmd.hint?.toLowerCase().includes(q) ||
+        cmd.hint?.toLowerCase().includes(cleanQ) ||
+        cmd.category.toLowerCase().includes(q)
+    );
+  }, [commands, query]);
 
-  // Opening steals focus from a terminal or an editor. Remembering the previous
-  // element and handing focus back on close means Ctrl+K → Esc leaves the user
-  // typing exactly where they were, instead of on the document body.
   useEffect(() => {
     if (!isOpen) return;
     restoreRef.current = document.activeElement as HTMLElement | null;
@@ -97,118 +452,114 @@ export default function CommandPalette({
     };
   }, [isOpen]);
 
-  // Typing shortens the list under the cursor. Without this the highlight kept
-  // an index past the end and Enter silently did nothing.
-  useEffect(() => { setSelectedIndex(0); }, [query]);
-
-  // Keep the highlighted row visible once the list is long enough to scroll —
-  // arrowing past the fold otherwise moves an invisible selection.
   useEffect(() => {
-    listRef.current
-      ?.querySelector<HTMLElement>('[data-selected="true"]')
-      ?.scrollIntoView({ block: "nearest" });
-  }, [selectedIndex, query]);
+    setSelectedIndex(0);
+  }, [query]);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isOpen) return;
-
-      if (e.key === "Escape") {
-        e.preventDefault();
-        onClose();
-        return;
-      }
-      // Every branch below indexes the filtered list; with no matches the
-      // modulo arithmetic yielded NaN and wedged the highlight permanently.
-      const n = filteredCommands.length;
-      if (n === 0) return;
-
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        setSelectedIndex((prev) => (prev + 1) % n);
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        setSelectedIndex((prev) => (prev - 1 + n) % n);
-      } else if (e.key === "Enter") {
-        e.preventDefault();
-        filteredCommands[selectedIndex]?.action();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, filteredCommands, selectedIndex, onClose]);
+  // Keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev + 1) % Math.max(1, filteredCommands.length));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev - 1 + filteredCommands.length) % Math.max(1, filteredCommands.length));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const current = filteredCommands[selectedIndex];
+      if (current) current.action();
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      onClose();
+    }
+  };
 
   if (!isOpen) return null;
 
   return (
     <div
-      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-start justify-center pt-24 z-50"
+      className="fixed inset-0 z-[500] flex items-start justify-center pt-[15vh] bg-black/65 backdrop-blur-md animate-in fade-in duration-150"
       onClick={onClose}
     >
       <div
-        role="dialog"
-        aria-modal="true"
-        aria-label="Command palette"
-        className="mx-4 w-full max-w-xl glass-hi rounded-2xl overflow-hidden animate-scale-in"
+        className="w-full max-w-xl rounded-2xl border border-zinc-700/60 bg-zinc-950/95 shadow-[0_25px_70px_rgba(0,0,0,0.85),0_0_40px_rgba(245,158,11,0.15)] backdrop-blur-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
+        onKeyDown={handleKeyDown}
       >
-        {/* Search input */}
-        <div className="flex items-center px-4 py-3 border-b border-swarm-border/50">
-          <Search size={18} className="text-swarm-gold mr-3" />
+        {/* Search input header */}
+        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-zinc-800/80 bg-zinc-900/50">
+          <Search size={18} className="text-amber-400 shrink-0" />
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Type a command or search…"
-            className="flex-1 bg-transparent text-swarm-text placeholder-swarm-textMuted outline-none text-sm"
+            placeholder="Type / for real CLI commands, + to summon agents, or search..."
+            className="w-full bg-transparent text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none font-mono"
           />
+          <span className="text-[10px] font-mono text-zinc-400 bg-zinc-800/80 px-2 py-0.5 rounded">
+            ESC
+          </span>
         </div>
 
-        {/* Command list */}
-        <div ref={listRef} className="max-h-96 overflow-y-auto scrollbar-sleek p-1.5">
+        {/* Commands List */}
+        <div
+          ref={listRef}
+          className="max-h-[380px] overflow-y-auto p-2 flex flex-col gap-1 scrollbar-sleek"
+        >
           {filteredCommands.length === 0 ? (
-            <div className="px-4 py-8 text-center text-sm text-swarm-textMuted">
-              No commands match “{query}”
+            <div className="p-8 text-center text-xs text-zinc-400">
+              No matching commands found for &ldquo;{query}&rdquo;
             </div>
           ) : (
-            filteredCommands.map((cmd, index) => (
-              <button
-                key={cmd.id}
-                data-selected={index === selectedIndex}
-                onClick={cmd.action}
-                // Hovering moves the highlight instead of adding a second one:
-                // a mouse-hover tint alongside the keyboard row made it
-                // ambiguous which row Enter would actually run.
-                onMouseMove={() => setSelectedIndex(index)}
-                className={`w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors ${
-                  index === selectedIndex
-                    ? "bg-swarm-gold/15 text-swarm-goldHi"
-                    : "text-swarm-textDim"
-                }`}
-              >
-                <span className={`mr-3 ${index === selectedIndex ? "text-swarm-gold" : "text-swarm-textMuted"}`}>
-                  {cmd.icon}
-                </span>
-                <span className="flex-1 text-left">{cmd.label}</span>
-                {cmd.shortcut && (
-                  <span className="text-mini text-swarm-textMuted bg-swarm-border/50 px-2 py-0.5 rounded-md">
-                    {cmd.shortcut}
-                  </span>
-                )}
-              </button>
-            ))
+            filteredCommands.map((cmd, idx) => {
+              const isSelected = idx === selectedIndex;
+              return (
+                <button
+                  key={cmd.id}
+                  onClick={cmd.action}
+                  onMouseEnter={() => setSelectedIndex(idx)}
+                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left text-xs transition-all ${
+                    isSelected
+                      ? "bg-amber-500/15 text-amber-200 shadow-sm border border-amber-500/30"
+                      : "text-zinc-300 hover:bg-zinc-800/50 border border-transparent"
+                  }`}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex size-7 items-center justify-center rounded-lg bg-zinc-900 border border-zinc-800 shrink-0">
+                      {cmd.icon}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-semibold text-zinc-100 truncate font-mono">{cmd.label}</div>
+                      {cmd.hint && (
+                        <div className="text-[11px] text-zinc-400 truncate">{cmd.hint}</div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    {cmd.shortcut && (
+                      <span className="font-mono text-[10px] text-zinc-400 bg-zinc-900/80 px-1.5 py-0.5 rounded border border-zinc-800">
+                        {cmd.shortcut}
+                      </span>
+                    )}
+                    <span className="text-[10px] text-zinc-400 font-sans">{cmd.category}</span>
+                  </div>
+                </button>
+              );
+            })
           )}
         </div>
 
-        {/* Footer */}
-        <div className="px-4 py-2 border-t border-swarm-border/50 text-mini text-swarm-textMuted flex justify-between">
-          <span>
-            <span className="mr-4">↑↓ Navigate</span>
-            <span className="mr-4">Enter Select</span>
-            <span>Esc Close</span>
-          </span>
+        {/* Footer shortcuts tip */}
+        <div className="px-4 py-2 border-t border-zinc-800/60 bg-zinc-900/40 text-[11px] text-zinc-400 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span><kbd className="font-mono bg-zinc-800 px-1 py-0.5 rounded text-zinc-300">↑↓</kbd> Navigate</span>
+            <span><kbd className="font-mono bg-zinc-800 px-1 py-0.5 rounded text-zinc-300">↵</kbd> Execute</span>
+            <span><kbd className="font-mono bg-zinc-800 px-1 py-0.5 rounded text-zinc-300">/</kbd> CLI Commands</span>
+            <span><kbd className="font-mono bg-zinc-800 px-1 py-0.5 rounded text-zinc-300">+</kbd> Summon</span>
+          </div>
+          <span className="text-amber-400 font-medium font-mono text-[10px]">Swarm AI CLI Hub</span>
         </div>
       </div>
     </div>

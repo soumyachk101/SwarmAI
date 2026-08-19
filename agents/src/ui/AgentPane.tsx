@@ -1484,7 +1484,11 @@ export default function AgentPane({
   ];
 
   return (
-    <div className="flex flex-col h-full glass-body overflow-hidden">
+    <div
+      onMouseDown={() => useAgentsStore.getState().setActivePaneId(paneId)}
+      onFocus={() => useAgentsStore.getState().setActivePaneId(paneId)}
+      className="flex flex-col h-full glass-body overflow-hidden"
+    >
       {/* Neutral chrome — class identity is the leading accent dot only. */}
       <div data-pane-drag data-pane-header="true" className={`${PANE_HEADER_CLASS} justify-between`}>
         <div className="flex items-center gap-2 min-w-0">

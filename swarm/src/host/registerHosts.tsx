@@ -205,10 +205,38 @@ export function registerHosts(): void {
     deliverToLead: (text) => {
       const s = useWorkspaceStore.getState();
       const lead = useAgentsStore.getState().leadOf(s.activeWorkspaceId);
-      if (!lead) return; // nothing wears the crown — nowhere to dictate
+      if (!lead) return;
       invoke("write_to_terminal", { paneId: lead.id, data: text }).catch((e) =>
         console.error("[Voice] write to Lead failed:", e),
       );
+    },
+    deliverToActive: (text) => {
+      const s = useWorkspaceStore.getState();
+      const swarms = useAgentsStore.getState();
+      const activePaneId = swarms.activePaneId;
+      const wsPanes = swarms.swarmsOf(s.activeWorkspaceId);
+      const target = activePaneId
+        ? swarms.agents.find((b) => b.id === activePaneId)
+        : wsPanes[0] || swarms.leadOf(s.activeWorkspaceId);
+
+      if (target) {
+        invoke("write_to_terminal", { paneId: target.id, data: text }).catch((e) =>
+          console.error("[Voice] write to active pane failed:", e),
+        );
+      }
+    },
+    getActiveTargetInfo: () => {
+      const s = useWorkspaceStore.getState();
+      const swarms = useAgentsStore.getState();
+      const activePaneId = swarms.activePaneId;
+      const wsPanes = swarms.swarmsOf(s.activeWorkspaceId);
+      const target = activePaneId
+        ? swarms.agents.find((b) => b.id === activePaneId)
+        : wsPanes[0] || swarms.leadOf(s.activeWorkspaceId);
+      return {
+        name: target ? (target.customName || target.cliName || target.cli) : "Terminal",
+        isLead: !!target?.isLead,
+      };
     },
   });
 
@@ -233,6 +261,26 @@ export function registerHosts(): void {
     leadOf: (wsId) => asCrowned(useAgentsStore.getState().leadOf(wsId)),
     setLeadMode: (swarmId, mode) => useAgentsStore.getState().setLeadMode(swarmId, mode),
     publishRole: (mode) => publishLeadRole(getActiveProjectPath(), mode),
+    summonLead: (wsId, cli, name) => {
+      const chosenCli = cli || useSettingsStore.getState().defaultAgent || "claude";
+      const id = `lead-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      const swarms = useAgentsStore.getState();
+      swarms.demoteLead(wsId);
+      swarms.addAgent({
+        id,
+        cli: chosenCli,
+        cliName: chosenCli,
+        customName: name || `${chosenCli === 'claude' ? 'Claude' : chosenCli === 'opencode' ? 'OpenCode' : chosenCli} Lead`,
+        args: modelArgs(chosenCli),
+        workspaceId: wsId,
+        isLead: true,
+        leadMode: "Steward",
+      });
+      swarms.setAgentStatus(id, "launching");
+      publishLeadRole(getActiveProjectPath(), "Steward");
+      useUiStore.getState().setRightOpen(true);
+      return id;
+    },
     LeadPane: ({ paneId, workingDir }) => {
       const swarms = useAgentsStore((s) => s.agents);
       const swarm = swarms.find((b) => b.id === paneId);

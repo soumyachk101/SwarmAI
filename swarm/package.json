@@ -22,6 +22,7 @@
     "@swarm/pheromone-mcp": "workspace:*",
     "@swarm/plugins": "workspace:*",
     "@swarm/lead": "workspace:*",
+    "@swarm/reports": "workspace:*",
     "@swarm/tasks": "workspace:*",
     "@swarm/agents": "workspace:*",
     "@swarm/workspace": "workspace:*",

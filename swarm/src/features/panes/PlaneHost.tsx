@@ -910,9 +910,9 @@ function PlaneAddMenu({
   const extensions = useExtensionStore((s) => s.installed);
   const has = (s: string) => s.toLowerCase().includes(q.toLowerCase());
 
-  // Board menu: unified gold theme, a search box, top 4 per category.
+  // Board menu: unified gold theme, a search box, top agents per category.
   if (plane.kind === "board") {
-    const agents = CLI_METADATA.filter((c) => has(c.name) || has(c.command)).slice(0, 4);
+    const agents = CLI_METADATA.filter((c) => has(c.name) || has(c.command)).slice(0, 8);
     const terms = shells.filter((s) => has(s.label)).slice(0, 4);
     const exts = extensions.filter((e) => has(e.name) || has(e.publisher)).slice(0, 4);
     const aiTools = [
