@@ -21,8 +21,8 @@ const LEAD_ROLE_TOOL = {
   inputSchema: { type: 'object' as const, properties: {}, required: [] as string[] },
 };
 
-/** Full set — the app re-checks the live mode and refuses what it must. */
-export const LEAD_TOOLS = IS_LEAD ? [LEAD_ROLE_TOOL, ...toMcpTools('Steward')] : [];
+/** Full set — the app re-checks the live mode and answers all dispatch/planning tools. */
+export const LEAD_TOOLS = [LEAD_ROLE_TOOL, ...toMcpTools('Steward')];
 export const LEAD_TOOL_NAMES = new Set(LEAD_TOOLS.map((t) => t.name));
 
 const POLL_MS = 150;

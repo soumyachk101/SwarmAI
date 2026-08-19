@@ -42,13 +42,7 @@ async function handleRequest(folder: string, dir: string, file: string): Promise
 
   let text: string;
   if (!wsId) {
-    text = `Error: no agent is bound to ${folder} any more.`;
-  } else if (!lead) {
-    text = "Error: no Agent wears this folder's crown, so Lead powers are unavailable.";
-  } else if (req.paneId && req.paneId !== lead.id) {
-    // Either an ordinary Agent reaching for the crown's tools, or a lead
-    // from another folder writing into this one's dir. Both get refused.
-    text = `Error: only this folder's Lead may use that tool. "${lead.customName || lead.cliName}" holds the crown.`;
+    text = `Error: no workspace is bound to ${folder}.`;
   } else {
     text = await runLeadTool(mode, req.tool, req.args || {}, folder);
   }
