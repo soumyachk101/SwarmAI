@@ -45,6 +45,11 @@ import {
   Activity,
   Zap,
   Sliders,
+  FolderGit2,
+  UploadCloud,
+  DownloadCloud,
+  GitCommit,
+  AlertCircle,
   type LucideIcon,
 } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
@@ -60,7 +65,7 @@ const WIDTH_KEY = "swarm.sidebarWidth";
 
 const clampWidth = (px: number) => Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, px));
 
-type LeftTab = "workspaces" | "explorer" | "search" | "devtools" | "fleet";
+type LeftTab = "workspaces" | "explorer" | "search" | "git" | "devtools" | "fleet";
 
 // Tokens, not raw Tailwind palette entries: bg-green-400 stayed the same green
 // in Rose, Forest and Dracula and clashed with every one of them.
@@ -1239,11 +1244,272 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
     openMenu(ws, e.clientX, e.clientY);
   };
 
+function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
+  const [branch, setBranch] = useState("main");
+  const [changedCount, setChangedCount] = useState(0);
+  const [isGitRepo, setIsGitRepo] = useState(true);
+  const [branches, setBranches] = useState<string[]>([]);
+  const [commitMsg, setCommitMsg] = useState("");
+  const [diffStats, setDiffStats] = useState("");
+  const [fullDiff, setFullDiff] = useState("");
+  const [diffViewMode, setDiffViewMode] = useState<"visual" | "stats">("visual");
+  const [loading, setLoading] = useState(false);
+  const [statusMsg, setStatusMsg] = useState<{ text: string; isError?: boolean } | null>(null);
+
+  const refresh = useCallback(async () => {
+    if (!projectPath) return;
+    try {
+      const st = await invoke<{ branch: string; changed: number }>("git_status", { projectPath });
+      setBranch(st.branch);
+      setChangedCount(st.changed);
+      setIsGitRepo(true);
+      const brs = await invoke<string[]>("git_branches", { projectPath });
+      setBranches(brs);
+      const diff = await invoke<string>("git_diff", { projectPath }).catch(() => "");
+      setDiffStats(diff);
+      const raw = await invoke<string>("git_diff_full", { projectPath }).catch(() => "");
+      setFullDiff(raw);
+    } catch (e: any) {
+      if (String(e).includes("Not a git repository")) {
+        setIsGitRepo(false);
+      }
+    }
+  }, [projectPath]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  const handleCommit = async () => {
+    if (!projectPath || !commitMsg.trim()) return;
+    setLoading(true);
+    try {
+      const res = await invoke<{ success: boolean; stdout: string; stderr: string }>("git_commit", {
+        projectPath,
+        message: commitMsg.trim(),
+      });
+      if (res.success) {
+        setStatusMsg({ text: res.stdout || "Committed successfully" });
+        setCommitMsg("");
+        await refresh();
+      } else {
+        setStatusMsg({ text: res.stderr || "Commit failed", isError: true });
+      }
+    } catch (e: any) {
+      setStatusMsg({ text: String(e), isError: true });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePush = async () => {
+    if (!projectPath) return;
+    setLoading(true);
+    try {
+      const res = await invoke<{ success: boolean; stdout: string; stderr: string }>("git_push", {
+        projectPath,
+        remote: "origin",
+        branch,
+      });
+      setStatusMsg(res.success ? { text: res.stdout || "Pushed to origin" } : { text: res.stderr || "Push failed", isError: true });
+      await refresh();
+    } catch (e: any) {
+      setStatusMsg({ text: String(e), isError: true });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePull = async () => {
+    if (!projectPath) return;
+    setLoading(true);
+    try {
+      const res = await invoke<{ success: boolean; stdout: string; stderr: string }>("git_pull", {
+        projectPath,
+        remote: "origin",
+        branch,
+      });
+      setStatusMsg(res.success ? { text: res.stdout || "Pulled from origin" } : { text: res.stderr || "Pull failed", isError: true });
+      await refresh();
+    } catch (e: any) {
+      setStatusMsg({ text: String(e), isError: true });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInit = async () => {
+    if (!projectPath) return;
+    setLoading(true);
+    try {
+      await invoke("git_init", { projectPath });
+      setStatusMsg({ text: "Git repository initialized" });
+      await refresh();
+    } catch (e: any) {
+      setStatusMsg({ text: String(e), isError: true });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!projectPath) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center p-6 text-center text-xs text-zinc-500">
+        <FolderGit2 size={32} className="text-zinc-600 mb-2" />
+        <p>No workspace folder bound</p>
+      </div>
+    );
+  }
+
+  if (!isGitRepo) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center p-6 text-center gap-3">
+        <FolderGit2 size={36} className="text-amber-400/80" />
+        <div>
+          <h4 className="text-xs font-bold text-zinc-200">Not a Git Repository</h4>
+          <p className="text-mini text-zinc-500 mt-1">Initialize git to track changes and push to GitHub.</p>
+        </div>
+        <button
+          onClick={handleInit}
+          disabled={loading}
+          className="px-3.5 py-1.5 rounded-lg bg-amber-500 text-zinc-950 font-bold text-xs hover:bg-amber-400 transition-all cursor-pointer shadow-md"
+        >
+          Initialize Repository
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-1 flex-col overflow-hidden text-xs">
+      {/* Header Info */}
+      <div className="p-3 border-b border-white/[0.06] bg-black/20 flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <span className="font-mono text-zinc-300 font-bold flex items-center gap-1.5 truncate">
+            <GitBranch size={13} className="text-amber-400 shrink-0" />
+            <span className="truncate">{branch}</span>
+          </span>
+          <span className="pro-badge pro-badge-amber text-[10px] shrink-0">
+            {changedCount} modified
+          </span>
+        </div>
+
+        {/* Quick Push / Pull buttons */}
+        <div className="grid grid-cols-2 gap-1.5 pt-1">
+          <button
+            onClick={handlePush}
+            disabled={loading}
+            className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 hover:bg-amber-500/25 transition-all text-mini font-semibold cursor-pointer disabled:opacity-50"
+            title="Push commits to origin"
+          >
+            <UploadCloud size={12} />
+            <span>Push</span>
+          </button>
+          <button
+            onClick={handlePull}
+            disabled={loading}
+            className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-zinc-800/80 border border-zinc-700/60 text-zinc-200 hover:bg-zinc-700/80 transition-all text-mini font-semibold cursor-pointer disabled:opacity-50"
+            title="Pull commits from origin"
+          >
+            <DownloadCloud size={12} />
+            <span>Pull</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Quick Commit Input */}
+      <div className="p-3 border-b border-white/[0.06] bg-black/10 flex flex-col gap-2">
+        <div className="flex gap-1.5">
+          <input
+            type="text"
+            value={commitMsg}
+            onChange={(e) => setCommitMsg(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") handleCommit(); }}
+            placeholder="Commit message..."
+            className="flex-1 min-w-0 px-2.5 py-1.5 rounded-lg bg-zinc-950 border border-zinc-700/70 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-500/60 font-sans"
+          />
+          <button
+            onClick={handleCommit}
+            disabled={loading || !commitMsg.trim() || changedCount === 0}
+            className="px-3 py-1.5 rounded-lg bg-amber-500 text-zinc-950 font-bold text-mini hover:bg-amber-400 transition-all disabled:opacity-40 cursor-pointer shrink-0"
+          >
+            Commit
+          </button>
+        </div>
+      </div>
+
+      {/* Changes Inspector */}
+      <div className="flex-1 overflow-y-auto scrollbar-sleek p-3 space-y-2">
+        <div className="flex items-center justify-between text-[10px] uppercase tracking-wider font-semibold text-zinc-500">
+          <span>Uncommitted Changes</span>
+          <div className="flex items-center gap-1 bg-zinc-900 px-1 py-0.5 rounded border border-zinc-800">
+            <button
+              onClick={() => setDiffViewMode("visual")}
+              className={`px-1.5 py-0.2 rounded text-[9px] font-mono ${diffViewMode === "visual" ? "text-amber-300 font-bold bg-amber-500/20" : "text-zinc-500 hover:text-zinc-300"}`}
+            >
+              Visual
+            </button>
+            <button
+              onClick={() => setDiffViewMode("stats")}
+              className={`px-1.5 py-0.2 rounded text-[9px] font-mono ${diffViewMode === "stats" ? "text-amber-300 font-bold bg-amber-500/20" : "text-zinc-500 hover:text-zinc-300"}`}
+            >
+              Stats
+            </button>
+          </div>
+        </div>
+
+        {diffViewMode === "visual" && fullDiff ? (
+          <div className="p-2 rounded-lg bg-zinc-950 border border-zinc-800 text-[10px] font-mono space-y-0.5 max-h-72 overflow-y-auto scrollbar-sleek">
+            {fullDiff.split("\n").map((line, i) => {
+              const isAdd = line.startsWith("+") && !line.startsWith("+++");
+              const isDel = line.startsWith("-") && !line.startsWith("---");
+              const isHeader = line.startsWith("diff --git") || line.startsWith("@@");
+              return (
+                <div
+                  key={i}
+                  className={`px-1 py-0.5 rounded-xs whitespace-pre-wrap break-all ${
+                    isAdd
+                      ? "bg-emerald-500/15 text-emerald-300 border-l-2 border-emerald-400"
+                      : isDel
+                      ? "bg-rose-500/15 text-rose-300 border-l-2 border-rose-400"
+                      : isHeader
+                      ? "text-amber-400 font-bold bg-zinc-900 py-0.5 px-1 my-0.5 rounded"
+                      : "text-zinc-400"
+                  }`}
+                >
+                  {line || " "}
+                </div>
+              );
+            })}
+          </div>
+        ) : diffStats ? (
+          <pre className="p-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-[10px] text-zinc-300 font-mono leading-relaxed whitespace-pre-wrap max-h-72 overflow-y-auto scrollbar-sleek">
+            {diffStats}
+          </pre>
+        ) : (
+          <div className="p-4 text-center text-zinc-500 text-mini border border-dashed border-zinc-800 rounded-lg">
+            Working tree clean — no uncommitted changes
+          </div>
+        )}
+
+        {statusMsg && (
+          <div className={`p-2 rounded-lg border text-mini font-mono ${
+            statusMsg.isError ? "border-red-500/30 bg-red-500/10 text-red-300" : "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+          }`}>
+            {statusMsg.text}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
   // Not LucideIcon: the Projects tab carries Swarm's own agent mark, which
   // is a plain function component, not a lucide forwardRef.
   const TABS: { id: LeftTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
     { id: "workspaces", label: "Projects", icon: WorkspaceMark },
     { id: "explorer", label: "Explorer", icon: Folder },
+    { id: "git", label: "Git", icon: FolderGit2 },
     { id: "search", label: "Search", icon: Search },
     { id: "devtools", label: "DevTools", icon: Wrench },
     { id: "fleet", label: "Fleet", icon: Cpu },
@@ -1281,7 +1547,7 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
               key={tab.id}
               onClick={() => { setActiveTab(tab.id); setViewer(null); }}
               title={tab.label}
-              className={`flex items-center justify-center gap-1.5 flex-1 min-w-0 h-8 px-2 rounded-lg text-mini font-medium transition-all whitespace-nowrap ${
+              className={`flex items-center justify-center gap-1.5 flex-1 min-w-0 h-8 px-1.5 rounded-lg text-mini font-medium transition-all whitespace-nowrap ${
                 active
                   ? "text-swarm-goldHi bg-swarm-gold/[0.12] border border-swarm-gold/30 shadow-sm"
                   : "text-swarm-textMuted hover:text-swarm-textDim hover:bg-white/[0.04]"
@@ -1324,6 +1590,8 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
           <FileViewer target={viewer} onBack={() => setViewer(null)} />
         ) : activeTab === "explorer" ? (
           <ExplorerPanel projectPath={projectPath || null} onOpen={setViewer} />
+        ) : activeTab === "git" ? (
+          <GitSidebarPanel projectPath={projectPath || null} />
         ) : activeTab === "search" ? (
           <SearchPanel projectPath={projectPath || null} onOpen={setViewer} />
         ) : activeTab === "devtools" ? (
@@ -1333,11 +1601,11 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
         ) : (
           /* Workspaces Tab Content */
           <>
-            {/* WorkHive Top Action Header (Matches Screenshot 1) */}
+            {/* WorkHive Top Action Header */}
             <div className="flex h-10 shrink-0 items-center justify-between px-3 pt-1 border-b border-white/[0.04] bg-white/[0.01]">
               <button
                 onClick={() => setHideSleeping(!hideSleeping)}
-                className="flex items-center gap-1.5 text-swarm-textMuted hover:text-swarm-text transition-colors text-xs font-mono"
+                className="flex items-center gap-1.5 text-swarm-textMuted hover:text-swarm-text transition-colors text-xs font-mono shrink-0"
                 title={hideSleeping ? "Show all workHives" : "Hide sleeping workHives"}
               >
                 {hideSleeping ? <EyeOff size={13} /> : <Eye size={13} />}
@@ -1346,11 +1614,11 @@ export default function ADEWorktreeSidebar({ projectPath, pinned = true, onToggl
 
               <button
                 onClick={handleAdd}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-b from-white/[0.1] to-white/[0.04] hover:from-white/[0.14] hover:to-white/[0.06] border border-white/[0.10] px-3 py-1 text-xs font-semibold text-swarm-text transition-all shadow-sm active:scale-[0.98]"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-b from-white/[0.1] to-white/[0.04] hover:from-white/[0.14] hover:to-white/[0.06] border border-white/[0.10] px-2.5 py-1 text-xs font-semibold text-swarm-text transition-all shadow-sm active:scale-[0.98] shrink-0"
                 title="New WorkHive"
               >
-                <Plus size={13} className="text-swarm-gold" />
-                <span>New WorkHive</span>
+                <Plus size={13} className="text-swarm-gold shrink-0" />
+                <span className="shrink-0">New Hive</span>
               </button>
             </div>
 

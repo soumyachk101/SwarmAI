@@ -572,23 +572,39 @@ export default function HomePage() {
         )}
         <button
           onClick={() => setShowGitModal(true)}
-          className="flex shrink-0 items-center gap-1.5 px-2 py-0.5 rounded hover:bg-white/[0.08] text-swarm-gold transition-colors cursor-pointer group"
+          className="flex shrink-0 items-center gap-1.5 px-2 py-0.5 rounded hover:bg-white/[0.08] text-swarm-gold transition-colors cursor-pointer group pro-badge pro-badge-amber"
           title={gitStatus ? `Git Control Hub (Branch: ${gitStatus.branch})` : "Initialize Git Repository"}
         >
-          <GitBranch size={11} className="group-hover:scale-110 transition-transform" />
-          <span className="max-w-[24ch] truncate font-mono">{gitStatus?.branch ?? "no repo"}</span>
+          <GitBranch size={11} className="group-hover:scale-110 transition-transform text-amber-400" />
+          <span className="max-w-[24ch] truncate font-mono font-medium text-amber-300">{gitStatus?.branch ?? "no repo"}</span>
           {gitStatus && gitStatus.changed > 0 && (
-            <span className="ml-1 px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[10px] font-mono">
+            <span className="ml-1 px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-200 text-[10px] font-mono font-bold">
               +{gitStatus.changed}
             </span>
           )}
         </button>
-        <span className="ml-auto flex shrink-0 items-center gap-3">
+
+        <span className="hidden md:flex items-center gap-2 text-[11px] font-mono text-zinc-400 ml-2">
+          <span className="flex items-center gap-1 text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20 text-[10px]">
+            <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>Swarm Engine</span>
+          </span>
+          <span className="text-zinc-600">·</span>
+          <span className="text-zinc-400 text-[10px]">Local Memory Bridge</span>
+        </span>
+
+        <span className="ml-auto flex shrink-0 items-center gap-2">
           {erroredAgents > 0 && (
-            <span className="text-swarm-err">{erroredAgents} failed</span>
+            <span className="pro-badge text-red-300 border-red-500/30 bg-red-500/10">
+              {erroredAgents} failed
+            </span>
           )}
-          <span title={`${busyAgents} of ${totalAgents} agents working`}>
-            {busyAgents}/{totalAgents} active
+          <span
+            className="pro-badge pro-badge-cyan"
+            title={`${busyAgents} of ${totalAgents} agents working`}
+          >
+            <span className={`size-1.5 rounded-full ${busyAgents > 0 ? "bg-cyan-400 animate-pulse" : "bg-zinc-500"}`} />
+            <span>{busyAgents}/{totalAgents} active</span>
           </span>
         </span>
       </div>

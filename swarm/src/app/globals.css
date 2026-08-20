@@ -34,41 +34,41 @@
 :root {
   --font-sans: 'Geist', sans-serif;
   --font-mono: 'Geist Mono', monospace;
-  --swarm-canvas: 14 16 19;
-  --swarm-canvas-hi: 20 23 28;
-  --swarm-surface: 25 29 35;
-  --swarm-surface-hi: 33 39 48;
-  --swarm-border: 44 51 61;
-  --swarm-border-hi: 97 105 114;
-  --swarm-gold: 224 168 58;
-  --swarm-gold-hi: 240 195 104;
-  --swarm-gold-dim: 169 122 37;
-  --swarm-honey: 240 195 104;
-  --swarm-amber: 208 146 47;
-  --swarm-text: 238 241 245;
-  --swarm-text-dim: 179 189 201;
-  --swarm-text-muted: 125 136 150;
-  --swarm-ok: 79 178 134;
-  --swarm-warn: 216 161 60;
-  --swarm-err: 224 100 94;
+  --swarm-canvas: 10 11 15;
+  --swarm-canvas-hi: 14 17 23;
+  --swarm-surface: 19 23 32;
+  --swarm-surface-hi: 26 31 43;
+  --swarm-border: 36 43 57;
+  --swarm-border-hi: 60 71 92;
+  --swarm-gold: 245 158 11;
+  --swarm-gold-hi: 251 191 36;
+  --swarm-gold-dim: 180 115 10;
+  --swarm-honey: 251 191 36;
+  --swarm-amber: 217 119 6;
+  --swarm-text: 243 244 246;
+  --swarm-text-dim: 156 163 175;
+  --swarm-text-muted: 107 114 128;
+  --swarm-ok: 16 185 129;
+  --swarm-warn: 245 158 11;
+  --swarm-err: 239 68 68;
   /* Hex mirrors (JS/SVG); applyTheme keeps these in sync with channel tokens */
-  --swarm-canvas-hex: #0e1013;
-  --swarm-canvas-hi-hex: #14171c;
-  --swarm-surface-hex: #191d23;
-  --swarm-surface-hi-hex: #212730;
-  --swarm-border-hex: #2c333d;
-  --swarm-border-hi-hex: #616972;
-  --swarm-gold-hex: #e0a83a;
-  --swarm-gold-hi-hex: #f0c368;
-  --swarm-gold-dim-hex: #a97a25;
-  --swarm-honey-hex: #f0c368;
-  --swarm-amber-hex: #d0922f;
-  --swarm-text-hex: #eef1f5;
-  --swarm-text-dim-hex: #b3bdc9;
-  --swarm-text-muted-hex: #7d8896;
-  --swarm-ok-hex: #4fb286;
-  --swarm-warn-hex: #d8a13c;
-  --swarm-err-hex: #e0645e;
+  --swarm-canvas-hex: #0a0b0f;
+  --swarm-canvas-hi-hex: #0e1117;
+  --swarm-surface-hex: #131720;
+  --swarm-surface-hi-hex: #1a1f2b;
+  --swarm-border-hex: #242b39;
+  --swarm-border-hi-hex: #3c475c;
+  --swarm-gold-hex: #f59e0b;
+  --swarm-gold-hi-hex: #fbbf24;
+  --swarm-gold-dim-hex: #b4730a;
+  --swarm-honey-hex: #fbbf24;
+  --swarm-amber-hex: #d97706;
+  --swarm-text-hex: #f3f4f6;
+  --swarm-text-dim-hex: #9ca3af;
+  --swarm-text-muted-hex: #6b7280;
+  --swarm-ok-hex: #10b981;
+  --swarm-warn-hex: #f59e0b;
+  --swarm-err-hex: #ef4444;
 }
 
 /* Motion scale. Two durations and one curve for the whole app — the file used
@@ -432,6 +432,75 @@ select:focus {
     height: 7px;
     opacity: 0.7;
   }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.6));
+  }
+  50% {
+    opacity: 0.75;
+    filter: drop-shadow(0 0 2px rgba(245, 158, 11, 0.2));
+  }
+}
+
+@keyframes pulse-emerald {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.6));
+  }
+  50% {
+    opacity: 0.75;
+    filter: drop-shadow(0 0 2px rgba(16, 185, 129, 0.2));
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-pulse-emerald {
+  animation: pulse-emerald 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.pro-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.1875rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.6875rem;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+}
+
+.pro-badge-amber {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.25);
+  color: #fbbf24;
+}
+
+.pro-badge-emerald {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.25);
+  color: #34d399;
+}
+
+.pro-badge-cyan {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: rgba(6, 182, 212, 0.25);
+  color: #22d3ee;
+}
+
+.pro-badge-purple {
+  background: rgba(168, 85, 247, 0.1);
+  border-color: rgba(168, 85, 247, 0.25);
+  color: #c084fc;
 }
 
 

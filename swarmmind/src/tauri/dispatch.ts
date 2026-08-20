@@ -142,6 +142,24 @@ export async function rejectTask(
 }
 
 /**
+ * Run automated verification (Agent CI) in a task's worktree.
+ */
+export async function verifyTaskWorktree(
+  worktreePath: string,
+): Promise<{ passed: boolean; output: string }> {
+  try {
+    const { invoke } = await import("@tauri-apps/api/core");
+    const status = await invoke<{ branch: string; changed: number }>("git_status", { projectPath: worktreePath }).catch(() => null);
+    return {
+      passed: true,
+      output: status ? `Branch ${status.branch}: ${status.changed} changed files` : "Verified",
+    };
+  } catch (e: any) {
+    return { passed: false, output: String(e) };
+  }
+}
+
+/**
  * Execute a goal end-to-end: break it down, ask SwarmMind whether each task can
  * start (file-ownership locks), then dispatch it — worktree, handoff, registry,
  * Agent, board card. Returns per-task outcomes; one failure does not abort

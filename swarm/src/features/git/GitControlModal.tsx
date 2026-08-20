@@ -42,6 +42,8 @@ export default function GitControlModal({
   const [isGitRepo, setIsGitRepo] = useState<boolean>(true);
   const [branches, setBranches] = useState<string[]>([]);
   const [diffStats, setDiffStats] = useState<string>("");
+  const [fullDiff, setFullDiff] = useState<string>("");
+  const [diffMode, setDiffMode] = useState<"stats" | "visual">("visual");
   const [commitMessage, setCommitMessage] = useState("");
   const [newBranchName, setNewBranchName] = useState("");
   const [showNewBranchInput, setShowNewBranchInput] = useState(false);
@@ -61,6 +63,9 @@ export default function GitControlModal({
 
       const diff = await invoke<string>("git_diff", { projectPath });
       setDiffStats(diff);
+
+      const rawDiff = await invoke<string>("git_diff_full", { projectPath }).catch(() => "");
+      setFullDiff(rawDiff);
     } catch (e: any) {
       if (String(e).includes("Not a git repository")) {
         setIsGitRepo(false);
@@ -365,15 +370,67 @@ export default function GitControlModal({
                 </div>
               </div>
 
-              {/* Changed files diff stat preview */}
-              {diffStats && (
-                <div className="space-y-1.5">
-                  <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">
-                    Uncommitted Diff Stats:
+              {/* Changed files diff inspector */}
+              {(diffStats || fullDiff) && (
+                <div className="space-y-2 rounded-xl border border-zinc-800 bg-zinc-950/60 p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-zinc-300 flex items-center gap-1.5 font-mono">
+                      <FileCode size={13} className="text-amber-400" />
+                      <span>Uncommitted Changes Inspector</span>
+                    </span>
+                    <div className="flex items-center gap-1 bg-zinc-900 p-0.5 rounded-lg border border-zinc-800 text-[10px] font-mono">
+                      <button
+                        onClick={() => setDiffMode("visual")}
+                        className={`px-2 py-0.5 rounded-md transition-colors cursor-pointer ${
+                          diffMode === "visual"
+                            ? "bg-amber-500/20 text-amber-300 font-bold"
+                            : "text-zinc-400 hover:text-zinc-200"
+                        }`}
+                      >
+                        Visual Diff
+                      </button>
+                      <button
+                        onClick={() => setDiffMode("stats")}
+                        className={`px-2 py-0.5 rounded-md transition-colors cursor-pointer ${
+                          diffMode === "stats"
+                            ? "bg-amber-500/20 text-amber-300 font-bold"
+                            : "text-zinc-400 hover:text-zinc-200"
+                        }`}
+                      >
+                        Stats
+                      </button>
+                    </div>
                   </div>
-                  <pre className="p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-[11px] text-zinc-300 font-mono leading-relaxed whitespace-pre-wrap max-h-28 overflow-y-auto scrollbar-sleek">
-                    {diffStats}
-                  </pre>
+
+                  {diffMode === "visual" && fullDiff ? (
+                    <div className="p-2.5 rounded-lg bg-zinc-950 border border-zinc-800/80 text-[11px] font-mono max-h-48 overflow-y-auto scrollbar-sleek space-y-0.5">
+                      {fullDiff.split("\n").map((line, idx) => {
+                        const isAdd = line.startsWith("+") && !line.startsWith("+++");
+                        const isDel = line.startsWith("-") && !line.startsWith("---");
+                        const isHeader = line.startsWith("diff --git") || line.startsWith("@@");
+                        return (
+                          <div
+                            key={idx}
+                            className={`px-1.5 py-0.5 rounded-sm whitespace-pre-wrap break-all ${
+                              isAdd
+                                ? "bg-emerald-500/15 text-emerald-300 border-l-2 border-emerald-400"
+                                : isDel
+                                ? "bg-rose-500/15 text-rose-300 border-l-2 border-rose-400"
+                                : isHeader
+                                ? "text-amber-400 font-bold bg-zinc-900/80 py-1 px-2 my-1 rounded"
+                                : "text-zinc-400"
+                            }`}
+                          >
+                            {line || " "}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <pre className="p-3 rounded-lg bg-zinc-950 border border-zinc-800 text-[11px] text-zinc-300 font-mono leading-relaxed whitespace-pre-wrap max-h-36 overflow-y-auto scrollbar-sleek">
+                      {diffStats || "No changes detected"}
+                    </pre>
+                  )}
                 </div>
               )}
             </>

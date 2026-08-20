@@ -1404,6 +1404,24 @@ async fn git_diff(project_path: String) -> Result<String, String> {
 }
 
 #[tauri::command]
+async fn git_diff_full(project_path: String) -> Result<String, String> {
+    let output = git_output(&project_path, &["diff", "HEAD"])
+        .map_err(|e| e.to_string())?;
+    if output.status.success() {
+        let diff = String::from_utf8_lossy(&output.stdout).to_string();
+        if diff.trim().is_empty() {
+            let unstaged = git_output(&project_path, &["diff"])
+                .map_err(|e| e.to_string())?;
+            Ok(String::from_utf8_lossy(&unstaged.stdout).to_string())
+        } else {
+            Ok(diff)
+        }
+    } else {
+        Err(String::from_utf8_lossy(&output.stderr).to_string())
+    }
+}
+
+#[tauri::command]
 async fn git_push(project_path: String, remote: String, branch: String) -> Result<GitPushPullResponse, String> {
     let remote = if remote.is_empty() { "origin" } else { &remote };
     let branch = if branch.is_empty() {
@@ -3845,6 +3863,7 @@ pub fn run() {
             git_checkout,
             git_commit,
             git_diff,
+            git_diff_full,
             git_push,
             git_pull,
             cli_usage,
