@@ -158,6 +158,14 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
   const [over, setOver] = useState<
     { kind: "snap"; id: GridLayout } | { kind: "pane"; id: string } | null
   >(null);
+
+  // Auto-refit terminals whenever layout shape or count changes to eliminate CLI shape glitches
+  useEffect(() => {
+    const handle = requestAnimationFrame(() => {
+      refitTerminals();
+    });
+    return () => cancelAnimationFrame(handle);
+  }, [agents.length, gridLayout, maximizedPane, activeWorkspaceId, fit, refitTerminals]);
   // Live cursor position. A ref, not state: the ghost is moved by writing
   // transform straight to the DOM (see below), and only the very first frame
   // of the drag reads this during render.
@@ -819,13 +827,13 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
                      blurry, with box-drawing borders landing off the pixel
                      grid so their corners never meet. Anything added here must
                      leave geometry alone. */
-                  className={`flex flex-col overflow-hidden glass glass-lift glass-sheen font-sans antialiased ${
+                  className={`flex flex-col overflow-hidden font-sans antialiased ${
                     shouldHide
                       ? "hidden"
-                      : "relative h-full rounded-lg border border-swarm-border transition-[box-shadow,border-color,opacity] duration-200"
+                      : "relative h-full rounded-2xl border border-white/[0.08] bg-[#12141c]/90 shadow-lg shadow-black/40 backdrop-blur-xl transition-[box-shadow,border-color,opacity] duration-200"
                   } ${drag?.id === swarm.id ? "opacity-30" : ""} ${
                     over?.kind === "pane" && over.id === swarm.id ? "ring-2 ring-swarm-gold/70" : ""
-                  } ${focusedPane === swarm.id && !isThisMax ? "pane-active" : ""}`}
+                  } ${focusedPane === swarm.id && !isThisMax ? "ring-1 ring-swarm-gold/40 border-swarm-gold/40 shadow-xl shadow-amber-500/5" : ""}`}
                   style={
                     shouldHide
                       ? undefined

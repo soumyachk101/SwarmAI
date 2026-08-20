@@ -323,7 +323,7 @@ function getCliModelPresets(cli: string): CliModelPreset {
       brandName: "OpenAI Codex Models",
       brandColor: "#10A37F",
       switchCommand: "/model",
-      defaultModel: "GPT-5 Omni",
+      defaultModel: "o3-mini",
       supportsEffort: true,
       defaultEffort: "High",
       effortLevels: [
@@ -332,11 +332,13 @@ function getCliModelPresets(cli: string): CliModelPreset {
         { id: "low", label: "Low Reasoning" },
       ],
       models: [
-        { id: "gpt-5-omni", label: "GPT-5 Omni (Next-Gen)" },
-        { id: "gpt-4.5-preview", label: "GPT-4.5 Preview (Orion)" },
-        { id: "o3-mini", label: "o3-mini (High Reasoning)" },
+        { id: "o3-mini", label: "o3-mini (High Reasoning, Recommended)" },
+        { id: "o3", label: "o3 (Deep Reasoning)" },
         { id: "o1", label: "o1 (Full Reasoning)" },
-        { id: "gpt-4o", label: "GPT-4o (Latest)" },
+        { id: "o1-mini", label: "o1-mini (Fast Reasoning)" },
+        { id: "gpt-4o", label: "GPT-4o (Flagship Multimodal)" },
+        { id: "gpt-4o-mini", label: "GPT-4o-mini (Fast & Lightweight)" },
+        { id: "gpt-4.5-preview", label: "GPT-4.5 Preview (Orion Research)" },
       ],
     };
   }
