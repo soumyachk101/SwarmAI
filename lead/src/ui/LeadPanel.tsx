@@ -97,6 +97,7 @@ export default function LeadPanel() {
   const lead = host.useLead(activeWsId);
   const workingDir = host.useActiveFolder();
   const [missionInput, setMissionInput] = useState("");
+  const [workerCli, setWorkerCli] = useState<string>("auto");
   const [isDispatching, setIsDispatching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -137,7 +138,7 @@ export default function LeadPanel() {
     setIsDispatching(true);
 
     try {
-      await host.dispatchGoal(goal, workingDir, activeWsId);
+      await host.dispatchGoal(goal, workingDir, activeWsId, workerCli);
     } catch (e) {
       console.error("[Lead] Failed instant parallel dispatch:", e);
     } finally {
@@ -172,7 +173,9 @@ export default function LeadPanel() {
                 <div className="text-[10px] text-amber-400/70 font-normal">Opus 5 &middot; Strategic Planner</div>
               </div>
             </div>
-            <span className="text-[10px] bg-amber-500/20 px-2 py-0.5 rounded-full font-mono">👑 1-Click</span>
+            <span className="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-md font-mono flex items-center gap-1">
+              <Sparkles size={10} /> Lead
+            </span>
           </button>
 
           <button
@@ -186,7 +189,7 @@ export default function LeadPanel() {
                 <div className="text-[10px] text-purple-400/70 font-normal">Nemotron Free &middot; Autonomous</div>
               </div>
             </div>
-            <span className="text-[10px] bg-purple-500/20 px-2 py-0.5 rounded-full font-mono">Free</span>
+            <span className="text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded-md font-mono">Free AI</span>
           </button>
 
           <button
@@ -200,7 +203,7 @@ export default function LeadPanel() {
                 <div className="text-[10px] text-cyan-400/70 font-normal">OpenAI GPT-5 Core</div>
               </div>
             </div>
-            <span className="text-[10px] bg-cyan-500/20 px-2 py-0.5 rounded-full font-mono">Fast</span>
+            <span className="text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded-md font-mono">Fast</span>
           </button>
         </div>
       </div>
@@ -234,28 +237,41 @@ export default function LeadPanel() {
               if (e.key === "Enter") handleDispatchToLead();
             }}
             placeholder="Type mission here (e.g. Build premium portfolio UI with animations)..."
-            className="w-full bg-transparent text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none"
+            className="w-full bg-transparent text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none font-sans"
           />
           <button
             onClick={() => window.dispatchEvent(new CustomEvent("swarm:voice:toggle", { detail: { mode: "lead" } }))}
-            className="p-1 rounded text-zinc-400 hover:text-amber-400 hover:bg-zinc-800 transition-colors shrink-0"
+            className="p-1 rounded-md text-zinc-400 hover:text-amber-400 hover:bg-zinc-800 transition-colors shrink-0"
             title="Dictate with voice"
           >
-            <Mic size={13} />
+            <Mic size={14} />
           </button>
+          <select
+            value={workerCli}
+            onChange={(e) => setWorkerCli(e.target.value)}
+            className="bg-zinc-800 text-[11px] font-mono text-zinc-300 border border-zinc-700/60 rounded-md px-2 py-1 focus:outline-none focus:border-amber-500/50 cursor-pointer shrink-0"
+            title="Choose which CLI engine to dispatch worker tasks to"
+          >
+            <option value="auto">Auto (Board CLI)</option>
+            <option value="claude">Claude Code</option>
+            <option value="opencode">OpenCode Zen</option>
+            <option value="codex">Codex CLI</option>
+            <option value="agy">Antigravity</option>
+            <option value="aider">Aider</option>
+          </select>
           <button
             onClick={handleInstantParallelDispatch}
             disabled={isDispatching}
-            className="flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/30 transition-all shrink-0 cursor-pointer shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-amber-500/20 to-amber-600/20 text-amber-300 border border-amber-500/35 hover:border-amber-500/60 hover:bg-amber-500/30 transition-all shrink-0 cursor-pointer shadow-sm hover:shadow-amber-500/10 active:scale-95"
             title="Instant parallel dispatch: decompose & launch worker agents in worktrees immediately"
           >
-            <Layers size={12} className="text-cyan-400" />
+            <Layers size={13} className="text-amber-400" />
             <span>Parallel Dispatch</span>
           </button>
           <button
             onClick={() => handleDispatchToLead()}
             disabled={isDispatching}
-            className="p-1.5 rounded-md bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors shrink-0 cursor-pointer shadow-sm"
+            className="p-1.5 rounded-md bg-zinc-800 text-zinc-300 hover:bg-amber-500/20 hover:text-amber-300 border border-zinc-700/60 hover:border-amber-500/30 transition-colors shrink-0 cursor-pointer shadow-sm"
             title="Send mission directive to Lead Agent"
           >
             <Send size={13} />

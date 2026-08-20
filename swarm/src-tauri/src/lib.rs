@@ -1331,27 +1331,117 @@ pub struct GitPushPullResponse {
 }
 
 #[tauri::command]
+async fn git_init(project_path: String) -> Result<String, String> {
+    let output = git_output(&project_path, &["init"])
+        .map_err(|e| e.to_string())?;
+    if output.status.success() {
+        Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
+    } else {
+        Err(String::from_utf8_lossy(&output.stderr).trim().to_string())
+    }
+}
+
+#[tauri::command]
+async fn git_branches(project_path: String) -> Result<Vec<String>, String> {
+    let output = git_output(&project_path, &["branch", "--format=%(refname:short)"])
+        .map_err(|e| e.to_string())?;
+    if !output.status.success() {
+        return Err(String::from_utf8_lossy(&output.stderr).trim().to_string());
+    }
+    let branches = String::from_utf8_lossy(&output.stdout)
+        .lines()
+        .map(|l| l.trim().to_string())
+        .filter(|l| !l.is_empty())
+        .collect();
+    Ok(branches)
+}
+
+#[tauri::command]
+async fn git_checkout(project_path: String, branch: String, create_new: bool) -> Result<GitPushPullResponse, String> {
+    let args: Vec<&str> = if create_new {
+        vec!["checkout", "-b", &branch]
+    } else {
+        vec!["checkout", &branch]
+    };
+    let output = git_output(&project_path, &args).map_err(|e| e.to_string())?;
+    Ok(GitPushPullResponse {
+        success: output.status.success(),
+        stdout: String::from_utf8_lossy(&output.stdout).to_string(),
+        stderr: String::from_utf8_lossy(&output.stderr).to_string(),
+    })
+}
+
+#[tauri::command]
+async fn git_commit(project_path: String, message: String) -> Result<GitPushPullResponse, String> {
+    // Stage all tracked and untracked changes
+    let add_out = git_output(&project_path, &["add", "."]).map_err(|e| e.to_string())?;
+    if !add_out.status.success() {
+        return Ok(GitPushPullResponse {
+            success: false,
+            stdout: String::from_utf8_lossy(&add_out.stdout).to_string(),
+            stderr: String::from_utf8_lossy(&add_out.stderr).to_string(),
+        });
+    }
+
+    let msg = if message.trim().is_empty() { "chore: update via SwarmAI" } else { message.trim() };
+    let commit_out = git_output(&project_path, &["commit", "-m", msg]).map_err(|e| e.to_string())?;
+    Ok(GitPushPullResponse {
+        success: commit_out.status.success(),
+        stdout: String::from_utf8_lossy(&commit_out.stdout).to_string(),
+        stderr: String::from_utf8_lossy(&commit_out.stderr).to_string(),
+    })
+}
+
+#[tauri::command]
+async fn git_diff(project_path: String) -> Result<String, String> {
+    let output = git_output(&project_path, &["diff", "--stat"])
+        .map_err(|e| e.to_string())?;
+    if output.status.success() {
+        Ok(String::from_utf8_lossy(&output.stdout).to_string())
+    } else {
+        Err(String::from_utf8_lossy(&output.stderr).to_string())
+    }
+}
+
+#[tauri::command]
 async fn git_push(project_path: String, remote: String, branch: String) -> Result<GitPushPullResponse, String> {
- let remote = if remote.is_empty() { "origin" } else { &remote };
- let output = git_output(&project_path, &["push", remote, &branch])
- .map_err(|e| e.to_string())?;
- Ok(GitPushPullResponse {
- success: output.status.success(),
- stdout: String::from_utf8_lossy(&output.stdout).to_string(),
- stderr: String::from_utf8_lossy(&output.stderr).to_string(),
- })
+    let remote = if remote.is_empty() { "origin" } else { &remote };
+    let branch = if branch.is_empty() {
+        // Auto-detect current HEAD branch
+        let head_out = git_output(&project_path, &["rev-parse", "--abbrev-ref", "HEAD"])
+            .map_err(|e| e.to_string())?;
+        String::from_utf8_lossy(&head_out.stdout).trim().to_string()
+    } else {
+        branch
+    };
+
+    let output = git_output(&project_path, &["push", remote, &branch])
+        .map_err(|e| e.to_string())?;
+    Ok(GitPushPullResponse {
+        success: output.status.success(),
+        stdout: String::from_utf8_lossy(&output.stdout).to_string(),
+        stderr: String::from_utf8_lossy(&output.stderr).to_string(),
+    })
 }
 
 #[tauri::command]
 async fn git_pull(project_path: String, remote: String, branch: String) -> Result<GitPushPullResponse, String> {
- let remote = if remote.is_empty() { "origin" } else { &remote };
- let output = git_output(&project_path, &["pull", remote, &branch])
- .map_err(|e| e.to_string())?;
- Ok(GitPushPullResponse {
- success: output.status.success(),
- stdout: String::from_utf8_lossy(&output.stdout).to_string(),
- stderr: String::from_utf8_lossy(&output.stderr).to_string(),
- })
+    let remote = if remote.is_empty() { "origin" } else { &remote };
+    let branch = if branch.is_empty() {
+        let head_out = git_output(&project_path, &["rev-parse", "--abbrev-ref", "HEAD"])
+            .map_err(|e| e.to_string())?;
+        String::from_utf8_lossy(&head_out.stdout).trim().to_string()
+    } else {
+        branch
+    };
+
+    let output = git_output(&project_path, &["pull", remote, &branch])
+        .map_err(|e| e.to_string())?;
+    Ok(GitPushPullResponse {
+        success: output.status.success(),
+        stdout: String::from_utf8_lossy(&output.stdout).to_string(),
+        stderr: String::from_utf8_lossy(&output.stderr).to_string(),
+    })
 }
 
 /// Path of an existing worktree that already has `branch` checked out, if any.
@@ -3630,6 +3720,85 @@ async fn cli_usage(clis: Vec<String>) -> Result<Vec<CliUsage>, String> {
     Ok(report)
 }
 
+#[tauri::command]
+async fn download_and_install_update(
+    download_url: String,
+    file_name: String,
+) -> Result<String, String> {
+    use std::path::PathBuf;
+
+    let home = std::env::var("HOME")
+        .or_else(|_| std::env::var("USERPROFILE"))
+        .unwrap_or_else(|_| "/tmp".to_string());
+    let downloads_dir = PathBuf::from(home).join("Downloads");
+    let _ = std::fs::create_dir_all(&downloads_dir);
+    let target_path = downloads_dir.join(&file_name);
+
+    // Download using curl with redirect follow
+    let status = std::process::Command::new("curl")
+        .arg("-L")
+        .arg("-o")
+        .arg(&target_path)
+        .arg(&download_url)
+        .status()
+        .map_err(|e| format!("Failed to download update: {}", e))?;
+
+    if !status.success() {
+        return Err("Download failed via curl".to_string());
+    }
+
+    // On macOS: Open the DMG so macOS mounts it automatically
+    #[cfg(target_os = "macos")]
+    {
+        if file_name.ends_with(".dmg") {
+            let _ = std::process::Command::new("open")
+                .arg(&target_path)
+                .spawn();
+        }
+    }
+
+    // On Windows: Open installer
+    #[cfg(target_os = "windows")]
+    {
+        let _ = std::process::Command::new("cmd")
+            .args(["/C", "start", "", target_path.to_str().unwrap_or_default()])
+            .spawn();
+    }
+
+    // On Linux: Open/run
+    #[cfg(target_os = "linux")]
+    {
+        let _ = std::process::Command::new("xdg-open")
+            .arg(&target_path)
+            .spawn();
+    }
+
+    Ok(target_path.to_string_lossy().to_string())
+}
+
+#[tauri::command]
+fn open_external_url(url: String) -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    {
+        let _ = std::process::Command::new("open")
+            .arg(&url)
+            .spawn();
+    }
+    #[cfg(target_os = "windows")]
+    {
+        let _ = std::process::Command::new("cmd")
+            .args(["/C", "start", "", &url])
+            .spawn();
+    }
+    #[cfg(target_os = "linux")]
+    {
+        let _ = std::process::Command::new("xdg-open")
+            .arg(&url)
+            .spawn();
+    }
+    Ok(())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let pty_system = PtySystem {
@@ -3643,6 +3812,8 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
+            download_and_install_update,
+            open_external_url,
             spawn_terminal,
             write_to_terminal,
             resize_terminal,
@@ -3667,10 +3838,15 @@ pub fn run() {
             pheromone_log_session,
             pheromone_list_sessions,
             pheromone_close,
-            git_status,
- git_push,
- git_pull,
             detect_shells,
+            git_status,
+            git_init,
+            git_branches,
+            git_checkout,
+            git_commit,
+            git_diff,
+            git_push,
+            git_pull,
             cli_usage,
             create_worktree,
             merge_worktree,

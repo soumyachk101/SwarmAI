@@ -34,10 +34,12 @@ import {
   PanelRight,
   Columns3,
   Mic,
+  FolderGit2,
 } from "lucide-react";
 import ThemePicker from "@/shared/ThemePicker";
 import OverflowMenu from "@/shared/OverflowMenu";
 import CommandPalette from "@/shared/CommandPalette";
+import GitControlModal from "@/features/git/GitControlModal";
 
 
 /**
@@ -77,6 +79,7 @@ export default function HomePage() {
   const [showExtensions, setShowExtensions] = useState(false);
   const [showUsage, setShowUsage] = useState(false);
   const [showPalette, setShowPalette] = useState(false);
+  const [showGitModal, setShowGitModal] = useState(false);
   const [gitStatus, setGitStatus] = useState<{
     branch: string;
     changed: number;
@@ -288,6 +291,13 @@ export default function HomePage() {
             hint: "Start or switch a workspace",
             icon: FolderOpen,
             onSelect: handleOpenFolder,
+          },
+          {
+            id: "git",
+            label: "Git & GitHub Hub…",
+            hint: "Commit, push, pull, branches",
+            icon: FolderGit2,
+            onSelect: () => setShowGitModal(true),
           },
           {
             id: "extensions",
@@ -560,13 +570,19 @@ export default function HomePage() {
             {projectPath.split(/[\\/]/).filter(Boolean).pop()}
           </span>
         )}
-        <span className="flex shrink-0 items-center gap-1.5 text-swarm-gold" title={gitStatus ? `On branch ${gitStatus.branch}` : "Not a git repository"}>
-          <GitBranch size={11} />
-          <span className="max-w-[24ch] truncate">{gitStatus?.branch ?? "no repo"}</span>
-        </span>
-        {gitStatus && gitStatus.changed > 0 && (
-          <span className="shrink-0 text-swarm-textMuted">{gitStatus.changed} changed</span>
-        )}
+        <button
+          onClick={() => setShowGitModal(true)}
+          className="flex shrink-0 items-center gap-1.5 px-2 py-0.5 rounded hover:bg-white/[0.08] text-swarm-gold transition-colors cursor-pointer group"
+          title={gitStatus ? `Git Control Hub (Branch: ${gitStatus.branch})` : "Initialize Git Repository"}
+        >
+          <GitBranch size={11} className="group-hover:scale-110 transition-transform" />
+          <span className="max-w-[24ch] truncate font-mono">{gitStatus?.branch ?? "no repo"}</span>
+          {gitStatus && gitStatus.changed > 0 && (
+            <span className="ml-1 px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[10px] font-mono">
+              +{gitStatus.changed}
+            </span>
+          )}
+        </button>
         <span className="ml-auto flex shrink-0 items-center gap-3">
           {erroredAgents > 0 && (
             <span className="text-swarm-err">{erroredAgents} failed</span>
@@ -580,6 +596,13 @@ export default function HomePage() {
       {showSettings && <SettingsPage onClose={() => setShowSettings(false)} />}
       {showExtensions && <ExtensionsMarketplace onClose={() => setShowExtensions(false)} />}
       {showUpdates && <UpdateCheckerModal isOpen={showUpdates} onClose={() => setShowUpdates(false)} />}
+      {showGitModal && (
+        <GitControlModal
+          isOpen={showGitModal}
+          onClose={() => setShowGitModal(false)}
+          projectPath={projectPath}
+        />
+      )}
       <CommandPalette
         isOpen={showPalette}
         onClose={() => setShowPalette(false)}
@@ -587,6 +610,7 @@ export default function HomePage() {
         onOpenExtensions={() => setShowExtensions(true)}
         onOpenFolder={handleOpenFolder}
         onOpenUpdates={() => setShowUpdates(true)}
+        onOpenGit={() => setShowGitModal(true)}
       />
 
       {/* Global voice hotkeys: Ctrl+Win (type anywhere) · Ctrl+Alt (Agent). */}

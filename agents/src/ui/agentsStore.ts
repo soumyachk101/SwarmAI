@@ -44,6 +44,8 @@ export interface Agent {
    *  Kept for display and so a respawn reuses the same configuration. */
   model?: string;
   effort?: string;
+  /** Initial task prompt to auto-feed when dispatched by Lead */
+  initialPrompt?: string;
 }
 
 export type AgentStatus = 'launching' | 'running' | 'idle' | 'error' | 'done';

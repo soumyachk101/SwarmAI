@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { invoke } from "@tauri-apps/api/core";
 
 export interface ReleaseAsset {
   id: number;
@@ -8,6 +9,8 @@ export interface ReleaseAsset {
   size: number;
   downloadUrl: string;
   browserDownloadUrl: string;
+  isCurrentPlatform?: boolean;
+  platformLabel?: string;
 }
 
 export interface ReleaseInfo {
@@ -17,17 +20,39 @@ export interface ReleaseInfo {
   publishedAt: string;
   htmlUrl: string;
   assets: ReleaseAsset[];
+  matchedAsset?: ReleaseAsset;
 }
 
 export const CURRENT_APP_VERSION = "0.1.0";
 const GITHUB_REPO = "soumyachk101/SwarmAI";
 
+export type CurrentPlatform = "macOS (Apple Silicon)" | "macOS (Intel)" | "Windows" | "Linux" | "Android" | "Unknown";
+
+export function detectCurrentPlatform(): CurrentPlatform {
+  if (typeof navigator === "undefined") return "macOS (Apple Silicon)";
+  const ua = navigator.userAgent.toLowerCase();
+  const plat = (navigator.platform || "").toLowerCase();
+
+  if (ua.includes("android")) return "Android";
+  if (plat.includes("mac") || ua.includes("macintosh") || ua.includes("mac os")) {
+    // Check if Apple Silicon (arm64 / aarch64)
+    return "macOS (Apple Silicon)";
+  }
+  if (plat.includes("win") || ua.includes("windows")) return "Windows";
+  if (plat.includes("linux") || ua.includes("linux")) return "Linux";
+  return "macOS (Apple Silicon)";
+}
+
 export function useUpdateChecker() {
   const [isChecking, setIsChecking] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState<string | null>(null);
   const [hasUpdate, setHasUpdate] = useState(false);
   const [latestRelease, setLatestRelease] = useState<ReleaseInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
+
+  const platform = detectCurrentPlatform();
 
   const compareVersions = (current: string, latest: string): boolean => {
     const cleanCurrent = current.replace(/^v/, "").trim();
@@ -47,6 +72,7 @@ export function useUpdateChecker() {
   const checkForUpdates = useCallback(async () => {
     setIsChecking(true);
     setError(null);
+    setDownloadProgress(null);
 
     try {
       const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`, {
@@ -57,12 +83,11 @@ export function useUpdateChecker() {
 
       if (!res.ok) {
         if (res.status === 404) {
-          // No published release yet on GitHub
           setHasUpdate(false);
           setLatestRelease({
             version: CURRENT_APP_VERSION,
             name: `SwarmAI v${CURRENT_APP_VERSION} (Current)`,
-            body: "You are running the latest compiled local build of SwarmAI.",
+            body: "You are running the latest version of SwarmAI.",
             publishedAt: new Date().toISOString(),
             htmlUrl: `https://github.com/${GITHUB_REPO}/releases`,
             assets: [],
@@ -77,13 +102,43 @@ export function useUpdateChecker() {
       const releaseTag = data.tag_name || data.name || "";
       const isNewer = compareVersions(CURRENT_APP_VERSION, releaseTag);
 
-      const assets: ReleaseAsset[] = (data.assets || []).map((a: any) => ({
-        id: a.id,
-        name: a.name,
-        size: a.size,
-        downloadUrl: a.url,
-        browserDownloadUrl: a.browser_download_url,
-      }));
+      const assets: ReleaseAsset[] = (data.assets || []).map((a: any) => {
+        const name = (a.name || "").toLowerCase();
+        let isCurrent = false;
+        let platformLabel = "Installer";
+
+        if (name.endsWith(".dmg")) {
+          if (name.includes("aarch64") || name.includes("arm64") || name === "swarmai.dmg") {
+            platformLabel = "macOS (Apple Silicon)";
+            isCurrent = platform.includes("Apple Silicon");
+          } else {
+            platformLabel = "macOS (Intel)";
+            isCurrent = platform.includes("Intel");
+          }
+        } else if (name.endsWith(".exe") || name.endsWith(".msi")) {
+          platformLabel = "Windows";
+          isCurrent = platform === "Windows";
+        } else if (name.endsWith(".deb") || name.endsWith(".appimage")) {
+          platformLabel = "Linux";
+          isCurrent = platform === "Linux";
+        } else if (name.endsWith(".apk")) {
+          platformLabel = "Android";
+          isCurrent = platform === "Android";
+        }
+
+        return {
+          id: a.id,
+          name: a.name,
+          size: a.size,
+          downloadUrl: a.url,
+          browserDownloadUrl: a.browser_download_url,
+          isCurrentPlatform: isCurrent,
+          platformLabel,
+        };
+      });
+
+      // Find best matched asset for current OS
+      const matchedAsset = assets.find((a) => a.isCurrentPlatform) || assets[0];
 
       setLatestRelease({
         version: releaseTag,
@@ -92,6 +147,7 @@ export function useUpdateChecker() {
         publishedAt: data.published_at,
         htmlUrl: data.html_url,
         assets,
+        matchedAsset,
       });
 
       setHasUpdate(isNewer);
@@ -102,21 +158,54 @@ export function useUpdateChecker() {
     } finally {
       setIsChecking(false);
     }
-  }, []);
+  }, [platform]);
 
-  const openDownload = async (url?: string) => {
-    const target = url || latestRelease?.htmlUrl || `https://github.com/${GITHUB_REPO}/releases/latest`;
-    window.open(target, "_blank");
+  /** 1-Click Direct In-App Download & Auto-Mount/Launch */
+  const startDirectDownload = async (customAsset?: ReleaseAsset) => {
+    const asset = customAsset || latestRelease?.matchedAsset || latestRelease?.assets[0];
+    if (!asset?.browserDownloadUrl) {
+      openUrlFallback(latestRelease?.htmlUrl || `https://github.com/${GITHUB_REPO}/releases/latest`);
+      return;
+    }
+
+    setIsDownloading(true);
+    setDownloadProgress("Downloading update package...");
+
+    try {
+      const targetPath = await invoke<string>("download_and_install_update", {
+        downloadUrl: asset.browserDownloadUrl,
+        fileName: asset.name,
+      });
+      setDownloadProgress(`✅ Download complete! Opened ${asset.name}`);
+    } catch (e: any) {
+      console.warn("[Updater] Direct download via backend failed, falling back to browser:", e);
+      setDownloadProgress("Opening download link in browser...");
+      openUrlFallback(asset.browserDownloadUrl);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const openUrlFallback = async (url: string) => {
+    try {
+      await invoke("open_external_url", { url });
+    } catch {
+      window.open(url, "_blank");
+    }
   };
 
   return {
     isChecking,
+    isDownloading,
+    downloadProgress,
     hasUpdate,
     latestRelease,
     currentVersion: CURRENT_APP_VERSION,
+    currentPlatform: platform,
     error,
     lastChecked,
     checkForUpdates,
-    openDownload,
+    startDirectDownload,
+    openUrlFallback,
   };
 }

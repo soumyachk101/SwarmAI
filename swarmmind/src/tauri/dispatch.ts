@@ -56,17 +56,17 @@ function toSwarmMindRole(suggested: string): Role {
  * Pure: turn breakdown tasks into an ordered dispatch plan.
  * Worktree need comes from SwarmMind's RoleManager — the single source of truth.
  */
-export function planDispatch(tasks: LeadTask[]): DispatchPlanEntry[] {
+export function planDispatch(tasks: LeadTask[], preferredCli?: string): DispatchPlanEntry[] {
   return tasks.map((task) => ({
     task,
-    cli: task.suggestedCli || "claude",
+    cli: preferredCli && preferredCli !== "auto" ? preferredCli : (task.suggestedCli || "claude"),
     needsWorktree: roles.getDefinition(toSwarmMindRole(task.suggestedRole)).needsWorktree,
   }));
 }
 
 export interface DispatchHooks {
   /** Launch the agent pane and return its id, so the card can point at it. */
-  launchAgent: (cli: string, name: string, cwd?: string) => string;
+  launchAgent: (cli: string, name: string, cwd?: string, initialPrompt?: string) => string;
   addCard: (card: NewCardInput) => void;
 }
 
@@ -152,9 +152,10 @@ export async function dispatchGoal(
   projectPath: string,
   hooks: DispatchHooks,
   pheromoneContext?: string,
+  preferredCli?: string,
 ): Promise<DispatchResult[]> {
   const { tasks } = await breakdown({ goal, pheromoneContext });
-  const plan = planDispatch(tasks);
+  const plan = planDispatch(tasks, preferredCli);
   const results: DispatchResult[] = [];
 
   const { orchestrator, handoffs } = getOrchestrator(projectPath);
@@ -211,7 +212,7 @@ export async function dispatchGoal(
         result.worktree = { path: worktree.path, branch: worktree.branch, task_id: worktree.taskId };
       }
 
-      const paneAgentId = hooks.launchAgent(cli, task.description.slice(0, 40), worktree?.path);
+      const paneAgentId = hooks.launchAgent(cli, task.description.slice(0, 40), worktree?.path, task.description);
 
       // The card must carry the agent link, or the pipeline can never show the
       // task as running: nodeStatus() reads agent status via paneAgentId.

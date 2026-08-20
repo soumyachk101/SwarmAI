@@ -123,10 +123,10 @@ function toolContextFor(wsId: string): ToolContext {
   };
 }
 
-function launchSwarm(wsId: string, cli: string, name: string, args?: string[]): string {
+function launchSwarm(wsId: string, cli: string, name: string, args?: string[], initialPrompt?: string): string {
   const id = `swarm-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   const swarms = useAgentsStore.getState();
-  swarms.addAgent({ id, cli, cliName: cli, customName: name, args, workspaceId: wsId });
+  swarms.addAgent({ id, cli, cliName: cli, customName: name, args, workspaceId: wsId, initialPrompt });
   // Mark it launching so the pipeline shows the node active straight away,
   // rather than waiting for the pane to report in.
   swarms.setAgentStatus(id, "launching");
@@ -309,12 +309,25 @@ export function registerHosts(): void {
       );
     },
 
-    dispatchGoal: (goal, folder, wsId) =>
-      dispatchGoal(goal, folder, {
-        launchAgent: (cli, displayName, cwd) =>
-          launchSwarm(wsId, cli, displayName, cwd ? ["--cwd", cwd] : undefined),
-        addCard: (card) => useWorkspaceStore.getState().addTaskCard(wsId, card),
-      }).then((results) => {
+    dispatchGoal: (goal, folder, wsId, preferredCli) => {
+      const activeSwarmCli = useAgentsStore.getState().swarmsOf(wsId).find((s) => !s.isLead)?.cli;
+      const targetCli = preferredCli && preferredCli !== "auto"
+        ? preferredCli
+        : (preferredCli === "auto" && activeSwarmCli)
+        ? activeSwarmCli
+        : useSettingsStore.getState().defaultAgent || "claude";
+
+      return dispatchGoal(
+        goal,
+        folder,
+        {
+          launchAgent: (cli, displayName, cwd, initialPrompt) =>
+            launchSwarm(wsId, targetCli || cli, displayName, cwd ? ["--cwd", cwd] : undefined, initialPrompt),
+          addCard: (card) => useWorkspaceStore.getState().addTaskCard(wsId, card),
+        },
+        undefined,
+        targetCli,
+      ).then((results) => {
         // Remember each worktree so approve_task can merge it later.
         for (const r of results) {
           if (r.worktree && !r.error) {
@@ -325,7 +338,8 @@ export function registerHosts(): void {
           }
         }
         return results;
-      }),
+      });
+    },
     approveTask: async (folder, taskId) => {
       const entry = useDispatchStore.getState().get(folder, taskId)!;
       const { merged, viaOrchestrator } = await approveTask(folder, taskId, {

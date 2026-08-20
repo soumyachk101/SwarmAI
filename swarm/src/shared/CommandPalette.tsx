@@ -27,6 +27,7 @@ import {
   Stethoscope,
   Trash2,
   Download,
+  FolderGit2,
 } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 import { useAgentsStore } from "@swarm/agents/ui";
@@ -53,6 +54,7 @@ interface CommandPaletteProps {
   onOpenExtensions: () => void;
   onOpenFolder: () => void;
   onOpenUpdates?: () => void;
+  onOpenGit?: () => void;
 }
 
 export default function CommandPalette({
@@ -62,6 +64,7 @@ export default function CommandPalette({
   onOpenExtensions,
   onOpenFolder,
   onOpenUpdates,
+  onOpenGit,
 }: CommandPaletteProps) {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -431,7 +434,19 @@ export default function CommandPalette({
         onClose();
       },
     },
-  ], [activeWsId, boardOpen, view, onClose, onOpenSettings, onOpenExtensions, onOpenFolder, onOpenUpdates]);
+    {
+      id: "open-git",
+      category: "Project",
+      label: "/git",
+      hint: "Git & GitHub Hub (commit, push, pull, branch, init)",
+      icon: <FolderGit2 size={16} className="text-amber-400" />,
+      shortcut: "Cmd+G",
+      action: () => {
+        if (onOpenGit) onOpenGit();
+        onClose();
+      },
+    },
+  ], [activeWsId, boardOpen, view, onClose, onOpenSettings, onOpenExtensions, onOpenFolder, onOpenUpdates, onOpenGit]);
 
   const filteredCommands = useMemo(() => {
     if (!query.trim()) return commands;

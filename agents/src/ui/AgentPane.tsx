@@ -68,6 +68,7 @@ export interface AgentInfo {
   /** Model / effort this swarm was summoned with, when pinned. */
   model?: string;
   effort?: string;
+  initialPrompt?: string;
 }
 
 interface AgentPaneProps {
@@ -272,12 +273,21 @@ const COMMAND_SUGGESTIONS: CommandSuggestion[] = [
   { name: "/memory", description: "Inspect or manage agent long-term memory", category: "Memory" },
 ];
 
-interface CliModelPreset {
+export interface EffortOption {
+  id: string;
+  label: string;
+  isHighlight?: boolean;
+}
+
+export interface CliModelPreset {
   brandName: string;
   brandColor: string;
   switchCommand: string;
   defaultModel: string;
   models: ModelOption[];
+  supportsEffort: boolean;
+  effortLevels?: EffortOption[];
+  defaultEffort?: string;
 }
 
 function getCliModelPresets(cli: string): CliModelPreset {
@@ -288,6 +298,15 @@ function getCliModelPresets(cli: string): CliModelPreset {
       brandColor: "#D97757",
       switchCommand: "/model",
       defaultModel: "Opus 5 (1M Context)",
+      supportsEffort: true,
+      defaultEffort: "Max",
+      effortLevels: [
+        { id: "max", label: "Max Effort", isHighlight: true },
+        { id: "xhigh", label: "Extra High" },
+        { id: "high", label: "High" },
+        { id: "medium", label: "Medium" },
+        { id: "low", label: "Low" },
+      ],
       models: [
         { id: "opus[1m]", label: "Opus 5 (1M Context)", is1M: true, pricing: "$5/$25 Mtok" },
         { id: "fable[1m]", label: "Fable 5 (1M Context)", is1M: true, pricing: "$4/$20 Mtok" },
@@ -299,28 +318,19 @@ function getCliModelPresets(cli: string): CliModelPreset {
       ],
     };
   }
-  if (c === "agy" || c === "antigravity") {
-    return {
-      brandName: "Antigravity Models",
-      brandColor: "#4285F4",
-      switchCommand: "/model",
-      defaultModel: "Gemini 3.7 Flash",
-      models: [
-        { id: "gemini-3.7-flash", label: "Gemini 3.7 Flash (Ultra Realtime)", is1M: true },
-        { id: "gemini-3.6-flash", label: "Gemini 3.6 Flash (1M Context)", is1M: true },
-        { id: "gemini-3.5-flash", label: "Gemini 3.5 Flash", is1M: true },
-        { id: "gemini-3.1-pro", label: "Gemini 3.1 Pro (2M Context)", is1M: true },
-        { id: "claude-5-sonnet", label: "Claude 5 Sonnet", is1M: true },
-        { id: "deepseek-r1", label: "DeepSeek-R1 (671B CoT)", is1M: false },
-      ],
-    };
-  }
   if (c === "codex" || c === "openai") {
     return {
       brandName: "OpenAI Codex Models",
       brandColor: "#10A37F",
       switchCommand: "/model",
       defaultModel: "GPT-5 Omni",
+      supportsEffort: true,
+      defaultEffort: "High",
+      effortLevels: [
+        { id: "high", label: "High Reasoning", isHighlight: true },
+        { id: "medium", label: "Medium Reasoning" },
+        { id: "low", label: "Low Reasoning" },
+      ],
       models: [
         { id: "gpt-5-omni", label: "GPT-5 Omni (Next-Gen)" },
         { id: "gpt-4.5-preview", label: "GPT-4.5 Preview (Orion)" },
@@ -336,6 +346,7 @@ function getCliModelPresets(cli: string): CliModelPreset {
       brandColor: "#A855F7",
       switchCommand: "/model",
       defaultModel: "Nemotron 3.5 Lightning Free",
+      supportsEffort: false,
       models: [
         { id: "opencode/nemotron-3.5-lightning", label: "Nemotron 3.5 Lightning Free (Zen)", pricing: "Free" },
         { id: "opencode/nemotron-3-ultra", label: "Nemotron 3 Ultra Free (Zen)", pricing: "Free" },
@@ -347,12 +358,30 @@ function getCliModelPresets(cli: string): CliModelPreset {
       ],
     };
   }
+  if (c === "agy" || c === "antigravity") {
+    return {
+      brandName: "Antigravity Models",
+      brandColor: "#4285F4",
+      switchCommand: "/model",
+      defaultModel: "Gemini 3.7 Flash",
+      supportsEffort: false,
+      models: [
+        { id: "gemini-3.7-flash", label: "Gemini 3.7 Flash (Ultra Realtime)", is1M: true },
+        { id: "gemini-3.6-flash", label: "Gemini 3.6 Flash (1M Context)", is1M: true },
+        { id: "gemini-3.5-flash", label: "Gemini 3.5 Flash", is1M: true },
+        { id: "gemini-3.1-pro", label: "Gemini 3.1 Pro (2M Context)", is1M: true },
+        { id: "claude-5-sonnet", label: "Claude 5 Sonnet", is1M: true },
+        { id: "deepseek-r1", label: "DeepSeek-R1 (671B CoT)", is1M: false },
+      ],
+    };
+  }
   if (c === "aider") {
     return {
       brandName: "Aider Models",
       brandColor: "#14B8A6",
       switchCommand: "/model",
       defaultModel: "Claude 3.7 Sonnet",
+      supportsEffort: false,
       models: [
         { id: "sonnet", label: "Claude 3.7 Sonnet" },
         { id: "o3-mini", label: "OpenAI o3-mini" },
@@ -367,13 +396,10 @@ function getCliModelPresets(cli: string): CliModelPreset {
     brandName: "CLI Models",
     brandColor: "#E5A93C",
     switchCommand: "/model",
-    defaultModel: "Claude 3.7 Sonnet",
+    defaultModel: "Default Model",
+    supportsEffort: false,
     models: [
-      { id: "claude-3-7-sonnet", label: "Claude 3.7 Sonnet" },
-      { id: "o3-mini", label: "o3-mini" },
-      { id: "gpt-4o", label: "GPT-4o" },
-      { id: "deepseek-r1", label: "DeepSeek R1" },
-      { id: "gemini-2.5-pro", label: "Gemini 2.5 Pro" },
+      { id: "default", label: "Default CLI Model" },
     ],
   };
 }
@@ -1139,7 +1165,29 @@ export default function AgentPane({
                 // Do not writeToProcess — submitting a tip as a fake user turn
                 // pollutes Claude/Codex/OpenCode chat and can land mid-wizard.
                 console.log(`[Pheromone] MCP bridge live for ${paneId}; skipped stdin injection`);
+
+                // Auto-feed task prompt if this worker was dispatched with an initial prompt
+                if (agent.initialPrompt && !disposed) {
+                  const pText = agent.initialPrompt;
+                  useAgentsStore.getState().updateAgent(paneId, { initialPrompt: undefined });
+                  setTimeout(() => {
+                    if (!disposed) {
+                      writeToProcess(pText + "\r");
+                    }
+                  }, 1200);
+                }
                 return;
+              }
+
+              // Auto-feed task prompt if this worker was dispatched with an initial prompt
+              if (agent.initialPrompt && !disposed) {
+                const pText = agent.initialPrompt;
+                useAgentsStore.getState().updateAgent(paneId, { initialPrompt: undefined });
+                setTimeout(() => {
+                  if (!disposed) {
+                    writeToProcess(pText + "\r");
+                  }
+                }, 1200);
               }
 
               // MCP-capable CLIs (Claude Code, Kilo, Codex, OpenCode, …) NEVER get
@@ -1897,35 +1945,37 @@ export default function AgentPane({
                     )}
                   </div>
 
-                  {/* Effort Selector Dropdown */}
-                  <div ref={effortMenuRef} className="relative">
-                    <button
-                      onClick={() => { setEffortMenuOpen(!effortMenuOpen); setModelMenuOpen(false); setSettingsMenuOpen(false); }}
-                      className="flex items-center gap-1 text-xs text-swarm-textDim hover:text-swarm-text transition-colors font-medium"
-                      title="Reasoning Effort"
-                    >
-                      <span className="font-semibold text-swarm-text/90">{currentEffort}</span>
-                      <ChevronDown size={13} className="text-swarm-textMuted/70" />
-                    </button>
+                  {/* Effort Selector Dropdown — only for CLIs that support reasoning effort (Claude, Codex) */}
+                  {cliPreset.supportsEffort && cliPreset.effortLevels && cliPreset.effortLevels.length > 0 && (
+                    <div ref={effortMenuRef} className="relative">
+                      <button
+                        onClick={() => { setEffortMenuOpen(!effortMenuOpen); setModelMenuOpen(false); setSettingsMenuOpen(false); }}
+                        className="flex items-center gap-1 text-xs text-swarm-textDim hover:text-swarm-text transition-colors font-medium"
+                        title="Reasoning Effort"
+                      >
+                        <span className="font-semibold text-swarm-text/90">{currentEffort}</span>
+                        <ChevronDown size={13} className="text-swarm-textMuted/70" />
+                      </button>
 
-                    {effortMenuOpen && (
-                      <div className="absolute bottom-full left-0 mb-2 min-w-[130px] rounded-xl border border-white/[0.12] bg-[#141720] p-1.5 shadow-2xl z-50 animate-fade-in">
-                        <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase">
-                          Effort Level
+                      {effortMenuOpen && (
+                        <div className="absolute bottom-full left-0 mb-2 min-w-[130px] rounded-xl border border-white/[0.12] bg-[#141720] p-1.5 shadow-2xl z-50 animate-fade-in">
+                          <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase">
+                            Effort Level
+                          </div>
+                          {cliPreset.effortLevels.map((eff) => (
+                            <button
+                              key={eff.id}
+                              onClick={() => handleSelectEffort(eff.label)}
+                              className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-xs text-left text-swarm-textDim hover:bg-white/[0.08] hover:text-swarm-text transition-colors"
+                            >
+                              <span className={eff.isHighlight ? "font-bold text-swarm-goldHi" : ""}>{eff.label}</span>
+                              {currentEffort === eff.label && <Check size={12} className="text-swarm-gold" />}
+                            </button>
+                          ))}
                         </div>
-                        {["UltraCode", "Max", "High", "Medium", "Low"].map((eff) => (
-                          <button
-                            key={eff}
-                            onClick={() => handleSelectEffort(eff)}
-                            className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-xs text-left text-swarm-textDim hover:bg-white/[0.08] hover:text-swarm-text transition-colors"
-                          >
-                            <span className={eff === "UltraCode" ? "font-bold text-swarm-goldHi" : ""}>{eff}</span>
-                            {currentEffort === eff && <Check size={12} className="text-swarm-gold" />}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                      )}
+                    </div>
+                  )}
 
                   {/* Usage Speedometer Check Button */}
                   <button

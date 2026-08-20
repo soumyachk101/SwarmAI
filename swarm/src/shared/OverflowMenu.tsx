@@ -77,13 +77,13 @@ export default function OverflowMenu({ items }: { items: OverflowItem[] }) {
         aria-expanded={open}
         aria-label="More"
         title="More"
-        className={`shrink-0 rounded-md p-1 transition-colors ${
+        className={`shrink-0 flex items-center justify-center size-7 rounded-lg border transition-all ${
           open
-            ? "bg-swarm-gold/15 text-swarm-goldHi"
-            : "text-swarm-textMuted hover:bg-swarm-border/50 hover:text-swarm-text"
+            ? "border-amber-500/40 bg-amber-500/15 text-amber-300 shadow-sm"
+            : "border-zinc-800/80 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-800/80 hover:text-zinc-200"
         }`}
       >
-        <MoreHorizontal size={15} />
+        <MoreHorizontal size={16} strokeWidth={2.2} />
       </button>
 
       {open &&

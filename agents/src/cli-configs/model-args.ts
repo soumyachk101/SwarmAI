@@ -26,10 +26,7 @@ function normaliseModel(cli: string, model: string): string {
     return model.trim();
   }
   if (cli === "opencode") {
-    if (m.includes("nemotron")) return "openrouter/nvidia/nemotron-4-340b-instruct";
-    if (m.includes("llama")) return "openrouter/meta-llama/llama-3.3-70b-instruct";
-    if (m.includes("qwen")) return "openrouter/qwen/qwen-2.5-coder-32b-instruct";
-    if (m.includes("deepseek")) return "openrouter/deepseek/deepseek-chat";
+    if (m.startsWith("opencode/")) return "";
     if (m.includes("/")) return m;
     return "";
   }

@@ -66,7 +66,7 @@ export interface LeadHost {
   captureBrowser(url?: string): Promise<{ url: string } | null>;
 
   /** SwarmMind's pipeline, injected so Lead doesn't depend on it. */
-  dispatchGoal(goal: string, folder: string, workspaceId: string): Promise<DispatchOutcome[]>;
+  dispatchGoal(goal: string, folder: string, workspaceId: string, preferredCli?: string): Promise<DispatchOutcome[]>;
   approveTask(folder: string, taskId: string): Promise<{ merged: boolean; viaOrchestrator: boolean; branch: string }>;
   rejectTask(folder: string, taskId: string, notes: string): Promise<{ viaOrchestrator: boolean; branch: string }>;
   dispatchedIn(folder: string): DispatchedEntry[];
