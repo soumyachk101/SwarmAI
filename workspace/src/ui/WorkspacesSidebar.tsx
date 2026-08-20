@@ -1058,61 +1058,6 @@ function FleetPanel({ onSelectWorkspace }: { onSelectWorkspace: (wsId: string) =
   );
 }
 
-// ── Developer HUD Mini-Status Footer ─────────────────────────────
-function SidebarDeveloperHud({
-  projectPath,
-  onOpenTab,
-}: {
-  projectPath: string | null;
-  onOpenTab: (tab: LeftTab) => void;
-}) {
-  const [branch, setBranch] = useState<string>("");
-  const agents = useAgentsStore((s) => s.agents);
-  const statuses = useAgentsStore((s) => s.agentStatuses);
-  const runningCount = agents.filter((a) => statuses[a.id] === "running" || statuses[a.id] === "launching").length;
-
-  useEffect(() => {
-    if (!projectPath) { setBranch(""); return; }
-    let cancelled = false;
-    invoke<string>("run_command", {
-      command: "git",
-      args: ["-C", projectPath, "rev-parse", "--abbrev-ref", "HEAD"],
-    })
-      .then((b) => { if (!cancelled) setBranch(b.trim()); })
-      .catch(() => { if (!cancelled) setBranch(""); });
-    return () => { cancelled = true; };
-  }, [projectPath]);
-
-  return (
-    <div className="flex h-8 shrink-0 items-center justify-between border-t border-swarm-border/40 bg-swarm-surface/90 px-2.5 text-micro font-mono">
-      <div className="flex items-center gap-1.5 min-w-0">
-        <span className="size-1.5 rounded-full bg-swarm-ok" />
-        <span className="truncate text-swarm-textDim max-w-[100px]" title={branch || "Detached"}>
-          {branch || "main"}
-        </span>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => onOpenTab("fleet")}
-          className="flex items-center gap-1 rounded px-1.5 py-0.5 text-swarm-textMuted hover:bg-swarm-border/30 hover:text-swarm-gold transition-colors"
-          title="Swarm Fleet Status"
-        >
-          <Cpu size={11} className={runningCount > 0 ? "text-swarm-ok" : "text-swarm-textMuted"} />
-          <span>{runningCount}</span>
-        </button>
-        <button
-          onClick={() => onOpenTab("devtools")}
-          className="flex items-center gap-1 rounded px-1.5 py-0.5 text-swarm-textMuted hover:bg-swarm-border/30 hover:text-swarm-gold transition-colors"
-          title="Open DevTools"
-        >
-          <Wrench size={11} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
 export default function ADEWorktreeSidebar({ projectPath, pinned = true, onTogglePin, onClose, topBar }: Props) {
   const [activeTab, setActiveTab] = useState<LeftTab>("workspaces");
   const [viewer, setViewer] = useState<ViewerTarget | null>(null);
@@ -1756,8 +1701,6 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
         )}
       </div>
 
-      {/* Developer HUD Mini-Status Footer */}
-      <SidebarDeveloperHud projectPath={projectPath || null} onOpenTab={(tab) => setActiveTab(tab)} />
       {contextMenu && createPortal(
         <>
           <div className="fixed inset-0 z-[200]" onClick={() => setContextMenu(null)} />
@@ -1896,12 +1839,12 @@ function ProjectGroup({
 
   return (
     <div className="px-1.5 py-1">
-      {/* Outer WorkHive Rounded Card */}
+      {/* Outer WorkHive Rounded Card with Hover Lift Animation */}
       <div
-        className={`rounded-2xl border transition-all p-3 shadow-md ${
+        className={`rounded-2xl border p-3 shadow-md transition-all duration-200 ease-out cursor-pointer hover:-translate-y-1 hover:shadow-xl active:translate-y-0 ${
           isActive
-            ? "border-swarm-gold/40 bg-gradient-to-b from-[#151926] to-[#0e111a] ring-1 ring-swarm-gold/25 shadow-black/60"
-            : "border-white/[0.07] bg-[#10121a]/70 hover:border-white/[0.14] hover:bg-[#131622]/80"
+            ? "border-swarm-gold/40 bg-gradient-to-b from-[#181a21] to-[#121318] ring-1 ring-swarm-gold/25 shadow-black/60 hover:border-swarm-gold/60"
+            : "border-white/[0.07] bg-[#14161d]/80 hover:border-white/[0.18] hover:bg-[#181b24]"
         }`}
         onClick={() => { if (!isRenaming) onActivate(); }}
       >

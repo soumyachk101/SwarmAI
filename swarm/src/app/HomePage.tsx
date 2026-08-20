@@ -29,6 +29,7 @@ import {
   Square,
   Copy,
   FolderOpen,
+  Folder,
   GitBranch,
   PanelLeft,
   PanelRight,
@@ -564,32 +565,38 @@ export default function HomePage() {
       {/* Status bar. It used to spend a whole row on the word "no repo"; it now
           carries the four things worth glancing at — where you are, what the
           repo looks like, and whether anything is running or has failed. */}
-      <div className="h-6 glass-toolbar border-t border-swarm-border/60 flex items-center gap-3 px-3 text-mini text-swarm-textDim">
+      {/* Luxury Pro Status Bar */}
+      <div className="h-7 border-t border-white/[0.07] bg-[#0c0d10]/95 backdrop-blur-xl flex items-center gap-3 px-3 text-mini select-none z-10">
         {projectPath && (
-          <span className="min-w-0 truncate text-swarm-textMuted" title={projectPath}>
-            {projectPath.split(/[\\/]/).filter(Boolean).pop()}
+          <span
+            className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.07] text-zinc-300 font-mono text-[11px] max-w-[200px] truncate shadow-2xs"
+            title={projectPath}
+          >
+            <Folder size={11} className="text-amber-400/80 shrink-0" />
+            <span className="truncate">{projectPath.split(/[\\/]/).filter(Boolean).pop()}</span>
           </span>
         )}
+
         <button
           onClick={() => setShowGitModal(true)}
-          className="flex shrink-0 items-center gap-1.5 px-2 py-0.5 rounded hover:bg-white/[0.08] text-swarm-gold transition-colors cursor-pointer group pro-badge pro-badge-amber"
+          className="flex shrink-0 items-center gap-1.5 px-2.5 py-0.5 rounded-md hover:bg-white/[0.06] text-amber-300 transition-colors cursor-pointer group pro-badge pro-badge-gold shadow-2xs"
           title={gitStatus ? `Git Control Hub (Branch: ${gitStatus.branch})` : "Initialize Git Repository"}
         >
-          <GitBranch size={11} className="group-hover:scale-110 transition-transform text-amber-400" />
-          <span className="max-w-[24ch] truncate font-mono font-medium text-amber-300">{gitStatus?.branch ?? "no repo"}</span>
+          <GitBranch size={11} className="group-hover:scale-110 transition-transform text-amber-400 shrink-0" />
+          <span className="max-w-[24ch] truncate font-mono font-medium">{gitStatus?.branch ?? "no repo"}</span>
           {gitStatus && gitStatus.changed > 0 && (
-            <span className="ml-1 px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-200 text-[10px] font-mono font-bold">
+            <span className="ml-0.5 px-1.5 py-0.2 rounded bg-amber-500/25 text-amber-200 text-[10px] font-mono font-bold">
               +{gitStatus.changed}
             </span>
           )}
         </button>
 
-        <span className="hidden md:flex items-center gap-2 text-[11px] font-mono text-zinc-400 ml-2">
-          <span className="flex items-center gap-1 text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20 text-[10px]">
+        <span className="hidden md:flex items-center gap-2 text-[11px] font-mono text-zinc-400 ml-1">
+          <span className="flex items-center gap-1.5 text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20 text-[10px]">
             <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <span>Swarm Engine</span>
           </span>
-          <span className="text-zinc-600">·</span>
+          <span className="text-zinc-700">·</span>
           <span className="text-zinc-400 text-[10px]">Local Memory Bridge</span>
         </span>
 
@@ -600,10 +607,10 @@ export default function HomePage() {
             </span>
           )}
           <span
-            className="pro-badge pro-badge-cyan"
+            className="pro-badge pro-badge-gold"
             title={`${busyAgents} of ${totalAgents} agents working`}
           >
-            <span className={`size-1.5 rounded-full ${busyAgents > 0 ? "bg-cyan-400 animate-pulse" : "bg-zinc-500"}`} />
+            <span className={`size-1.5 rounded-full ${busyAgents > 0 ? "bg-amber-400 animate-pulse" : "bg-zinc-500"}`} />
             <span>{busyAgents}/{totalAgents} active</span>
           </span>
         </span>

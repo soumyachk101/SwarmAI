@@ -212,11 +212,11 @@ export default function LeadPanel() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      {/* Lead Mission Control Header Bar */}
-      <div className="border-b border-zinc-800/80 bg-zinc-950/70 px-3 py-2 flex flex-col gap-2">
+      {/* Lead Mission Control Header Bar with BridgeMind Luxury Styling */}
+      <div className="border-b border-white/[0.06] bg-zinc-950/80 px-3 py-2.5 flex flex-col gap-2 backdrop-blur-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="flex size-5 items-center justify-center rounded-md bg-amber-500/20 text-amber-400">
+            <div className="flex size-5 items-center justify-center rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30 shadow-xs">
               <LeadCrown size={12} />
             </div>
             <span className="text-xs font-bold text-zinc-100">
@@ -227,7 +227,7 @@ export default function LeadPanel() {
         </div>
 
         {/* Quick Goal Dispatch Input */}
-        <div className="flex items-center gap-1.5 bg-zinc-900/90 border border-zinc-700/50 rounded-lg px-2.5 py-1.5 focus-within:border-amber-500/60 focus-within:ring-1 focus-within:ring-amber-500/30 transition-all">
+        <div className="flex items-center gap-1.5 bg-black/40 border border-zinc-700/60 rounded-xl px-3 py-1.5 focus-within:border-amber-500/60 focus-within:ring-1 focus-within:ring-amber-500/20 transition-all shadow-inner">
           <input
             ref={inputRef}
             type="text"
@@ -236,12 +236,12 @@ export default function LeadPanel() {
             onKeyDown={(e) => {
               if (e.key === "Enter") handleDispatchToLead();
             }}
-            placeholder="Type mission here (e.g. Build premium portfolio UI with animations)..."
+            placeholder="Type mission here (e.g. Build authentication flow with unit tests)..."
             className="w-full bg-transparent text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none font-sans"
           />
           <button
             onClick={() => window.dispatchEvent(new CustomEvent("swarm:voice:toggle", { detail: { mode: "lead" } }))}
-            className="p-1 rounded-md text-zinc-400 hover:text-amber-400 hover:bg-zinc-800 transition-colors shrink-0"
+            className="p-1 rounded-md text-zinc-400 hover:text-amber-300 hover:bg-zinc-800 transition-colors shrink-0"
             title="Dictate with voice"
           >
             <Mic size={14} />
@@ -249,7 +249,7 @@ export default function LeadPanel() {
           <select
             value={workerCli}
             onChange={(e) => setWorkerCli(e.target.value)}
-            className="bg-zinc-800 text-[11px] font-mono text-zinc-300 border border-zinc-700/60 rounded-md px-2 py-1 focus:outline-none focus:border-amber-500/50 cursor-pointer shrink-0"
+            className="bg-zinc-900 text-[11px] font-mono text-zinc-300 border border-zinc-700/60 rounded-lg px-2 py-1 focus:outline-none focus:border-amber-500/50 cursor-pointer shrink-0"
             title="Choose which CLI engine to dispatch worker tasks to"
           >
             <option value="auto">Auto (Board CLI)</option>
@@ -262,7 +262,7 @@ export default function LeadPanel() {
           <button
             onClick={handleInstantParallelDispatch}
             disabled={isDispatching}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-amber-500/20 to-amber-600/20 text-amber-300 border border-amber-500/35 hover:border-amber-500/60 hover:bg-amber-500/30 transition-all shrink-0 cursor-pointer shadow-sm hover:shadow-amber-500/10 active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/35 hover:bg-amber-500/25 hover:border-amber-500/60 transition-all shrink-0 cursor-pointer shadow-xs active:scale-95"
             title="Instant parallel dispatch: decompose & launch worker agents in worktrees immediately"
           >
             <Layers size={13} className="text-amber-400" />
@@ -271,7 +271,7 @@ export default function LeadPanel() {
           <button
             onClick={() => handleDispatchToLead()}
             disabled={isDispatching}
-            className="p-1.5 rounded-md bg-zinc-800 text-zinc-300 hover:bg-amber-500/20 hover:text-amber-300 border border-zinc-700/60 hover:border-amber-500/30 transition-colors shrink-0 cursor-pointer shadow-sm"
+            className="p-1.5 rounded-lg bg-zinc-800/80 text-zinc-300 hover:bg-amber-500/20 hover:text-amber-300 border border-zinc-700/60 hover:border-amber-500/40 transition-colors shrink-0 cursor-pointer shadow-xs"
             title="Send mission directive to Lead Agent"
           >
             <Send size={13} />

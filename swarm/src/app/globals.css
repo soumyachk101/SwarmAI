@@ -34,41 +34,41 @@
 :root {
   --font-sans: 'Geist', sans-serif;
   --font-mono: 'Geist Mono', monospace;
-  --swarm-canvas: 10 11 15;
-  --swarm-canvas-hi: 14 17 23;
-  --swarm-surface: 19 23 32;
-  --swarm-surface-hi: 26 31 43;
-  --swarm-border: 36 43 57;
-  --swarm-border-hi: 60 71 92;
-  --swarm-gold: 245 158 11;
-  --swarm-gold-hi: 251 191 36;
-  --swarm-gold-dim: 180 115 10;
-  --swarm-honey: 251 191 36;
-  --swarm-amber: 217 119 6;
-  --swarm-text: 243 244 246;
-  --swarm-text-dim: 156 163 175;
-  --swarm-text-muted: 107 114 128;
-  --swarm-ok: 16 185 129;
-  --swarm-warn: 245 158 11;
-  --swarm-err: 239 68 68;
+  --swarm-canvas: 12 13 16;
+  --swarm-canvas-hi: 18 19 24;
+  --swarm-surface: 24 26 33;
+  --swarm-surface-hi: 32 35 44;
+  --swarm-border: 42 46 58;
+  --swarm-border-hi: 75 82 102;
+  --swarm-gold: 218 165 72;
+  --swarm-gold-hi: 240 195 110;
+  --swarm-gold-dim: 165 120 45;
+  --swarm-honey: 240 195 110;
+  --swarm-amber: 218 165 72;
+  --swarm-text: 240 242 245;
+  --swarm-text-dim: 165 172 184;
+  --swarm-text-muted: 115 122 135;
+  --swarm-ok: 70 180 130;
+  --swarm-warn: 218 165 72;
+  --swarm-err: 220 80 80;
   /* Hex mirrors (JS/SVG); applyTheme keeps these in sync with channel tokens */
-  --swarm-canvas-hex: #0a0b0f;
-  --swarm-canvas-hi-hex: #0e1117;
-  --swarm-surface-hex: #131720;
-  --swarm-surface-hi-hex: #1a1f2b;
-  --swarm-border-hex: #242b39;
-  --swarm-border-hi-hex: #3c475c;
-  --swarm-gold-hex: #f59e0b;
-  --swarm-gold-hi-hex: #fbbf24;
-  --swarm-gold-dim-hex: #b4730a;
-  --swarm-honey-hex: #fbbf24;
-  --swarm-amber-hex: #d97706;
-  --swarm-text-hex: #f3f4f6;
-  --swarm-text-dim-hex: #9ca3af;
-  --swarm-text-muted-hex: #6b7280;
-  --swarm-ok-hex: #10b981;
-  --swarm-warn-hex: #f59e0b;
-  --swarm-err-hex: #ef4444;
+  --swarm-canvas-hex: #0c0d10;
+  --swarm-canvas-hi-hex: #121318;
+  --swarm-surface-hex: #181a21;
+  --swarm-surface-hi-hex: #20232c;
+  --swarm-border-hex: #2a2e3a;
+  --swarm-border-hi-hex: #4b5266;
+  --swarm-gold-hex: #daa548;
+  --swarm-gold-hi-hex: #f0c36e;
+  --swarm-gold-dim-hex: #a5782d;
+  --swarm-honey-hex: #f0c36e;
+  --swarm-amber-hex: #daa548;
+  --swarm-text-hex: #f0f2f5;
+  --swarm-text-dim-hex: #a5acb8;
+  --swarm-text-muted-hex: #737a87;
+  --swarm-ok-hex: #46b482;
+  --swarm-warn-hex: #daa548;
+  --swarm-err-hex: #dc5050;
 }
 
 /* Motion scale. Two durations and one curve for the whole app — the file used
@@ -473,34 +473,49 @@ select:focus {
   font-size: 0.6875rem;
   font-family: var(--font-mono);
   font-weight: 500;
-  letter-spacing: 0.02em;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  letter-spacing: 0.01em;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   backdrop-filter: blur(8px);
 }
 
-.pro-badge-amber {
-  background: rgba(245, 158, 11, 0.1);
-  border-color: rgba(245, 158, 11, 0.25);
-  color: #fbbf24;
+.pro-badge-amber,
+.pro-badge-gold {
+  background: rgba(218, 165, 72, 0.08);
+  border-color: rgba(218, 165, 72, 0.22);
+  color: #f0c36e;
 }
 
-.pro-badge-emerald {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.25);
-  color: #34d399;
+.pro-badge-emerald,
+.pro-badge-ok {
+  background: rgba(70, 180, 130, 0.08);
+  border-color: rgba(70, 180, 130, 0.22);
+  color: #46b482;
 }
 
 .pro-badge-cyan {
-  background: rgba(6, 182, 212, 0.1);
-  border-color: rgba(6, 182, 212, 0.25);
-  color: #22d3ee;
+  background: rgba(218, 165, 72, 0.08);
+  border-color: rgba(218, 165, 72, 0.22);
+  color: #f0c36e;
 }
 
-.pro-badge-purple {
-  background: rgba(168, 85, 247, 0.1);
-  border-color: rgba(168, 85, 247, 0.25);
-  color: #c084fc;
+.bridgemind-card {
+  position: relative;
+  background: rgba(24, 26, 33, 0.75);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.35);
+}
+
+.bridgemind-card:hover {
+  border-color: rgba(218, 165, 72, 0.2);
+  box-shadow: 0 6px 24px -4px rgba(0, 0, 0, 0.5);
+}
+
+.text-gradient-gold {
+  background: linear-gradient(180deg, #F0F2F5 0%, #DAA548 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 

@@ -81,14 +81,21 @@ export default function ThemePicker() {
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={`Theme: ${current.label}`}
-        className={`rounded-md p-1.5 transition-colors ${
+        className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border transition-all cursor-pointer shadow-xs ${
           open
-            ? "bg-swarm-gold/15 text-swarm-goldHi"
-            : "text-swarm-textMuted hover:bg-swarm-border/60 hover:text-swarm-text"
+            ? "bg-amber-500/20 text-amber-300 border-amber-500/40 ring-1 ring-amber-500/25"
+            : "bg-white/[0.03] text-zinc-300 border-white/[0.08] hover:bg-white/[0.07] hover:border-amber-500/30 hover:text-amber-300 hover:-translate-y-0.5 active:translate-y-0"
         }`}
-        title={`Theme: ${current.label}`}
+        title={`Theme: ${current.label} (Click to switch)`}
       >
-        <Palette size={14} />
+        <span
+          className="size-2 rounded-full ring-1 ring-white/20 shrink-0"
+          style={{ backgroundColor: current.swatch[0] }}
+        />
+        <Palette size={13} className="shrink-0 text-amber-400" />
+        <span className="text-[11px] font-medium font-sans truncate max-w-[90px] hidden sm:inline">
+          {current.label}
+        </span>
       </button>
 
       {open &&
@@ -100,11 +107,7 @@ export default function ThemePicker() {
               ref={menuRef}
               role="menu"
               aria-label="Choose theme"
-              className="fixed z-[201] w-[19rem] overflow-y-auto scrollbar-sleek rounded-xl glass-hi glass-sheen p-1.5 animate-fade-in"
-              // Right-anchoring alone only guarded the right edge: with the
-              // trigger near the left of a narrow window the panel ran off the
-              // left instead. Eight themes at ~60px a row also overflow a short
-              // window, hence the cap and the scroller.
+              className="fixed z-[201] w-[20rem] overflow-y-auto scrollbar-sleek rounded-xl bg-zinc-950/95 backdrop-blur-2xl border border-white/[0.12] p-2 shadow-2xl animate-fade-in"
               style={{
                 top: rect.bottom + 6,
                 right: Math.min(
@@ -114,8 +117,9 @@ export default function ThemePicker() {
                 maxHeight: Math.max(160, window.innerHeight - rect.bottom - 16),
               }}
             >
-              <div className="px-2 pb-1.5 pt-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
-                Theme
+              <div className="px-2 pb-1.5 pt-0.5 text-micro font-semibold uppercase tracking-wider text-zinc-400 flex items-center justify-between">
+                <span>Color Themes</span>
+                <span className="text-[10px] font-mono text-amber-400/80 font-normal">{THEMES.length} Available</span>
               </div>
               {THEMES.map((t) => (
                 <ThemeRow

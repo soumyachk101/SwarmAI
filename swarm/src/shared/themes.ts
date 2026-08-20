@@ -1,6 +1,6 @@
 /** Color themes — only CSS token values change; layout/components stay the same. */
 
-export type ThemeId = "graphite" | "obsidian" | "amber";
+export type ThemeId = "swarm" | "graphite" | "obsidian" | "amber";
 
 export interface ThemeTokens {
   /** Space-separated RGB channels, e.g. "224 168 58" — used with rgb(var(--x) / a). */
@@ -32,20 +32,25 @@ export interface ThemeDef {
   tokens: ThemeTokens;
 }
 
-/**
- * Three themes, not eight. Eight meant eight half-tuned palettes; three means
- * each one is a deliberate, verified position:
- *
- *   Graphite - neutral cool grey, amber signal. The default working surface:
- *              nothing in the chrome competes with syntax colour in a terminal.
- *   Obsidian - near-black, cold blue signal. Maximum focus and least emitted
- *              light, for long sessions and OLED panels.
- *   Amber    - the warm swarm identity, held back so it stays a workplace.
- *
- * Every foreground token is verified against BOTH surface and canvas at WCAG
- * AA, and control edges (borderHi) at the 3:1 the spec asks of non-text UI.
- * `themes.contrast.test.ts` fails the build if a future edit breaks that.
- */
+const SWARM_THEME: ThemeTokens = {
+  canvas: "12 13 16",
+  canvasHi: "18 19 24",
+  surface: "24 26 33",
+  surfaceHi: "32 35 44",
+  border: "42 46 58",
+  borderHi: "75 82 102",
+  gold: "218 165 72",
+  goldHi: "240 195 110",
+  goldDim: "165 120 45",
+  honey: "240 195 110",
+  amber: "218 165 72",
+  text: "240 242 245",
+  textDim: "165 172 184",
+  textMuted: "115 122 135",
+  ok: "70 180 130",
+  warn: "218 165 72",
+  err: "220 80 80",
+};
 
 const GRAPHITE: ThemeTokens = {
   canvas: "14 16 19",
@@ -74,11 +79,11 @@ const OBSIDIAN: ThemeTokens = {
   surfaceHi: "25 29 37",
   border: "36 41 51",
   borderHi: "93 99 108",
-  gold: "91 157 250",
-  goldHi: "138 184 252",
-  goldDim: "63 116 196",
-  honey: "138 184 252",
-  amber: "79 143 232",
+  gold: "218 165 72",
+  goldHi: "240 195 110",
+  goldDim: "165 120 45",
+  honey: "240 195 110",
+  amber: "218 165 72",
   text: "240 243 248",
   textDim: "182 192 207",
   textMuted: "124 135 152",
@@ -109,23 +114,30 @@ const AMBER: ThemeTokens = {
 
 export const THEMES: ThemeDef[] = [
   {
+    id: "swarm",
+    label: "Swarm Dark",
+    description: "Official SwarmAI luxury dark slate with champagne gold accents",
+    swatch: ["#daa548", "#181a21", "#0c0d10"],
+    tokens: SWARM_THEME,
+  },
+  {
+    id: "obsidian",
+    label: "Obsidian OLED",
+    description: "Deep obsidian black with gold accents",
+    swatch: ["#daa548", "#12151b", "#08090c"],
+    tokens: OBSIDIAN,
+  },
+  {
     id: "graphite",
     label: "Graphite",
-    description: "Neutral graphite with an amber signal",
+    description: "Neutral graphite with a warm signal",
     swatch: ["#e0a83a", "#191d23", "#0e1013"],
     tokens: GRAPHITE,
   },
   {
-    id: "obsidian",
-    label: "Obsidian",
-    description: "Near-black with a cold blue signal",
-    swatch: ["#5b9dfa", "#12151b", "#08090c"],
-    tokens: OBSIDIAN,
-  },
-  {
     id: "amber",
-    label: "Amber",
-    description: "The warm swarm, kept restrained",
+    label: "Honey Amber",
+    description: "The warm swarm honeycomb theme",
     swatch: ["#e8b04a", "#1f1b15", "#12100c"],
     tokens: AMBER,
   },
@@ -135,7 +147,7 @@ export const THEME_BY_ID: Record<ThemeId, ThemeDef> = Object.fromEntries(
   THEMES.map((t) => [t.id, t]),
 ) as Record<ThemeId, ThemeDef>;
 
-export const DEFAULT_THEME_ID: ThemeId = "graphite";
+export const DEFAULT_THEME_ID: ThemeId = "swarm";
 
 const TOKEN_TO_CSS: Record<keyof ThemeTokens, string> = {
   canvas: "--swarm-canvas",
