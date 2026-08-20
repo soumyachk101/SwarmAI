@@ -128,13 +128,16 @@ function isNotFoundError(err: unknown): boolean {
 }
 
 function detectCommandNotFoundError(output: string, command: string): boolean {
-  const lower = output.toLowerCase();
+  const lower = output.toLowerCase().trim();
   return (
     lower.includes("is not recognized as an internal or external command") ||
     lower.includes("not recognized as the name of a cmdlet") ||
-    lower.includes("command not found") ||
-    lower.includes("no such file or directory") ||
-    (lower.includes("not found") && lower.includes(command.toLowerCase()))
+    lower.includes(`bash: ${command}: command not found`) ||
+    lower.includes(`zsh: command not found: ${command}`) ||
+    lower.includes(`sh: ${command}: not found`) ||
+    lower.includes(`execvp: ${command}: no such file or directory`) ||
+    lower.includes(`spawn ${command} enoent`) ||
+    lower.includes(`cannot find binary: ${command}`)
   );
 }
 
@@ -320,25 +323,26 @@ function getCliModelPresets(cli: string): CliModelPreset {
   }
   if (c === "codex" || c === "openai") {
     return {
-      brandName: "OpenAI Codex Models",
+      brandName: "Codex Models",
       brandColor: "#10A37F",
       switchCommand: "/model",
-      defaultModel: "o3-mini",
+      defaultModel: "5.6 Sol",
       supportsEffort: true,
       defaultEffort: "High",
       effortLevels: [
-        { id: "high", label: "High Reasoning", isHighlight: true },
-        { id: "medium", label: "Medium Reasoning" },
-        { id: "low", label: "Low Reasoning" },
+        { id: "ultra", label: "Ultra", isHighlight: true },
+        { id: "xhigh", label: "Extra High" },
+        { id: "high", label: "High" },
+        { id: "medium", label: "Medium" },
+        { id: "light", label: "Light" },
       ],
       models: [
-        { id: "o3-mini", label: "o3-mini (High Reasoning, Recommended)" },
-        { id: "o3", label: "o3 (Deep Reasoning)" },
-        { id: "o1", label: "o1 (Full Reasoning)" },
-        { id: "o1-mini", label: "o1-mini (Fast Reasoning)" },
-        { id: "gpt-4o", label: "GPT-4o (Flagship Multimodal)" },
-        { id: "gpt-4o-mini", label: "GPT-4o-mini (Fast & Lightweight)" },
-        { id: "gpt-4.5-preview", label: "GPT-4.5 Preview (Orion Research)" },
+        { id: "5.6-sol", label: "5.6 Sol", is1M: true },
+        { id: "5.6-terra", label: "5.6 Terra", is1M: true },
+        { id: "5.6-luna", label: "5.6 Luna", is1M: true },
+        { id: "5.5", label: "5.5", is1M: false },
+        { id: "5.4", label: "5.4", is1M: false },
+        { id: "5.4-mini", label: "5.4 Mini", is1M: false },
       ],
     };
   }

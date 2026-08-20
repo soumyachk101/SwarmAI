@@ -58,9 +58,7 @@ export function modelArgs(
       // -m/--model, and effort rides on a config override.
       if (m) args.push("--model", m);
       if (validEffort) {
-        // Codex tops out at "high"; anything beyond clamps to it.
-        const level = validEffort === "xhigh" || validEffort === "max" ? "high" : validEffort;
-        args.push("-c", `model_reasoning_effort="${level}"`);
+        args.push("-c", `model_reasoning_effort="${validEffort}"`);
       }
       break;
 

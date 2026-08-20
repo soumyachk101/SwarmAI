@@ -23,13 +23,13 @@ describe("modelArgs", () => {
   });
 
   it("puts Codex effort on a config override, not a flag it lacks", () => {
-    expect(modelArgs("codex", "gpt-5", "high")).toEqual([
-      "--model", "gpt-5", "-c", 'model_reasoning_effort="high"',
+    expect(modelArgs("codex", "5.6-sol", "ultra")).toEqual([
+      "--model", "5.6-sol", "-c", 'model_reasoning_effort="ultra"',
     ]);
   });
 
-  it("clamps effort levels Codex does not have", () => {
-    expect(modelArgs("codex", undefined, "max")).toEqual([
+  it("handles Codex effort levels properly", () => {
+    expect(modelArgs("codex", undefined, "high")).toEqual([
       "-c", 'model_reasoning_effort="high"',
     ]);
   });
