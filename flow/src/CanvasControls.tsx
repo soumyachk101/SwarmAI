@@ -34,7 +34,7 @@ export default function CanvasControls({
     // The whole bar is interactive, not just the buttons: with the container
     // pointer-events-none, a press on its padding or between two buttons fell
     // through to the canvas and started a pan under the panel.
-    <div className="absolute bottom-3 right-3 flex items-center gap-0.5 rounded-xl glass-hi glass-sheen px-1.5 py-1.5 font-sans antialiased">
+    <div className="absolute bottom-3 right-3 z-30 pointer-events-auto flex items-center gap-0.5 rounded-xl glass-hi glass-sheen px-1.5 py-1.5 font-sans antialiased shadow-xl border border-white/[0.08]">
       <button type="button" className={btn}
         // Tidy re-lays panes from the world origin, which is very often not
         // where the camera is — without the fit that follows, the button looks

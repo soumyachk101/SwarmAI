@@ -518,6 +518,12 @@ select:focus {
   -webkit-text-fill-color: transparent;
 }
 
+@keyframes dash {
+  to {
+    stroke-dashoffset: -36;
+  }
+}
+
 
 /* The two accessibility overrides live at the very END of the file, after the
    components layer, so plain source order settles the tie with the classes they

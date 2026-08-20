@@ -613,7 +613,57 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
     id: b.id,
     name: b.customName || b.cliName,
     kind: b.kind ?? "agent",
-    icon: paneIconNode(b),
+    accent: themeForKind(b.kind).accent,
+  }));
+
+  const handleFlowDispatch = async ({
+    prompt,
+    mode,
+    targetIds,
+  }: {
+    prompt: string;
+    mode: "broadcast" | "pipeline";
+    targetIds: string[];
+  }) => {
+    const cleanPrompt = prompt.replace(/\r?\n/g, " ").trim();
+    if (!cleanPrompt) return;
+
+    const dispatchToAgent = async (targetId: string, text: string) => {
+      try {
+        // Step 1: Send line clear (\x15 = Ctrl+U) + prompt text directly into PTY
+        await invoke("write_to_terminal", { paneId: targetId, data: `\x15${text}` });
+        // Step 2: Micro debounce (40ms) so Node/Ink readline absorbs the input characters
+        await new Promise((r) => setTimeout(r, 45));
+        // Step 3: Send Enter keycode to immediately trigger autonomous execution
+        await invoke("write_to_terminal", { paneId: targetId, data: "\r\n" });
+      } catch (err) {
+        console.error(`[Flow Dispatch] Failed to dispatch to ${targetId}:`, err);
+      }
+    };
+
+    if (mode === "broadcast") {
+      // Parallel execution across all selected CLIs simultaneously
+      await Promise.all(targetIds.map((id) => dispatchToAgent(id, cleanPrompt)));
+    } else {
+      const canvasEdges = useCanvasStore.getState().edges;
+      const roots = targetIds.filter((id) => !canvasEdges.some((e) => e.to === id));
+      const dispatchTargets = roots.length > 0 ? roots : targetIds;
+
+      await Promise.all(
+        dispatchTargets.map((id) => {
+          const connectedOut = canvasEdges.filter((e) => e.from === id).length;
+          const pipelinePrompt = `[Swarm Flow Pipeline | ${connectedOut} out-links]: ${cleanPrompt}`;
+          return dispatchToAgent(id, pipelinePrompt);
+        })
+      );
+    }
+  };
+
+  const flowAgentsMeta = items.map((swarm) => ({
+    id: swarm.id,
+    name: swarm.customName || swarm.cliName || swarm.cli || swarm.id,
+    cli: swarm.cli,
+    isLead: swarm.isLead,
   }));
 
   return (
@@ -789,6 +839,8 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
           <FlowCanvas
             swarmId={activeWorkspaceId || "default"}
             items={items.map((swarm) => ({ id: swarm.id, content: renderPane(swarm, maximizedPane === swarm.id) }))}
+            agentsMeta={flowAgentsMeta}
+            onDispatch={handleFlowDispatch}
             onZoomSettled={refitTerminals}
             emptyState={<PlaneEmpty plane={plane} onAdd={() => setShowAdd(true)} />}
           />

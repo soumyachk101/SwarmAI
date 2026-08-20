@@ -26,8 +26,9 @@ export default function CanvasNode({ id, box, zoom, children }: Props) {
   const resize = useRef<{ px: number; py: number; w: number; h: number } | null>(null);
   const [live, setLive] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
 
-  if (!box) return null;
-  const shown = live ?? box;
+  const ensureNode = useCanvasStore((s) => s.ensureNode);
+  const fallbackBox = box ?? { x: 0, y: 0, w: 520, h: 380, z: 1 };
+  const shown = live ?? fallbackBox;
 
   const startDrag = (e: React.PointerEvent) => {
     // Only the header drags, and only with the left button.
@@ -35,8 +36,8 @@ export default function CanvasNode({ id, box, zoom, children }: Props) {
     if (e.button !== 0) return;
     if (el.closest("button, input, select, textarea, a, [role='button']")) return;
     if (!el.closest("[data-pane-header]")) return;
-    drag.current = { px: e.clientX, py: e.clientY, x: box.x, y: box.y };
-    setLive({ ...box });
+    drag.current = { px: e.clientX, py: e.clientY, x: fallbackBox.x, y: fallbackBox.y };
+    setLive({ x: fallbackBox.x, y: fallbackBox.y, w: fallbackBox.w, h: fallbackBox.h });
     raiseNode(id);
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     e.stopPropagation();
@@ -44,8 +45,8 @@ export default function CanvasNode({ id, box, zoom, children }: Props) {
 
   const startResize = (e: React.PointerEvent) => {
     if (e.button !== 0) return;
-    resize.current = { px: e.clientX, py: e.clientY, w: box.w, h: box.h };
-    setLive({ ...box });
+    resize.current = { px: e.clientX, py: e.clientY, w: fallbackBox.w, h: fallbackBox.h };
+    setLive({ x: fallbackBox.x, y: fallbackBox.y, w: fallbackBox.w, h: fallbackBox.h });
     raiseNode(id);
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     e.stopPropagation();
@@ -57,12 +58,18 @@ export default function CanvasNode({ id, box, zoom, children }: Props) {
     // the node runs away from the cursor at anything but 100% zoom.
     if (drag.current) {
       const d = drag.current;
-      setLive({ ...box, x: d.x + (e.clientX - d.px) / zoom, y: d.y + (e.clientY - d.py) / zoom });
+      setLive({
+        x: d.x + (e.clientX - d.px) / zoom,
+        y: d.y + (e.clientY - d.py) / zoom,
+        w: fallbackBox.w,
+        h: fallbackBox.h,
+      });
       e.stopPropagation();
     } else if (resize.current) {
       const r = resize.current;
       setLive({
-        ...box,
+        x: fallbackBox.x,
+        y: fallbackBox.y,
         w: Math.max(260, r.w + (e.clientX - r.px) / zoom),
         h: Math.max(160, r.h + (e.clientY - r.py) / zoom),
       });
@@ -80,19 +87,36 @@ export default function CanvasNode({ id, box, zoom, children }: Props) {
     setLive(null);
   };
 
+  const connectingFrom = useCanvasStore((s) => s.connectingFrom);
+  const setConnectingFrom = useCanvasStore((s) => s.setConnectingFrom);
+  const addEdge = useCanvasStore((s) => s.addEdge);
+
+  const edges = useCanvasStore((s) => s.edges);
+  const incomingCount = edges.filter((e) => e.to === id).length;
+  const outgoingCount = edges.filter((e) => e.from === id).length;
+  const isConnected = incomingCount > 0 || outgoingCount > 0;
+
+  const isConnectingSource = connectingFrom?.nodeId === id;
+  const isConnectingTarget = connectingFrom !== null && connectingFrom.nodeId !== id;
+
   const dragging = live !== null;
 
   return (
     <div
-      className={`absolute flex flex-col overflow-hidden rounded-xl glass ${
-        dragging ? "shadow-glass-lg ring-1 ring-swarm-gold/40" : "hover:shadow-glass-lg"
+      className={`absolute flex flex-col overflow-visible rounded-2xl border transition-[box-shadow,border-color] duration-200 ${
+        isConnected
+          ? "border-amber-500/40 bg-[#12141c]/95 shadow-xl shadow-amber-500/5 ring-1 ring-amber-500/20"
+          : "border-white/[0.08] bg-[#12141c]/90 hover:border-white/[0.14] hover:shadow-xl"
+      } ${dragging ? "shadow-2xl ring-2 ring-swarm-gold/60" : ""} ${
+        isConnectingSource ? "ring-2 ring-amber-400" : ""
       }`}
       style={{
-        left: shown.x, top: shown.y, width: shown.w, height: shown.h, zIndex: box.z,
-        // Snapping during a drag would make the node stutter; snap on drop.
-        transition: dragging ? "none" : "box-shadow 0.2s ease",
-        // Same reason as the viewport: without it a pen/touch drag on the title
-        // bar is stolen by the browser's scroll gesture partway through.
+        left: shown.x,
+        top: shown.y,
+        width: shown.w,
+        height: shown.h,
+        zIndex: fallbackBox.z,
+        transition: dragging ? "none" : "box-shadow 0.2s ease, border-color 0.2s ease",
         touchAction: "none",
       }}
       onPointerDown={startDrag}
@@ -101,19 +125,151 @@ export default function CanvasNode({ id, box, zoom, children }: Props) {
       onPointerCancel={commit}
       onMouseDownCapture={() => raiseNode(id)}
     >
-      <div className="min-h-0 flex-1 overflow-hidden">{children}</div>
+      {/* Active Synapse Swarm Badge */}
+      {isConnected && (
+        <div className="pointer-events-none absolute -top-3 left-4 z-30 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0b0e17] border border-amber-500/40 text-[10px] font-mono text-amber-300 shadow-lg backdrop-blur-md">
+          <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse shadow-xs shadow-emerald-400" />
+          <span>
+            {incomingCount > 0 && outgoingCount > 0
+              ? `Synapse (${incomingCount} in · ${outgoingCount} out)`
+              : incomingCount > 0
+              ? `Receiving (${incomingCount} link${incomingCount > 1 ? "s" : ""})`
+              : `Dispatches to (${outgoingCount} CLI${outgoingCount > 1 ? "s" : ""})`}
+          </span>
+        </div>
+      )}
 
-      {/* Resize grip. Sized in screen pixels so it stays grabbable when zoomed
-          out. The padding pulls the chevron clear of the frame's rounded
-          corner, which was slicing the ends off both strokes; the hit area
-          keeps the full square. */}
+      {/* Node Content Container with Curvy Corners */}
+      <div className="min-h-0 flex-1 overflow-hidden rounded-2xl">{children}</div>
+
+      {/* Top Socket (Top Side Connector) */}
+      <div
+        data-input-socket="true"
+        className={`absolute left-1/2 -top-2.5 -translate-x-1/2 size-5 rounded-full flex items-center justify-center cursor-crosshair transition-all z-30 opacity-70 hover:opacity-100 ${
+          isConnectingTarget
+            ? "bg-amber-400 text-black scale-125 animate-bounce shadow-md shadow-amber-400/50 opacity-100"
+            : "bg-[#181a24] border border-amber-500/40 hover:scale-110 hover:border-amber-400 hover:bg-amber-500/20"
+        }`}
+        title="Top Port (Drag wire or drop here to connect)"
+        onPointerDown={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          setConnectingFrom({ nodeId: id, port: "top" });
+        }}
+        onPointerUp={(e) => {
+          e.stopPropagation();
+          if (connectingFrom && connectingFrom.nodeId !== id) {
+            addEdge(connectingFrom.nodeId, id, connectingFrom.port, "top");
+          }
+        }}
+      >
+        <span className="size-1.5 rounded-full bg-amber-400" />
+      </div>
+
+      {/* Left Socket (Left Side Connector - Drag OR Drop) */}
+      <div
+        data-input-socket="true"
+        className={`absolute -left-3 top-1/2 -translate-y-1/2 size-6 rounded-full flex items-center justify-center cursor-crosshair transition-all z-30 ${
+          isConnectingTarget
+            ? "bg-amber-400 text-black scale-125 animate-bounce shadow-lg shadow-amber-400/50"
+            : incomingCount > 0
+            ? "bg-[#0f172a] border-2 border-sky-400 text-sky-300 shadow-md shadow-sky-400/30 hover:scale-110"
+            : "bg-[#181a24] border border-amber-500/40 text-amber-300 hover:scale-110 hover:border-amber-400 hover:bg-amber-500/20"
+        }`}
+        title="Left Port (Drag wire or drop here to connect)"
+        onPointerDown={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          setConnectingFrom({ nodeId: id, port: "left" });
+        }}
+        onPointerUp={(e) => {
+          e.stopPropagation();
+          if (connectingFrom && connectingFrom.nodeId !== id) {
+            addEdge(connectingFrom.nodeId, id, connectingFrom.port, "left");
+          }
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (connectingFrom && connectingFrom.nodeId !== id) {
+            addEdge(connectingFrom.nodeId, id, connectingFrom.port, "left");
+          }
+        }}
+      >
+        <span
+          className={`size-2 rounded-full ${
+            incomingCount > 0 ? "bg-sky-400 animate-pulse" : "bg-amber-400"
+          }`}
+        />
+      </div>
+
+      {/* Right Socket (Right Side Connector - Drag OR Drop) */}
+      <div
+        data-input-socket="true"
+        className={`absolute -right-3 top-1/2 -translate-y-1/2 size-6 rounded-full flex items-center justify-center cursor-crosshair transition-all z-30 ${
+          isConnectingSource
+            ? "bg-amber-400 text-black scale-125 ring-2 ring-amber-300 shadow-lg shadow-amber-400/50"
+            : outgoingCount > 0
+            ? "bg-[#1a1505] border-2 border-amber-400 text-amber-300 shadow-md shadow-amber-400/30 hover:scale-110"
+            : "bg-[#181a24] border border-amber-500/40 text-amber-300 hover:scale-110 hover:border-amber-400 hover:bg-amber-500/20"
+        }`}
+        title="Right Port (Drag wire or drop here to connect)"
+        onPointerDown={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          setConnectingFrom({ nodeId: id, port: "right" });
+        }}
+        onPointerUp={(e) => {
+          e.stopPropagation();
+          if (connectingFrom && connectingFrom.nodeId !== id) {
+            addEdge(connectingFrom.nodeId, id, connectingFrom.port, "right");
+          }
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (connectingFrom && connectingFrom.nodeId !== id) {
+            addEdge(connectingFrom.nodeId, id, connectingFrom.port, "right");
+          }
+        }}
+      >
+        <span
+          className={`size-2 rounded-full ${
+            outgoingCount > 0 ? "bg-amber-400 animate-pulse" : "bg-amber-400"
+          }`}
+        />
+      </div>
+
+      {/* Bottom Socket (Bottom Side Connector) */}
+      <div
+        data-input-socket="true"
+        className={`absolute left-1/2 -bottom-2.5 -translate-x-1/2 size-5 rounded-full flex items-center justify-center cursor-crosshair transition-all z-30 opacity-70 hover:opacity-100 ${
+          isConnectingTarget
+            ? "bg-amber-400 text-black scale-125 animate-bounce shadow-md shadow-amber-400/50 opacity-100"
+            : "bg-[#181a24] border border-amber-500/40 hover:scale-110 hover:border-amber-400 hover:bg-amber-500/20"
+        }`}
+        title="Bottom Port (Drag wire or drop here to connect)"
+        onPointerDown={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          setConnectingFrom({ nodeId: id, port: "bottom" });
+        }}
+        onPointerUp={(e) => {
+          e.stopPropagation();
+          if (connectingFrom && connectingFrom.nodeId !== id) {
+            addEdge(connectingFrom.nodeId, id, connectingFrom.port, "bottom");
+          }
+        }}
+      >
+        <span className="size-1.5 rounded-full bg-amber-400" />
+      </div>
+
+      {/* Resize grip */}
       <div
         onPointerDown={startResize}
         onPointerMove={onMove}
         onPointerUp={commit}
         onPointerCancel={commit}
         title="Resize"
-        className="absolute bottom-0 right-0 cursor-nwse-resize"
+        className="absolute bottom-0 right-0 cursor-nwse-resize z-20"
         style={{ width: 20 / zoom, height: 20 / zoom, padding: 4 / zoom, boxSizing: "border-box", touchAction: "none" }}
       >
         <svg viewBox="0 0 16 16" className="size-full text-swarm-textMuted/70">

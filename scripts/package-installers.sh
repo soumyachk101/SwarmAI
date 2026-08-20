@@ -11,21 +11,25 @@ mkdir -p "$RELEASES_DIR/windows"
 mkdir -p "$RELEASES_DIR/android"
 
 # 1. Check for macOS DMG
+APP_SRC="$PROJECT_ROOT/swarm/src-tauri/target/release/bundle/macos/SwarmAI.app"
 DMG_SRC="$PROJECT_ROOT/swarm/src-tauri/target/release/bundle/dmg/SwarmAI_0.1.0_aarch64.dmg"
-if [ -f "$DMG_SRC" ]; then
-    echo "🍎 Copying macOS DMG installer..."
+
+if [ -d "$APP_SRC" ]; then
+    echo "🍎 Packaging macOS DMG from SwarmAI.app..."
+    TMP_DMG_DIR=$(mktemp -d)
+    cp -R "$APP_SRC" "$TMP_DMG_DIR/"
+    ln -s /Applications "$TMP_DMG_DIR/Applications"
+    mkdir -p "$(dirname "$DMG_SRC")"
+    hdiutil create -volname "SwarmAI" -srcfolder "$TMP_DMG_DIR" -ov -format UDZO "$DMG_SRC"
+    rm -rf "$TMP_DMG_DIR"
     cp -f "$DMG_SRC" "$RELEASES_DIR/macOS/SwarmAI.dmg"
     cp -f "$DMG_SRC" "$RELEASES_DIR/macOS/SwarmAI_0.1.0_aarch64.dmg"
     echo "✅ macOS DMG ready at: releases/macOS/SwarmAI.dmg"
-else
-    echo "ℹ️ Building macOS DMG bundle..."
-    hdiutil detach "/Volumes/SwarmAI" -force 2>/dev/null || true
-    hdiutil detach "/Volumes/SwarmAI 1" -force 2>/dev/null || true
-    pnpm --filter @swarm/app tauri build --bundles dmg
-    if [ -f "$DMG_SRC" ]; then
-        cp -f "$DMG_SRC" "$RELEASES_DIR/macOS/SwarmAI.dmg"
-        cp -f "$DMG_SRC" "$RELEASES_DIR/macOS/SwarmAI_0.1.0_aarch64.dmg"
-    fi
+elif [ -f "$DMG_SRC" ]; then
+    echo "🍎 Copying existing macOS DMG installer..."
+    cp -f "$DMG_SRC" "$RELEASES_DIR/macOS/SwarmAI.dmg"
+    cp -f "$DMG_SRC" "$RELEASES_DIR/macOS/SwarmAI_0.1.0_aarch64.dmg"
+    echo "✅ macOS DMG ready at: releases/macOS/SwarmAI.dmg"
 fi
 
 # 2. Check for Windows NSIS / MSI

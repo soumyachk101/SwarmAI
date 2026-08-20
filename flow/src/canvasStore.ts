@@ -12,6 +12,21 @@ export interface NodeBox extends Rect {
 
 export const DEFAULT_NODE_SIZE = { w: 520, h: 380 };
 
+export type PortSide = "left" | "right" | "top" | "bottom";
+
+export interface ConnectingInfo {
+  nodeId: string;
+  port: PortSide;
+}
+
+export interface CanvasEdge {
+  id: string;
+  from: string;
+  to: string;
+  fromPort?: PortSide;
+  toPort?: PortSide;
+}
+
 interface CanvasState {
   /** Node geometry, keyed by pane id. One flat map across all swarms: pane
    *  ids are already unique, and a pane keeps its spot when swarms switch. */
@@ -19,6 +34,10 @@ interface CanvasState {
   /** Camera per swarm, so each project keeps its own viewpoint. */
   cameras: Record<string, Camera>;
   topZ: number;
+  /** Active wire connections between nodes */
+  edges: CanvasEdge[];
+  /** Node and port currently initiating a connection drag */
+  connectingFrom: ConnectingInfo | null;
 
   cameraFor: (swarmId: string) => Camera;
   setCamera: (swarmId: string, cam: Camera) => void;
@@ -36,6 +55,12 @@ interface CanvasState {
   removeNode: (id: string) => void;
   /** Lay every pane out in a tidy grid — the escape hatch from a messy canvas. */
   tidy: (ids: string[]) => void;
+
+  /** Edge actions */
+  setConnectingFrom: (info: ConnectingInfo | null) => void;
+  addEdge: (from: string, to: string, fromPort?: PortSide, toPort?: PortSide) => void;
+  removeEdge: (edgeId: string) => void;
+  clearEdges: () => void;
 }
 
 const MIN_W = 260;
@@ -47,6 +72,8 @@ export const useCanvasStore = create<CanvasState>()(
       nodes: {},
       cameras: {},
       topZ: 1,
+      edges: [],
+      connectingFrom: null,
 
       cameraFor: (swarmId) => get().cameras[swarmId] ?? DEFAULT_CAMERA,
       setCamera: (swarmId, cam) =>
@@ -112,7 +139,8 @@ export const useCanvasStore = create<CanvasState>()(
       removeNode: (id) =>
         set((s) => {
           const { [id]: _gone, ...rest } = s.nodes;
-          return { nodes: rest };
+          const remainingEdges = s.edges.filter((e) => e.from !== id && e.to !== id);
+          return { nodes: rest, edges: remainingEdges };
         }),
 
       tidy: (ids) =>
@@ -132,11 +160,33 @@ export const useCanvasStore = create<CanvasState>()(
           });
           return { nodes };
         }),
+
+      setConnectingFrom: (info) => set({ connectingFrom: info }),
+
+      addEdge: (from, to, fromPort = "right", toPort = "left") =>
+        set((s) => {
+          if (from === to) return s;
+          const exists = s.edges.some((e) => e.from === from && e.to === to);
+          if (exists) return s;
+          const newEdge: CanvasEdge = {
+            id: `edge-${from}-${to}-${Date.now()}`,
+            from,
+            to,
+            fromPort,
+            toPort,
+          };
+          return { edges: [...s.edges, newEdge], connectingFrom: null };
+        }),
+
+      removeEdge: (edgeId) =>
+        set((s) => ({ edges: s.edges.filter((e) => e.id !== edgeId) })),
+
+      clearEdges: () => set({ edges: [] }),
     }),
     {
       name: "swarm-canvas",
       storage: createJSONStorage(() => localStorage),
-      partialize: (s) => ({ nodes: s.nodes, cameras: s.cameras, topZ: s.topZ }),
+      partialize: (s) => ({ nodes: s.nodes, cameras: s.cameras, topZ: s.topZ, edges: s.edges }),
     },
   ),
 );
