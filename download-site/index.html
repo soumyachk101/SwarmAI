@@ -1273,177 +1273,344 @@
 
       <!-- Docs Articles View -->
       <div class="docs-content">
-        <!-- Quickstart -->
+        <!-- 1. Quickstart & Installation -->
         <article id="doc-quickstart" class="docs-article active">
           <h1 class="docs-h1">Quickstart & Installation</h1>
-          <p class="docs-lead">Get Swarm AI running locally on your development machine in under 2 minutes.</p>
+          <p class="docs-lead">Production setup guide for deploying Swarm AI on macOS, Windows, and Linux workstations with local PTY bridges.</p>
           
-          <h2 class="docs-h2">System Requirements</h2>
+          <h2 class="docs-h2">1. Prerequisites & Runtime Requirements</h2>
           <p class="docs-p">
-            • <strong>macOS</strong>: 12.0+ (Apple Silicon or Intel)<br />
-            • <strong>Windows</strong>: 10 / 11 (64-bit)<br />
-            • <strong>Linux</strong>: Ubuntu 20.04+, Debian 11+, Fedora 36+<br />
-            • <strong>Memory</strong>: 8 GB RAM minimum (16 GB recommended for 4+ simultaneous CLIs)
+            Before launching Swarm AI, ensure your host operating system meets the following baseline toolchains:
           </p>
-
-          <h2 class="docs-h2">1. Installation via Binary</h2>
-          <p class="docs-p">Download the standalone installer for your platform from the Downloads section above and move it to your Applications folder.</p>
-
-          <h2 class="docs-h2">2. Terminal CLI Integration</h2>
-          <p class="docs-p">Swarm AI leverages your existing terminal-installed CLI agents. Make sure you have at least one of the supported CLIs installed:</p>
           <div class="docs-code-block">
-# Install Claude Code globally
+# Check Node.js and Git installations
+node -v    # Must be v20.0.0 or higher
+git --version   # Git 2.38.0+ required for worktree concurrency
+pnpm -v    # Recommended package manager (v9.0.0+)
+          </div>
+
+          <h2 class="docs-h2">2. Operating System Specific Installation</h2>
+          
+          <p class="docs-p"><strong>macOS (Apple Silicon & Intel):</strong></p>
+          <p class="docs-p">
+            1. Download <code>SwarmAI.dmg</code> from the distribution grid.<br />
+            2. Open the disk image and drag <code>SwarmAI.app</code> into <code>/Applications</code>.<br />
+            3. If Gatekeeper displays an unsigned developer warning on first launch, execute the quarantine bypass:
+          </p>
+          <div class="docs-code-block">
+xattr -d com.apple.quarantine /Applications/SwarmAI.app
+          </div>
+
+          <p class="docs-p"><strong>Windows 10 / 11 (64-Bit):</strong></p>
+          <p class="docs-p">
+            1. Run <code>SwarmAI_Setup.exe</code> and proceed through the NSIS installer wizard.<br />
+            2. Ensure PowerShell execution policy permits local scripting for PTY spawning:
+          </p>
+          <div class="docs-code-block">
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+          </div>
+
+          <p class="docs-p"><strong>Linux (Ubuntu / Debian / Fedora):</strong></p>
+          <div class="docs-code-block">
+# For AppImage:
+chmod +x SwarmAI.AppImage
+./SwarmAI.AppImage --no-sandbox
+
+# For Debian / Ubuntu (.deb):
+sudo dpkg -i SwarmAI.deb
+sudo apt-get install -f
+          </div>
+
+          <h2 class="docs-h2">3. Workspace Initialization & Hive Bootstrapping</h2>
+          <p class="docs-p">
+            When you select a project directory in Swarm AI, the core engine automatically executes the following non-destructive initialization steps:
+          </p>
+          <p class="docs-p">
+            1. <strong>Memory Directory</strong>: Creates a local <code>.pheromone/</code> folder containing an embedded SQLite database (<code>memory.db</code>).<br />
+            2. <strong>Worktree Cache</strong>: Sets up <code>.swarm/worktrees/</code> for managing ephemeral branches and automatically appends it to <code>.gitignore</code>.<br />
+            3. <strong>CLI Discovery</strong>: Scans your user <code>$PATH</code> for global binary installations of <code>claude</code>, <code>codex</code>, <code>opencode</code>, <code>aider</code>, and <code>antigravity</code>.<br />
+            4. <strong>PTY Multiplexer</strong>: Allocates hardware-accelerated pseudo-terminal pipes with xterm.js frontends.
+          </p>
+        </article>
+
+        <!-- 2. Supported Coding CLIs -->
+        <article id="doc-supported-clis" class="docs-article">
+          <h1 class="docs-h1">Supported Coding CLIs & Runtime Specifications</h1>
+          <p class="docs-lead">Detailed runtime configurations, CLI arguments, effort levels, and MCP communication protocols for all supported autonomous agents.</p>
+          
+          <h2 class="docs-h2">1. Anthropic Claude Code</h2>
+          <p class="docs-p">
+            Swarm AI natively bridges with the official Anthropic Claude Code CLI, supporting 1M+ token context windows, MCP servers, and dynamic reasoning effort normalization.
+          </p>
+          <div class="docs-code-block">
+# Global installation via npm
 npm install -g @anthropic-ai/claude-code
 
-# Or OpenAI Codex CLI
+# Supported Models
+claude --model claude-3-7-sonnet-20250219    # High speed & reasoning
+claude --model claude-opus-5-2026            # Deep architectural design
+
+# Swarm Normalized Effort Levels (/effort command)
+/effort low         # Fast surface edits and lint fixes
+/effort medium      # Standard feature development
+/effort high        # Complex refactoring with test generation
+/effort ultracode   # Max compute reasoning with deep search
+          </div>
+
+          <h2 class="docs-h2">2. OpenAI Codex CLI</h2>
+          <p class="docs-p">
+            Built for OpenAI Codex 5.6 models with configurable reasoning tokens and automated headless execution:
+          </p>
+          <div class="docs-code-block">
+# Installation
 npm install -g @openai/codex-cli
 
-# Or OpenCode
-npm install -g opencode-ai
+# Execution Flags
+codex --model codex-5.6-sol --reasoning-effort high --dangerously-skip-permissions
           </div>
 
-          <h2 class="docs-h2">3. Initializing Your First Swarm</h2>
+          <h2 class="docs-h2">3. OpenCode & Local LLMs (Ollama / vLLM)</h2>
           <p class="docs-p">
-            1. Launch Swarm AI.<br />
-            2. Click <strong>+ New Hive</strong> in the left sidebar and select your project directory.<br />
-            3. In the Lead tab, enter your task directive and click <strong>Parallel Dispatch</strong>.
+            For privacy-focused, air-gapped workflows, OpenCode connects to local inference servers running open weights (DeepSeek R1 671B, Qwen 2.5 Coder 32B, LLaMA 3.3 70B):
           </p>
-        </article>
-
-        <!-- Supported CLIs -->
-        <article id="doc-supported-clis" class="docs-article">
-          <h1 class="docs-h1">Supported Coding CLIs</h1>
-          <p class="docs-lead">Swarm AI is 100% provider-agnostic and connects to all industry-standard agent CLIs.</p>
-          
-          <h2 class="docs-h2">CLI Compatibility Matrix</h2>
-          <p class="docs-p">
-            • <strong>Claude Code</strong>: Full Opus 5 1M context, /effort levels (low to ultracode), MCP bridge.<br />
-            • <strong>OpenAI Codex CLI</strong>: 5.6 Sol / Terra / Luna, reasoning effort controls, YOLO bypass.<br />
-            • <strong>OpenCode</strong>: Open weights (DeepSeek R1, Qwen 2.5 Coder, LLaMA 3.3) via Ollama/vLLM.<br />
-            • <strong>Aider</strong>: Multi-file git-aware editing and automatic commit generation.<br />
-            • <strong>Antigravity CLI</strong>: High-speed subagent parallel tool caller.<br />
-            • <strong>Cline & Kimi Code</strong>: Autonomous terminal scripting.
-          </p>
-
-          <h2 class="docs-h2">CLI Process Architecture</h2>
-          <div class="arch-flow-wrap" style="padding:16px;">
-            <div class="arch-flow-row">
-              <div class="arch-node primary">
-                <span class="arch-node-tag">Core Engine</span>
-                <div class="arch-node-title">Swarm Tauri Core</div>
-                <span class="arch-node-desc">Raw PTY multiplexer & terminal host</span>
-              </div>
-              <div class="arch-arrow">→</div>
-              <div class="arch-node">
-                <span class="arch-node-tag">Worker Processes</span>
-                <div class="arch-node-title">Claude Code · Codex · OpenCode</div>
-                <span class="arch-node-desc">Isolated process instances with MCP bridges</span>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <!-- Keybindings -->
-        <article id="doc-keybindings" class="docs-article">
-          <h1 class="docs-h1">Keyboard Shortcuts Cheatsheet</h1>
-          <p class="docs-lead">Supercharge your velocity with keyboard-first navigation.</p>
-          
           <div class="docs-code-block">
-⌘K / Ctrl+K         Open Command Palette
-⌘Enter              Dispatch Parallel Mission to Active Swarm
-⌘B                  Toggle Broadcast Mode (Send prompt to all CLIs)
-⌘P                  Toggle Pipeline Mode (Follow wire connections)
-⌘1 .. ⌘9            Focus specific Agent Terminal Pane
-Space + Drag        Pan Flow Canvas
-⌘+ / ⌘-             Zoom in / Zoom out of Flow Canvas
-⌘0                  Reset Canvas Camera to 100%
+# Connect Swarm AI to local Ollama server
+export OLLAMA_HOST="http://localhost:11434"
+opencode --model deepseek-r1:32b --api-base http://localhost:11434/v1
+          </div>
+
+          <h2 class="docs-h2">4. Automated CLI Process Architecture</h2>
+          <div class="arch-flow-wrap" style="padding:16px;">
+            <div class="arch-flow-row">
+              <div class="arch-node primary">
+                <span class="arch-node-tag">Tauri Backend</span>
+                <div class="arch-node-title">Rust PTY Host (portable-pty)</div>
+                <span class="arch-node-desc">Direct stdin/stdout byte streaming</span>
+              </div>
+              <div class="arch-arrow">→</div>
+              <div class="arch-node primary">
+                <span class="arch-node-tag">Frontend Renderer</span>
+                <div class="arch-node-title">xterm.js + WebGL Canvas</div>
+                <span class="arch-node-desc">Zero-latency terminal rendering</span>
+              </div>
+              <div class="arch-arrow">→</div>
+              <div class="arch-node">
+                <span class="arch-node-tag">Context Pipe</span>
+                <div class="arch-node-title">Dynamic MCP Bridge</div>
+                <span class="arch-node-desc">Atomic context injection without buffer pollution</span>
+              </div>
+            </div>
           </div>
         </article>
 
-        <!-- Pheromone -->
+        <!-- 3. Keybindings & Velocity -->
+        <article id="doc-keybindings" class="docs-article">
+          <h1 class="docs-h1">Keyboard Shortcuts & Developer Velocity</h1>
+          <p class="docs-lead">Complete keyboard navigation map for fluid canvas navigation, terminal focus, and mission dispatch.</p>
+          
+          <h2 class="docs-h2">Global Navigation & Swarm Control</h2>
+          <div class="docs-code-block">
+Shortcut                Action Description
+-----------------------------------------------------------------------------
+⌘K / Ctrl+K             Open Unified Swarm Command Palette
+⌘Enter                  Dispatch Parallel Prompt to Active Targets
+⌘B                      Switch Hub to Broadcast Mode (Simultaneous)
+⌘P                      Switch Hub to Wire Pipeline Mode (Chained)
+⌘T                      Create New Worker Agent Node
+⌘W                      Close Focused Agent Pane
+⌘,                      Open System Preferences & Theme Picker
+          </div>
+
+          <h2 class="docs-h2">Flow Canvas & Spatial Controls</h2>
+          <div class="docs-code-block">
+Shortcut                Action Description
+-----------------------------------------------------------------------------
+Space + Drag            Pan Canvas Viewport smoothly
+⌘+ / Ctrl++             Zoom In (+15%)
+⌘- / Ctrl+-             Zoom Out (-15%)
+⌘0 / Ctrl+0             Reset Zoom to 100% & Center Viewport
+Shift + Click (Socket)  Begin Drawing Synapse Connection Wire
+Delete / Backspace      Disconnect Selected Wire or Remove Node
+          </div>
+
+          <h2 class="docs-h2">Terminal Multiplexer Navigation</h2>
+          <div class="docs-code-block">
+Shortcut                Action Description
+-----------------------------------------------------------------------------
+⌘1 .. ⌘9                Directly focus Agent Terminal Pane 1 through 9
+⌘`                      Cycle focus to Next Active Agent Terminal
+⌘C                      Copy Terminal Selection (Standard Unix SIGINT when empty)
+⌘V                      Paste Text directly into Raw PTY Buffer
+⌘K (in terminal)        Clear Terminal Screen Buffer
+          </div>
+        </article>
+
+        <!-- 4. Pheromone Memory Engine -->
         <article id="doc-pheromone" class="docs-article">
-          <h1 class="docs-h1">Pheromone Shared Memory Engine</h1>
-          <p class="docs-lead">How multiple independent AI agents stay aligned without repetitive prompt engineering.</p>
+          <h1 class="docs-h1">Pheromone Shared Memory Engine & Vector Schema</h1>
+          <p class="docs-lead">Technical specifications for local vector indexing, semantic search, and inter-agent memory synchronization.</p>
+          
+          <h2 class="docs-h2">1. Memory Architecture Overview</h2>
           <p class="docs-p">
-            Pheromone is a lightweight, embedded SQLite vector database stored inside your project's <code>.pheromone/</code> folder.
+            Traditional multi-agent systems suffer from context drift: Agent A invents an API endpoint, while Agent B writes frontend code calling a completely different URL.
+            Pheromone eliminates this by maintaining an embedded SQLite database inside <code>.pheromone/memory.db</code> with sub-millisecond semantic search.
           </p>
 
+          <h2 class="docs-h2">2. Database Schema & Tables</h2>
+          <div class="docs-code-block">
+-- Core memory entities table
+CREATE TABLE IF NOT EXISTS memories (
+    id TEXT PRIMARY KEY,
+    project_id TEXT NOT NULL,
+    category TEXT NOT NULL CHECK(category IN ('architecture', 'decision', 'rule', 'plan', 'fact')),
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    embedding BLOB,               -- 384-dimensional cosine vector
+    source_agent TEXT NOT NULL,   -- e.g. 'claude-code-lead'
+    confidence REAL DEFAULT 1.0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Synapse wire links table
+CREATE TABLE IF NOT EXISTS synapses (
+    id TEXT PRIMARY KEY,
+    from_agent_id TEXT NOT NULL,
+    to_agent_id TEXT NOT NULL,
+    topic TEXT NOT NULL,
+    weight REAL DEFAULT 1.0,
+    last_synced TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+          </div>
+
+          <h2 class="docs-h2">3. Inter-Agent Communication Flow</h2>
           <div class="arch-flow-wrap" style="padding:16px;">
             <div class="arch-flow-row">
               <div class="arch-node primary">
-                <span class="arch-node-tag">Writer</span>
-                <div class="arch-node-title">Lead / Backend Worker</div>
-                <span class="arch-node-desc">Tags & writes API contract to memory</span>
+                <span class="arch-node-tag">1. Event Trigger</span>
+                <div class="arch-node-title">Agent Writes Code</div>
+                <span class="arch-node-desc">e.g. Creates session.ts API contract</span>
               </div>
               <div class="arch-arrow">→</div>
               <div class="arch-node primary">
-                <span class="arch-node-tag">Local Storage</span>
-                <div class="arch-node-title">.pheromone/memory.db</div>
-                <span class="arch-node-desc">SQLite vector embeddings & fast index</span>
+                <span class="arch-node-tag">2. Vector Indexing</span>
+                <div class="arch-node-title">Pheromone Embedded DB</div>
+                <span class="arch-node-desc">Auto-indexes contract into memory.db</span>
               </div>
               <div class="arch-arrow">→</div>
               <div class="arch-node">
-                <span class="arch-node-tag">Reader</span>
-                <div class="arch-node-title">Frontend / QA Workers</div>
-                <span class="arch-node-desc">Semantic context retrieval via MCP</span>
+                <span class="arch-node-tag">3. Context Broadcast</span>
+                <div class="arch-node-title">Frontend Worker MCP</div>
+                <span class="arch-node-desc">Auto-retrieves exact types & endpoints</span>
               </div>
             </div>
           </div>
 
-          <h2 class="docs-h2">Memory Schema</h2>
+          <h2 class="docs-h2">4. Supported Memory Categories</h2>
           <p class="docs-p">
-            • <strong>architecture</strong>: High-level database choices, library dependencies, pattern rules.<br />
-            • <strong>decision</strong>: File ownership declarations, API interfaces, schema contracts.<br />
-            • <strong>fact</strong>: Discovered codebase invariants, port allocations, environment flags.
+            • <strong>architecture</strong>: Core technology decisions (e.g. "Using Tailwind v4, Vite 5, React 19").<br />
+            • <strong>decision</strong>: Explicit structural declarations (e.g. "Auth endpoints live under /api/v1/auth").<br />
+            • <strong>rule</strong>: Mandatory coding constraints (e.g. "Do not use emojis; use Lucide vector icons").<br />
+            • <strong>plan</strong>: Decomposed task milestones currently allocated to specific workers.<br />
+            • <strong>fact</strong>: Discovered environment states (e.g. "Local postgres port is 5432; schema is migrated").
           </p>
         </article>
 
-        <!-- Worktrees -->
+        <!-- 5. Git Worktree Isolation -->
         <article id="doc-worktrees" class="docs-article">
-          <h1 class="docs-h1">Git Worktree Isolation</h1>
-          <p class="docs-lead">Parallel agent safety through ephemeral git worktrees.</p>
+          <h1 class="docs-h1">Git Worktree Isolation & 3-Way Merge Engine</h1>
+          <p class="docs-lead">Deterministic file isolation mechanics, branch locking algorithms, and clean 3-way fast-forward merges.</p>
+          
+          <h2 class="docs-h2">1. The Problem of File Contention</h2>
           <p class="docs-p">
-            Instead of running all AI bots in the same folder where they overwrite each other's edits, Swarm AI provisions a separate Git worktree for each agent under <code>.swarm/worktrees/&lt;task-id&gt;</code>.
+            When multiple autonomous agents operate inside the same working tree, concurrent disk writes cause catastrophic race conditions: partial AST writes, broken build states, and corrupted files.
           </p>
 
-          <div class="arch-flow-wrap" style="padding:16px;">
-            <div class="arch-flow-row">
-              <div class="arch-node">
-                <span class="arch-node-tag" style="color:var(--accent-emerald);">Branch 1</span>
-                <div class="arch-node-title">feature/backend-api</div>
-                <span class="arch-node-desc">Worker 1: REST endpoints & DB schema</span>
-              </div>
-              <div class="arch-node">
-                <span class="arch-node-tag" style="color:#38bdf8;">Branch 2</span>
-                <div class="arch-node-title">feature/frontend-ui</div>
-                <span class="arch-node-desc">Worker 2: React canvas & state</span>
-              </div>
-              <div class="arch-arrow">→</div>
-              <div class="arch-node primary">
-                <span class="arch-node-tag">Resolver</span>
-                <div class="arch-node-title">3-Way Fast-Forward Merge</div>
-                <span class="arch-node-desc">Safe validation into primary main branch</span>
-              </div>
-            </div>
+          <h2 class="docs-h2">2. Ephemeral Worktree Lifecycle</h2>
+          <div class="docs-code-block">
+# 1. Swarm provisions dedicated worktree for Worker 1
+git worktree add -b swarm/task-auth-01 .swarm/worktrees/task-auth-01 main
+
+# 2. Worker 2 gets isolated branch for Frontend UI
+git worktree add -b swarm/task-ui-02 .swarm/worktrees/task-ui-02 main
+
+# 3. Each agent executes in complete isolation on local disk
+cd .swarm/worktrees/task-auth-01 && claude --model claude-opus-5
+
+# 4. On mission completion: Swarm performs 3-way dry-run diff
+git merge-tree --write-tree main swarm/task-auth-01 swarm/task-ui-02
+
+# 5. Clean fast-forward merge into primary branch
+git checkout main
+git merge swarm/task-auth-01 --ff-only
+git merge swarm/task-ui-02 --ff-only
+
+# 6. Automatic cleanup of ephemeral worktrees
+git worktree remove --force .swarm/worktrees/task-auth-01
+git worktree remove --force .swarm/worktrees/task-ui-02
+          </div>
+
+          <h2 class="docs-h2">3. File Ownership Safety Locks</h2>
+          <p class="docs-p">
+            During task decomposition, the Lead Steward creates a file lock table stored in <code>.swarm/locks.json</code>. If Agent 1 is assigned <code>src/auth/*</code>, Agent 2 is restricted to read-only access for those paths, guaranteeing <strong>mathematically zero merge conflicts</strong>.
+          </p>
+        </article>
+
+        <!-- 6. Flow Canvas & Synapse Topology -->
+        <article id="doc-flow-canvas" class="docs-article">
+          <h1 class="docs-h1">Flow Canvas, Sockets & Live Telemetry Engine</h1>
+          <p class="docs-lead">Spatial execution graph, bidirectional socket wiring, and real-time token cost computation.</p>
+          
+          <h2 class="docs-h2">1. Spatial Graph Coordinates & Sockets</h2>
+          <p class="docs-p">
+            The Flow Canvas represents agents as reactive nodes in an infinite 2D plane with zoom capabilities (0.2x to 2.5x).
+            Each node exposes 4 directional sockets:
+          </p>
+          <p class="docs-p">
+            • <strong>Top Socket</strong>: Upstream control signals & supervisory directives from Lead Steward.<br />
+            • <strong>Bottom Socket</strong>: Downstream task delegation & worker dispatch.<br />
+            • <strong>Left Socket</strong>: Inbound memory contracts & context inputs.<br />
+            • <strong>Right Socket</strong>: Outbound API contracts & data pipelines.
+          </p>
+
+          <h2 class="docs-h2">2. Live Telemetry HUD Metrics</h2>
+          <p class="docs-p">
+            The Canvas HUD continuously tracks throughput and compute budgets in real time:
+          </p>
+          <div class="docs-code-block">
+Metric                  Formula & Source
+-----------------------------------------------------------------------------
+Token Velocity (t/s)    Sum of stream chunks received per second across all PTYs
+Total Cost ($)          (Input Tokens * Rate) + (Output Tokens * Rate) per model
+Cache Hit Rate (%)      Anthropic & OpenAI prompt cache read ratios (avg >95%)
+Active Worktrees        Count of mounted git worktree directory handles
           </div>
         </article>
 
-        <!-- Flow Canvas -->
-        <article id="doc-flow-canvas" class="docs-article">
-          <h1 class="docs-h1">Flow Canvas & Synapse Wires</h1>
-          <p class="docs-lead">Visual spatial layout for complex multi-model pipelines.</p>
-          <p class="docs-p">
-            Connect outputs of one agent to inputs of another by dragging between sockets. Synapse wires feature bidirectional pulse indicators, live token velocity telemetry, and single-click disconnection.
-          </p>
-        </article>
-
-        <!-- Security -->
+        <!-- 7. Security & Local-First Guarantees -->
         <article id="doc-security" class="docs-article">
-          <h1 class="docs-h1">Security & Local-First Guarantees</h1>
-          <p class="docs-lead">Zero telemetry tracking, air-gapped support, and local credential safety.</p>
+          <h1 class="docs-h1">Security, Sandboxing & Air-Gap Compliance</h1>
+          <p class="docs-lead">Zero-telemetry architecture, local credential security, and enterprise compliance standards.</p>
+          
+          <h2 class="docs-h2">1. Zero Cloud Proxy Guarantee</h2>
           <p class="docs-p">
-            • <strong>No Middleman Cloud Proxy</strong>: Swarm AI never proxies your code or API keys through our servers. All network calls go directly from your local machine to Anthropic/OpenAI or local Ollama instances.<br />
-            • <strong>Local-First Storage</strong>: Project memory, task trees, and logs stay entirely on your disk in SQLite and JSON files.
+            Swarm AI maintains <strong>zero middleman cloud infrastructure</strong>. When your agents call Anthropic, OpenAI, or a local Ollama instance, the HTTP/WebSocket connection originates directly from your localhost machine to the model provider.
+            Your code, diffs, API keys, and repository files are never uploaded to any Swarm AI servers.
+          </p>
+
+          <h2 class="docs-h2">2. Operating System Keychain Vault</h2>
+          <p class="docs-p">
+            All API keys are encrypted at rest using OS-native security primitives:
+          </p>
+          <p class="docs-p">
+            • <strong>macOS</strong>: Apple Keychain via Security.framework.<br />
+            • <strong>Windows</strong>: Windows Credential Manager (DPAPI).<br />
+            • <strong>Linux</strong>: Secret Service API via libsecret / GNOME Keyring.
+          </p>
+
+          <h2 class="docs-h2">3. Sensitive Secret Scrubbing</h2>
+          <p class="docs-p">
+            Swarm AI's PTY stream filter automatically detects and masks environment secrets, JWT tokens, private keys (<code>-----BEGIN RSA PRIVATE KEY-----</code>), and <code>.env</code> variables before rendering them in the terminal buffer or passing them to vector memory.
           </p>
         </article>
       </div>
