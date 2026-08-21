@@ -657,52 +657,47 @@ export default function ADERightDock({ projectPath, onClose }: Props) {
  : "items-center border-b border-swarm-border/40"
  }`}
  >
- {TABS.map((tab) => {
- const Icon = tab.icon;
- const active = activeTab === tab.id;
- return (
- <button
- key={tab.id}
- onClick={() => {
- if (collapsed) setCollapsed(false);
- else if (active) setCollapsed(true);
- setActiveTab(tab.id);
- setViewer(null);
- if (tab.id !== "glasschat") setIsExpanded(false);
- }}
- title={collapsed ? `${tab.label} — expand panel` : tab.label}
- aria-label={tab.label}
- aria-expanded={!collapsed && active}
- className={`flex items-center justify-center gap-1.5 min-w-0 h-9 text-mini font-medium transition-colors whitespace-nowrap ${
- collapsed ? "border-l-2" : "flex-1 px-2 border-b-2"
- } ${
- active
- ? "text-swarm-goldHi bg-swarm-gold/[0.06] border-swarm-gold"
- : "border-transparent text-swarm-textMuted hover:text-swarm-textDim hover:bg-swarm-border/20"
- }`}
- >
- <Icon className="size-3.5 shrink-0" />
- {!compact && !collapsed && <span className="truncate">{tab.label}</span>}
- </button>
- );
- })}
+          {TABS.map((tab) => {
+            const Icon = tab.icon;
+            const active = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  if (collapsed) setCollapsed(false);
+                  else if (active) setCollapsed(true);
+                  setActiveTab(tab.id);
+                  setViewer(null);
+                  if (tab.id !== "glasschat") setIsExpanded(false);
+                }}
+                title={collapsed ? `${tab.label} — expand panel` : tab.label}
+                aria-label={tab.label}
+                aria-expanded={!collapsed && active}
+                className={`flex items-center justify-center gap-1.5 min-w-0 h-9 text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                  collapsed ? "border-l-2" : "flex-1 px-2 border-b-2"
+                } ${
+                  active
+                    ? "text-white bg-white/[0.08] border-white shadow-xs"
+                    : "border-transparent text-zinc-400 hover:text-white hover:bg-white/[0.04]"
+                }`}
+              >
+                <Icon className="size-3.5 shrink-0" />
+                {!compact && !collapsed && <span className="truncate">{tab.label}</span>}
+              </button>
+            );
+          })}
 
- {activeTab === "chat" && !collapsed && (
- <div className="mr-1 flex shrink-0 items-center">
- <LeadModeSelect />
- </div>
- )}
- <button
- onClick={onClose}
- className={`h-8 flex items-center justify-center text-swarm-textMuted hover:text-swarm-text hover:bg-swarm-border/30 transition-colors shrink-0 ${
- collapsed ? "w-full" : "w-8"
- }`}
- title="Close panel"
- aria-label="Close panel"
- >
- <X className="size-3.5" />
- </button>
- </div>
+          <button
+            onClick={onClose}
+            className={`h-8 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors shrink-0 cursor-pointer ${
+              collapsed ? "w-full" : "w-8"
+            }`}
+            title="Close panel"
+            aria-label="Close panel"
+          >
+            <X className="size-3.5" />
+          </button>
+        </div>
 
  {!isExpanded && !collapsed && (
  <div

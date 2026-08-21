@@ -1,6 +1,13 @@
-/** Color themes — only CSS token values change; layout/components stay the same. */
-
-export type ThemeId = "swarm" | "graphite" | "obsidian" | "amber";
+export type ThemeId =
+  | "charcoal"
+  | "midnight"
+  | "matrix"
+  | "nordic"
+  | "crimson"
+  | "swarm"
+  | "obsidian"
+  | "graphite"
+  | "amber";
 
 export interface ThemeTokens {
   /** Space-separated RGB channels, e.g. "224 168 58" — used with rgb(var(--x) / a). */
@@ -31,6 +38,26 @@ export interface ThemeDef {
   swatch: [string, string, string];
   tokens: ThemeTokens;
 }
+
+const CHARCOAL_SMOKE: ThemeTokens = {
+  canvas: "6 7 9",          // Ultra Deep Velvet Charcoal (#060709)
+  canvasHi: "12 14 18",     // Obsidian Charcoal (#0c0e12)
+  surface: "17 20 26",      // Rich Frosted Surface (#11141a)
+  surfaceHi: "25 29 38",    // Luminous Charcoal Glass (#191d26)
+  border: "38 43 56",       // Micro Precision Hairline (#262b38)
+  borderHi: "160 174 196",  // Platinum Diamond (#a0aec4)
+  gold: "250 252 255",      // Diamond Smokie White (#fafcff)
+  goldHi: "255 255 255",    // Supernova Pure White (#ffffff)
+  goldDim: "156 172 196",   // Titanium Silver (#9cacb4)
+  honey: "235 240 248",     // Liquid Platinum (#ebf0f8)
+  amber: "210 220 235",     // Glacial Frost (#d2dceb)
+  text: "255 255 255",      // Ultra Crisp White (#ffffff)
+  textDim: "175 188 206",   // Silky Light Slate (#afbcce)
+  textMuted: "105 118 138", // Refined Stealth (#69768a)
+  ok: "52 211 153",         // Emerald Spark (#34d399)
+  warn: "250 252 255",      // Luminescent White
+  err: "244 63 94",         // Rose Crimson (#f43f5e)
+};
 
 const SWARM_THEME: ThemeTokens = {
   canvas: "12 13 16",
@@ -112,7 +139,122 @@ const AMBER: ThemeTokens = {
   err: "221 106 92",
 };
 
+const MIDNIGHT_CYBERPUNK: ThemeTokens = {
+  canvas: "6 8 18",          // Tokyo Midnight Sapphire (#060812)
+  canvasHi: "11 15 30",     // Deep Cyber Blue (#0b0f1e)
+  surface: "16 22 42",      // Frosted Sapphire Glass (#10162a)
+  surfaceHi: "24 32 60",    // Neon Glass Surface (#18203c)
+  border: "38 48 85",       // Electric Indigo Border (#263055)
+  borderHi: "168 85 247",   // Electric Violet Neon (#a855f7)
+  gold: "6 182 212",        // Neon Cyan Primary (#06b6d4)
+  goldHi: "168 85 247",     // Electric Violet (#a855f7)
+  goldDim: "37 99 235",     // Cobalt Blue (#2563eb)
+  honey: "147 51 234",      // Royal Purple (#9333ea)
+  amber: "56 189 248",      // Cyan Glow (#38bdf8)
+  text: "248 250 252",      // Crisp White (#f8fafc)
+  textDim: "192 132 252",   // Lilac Dim (#c084fc)
+  textMuted: "100 116 139", // Muted Slate (#64748b)
+  ok: "52 211 153",         // Matrix Emerald (#34d399)
+  warn: "250 204 21",       // Cyber Yellow (#facc15)
+  err: "244 63 94",         // Neon Pink/Rose (#f43f5e)
+};
+
+const MATRIX_PHOSPHOR: ThemeTokens = {
+  canvas: "4 8 6",           // Pure Hacker Void (#040806)
+  canvasHi: "8 16 12",      // Deep Terminal Obsidian (#08100c)
+  surface: "12 24 18",      // Frosted Forest Black (#0c1812)
+  surfaceHi: "18 36 28",    // Phosphor Glass (#12241c)
+  border: "28 58 44",       // Matrix Hairline Border (#1c3a2c)
+  borderHi: "16 185 129",   // Phosphor Emerald Glow (#10b981)
+  gold: "16 185 129",       // Radiant Emerald Accent (#10b981)
+  goldHi: "52 211 153",     // Supernova Mint (#34d399)
+  goldDim: "5 150 105",     // Deep Jade (#059669)
+  honey: "110 231 183",     // Light Phosphor (#6ee7b7)
+  amber: "52 211 153",      // Bright Mint (#34d399)
+  text: "236 253 245",      // Phosphor White-Green (#ecfdf5)
+  textDim: "110 231 183",   // Phosphor Mint Dim (#6ee7b7)
+  textMuted: "52 105 84",   // Stealth Matrix Muted (#346954)
+  ok: "16 185 129",         // Terminal Green (#10b981)
+  warn: "250 204 21",       // Warning Gold (#facc15)
+  err: "244 63 94",         // Red Terminal Alarm (#f43f5e)
+};
+
+const NORDIC_FROST: ThemeTokens = {
+  canvas: "7 13 20",        // Arctic Polar Void (#070d14)
+  canvasHi: "12 22 34",     // Nordic Ice Slate (#0c1622)
+  surface: "18 30 46",      // Frosted Iceberg (#121e2e)
+  surfaceHi: "26 42 64",    // Luminous Glacier Glass (#1a2a40)
+  border: "38 60 90",       // Sub-zero Hairline (#263c5a)
+  borderHi: "56 189 248",   // Glacial Ice Blue Glow (#38bdf8)
+  gold: "56 189 248",       // Polar Ice Blue (#38bdf8)
+  goldHi: "224 242 254",    // Ice Cap White (#e0f2fe)
+  goldDim: "14 165 233",    // Deep Azure (#0ea5e9)
+  honey: "125 211 252",     // Crystalline Blue (#7dd3fc)
+  amber: "186 230 253",     // Polar Frost Glow (#bae6fd)
+  text: "248 250 252",      // Diamond Ice White (#f8fafc)
+  textDim: "186 230 253",   // Frost Subtext (#bae6fd)
+  textMuted: "100 125 155", // Arctic Fog (#647d9b)
+  ok: "52 211 153",         // Emerald Aurora (#34d399)
+  warn: "250 204 21",       // Amber Sun (#facc15)
+  err: "244 63 94",         // Arctic Rose (#f43f5e)
+};
+
+const CRIMSON_ECLIPSE: ThemeTokens = {
+  canvas: "12 6 8",         // Dark Solar Eclipse Void (#0c0608)
+  canvasHi: "20 10 14",     // Deep Obsidian Ember (#140a0e)
+  surface: "30 16 22",      // Frosted Ruby Glass (#1e1016)
+  surfaceHi: "44 24 32",    // Solar Flare Glass (#2c1820)
+  border: "65 32 44",       // Crimson Hairline (#41202c)
+  borderHi: "244 63 94",    // Laser Ruby Glow (#f43f5e)
+  gold: "244 63 94",        // Crimson Laser Accent (#f43f5e)
+  goldHi: "251 113 133",    // Rose Supernova (#fb7185)
+  goldDim: "225 29 72",     // Deep Rose (#e11d48)
+  honey: "253 164 175",     // Light Sakura (#fda4af)
+  amber: "244 63 94",       // Bright Crimson (#f43f5e)
+  text: "255 241 242",      // Crisp Rose White (#fff1f2)
+  textDim: "253 164 175",   // Soft Rose Subtext (#fda4af)
+  textMuted: "140 90 105",  // Muted Ash (#8c5a69)
+  ok: "52 211 153",         // Emerald Spark (#34d399)
+  warn: "251 146 60",       // Solar Orange (#fb923c)
+  err: "244 63 94",         // Crimson Laser (#f43f5e)
+};
+
 export const THEMES: ThemeDef[] = [
+  {
+    id: "charcoal",
+    label: "Obsidian Charcoal & Smokie Platinum",
+    description: "Ultra-luxury deep charcoal obsidian with diamond smokie white & titanium accents",
+    swatch: ["#fafcff", "#11141a", "#060709"],
+    tokens: CHARCOAL_SMOKE,
+  },
+  {
+    id: "midnight",
+    label: "Midnight Cyberpunk",
+    description: "Deep Tokyo sapphire with electric violet & neon cyan neural wires",
+    swatch: ["#06b6d4", "#10162a", "#060812"],
+    tokens: MIDNIGHT_CYBERPUNK,
+  },
+  {
+    id: "matrix",
+    label: "Matrix Phosphor Emerald",
+    description: "Hacker void obsidian with radiant phosphor terminal emerald",
+    swatch: ["#10b981", "#0c1812", "#040806"],
+    tokens: MATRIX_PHOSPHOR,
+  },
+  {
+    id: "nordic",
+    label: "Nordic Polar Frost",
+    description: "Arctic titanium slate with crystal polar ice blue & iceberg glass",
+    swatch: ["#38bdf8", "#121e2e", "#070d14"],
+    tokens: NORDIC_FROST,
+  },
+  {
+    id: "crimson",
+    label: "Crimson Eclipse",
+    description: "Solar flare obsidian with laser ruby crimson & sakura accents",
+    swatch: ["#f43f5e", "#1e1016", "#0c0608"],
+    tokens: CRIMSON_ECLIPSE,
+  },
   {
     id: "swarm",
     label: "Swarm Dark",
@@ -147,7 +289,7 @@ export const THEME_BY_ID: Record<ThemeId, ThemeDef> = Object.fromEntries(
   THEMES.map((t) => [t.id, t]),
 ) as Record<ThemeId, ThemeDef>;
 
-export const DEFAULT_THEME_ID: ThemeId = "swarm";
+export const DEFAULT_THEME_ID: ThemeId = "charcoal";
 
 const TOKEN_TO_CSS: Record<keyof ThemeTokens, string> = {
   canvas: "--swarm-canvas",

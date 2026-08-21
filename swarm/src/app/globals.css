@@ -480,23 +480,24 @@ select:focus {
 }
 
 .pro-badge-amber,
-.pro-badge-gold {
-  background: rgba(218, 165, 72, 0.08);
-  border-color: rgba(218, 165, 72, 0.22);
-  color: #f0c36e;
+.pro-badge-gold,
+.pro-badge-platinum {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #f1f5f9;
 }
 
 .pro-badge-emerald,
 .pro-badge-ok {
-  background: rgba(70, 180, 130, 0.08);
-  border-color: rgba(70, 180, 130, 0.22);
-  color: #46b482;
+  background: rgba(52, 211, 153, 0.08);
+  border-color: rgba(52, 211, 153, 0.22);
+  color: #34d399;
 }
 
 .pro-badge-cyan {
-  background: rgba(218, 165, 72, 0.08);
-  border-color: rgba(218, 165, 72, 0.22);
-  color: #f0c36e;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #f1f5f9;
 }
 
 .bridgemind-card {

@@ -50,6 +50,9 @@ import {
   DownloadCloud,
   GitCommit,
   AlertCircle,
+  Settings,
+  Blocks,
+  Gauge,
   type LucideIcon,
 } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
@@ -59,8 +62,8 @@ import { useProjectStore } from "../openFiles.js";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import WorkspaceCreateDialog from "./WorkspaceCreateDialog.js";
 
-const MIN_WIDTH = 220;
-const MAX_WIDTH = 500;
+const MIN_WIDTH = 180;
+const MAX_WIDTH = 550;
 const WIDTH_KEY = "swarm.sidebarWidth";
 
 const clampWidth = (px: number) => Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, px));
@@ -96,6 +99,12 @@ interface Props {
    *  menu, panel toggles). A node, not a set of callbacks: the host owns what
    *  those actions are. */
   topBar?: React.ReactNode;
+  onOpenProject?: () => void;
+  onOpenGit?: () => void;
+  onOpenExtensions?: () => void;
+  onOpenUsage?: () => void;
+  onOpenSettings?: () => void;
+  themePickerSlot?: React.ReactNode;
 }
 
 interface ViewerTarget {
@@ -1058,9 +1067,24 @@ function FleetPanel({ onSelectWorkspace }: { onSelectWorkspace: (wsId: string) =
   );
 }
 
-export default function ADEWorktreeSidebar({ projectPath, pinned = true, onTogglePin, onClose, topBar }: Props) {
+export default function ADEWorktreeSidebar({
+  projectPath,
+  pinned = true,
+  onTogglePin,
+  onClose,
+  topBar,
+  onOpenProject,
+  onOpenGit,
+  onOpenExtensions,
+  onOpenUsage,
+  onOpenSettings,
+  themePickerSlot,
+}: Props) {
   const [activeTab, setActiveTab] = useState<LeftTab>("workspaces");
   const [viewer, setViewer] = useState<ViewerTarget | null>(null);
+  const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
+  const gearBtnRef = useRef<HTMLButtonElement>(null);
+  const [gearRect, setGearRect] = useState<DOMRect | null>(null);
 
   const workspaces = useWorkspaceStore((s) => s.workspaces);
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
@@ -1451,254 +1475,284 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
 
   // Not LucideIcon: the Projects tab carries Swarm's own agent mark, which
   // is a plain function component, not a lucide forwardRef.
-  const TABS: { id: LeftTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-    { id: "workspaces", label: "Projects", icon: WorkspaceMark },
+  const TABS: { id: LeftTab; label: string; icon: React.ComponentType<{ className?: string }>; count?: number }[] = [
+    { id: "workspaces", label: "Projects", icon: WorkspaceMark, count: workspaces.length },
     { id: "explorer", label: "Explorer", icon: Folder },
-    { id: "git", label: "Git", icon: FolderGit2 },
-    { id: "search", label: "Search", icon: Search },
+    { id: "git", label: "Git Control", icon: FolderGit2 },
+    { id: "search", label: "Global Search", icon: Search },
     { id: "devtools", label: "DevTools", icon: Wrench },
-    { id: "fleet", label: "Fleet", icon: Cpu },
+    { id: "fleet", label: "Swarm Fleet", icon: Cpu },
   ];
-
-  // Narrow sidebar → icon-only tabs (matches the right dock's behavior).
-  const compact = sidebarWidth < 340;
 
   return (
     <div
       ref={sidebarRef}
-      className="relative h-full flex flex-col bg-[#0b0d13]/95 backdrop-blur-2xl border-r border-white/[0.07] shrink-0 font-sans antialiased select-none"
-      // maxWidth in vw, not a JS resize listener: the browser re-clamps on every
-      // window resize for free and the user's chosen width survives untouched
-      // when the window grows back.
+      className="relative h-full flex bg-[#090b10] border-r border-white/[0.08] shrink-0 font-sans antialiased select-none"
       style={{ width: sidebarWidth, minWidth: MIN_WIDTH, maxWidth: "50vw" }}
     >
-      {/* App row — top-left corner */}
-      {topBar && (
-        <div
-          className="flex h-11 shrink-0 items-center gap-0.5 border-b border-white/[0.06] bg-white/[0.02] px-2.5"
-          data-tauri-drag-region
-        >
-          {topBar}
+      {/* ── Vertical Pro Activity Bar Rail (Far Left, 50px) ──────────────── */}
+      <div className="w-[50px] shrink-0 flex flex-col items-center justify-between border-r border-white/[0.06] bg-[#07080d] py-2.5 z-20">
+        {/* Top Section: App/Brand Logo & Activity Tabs */}
+        <div className="flex flex-col items-center gap-1.5 w-full">
+          {/* Activity Bar Tabs */}
+          {TABS.map((tab) => {
+            const Icon = tab.icon;
+            const active = activeTab === tab.id;
+            return (
+              <div key={tab.id} className="relative w-full flex justify-center py-0.5 group">
+                {/* Active Left Indicator Bar */}
+                {active && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r bg-white shadow-[0_0_8px_rgba(255,255,255,0.7)]" />
+                )}
+                <button
+                  onClick={() => { setActiveTab(tab.id); setViewer(null); }}
+                  title={tab.label}
+                  aria-label={tab.label}
+                  className={`size-9 rounded-xl flex items-center justify-center transition-all duration-150 ${
+                    active
+                      ? "text-white bg-white/[0.14] border border-white/[0.24] shadow-md"
+                      : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06]"
+                  }`}
+                >
+                  <Icon className="size-4.5" />
+                </button>
+              </div>
+            );
+          })}
         </div>
-      )}
 
-      {/* Sidebar Sub-Tabs Header (Workspaces, Explorer, Search, DevTools, Fleet) */}
-      <div className="flex items-center border-b border-white/[0.06] bg-black/20 shrink-0 overflow-x-auto scrollbar-none px-1 py-0.5">
-        {TABS.map((tab) => {
-          const Icon = tab.icon;
-          const active = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => { setActiveTab(tab.id); setViewer(null); }}
-              title={tab.label}
-              className={`flex items-center justify-center gap-1.5 flex-1 min-w-0 h-8 px-1.5 rounded-lg text-mini font-medium transition-all whitespace-nowrap ${
-                active
-                  ? "text-swarm-goldHi bg-swarm-gold/[0.12] border border-swarm-gold/30 shadow-sm"
-                  : "text-swarm-textMuted hover:text-swarm-textDim hover:bg-white/[0.04]"
-              }`}
-            >
-              <Icon className="size-3.5 shrink-0" />
-              {!compact && <span className="truncate">{tab.label}</span>}
-            </button>
-          );
-        })}
+        {/* Bottom Section: Theme Picker, Gear Settings, Pin & Close Actions */}
+        <div className="flex flex-col items-center gap-1.5 w-full pt-2 border-t border-white/[0.06]">
+          {/* Theme Picker Slot */}
+          {themePickerSlot}
 
-        <div className="flex items-center pr-1 shrink-0 gap-0.5 ml-1">
+          {/* Settings & Tools Gear Button */}
+          <button
+            ref={gearBtnRef}
+            onClick={() => {
+              setGearRect(gearBtnRef.current?.getBoundingClientRect() ?? null);
+              setSettingsMenuOpen((v) => !v);
+            }}
+            aria-haspopup="menu"
+            aria-expanded={settingsMenuOpen}
+            className={`size-9 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer ${
+              settingsMenuOpen
+                ? "text-white bg-white/[0.16] border border-white/[0.3] shadow-md"
+                : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06]"
+            }`}
+            title="Settings & Tools (Open project, Git, Extensions, Usage)"
+            aria-label="Settings and Tools"
+          >
+            <Settings size={18} className={settingsMenuOpen ? "rotate-45 transition-transform duration-200" : "transition-transform duration-200"} />
+          </button>
+
           <button
             onClick={onTogglePin}
-            className={`size-6 flex items-center justify-center rounded-lg transition-colors ${
-              pinned ? "text-swarm-gold bg-swarm-gold/10" : "text-swarm-textMuted hover:text-swarm-text hover:bg-white/[0.06]"
+            className={`size-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
+              pinned ? "text-white bg-white/[0.12] border border-white/[0.2]" : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.06]"
             }`}
             title={pinned ? "Unpin sidebar" : "Pin sidebar"}
             aria-label={pinned ? "Unpin sidebar" : "Pin sidebar"}
-            aria-pressed={pinned}
           >
-            {pinned ? <PinOff size={12} /> : <Pin size={12} />}
+            {pinned ? <PinOff size={13} /> : <Pin size={13} />}
           </button>
           {onClose && (
             <button
               onClick={onClose}
-              className="size-6 flex items-center justify-center rounded-lg text-swarm-textMuted hover:text-swarm-text hover:bg-white/[0.06] transition-colors"
+              className="size-8 flex items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.06] transition-colors cursor-pointer"
               title="Close sidebar"
               aria-label="Close sidebar"
             >
-              <X size={12} />
+              <X size={13} />
             </button>
           )}
         </div>
       </div>
 
-      {/* Main Tab Content */}
-      <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-        {viewer ? (
-          <FileViewer target={viewer} onBack={() => setViewer(null)} />
-        ) : activeTab === "explorer" ? (
-          <ExplorerPanel projectPath={projectPath || null} onOpen={setViewer} />
-        ) : activeTab === "git" ? (
-          <GitSidebarPanel projectPath={projectPath || null} />
-        ) : activeTab === "search" ? (
-          <SearchPanel projectPath={projectPath || null} onOpen={setViewer} />
-        ) : activeTab === "devtools" ? (
-          <DevToolsPanel projectPath={projectPath || null} />
-        ) : activeTab === "fleet" ? (
-          <FleetPanel onSelectWorkspace={(wsId) => activateAndSync(wsId)} />
-        ) : (
-          /* Workspaces Tab Content */
-          <>
-            {/* WorkHive Top Action Header */}
-            <div className="flex h-10 shrink-0 items-center justify-between px-3 pt-1 border-b border-white/[0.04] bg-white/[0.01]">
-              <button
-                onClick={() => setHideSleeping(!hideSleeping)}
-                className="flex items-center gap-1.5 text-swarm-textMuted hover:text-swarm-text transition-colors text-xs font-mono shrink-0"
-                title={hideSleeping ? "Show all workHives" : "Hide sleeping workHives"}
-              >
-                {hideSleeping ? <EyeOff size={13} /> : <Eye size={13} />}
-                <span className="text-xs text-swarm-textMuted font-mono font-medium">{visibleWorkspaces.length}</span>
-              </button>
-
-              <button
-                onClick={handleAdd}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-b from-white/[0.1] to-white/[0.04] hover:from-white/[0.14] hover:to-white/[0.06] border border-white/[0.10] px-2.5 py-1 text-xs font-semibold text-swarm-text transition-all shadow-sm active:scale-[0.98] shrink-0"
-                title="New WorkHive"
-              >
-                <Plus size={13} className="text-swarm-gold shrink-0" />
-                <span className="shrink-0">New Hive</span>
-              </button>
-            </div>
-
-            {/* Filter workHives input */}
-            <div className="px-3 py-2">
-              <div className="flex h-8 items-center gap-2 rounded-xl border border-white/[0.08] bg-black/40 px-2.5 focus-within:border-swarm-gold/50 focus-within:ring-1 focus-within:ring-swarm-gold/20 transition-all shadow-inner">
-                <Search size={13} className="text-swarm-textMuted/70 shrink-0" />
-                <input
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Filter workHives..."
-                  aria-label="Filter workHives"
-                  className="min-w-0 flex-1 bg-transparent text-xs text-swarm-text outline-none placeholder:text-swarm-textMuted/40 font-sans"
-                  spellCheck={false}
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery("")}
-                    title="Clear filter"
-                    className="text-swarm-textMuted hover:text-swarm-text"
-                  >
-                    <X size={12} />
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* WorkHive Cards List */}
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-sleek px-2 pb-2 space-y-1.5">
-                {visibleWorkspaces.length === 0 ? (
-                  searchQuery ? (
-                    <EmptyNote
-                      text="Nothing matches that filter"
-                      hint="Filters match a workHive's name and its folder."
-                      actionLabel="Clear filter"
-                      onAction={() => setSearchQuery("")}
-                    />
-                  ) : hideSleeping ? (
-                    <EmptyNote
-                      text="Every workHive is asleep"
-                      hint="Sleeping means no agent is running in it."
-                      actionLabel="Show sleeping"
-                      onAction={() => setHideSleeping(false)}
-                    />
-                  ) : (
-                    <EmptyNote
-                      text="No workHives yet"
-                      hint="A workHive is one workspace folder."
-                      actionLabel="New WorkHive"
-                      onAction={handleAdd}
-                    />
-                  )
-                ) : (
-                  visibleWorkspaces.map((ws) => (
-                    <div key={ws.id} className="relative" onContextMenu={(e) => handleContextMenu(e, ws)}>
-                      <ProjectGroup
-                        ws={ws}
-                        isActive={ws.id === activeWorkspaceId}
-                        hasActive={hasActiveAgent(ws, agentStatuses)}
-                        onActivate={() => { if (!ws.isDeleting) activateAndSync(ws.id); }}
-                        onMenu={(e) => openMenu(ws, e.clientX, e.clientY)}
-                        isRenaming={renamingWorkspaceId === ws.id}
-                        editValue={editValue}
-                        onEditChange={setEditValue}
-                        onCommitRename={commitRename}
-                        onCancelRename={() => { setRenamingWorkspaceId(null); setEditValue(""); }}
-                        onStartRename={() => startRename(ws.id, ws.name)}
-                      />
-
-                      {ws.isDeleting && (
-                        <div className="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-swarm-canvasHi/90">
-                          <div className="inline-flex max-w-full items-center gap-1.5 rounded-full glass-hi border border-swarm-border/60 px-2.5 py-1 text-mini font-medium text-swarm-text shadow-sm">
-                            <LoaderCircle className="size-3 shrink-0 animate-spin text-swarm-textMuted" />
-                            <span className="truncate">Deleting…</span>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); cancelDeleteWorkspace(ws.id); }}
-                              title="Cancel deletion"
-                              className="shrink-0 text-swarm-textMuted hover:text-swarm-text transition-colors"
-                            >
-                              <X className="size-3" />
-                            </button>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); commitDeleteWorkspace(ws.id); }}
-                              className="shrink-0 font-semibold text-swarm-err transition-colors hover:opacity-80"
-                            >
-                              Confirm
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))
-                )}
-              </div>
-
-              {/* Bottom Quick Navigation Links */}
-              <div className="px-2 pt-2.5 pb-2 border-t border-white/[0.06] flex flex-col gap-1 shrink-0">
-                <button
-                  onClick={() => setActiveTab("explorer")}
-                  className="flex h-8 items-center gap-2.5 rounded-xl border border-white/[0.04] bg-white/[0.02] px-2.5 text-xs font-semibold tracking-wider transition-all text-swarm-textMuted hover:bg-white/[0.07] hover:border-swarm-gold/30 hover:text-swarm-goldHi"
-                >
-                  <Folder size={14} className="text-swarm-gold/80" />
-                  <span className="tracking-widest font-mono text-[11px]">EXPLORER</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab("search")}
-                  className="flex h-8 items-center gap-2.5 rounded-xl border border-white/[0.04] bg-white/[0.02] px-2.5 text-xs font-semibold tracking-wider transition-all text-swarm-textMuted hover:bg-white/[0.07] hover:border-swarm-gold/30 hover:text-swarm-goldHi"
-                >
-                  <GitPullRequest size={14} className="text-amber-400/80" />
-                  <span className="tracking-widest font-mono text-[11px]">ISSUES & PRS</span>
-                </button>
-                <button
-                  onClick={() => setBoardOpen(!boardOpen)}
-                  className={`flex h-8 items-center gap-2.5 rounded-xl px-2.5 text-xs font-semibold tracking-wider transition-all ${
-                    boardOpen
-                      ? "bg-swarm-gold/15 text-swarm-gold border border-swarm-gold/40 shadow-sm"
-                      : "border border-white/[0.04] bg-white/[0.02] text-swarm-textMuted hover:bg-white/[0.07] hover:border-swarm-gold/30 hover:text-swarm-goldHi"
-                  }`}
-                  title="Toggle TaskComb Pipeline Board"
-                >
-                  <Network size={14} className={boardOpen ? "text-swarm-gold" : "text-cyan-400/80"} />
-                  <span className="tracking-widest font-mono text-[11px]">TASKCOMB</span>
-                  {activeWorkspace?.taskCards && activeWorkspace.taskCards.length > 0 && (
-                    <span className="ml-auto rounded-full bg-swarm-gold/20 text-swarm-goldHi px-2 py-0.5 text-[10px] font-mono border border-swarm-gold/30">
-                      {activeWorkspace.taskCards.length}
-                    </span>
-                  )}
-                </button>
-              </div>
-
-              <ActiveWorkspaceDetail ws={activeWorkspace} onOpenFile={setViewer} />
-            </div>
-          </>
+      {/* ── Main Sidebar Panel Content Area ──────────────────────────────── */}
+      <div className="flex-1 flex flex-col min-w-0 bg-gradient-to-b from-[#0c0e16]/98 to-[#090b11]/98 backdrop-blur-2xl">
+        {/* App row — top-left corner */}
+        {topBar && (
+          <div
+            className="flex h-11 shrink-0 items-center gap-0.5 border-b border-white/[0.06] bg-white/[0.01] px-3"
+            data-tauri-drag-region
+          >
+            {topBar}
+          </div>
         )}
+
+        {/* Main Tab Content */}
+        <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+          {viewer ? (
+            <FileViewer target={viewer} onBack={() => setViewer(null)} />
+          ) : activeTab === "explorer" ? (
+            <ExplorerPanel projectPath={projectPath || null} onOpen={setViewer} />
+          ) : activeTab === "git" ? (
+            <GitSidebarPanel projectPath={projectPath || null} />
+          ) : activeTab === "search" ? (
+            <SearchPanel projectPath={projectPath || null} onOpen={setViewer} />
+          ) : activeTab === "devtools" ? (
+            <DevToolsPanel projectPath={projectPath || null} />
+          ) : activeTab === "fleet" ? (
+            <FleetPanel onSelectWorkspace={(wsId) => activateAndSync(wsId)} />
+          ) : (
+            /* Workspaces Tab Content */
+            <>
+              {/* WorkHive Top Action Header */}
+              <div className="flex h-10 shrink-0 items-center justify-between px-3 border-b border-white/[0.06] bg-black/20">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-xs font-semibold text-white tracking-tight truncate">
+                    Projects & Hives
+                  </span>
+                  <span className="px-1.5 py-0.2 rounded-full bg-white/[0.08] border border-white/[0.12] text-[10px] font-mono font-medium text-zinc-300 shrink-0">
+                    {visibleWorkspaces.length}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => setHideSleeping(!hideSleeping)}
+                    className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                      hideSleeping
+                        ? "text-white bg-white/[0.12]"
+                        : "text-zinc-400 hover:text-white hover:bg-white/[0.06]"
+                    }`}
+                    title={hideSleeping ? "Show all workHives" : "Hide sleeping workHives"}
+                    aria-label="Toggle sleeping hives"
+                  >
+                    {hideSleeping ? <EyeOff size={13} /> : <Eye size={13} />}
+                  </button>
+
+                  <button
+                    onClick={handleAdd}
+                    className="inline-flex items-center gap-1 rounded-lg bg-white hover:bg-zinc-200 text-black font-semibold px-2.5 py-1 text-xs shadow-xs active:scale-95 transition-all cursor-pointer shrink-0"
+                    title="Create New Project Workspace"
+                  >
+                    <Plus size={13} strokeWidth={2.5} />
+                    <span>New Hive</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Filter workHives input */}
+              <div className="px-3 py-2">
+                <div className="flex h-8 items-center gap-2 rounded-xl border border-white/[0.08] bg-black/40 px-2.5 focus-within:border-white/40 focus-within:ring-1 focus-within:ring-white/20 transition-all shadow-inner">
+                  <Search size={13} className="text-zinc-500 shrink-0" />
+                  <input
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search projects & folders..."
+                    aria-label="Filter workHives"
+                    className="min-w-0 flex-1 bg-transparent text-xs text-zinc-200 outline-none placeholder:text-zinc-500 font-sans"
+                    spellCheck={false}
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      title="Clear filter"
+                      className="text-zinc-500 hover:text-zinc-300"
+                    >
+                      <X size={12} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* WorkHive Cards List */}
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-sleek px-2 pb-2 space-y-2">
+                  {visibleWorkspaces.length === 0 ? (
+                    searchQuery ? (
+                      <EmptyNote
+                        text="Nothing matches that filter"
+                        hint="Filters match a workHive's name and its folder."
+                        actionLabel="Clear filter"
+                        onAction={() => setSearchQuery("")}
+                      />
+                    ) : hideSleeping ? (
+                      <EmptyNote
+                        text="Every workHive is asleep"
+                        hint="Sleeping means no agent is running in it."
+                        actionLabel="Show sleeping"
+                        onAction={() => setHideSleeping(false)}
+                      />
+                    ) : (
+                      <EmptyNote
+                        text="No workHives yet"
+                        hint="A workHive is one workspace folder."
+                        actionLabel="New WorkHive"
+                        onAction={handleAdd}
+                      />
+                    )
+                  ) : (
+                    visibleWorkspaces.map((ws) => (
+                      <div key={ws.id} className="relative" onContextMenu={(e) => handleContextMenu(e, ws)}>
+                        <ProjectGroup
+                          ws={ws}
+                          isActive={ws.id === activeWorkspaceId}
+                          hasActive={hasActiveAgent(ws, agentStatuses)}
+                          onActivate={() => { if (!ws.isDeleting) activateAndSync(ws.id); }}
+                          onMenu={(e) => openMenu(ws, e.clientX, e.clientY)}
+                          isRenaming={renamingWorkspaceId === ws.id}
+                          editValue={editValue}
+                          onEditChange={setEditValue}
+                          onCommitRename={commitRename}
+                          onCancelRename={() => { setRenamingWorkspaceId(null); setEditValue(""); }}
+                          onStartRename={() => startRename(ws.id, ws.name)}
+                        />
+
+                        {ws.isDeleting && (
+                          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/80 backdrop-blur-sm">
+                            <div className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-[#161822] border border-white/[0.12] px-2.5 py-1 text-mini font-medium text-zinc-200 shadow-xl">
+                              <LoaderCircle className="size-3 shrink-0 animate-spin text-zinc-400" />
+                              <span className="truncate">Deleting…</span>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); cancelDeleteWorkspace(ws.id); }}
+                                title="Cancel deletion"
+                                className="shrink-0 text-zinc-400 hover:text-zinc-200 transition-colors"
+                              >
+                                <X className="size-3" />
+                              </button>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); commitDeleteWorkspace(ws.id); }}
+                                className="shrink-0 font-semibold text-red-400 transition-colors hover:opacity-80"
+                              >
+                                Confirm
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Bottom Quick Navigation Links */}
+                <div className="px-2 pt-2 pb-2 border-t border-white/[0.06] flex flex-col gap-1 shrink-0 bg-black/20">
+                  <button
+                    onClick={() => setBoardOpen(!boardOpen)}
+                    className={`flex h-8 items-center gap-2.5 rounded-xl px-2.5 text-xs font-semibold tracking-wider transition-all ${
+                      boardOpen
+                        ? "bg-amber-500/15 text-amber-300 border border-amber-500/40 shadow-sm"
+                        : "border border-white/[0.04] bg-white/[0.02] text-zinc-400 hover:bg-white/[0.07] hover:border-amber-500/30 hover:text-amber-200"
+                    }`}
+                    title="Toggle TaskComb Pipeline Board"
+                  >
+                    <Network size={14} className={boardOpen ? "text-amber-400" : "text-cyan-400"} />
+                    <span className="tracking-widest font-mono text-[11px]">TASK PIPELINE</span>
+                    {activeWorkspace?.taskCards && activeWorkspace.taskCards.length > 0 && (
+                      <span className="ml-auto rounded-full bg-amber-500/20 text-amber-300 px-2 py-0.5 text-[10px] font-mono border border-amber-500/30">
+                        {activeWorkspace.taskCards.length}
+                      </span>
+                    )}
+                  </button>
+                </div>
+
+                <ActiveWorkspaceDetail ws={activeWorkspace} onOpenFile={setViewer} />
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {contextMenu && createPortal(
@@ -1732,6 +1786,95 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
               className="w-full px-3 py-1.5 text-left text-xs text-swarm-err hover:bg-swarm-err/15 transition-colors"
             >
               Delete
+            </button>
+          </div>
+        </>,
+        document.body,
+      )}
+
+      {/* Settings & Tools Popup Menu (Triggered by bottom rail Gear icon) */}
+      {settingsMenuOpen && gearRect && createPortal(
+        <>
+          <div className="fixed inset-0 z-[300]" onClick={() => setSettingsMenuOpen(false)} />
+          <div
+            role="menu"
+            aria-label="Settings and Tools Menu"
+            className="fixed z-[301] w-64 rounded-2xl border border-white/[0.14] bg-[#0d0f17]/98 backdrop-blur-2xl p-1.5 shadow-2xl shadow-black/90 animate-fade-in flex flex-col gap-0.5"
+            style={{
+              left: Math.min(gearRect.right + 8, window.innerWidth - 270),
+              bottom: Math.max(12, window.innerHeight - gearRect.bottom),
+            }}
+          >
+            <div className="px-2.5 py-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500 border-b border-white/[0.06] mb-1 flex items-center justify-between">
+              <span>Settings & Tools</span>
+              <span className="size-1.5 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.8)]" />
+            </div>
+
+            <button
+              onClick={() => { setSettingsMenuOpen(false); onOpenProject?.(); }}
+              className="flex items-center gap-3 w-full px-2.5 py-2 rounded-xl text-left hover:bg-white/[0.08] hover:border-amber-500/30 border border-transparent transition-all group/item cursor-pointer"
+            >
+              <div className="size-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover/item:scale-110 transition-transform shrink-0">
+                <FolderOpen size={14} />
+              </div>
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-xs font-semibold text-zinc-200 group-hover/item:text-amber-300 transition-colors truncate">Open project…</span>
+                <span className="text-[10px] text-zinc-400 truncate">Start or switch a workspace</span>
+              </div>
+            </button>
+
+            <button
+              onClick={() => { setSettingsMenuOpen(false); onOpenGit?.(); }}
+              className="flex items-center gap-3 w-full px-2.5 py-2 rounded-xl text-left hover:bg-white/[0.08] hover:border-cyan-500/30 border border-transparent transition-all group/item cursor-pointer"
+            >
+              <div className="size-7 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover/item:scale-110 transition-transform shrink-0">
+                <FolderGit2 size={14} />
+              </div>
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-xs font-semibold text-zinc-200 group-hover/item:text-cyan-300 transition-colors truncate">Git & GitHub Hub…</span>
+                <span className="text-[10px] text-zinc-400 truncate">Commit, push, pull, branches</span>
+              </div>
+            </button>
+
+            <button
+              onClick={() => { setSettingsMenuOpen(false); onOpenExtensions?.(); }}
+              className="flex items-center gap-3 w-full px-2.5 py-2 rounded-xl text-left hover:bg-white/[0.08] hover:border-purple-500/30 border border-transparent transition-all group/item cursor-pointer"
+            >
+              <div className="size-7 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover/item:scale-110 transition-transform shrink-0">
+                <Blocks size={14} />
+              </div>
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-xs font-semibold text-zinc-200 group-hover/item:text-purple-300 transition-colors truncate">Extensions</span>
+                <span className="text-[10px] text-zinc-400 truncate">Agents and tools from Open-VSX</span>
+              </div>
+            </button>
+
+            <button
+              onClick={() => { setSettingsMenuOpen(false); onOpenUsage?.(); }}
+              className="flex items-center gap-3 w-full px-2.5 py-2 rounded-xl text-left hover:bg-white/[0.08] hover:border-emerald-500/30 border border-transparent transition-all group/item cursor-pointer"
+            >
+              <div className="size-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover/item:scale-110 transition-transform shrink-0">
+                <Gauge size={14} />
+              </div>
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-xs font-semibold text-zinc-200 group-hover/item:text-emerald-300 transition-colors truncate">Plan limits</span>
+                <span className="text-[10px] text-zinc-400 truncate">Token usage per CLI</span>
+              </div>
+            </button>
+
+            <div className="h-px bg-white/[0.06] my-0.5 mx-1" />
+
+            <button
+              onClick={() => { setSettingsMenuOpen(false); onOpenSettings?.(); }}
+              className="flex items-center gap-3 w-full px-2.5 py-2 rounded-xl text-left hover:bg-white/[0.08] hover:border-amber-500/30 border border-transparent transition-all group/item cursor-pointer"
+            >
+              <div className="size-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover/item:scale-110 transition-transform shrink-0">
+                <Settings size={14} />
+              </div>
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-xs font-semibold text-zinc-200 group-hover/item:text-amber-300 transition-colors truncate">Settings</span>
+                <span className="text-[10px] text-zinc-400 truncate">API keys and defaults</span>
+              </div>
             </button>
           </div>
         </>,
@@ -1838,25 +1981,25 @@ function ProjectGroup({
   };
 
   return (
-    <div className="px-1.5 py-1">
-      {/* Outer WorkHive Rounded Card with Hover Lift Animation */}
+    <div className="px-1 py-0.5">
+      {/* Outer WorkHive Luxury Obsidian Card with Smooth Hover Lift */}
       <div
-        className={`rounded-2xl border p-3 shadow-md transition-all duration-200 ease-out cursor-pointer hover:-translate-y-1 hover:shadow-xl active:translate-y-0 ${
+        className={`rounded-2xl border p-3 shadow-lg transition-all duration-200 ease-out cursor-pointer hover:-translate-y-0.5 hover:shadow-2xl active:translate-y-0 ${
           isActive
-            ? "border-swarm-gold/40 bg-gradient-to-b from-[#181a21] to-[#121318] ring-1 ring-swarm-gold/25 shadow-black/60 hover:border-swarm-gold/60"
-            : "border-white/[0.07] bg-[#14161d]/80 hover:border-white/[0.18] hover:bg-[#181b24]"
+            ? "border-white/[0.30] bg-gradient-to-b from-[#181c28] to-[#10121a] ring-1 ring-white/[0.20] shadow-black/80 hover:border-white/[0.45]"
+            : "border-white/[0.08] bg-gradient-to-b from-[#131520]/90 to-[#0c0e14]/90 hover:border-white/[0.18] hover:bg-[#181b26]"
         }`}
         onClick={() => { if (!isRenaming) onActivate(); }}
       >
-        {/* Card Header: ⌄ {ws.name} */}
+        {/* Card Header: Chevron + Title + Status Pill + Menu */}
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-1.5 min-w-0">
             <button
               onClick={(e) => { e.stopPropagation(); setCollapsed(!collapsed); }}
-              className="text-swarm-textMuted hover:text-swarm-text transition-colors p-0.5 -ml-0.5 rounded hover:bg-white/[0.06]"
+              className="text-zinc-400 hover:text-zinc-200 transition-colors p-0.5 -ml-0.5 rounded hover:bg-white/[0.06]"
             >
               <ChevronDown
-                size={15}
+                size={14}
                 className={`transition-transform duration-150 ${collapsed ? "-rotate-90" : ""}`}
               />
             </button>
@@ -1867,26 +2010,44 @@ function ProjectGroup({
                 onChange={(e) => onEditChange(e.target.value)}
                 onBlur={onCommitRename}
                 onKeyDown={(e) => { if (e.key === "Enter") onCommitRename(); if (e.key === "Escape") onCancelRename(); }}
-                className="bg-transparent border-b border-swarm-gold text-sm font-bold text-swarm-text outline-none font-sans"
+                className="bg-transparent border-b border-white text-sm font-bold text-zinc-100 outline-none font-sans"
               />
             ) : (
-              <span className="text-sm font-bold text-swarm-text truncate tracking-tight font-sans" onDoubleClick={onStartRename}>
+              <span className="text-xs font-bold text-zinc-100 truncate tracking-tight font-sans" onDoubleClick={onStartRename}>
                 {ws.name}
               </span>
             )}
           </div>
 
-          <div className="flex items-center gap-1 opacity-80 hover:opacity-100">
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Live Status Pill */}
+            <span
+              className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-mono border ${
+                hasActive
+                  ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                  : "bg-white/[0.04] border-white/[0.08] text-zinc-400"
+              }`}
+            >
+              <span
+                className={`size-1.5 rounded-full ${
+                  hasActive
+                    ? "bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(52,211,153,0.8)]"
+                    : "bg-zinc-500"
+                }`}
+              />
+              <span>{hasActive ? "Active" : "Idle"}</span>
+            </span>
+
             <button
               onClick={(e) => { e.stopPropagation(); onMenu(e); }}
-              className="size-5 flex items-center justify-center rounded-lg text-swarm-textMuted hover:text-swarm-text hover:bg-white/[0.08] transition-colors"
-              title="WorkHive menu"
+              className="size-5 flex items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.08] transition-colors"
+              title="Workspace menu"
             >
               <MoreHorizontal size={13} />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); if (noRepo) { bindRepo(); return; } setAdding(!adding); setError(null); }}
-              className="size-5 flex items-center justify-center rounded-lg text-swarm-textMuted hover:text-swarm-goldHi hover:bg-white/[0.08] transition-colors"
+              className="size-5 flex items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.08] transition-colors"
               title={noRepo ? "Bind folder" : "New tree"}
             >
               {noRepo ? <FolderPlus size={13} /> : <Plus size={13} />}
@@ -1894,9 +2055,26 @@ function ProjectGroup({
           </div>
         </div>
 
+        {/* Git Branch & Folder Metadata Pills */}
+        <div className="flex items-center gap-1.5 mb-2 overflow-hidden">
+          <div
+            onClick={(e) => { e.stopPropagation(); if (noRepo) bindRepo(); }}
+            className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-black/40 border border-white/[0.06] text-[10px] text-zinc-400 hover:text-zinc-200 transition-colors truncate max-w-[130px]"
+            title={ws.boundProjectPath || "No folder bound"}
+          >
+            <Folder size={11} className="text-slate-300 shrink-0" />
+            <span className="truncate font-mono">{repoName || "Unbound"}</span>
+          </div>
+
+          <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/[0.08] border border-white/[0.16] text-[10px] text-slate-200 truncate font-mono">
+            <GitBranch size={11} className="shrink-0" />
+            <span className="truncate">{noRepo ? "no repo" : "main"}</span>
+          </div>
+        </div>
+
         {/* Missing folder notice */}
         {missing && (
-          <div className="mb-2 flex h-6 items-center gap-1.5 rounded-lg bg-swarm-err/10 border border-swarm-err/30 px-2 text-[10px] text-swarm-err font-mono">
+          <div className="mb-2 flex h-6 items-center gap-1.5 rounded-lg bg-red-500/10 border border-red-500/30 px-2 text-[10px] text-red-400 font-mono">
             <span className="min-w-0 flex-1 truncate" title={ws.boundProjectPath}>Folder missing from disk</span>
             <button
               onClick={(e) => { e.stopPropagation(); bindRepo(); }}
@@ -1916,68 +2094,58 @@ function ProjectGroup({
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") submit(); if (e.key === "Escape") { setAdding(false); setName(""); } }}
               placeholder="branch-name"
-              className="h-6 min-w-0 flex-1 rounded-lg border border-swarm-gold/40 bg-black/50 px-2 text-mini text-swarm-text outline-none focus:ring-1 focus:ring-swarm-gold/30"
+              className="h-6 min-w-0 flex-1 rounded-lg border border-amber-400/40 bg-black/60 px-2 text-mini text-zinc-100 outline-none focus:ring-1 focus:ring-amber-400/30"
             />
-            <button onClick={submit} disabled={busy || !name.trim()} className="flex size-6 shrink-0 items-center justify-center rounded text-swarm-goldHi hover:bg-swarm-gold/15 disabled:opacity-40">
+            <button onClick={submit} disabled={busy || !name.trim()} className="flex size-6 shrink-0 items-center justify-center rounded text-amber-300 hover:bg-amber-400/15 disabled:opacity-40">
               {busy ? <LoaderCircle className="size-3 animate-spin" /> : <Check className="size-3" />}
             </button>
-            <button onClick={() => { setAdding(false); setName(""); }} className="flex size-6 shrink-0 items-center justify-center rounded text-swarm-textMuted hover:text-swarm-text">
+            <button onClick={() => { setAdding(false); setName(""); }} className="flex size-6 shrink-0 items-center justify-center rounded text-zinc-400 hover:text-zinc-200">
               <X className="size-3" />
             </button>
           </div>
         )}
 
-        {error && <div className="mb-2 text-[10px] text-swarm-err break-words font-mono">{error}</div>}
+        {error && <div className="mb-2 text-[10px] text-red-400 break-words font-mono">{error}</div>}
 
         {/* TREES Section */}
         {!collapsed && (
           <div>
-            <div className="text-[10px] font-bold tracking-widest text-swarm-textMuted/60 uppercase mb-1.5 pl-0.5 font-mono">
-              TREES
+            <div className="text-[9px] font-bold tracking-widest text-zinc-500 uppercase mb-1 pl-0.5 font-mono">
+              WORKTREES ({trees.length + 1})
             </div>
 
             {/* Tree Inner Box */}
-            <div className="rounded-xl bg-black/60 border border-white/[0.06] p-2.5 flex flex-col gap-2 shadow-inner">
+            <div className="rounded-xl bg-black/50 border border-white/[0.06] p-2 flex flex-col gap-1.5 shadow-inner">
               {/* Primary tree */}
               <div
                 onClick={noRepo ? bindRepo : onActivate}
-                className="flex flex-col gap-1 cursor-pointer group/primary"
+                className="flex items-center justify-between p-1 rounded-lg hover:bg-white/[0.04] cursor-pointer group/primary transition-colors"
               >
-                <div className="flex items-center gap-2">
-                  <span className={`size-2 rounded-full shrink-0 ${hasActive ? "bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]" : "bg-swarm-textMuted/40"}`} />
-                  <span className="text-xs font-bold text-swarm-text group-hover/primary:text-swarm-goldHi transition-colors">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className={`size-1.5 rounded-full shrink-0 ${hasActive ? "bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(52,211,153,0.8)]" : "bg-zinc-600"}`} />
+                  <span className="text-xs font-semibold text-zinc-200 group-hover/primary:text-amber-300 transition-colors truncate">
                     primary
                   </span>
-                  <span className="rounded-md bg-white/[0.07] px-1.5 py-0.5 text-[10px] font-medium text-swarm-textMuted border border-white/[0.06] truncate max-w-[110px] font-mono">
-                    {repoName || ws.name}
-                  </span>
                 </div>
-                <div className="flex items-center gap-1.5 pl-4 text-xs text-swarm-textMuted/70 font-mono">
-                  <GitBranch size={12} className="text-swarm-textMuted/60 shrink-0" />
-                  <span>on {noRepo ? "unbound" : "master"}</span>
-                </div>
+                <span className="text-[10px] text-zinc-400 font-mono">
+                  main
+                </span>
               </div>
 
               {/* Worktrees list */}
               {trees.map((t) => (
-                <div key={t.id} className="pt-2 border-t border-white/[0.04] flex flex-col gap-1">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="size-2 rounded-full bg-swarm-textMuted/40 shrink-0" />
-                      <span className="text-xs font-semibold text-swarm-text truncate">{t.name}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button onClick={() => merge(t.id)} className="text-swarm-textMuted hover:text-swarm-goldHi p-0.5 rounded hover:bg-white/[0.06]" title="Merge into main">
-                        <GitMerge size={11} />
-                      </button>
-                      <button onClick={() => remove(t.id)} className="text-swarm-textMuted hover:text-swarm-err p-0.5 rounded hover:bg-white/[0.06]" title="Remove tree">
-                        <Trash2 size={11} />
-                      </button>
-                    </div>
+                <div key={t.id} className="pt-1.5 border-t border-white/[0.04] flex items-center justify-between p-1 rounded-lg hover:bg-white/[0.04] transition-colors">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <GitBranch size={11} className="text-amber-400/70 shrink-0" />
+                    <span className="text-xs font-medium text-zinc-300 truncate">{t.name}</span>
                   </div>
-                  <div className="flex items-center gap-1.5 pl-4 text-xs text-swarm-textMuted/70 font-mono">
-                    <GitBranch size={12} className="text-swarm-textMuted/60 shrink-0" />
-                    <span>on {t.branch || t.name}</span>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button onClick={() => merge(t.id)} className="text-zinc-400 hover:text-amber-300 p-1 rounded hover:bg-white/[0.06]" title="Merge into main">
+                      <GitMerge size={11} />
+                    </button>
+                    <button onClick={() => remove(t.id)} className="text-zinc-400 hover:text-red-400 p-1 rounded hover:bg-white/[0.06]" title="Remove tree">
+                      <Trash2 size={11} />
+                    </button>
                   </div>
                 </div>
               ))}

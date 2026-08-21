@@ -15,7 +15,7 @@ export {
 } from './claude-code.js';
 export { permissionBypassArgs, withPermissionBypass } from './permission-bypass.js';
 export { envForCli } from './env.js';
-export { modelArgs, supportsModel, supportsEffort, EFFORT_LEVELS } from './model-args.js';
+export { modelArgs, normaliseEffort, supportsModel, supportsEffort, EFFORT_LEVELS } from './model-args.js';
 export type { EffortLevel } from './model-args.js';
 export type { ApiKeys } from './env.js';
 

@@ -77,29 +77,25 @@ export default function OverflowMenu({ items }: { items: OverflowItem[] }) {
         aria-expanded={open}
         aria-label="More"
         title="More"
-        className={`shrink-0 flex items-center justify-center size-7 rounded-lg border transition-all ${
+        className={`shrink-0 flex items-center justify-center size-7 rounded-lg border transition-all cursor-pointer ${
           open
-            ? "border-amber-500/40 bg-amber-500/15 text-amber-300 shadow-sm"
-            : "border-zinc-800/80 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-800/80 hover:text-zinc-200"
+            ? "border-white/30 bg-white/15 text-white shadow-xs"
+            : "border-white/[0.08] bg-white/[0.03] text-zinc-400 hover:border-white/20 hover:bg-white/[0.08] hover:text-white"
         }`}
       >
-        <MoreHorizontal size={16} strokeWidth={2.2} />
+        <MoreHorizontal size={15} strokeWidth={2.2} />
       </button>
 
       {open &&
         rect &&
         createPortal(
           <>
-            <div className="fixed inset-0 z-[200]" onClick={() => setOpen(false)} />
+            <div className="fixed inset-0 z-[300]" onClick={() => setOpen(false)} />
             <div
               ref={menuRef}
               role="menu"
               aria-label="More"
-              className="fixed z-[201] w-56 overflow-y-auto scrollbar-sleek rounded-xl glass-hi p-1 animate-fade-in"
-              // Clamped on both edges, not just the left: the trigger sits in a
-              // right-hand toolbar, so anchoring at rect.left alone pushed the
-              // panel past the window and clipped the labels. maxHeight keeps a
-              // long item list inside the viewport instead of off the bottom.
+              className="fixed z-[301] w-56 overflow-y-auto scrollbar-sleek rounded-2xl bg-[#0d0f17]/98 backdrop-blur-2xl border border-white/[0.14] p-1.5 shadow-2xl shadow-black/90 animate-fade-in"
               style={{
                 top: rect.bottom + 6,
                 left: Math.min(Math.max(8, rect.left), window.innerWidth - MENU_W - 8),
@@ -115,13 +111,13 @@ export default function OverflowMenu({ items }: { items: OverflowItem[] }) {
                     setOpen(false);
                     onSelect();
                   }}
-                  className="flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left text-swarm-textDim transition-colors hover:bg-swarm-gold/10 hover:text-swarm-text"
+                  className="flex w-full items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-left text-zinc-300 transition-colors hover:bg-white/[0.08] hover:text-white group cursor-pointer"
                 >
-                  <Icon size={14} className="shrink-0 text-swarm-gold" />
+                  <Icon size={14} className="shrink-0 text-slate-300 group-hover:text-white" />
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-mini font-medium">{label}</span>
+                    <span className="block truncate text-xs font-semibold">{label}</span>
                     {hint && (
-                      <span className="block truncate text-micro text-swarm-textMuted">{hint}</span>
+                      <span className="block truncate text-[10px] text-zinc-400">{hint}</span>
                     )}
                   </span>
                 </button>

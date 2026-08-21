@@ -25,9 +25,9 @@ export interface ComponentTheme {
 // code. All eight themes are dark, so one set of values reads on all of them.
 export const CLASS_COLORS = {
   /** Anything that can act as an agent — a CLI agent, or an agent extension. */
-  worker: "#f2c94c",
+  worker: "#34d399",
   /** A plain shell terminal. */
-  terminal: "#c6ced6",
+  terminal: "#cbd5e1",
   /** An editor extension that cannot act as an agent (a tool). */
   extension: "#5fbf7d",
   // A real blue, not the blue-grey this was (#8ab4d8). At 6px, next to the

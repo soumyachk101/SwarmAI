@@ -105,10 +105,10 @@ export default function CanvasNode({ id, box, zoom, children }: Props) {
     <div
       className={`absolute flex flex-col overflow-visible rounded-2xl border transition-[box-shadow,border-color] duration-200 ${
         isConnected
-          ? "border-amber-500/40 bg-[#12141c]/95 shadow-xl shadow-amber-500/5 ring-1 ring-amber-500/20"
-          : "border-white/[0.08] bg-[#12141c]/90 hover:border-white/[0.14] hover:shadow-xl"
+          ? "border-swarm-borderHi/60 bg-swarm-surface/95 shadow-2xl shadow-black/80 ring-1 ring-swarm-gold/20"
+          : "border-swarm-border/70 bg-swarm-surface/90 hover:border-swarm-borderHi/50 hover:shadow-xl"
       } ${dragging ? "shadow-2xl ring-2 ring-swarm-gold/60" : ""} ${
-        isConnectingSource ? "ring-2 ring-amber-400" : ""
+        isConnectingSource ? "ring-2 ring-swarm-gold" : ""
       }`}
       style={{
         left: shown.x,
@@ -127,7 +127,7 @@ export default function CanvasNode({ id, box, zoom, children }: Props) {
     >
       {/* Active Synapse Swarm Badge */}
       {isConnected && (
-        <div className="pointer-events-none absolute -top-3 left-4 z-30 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0b0e17] border border-amber-500/40 text-[10px] font-mono text-amber-300 shadow-lg backdrop-blur-md">
+        <div className="pointer-events-none absolute -top-3 left-4 z-30 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-swarm-canvas/95 border border-swarm-borderHi/40 text-[10px] font-mono text-swarm-text shadow-lg backdrop-blur-md">
           <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse shadow-xs shadow-emerald-400" />
           <span>
             {incomingCount > 0 && outgoingCount > 0
@@ -145,10 +145,10 @@ export default function CanvasNode({ id, box, zoom, children }: Props) {
       {/* Top Socket (Top Side Connector) */}
       <div
         data-input-socket="true"
-        className={`absolute left-1/2 -top-2.5 -translate-x-1/2 size-5 rounded-full flex items-center justify-center cursor-crosshair transition-all z-30 opacity-70 hover:opacity-100 ${
+        className={`absolute left-1/2 -top-2.5 -translate-x-1/2 size-5 rounded-full flex items-center justify-center cursor-crosshair transition-all z-30 opacity-75 hover:opacity-100 ${
           isConnectingTarget
-            ? "bg-amber-400 text-black scale-125 animate-bounce shadow-md shadow-amber-400/50 opacity-100"
-            : "bg-[#181a24] border border-amber-500/40 hover:scale-110 hover:border-amber-400 hover:bg-amber-500/20"
+            ? "bg-swarm-gold text-swarm-canvas scale-125 animate-bounce shadow-md shadow-swarm-gold/50 opacity-100"
+            : "bg-swarm-surfaceHi border border-swarm-borderHi/60 hover:scale-110 hover:border-swarm-gold"
         }`}
         title="Top Port (Drag wire or drop here to connect)"
         onPointerDown={(e) => {
@@ -163,7 +163,7 @@ export default function CanvasNode({ id, box, zoom, children }: Props) {
           }
         }}
       >
-        <span className="size-1.5 rounded-full bg-amber-400" />
+        <span className="size-1.5 rounded-full bg-swarm-textDim" />
       </div>
 
       {/* Left Socket (Left Side Connector - Drag OR Drop) */}
@@ -171,10 +171,10 @@ export default function CanvasNode({ id, box, zoom, children }: Props) {
         data-input-socket="true"
         className={`absolute -left-3 top-1/2 -translate-y-1/2 size-6 rounded-full flex items-center justify-center cursor-crosshair transition-all z-30 ${
           isConnectingTarget
-            ? "bg-amber-400 text-black scale-125 animate-bounce shadow-lg shadow-amber-400/50"
+            ? "bg-swarm-gold text-swarm-canvas scale-125 animate-bounce shadow-lg shadow-swarm-gold/50"
             : incomingCount > 0
-            ? "bg-[#0f172a] border-2 border-sky-400 text-sky-300 shadow-md shadow-sky-400/30 hover:scale-110"
-            : "bg-[#181a24] border border-amber-500/40 text-amber-300 hover:scale-110 hover:border-amber-400 hover:bg-amber-500/20"
+            ? "bg-swarm-surfaceHi border-2 border-swarm-gold text-swarm-text shadow-md shadow-swarm-gold/20 hover:scale-110"
+            : "bg-swarm-surfaceHi border border-swarm-borderHi/60 text-swarm-textDim hover:scale-110 hover:border-swarm-gold"
         }`}
         title="Left Port (Drag wire or drop here to connect)"
         onPointerDown={(e) => {
@@ -197,7 +197,7 @@ export default function CanvasNode({ id, box, zoom, children }: Props) {
       >
         <span
           className={`size-2 rounded-full ${
-            incomingCount > 0 ? "bg-sky-400 animate-pulse" : "bg-amber-400"
+            incomingCount > 0 ? "bg-swarm-gold animate-pulse" : "bg-swarm-textDim"
           }`}
         />
       </div>
@@ -207,10 +207,10 @@ export default function CanvasNode({ id, box, zoom, children }: Props) {
         data-input-socket="true"
         className={`absolute -right-3 top-1/2 -translate-y-1/2 size-6 rounded-full flex items-center justify-center cursor-crosshair transition-all z-30 ${
           isConnectingSource
-            ? "bg-amber-400 text-black scale-125 ring-2 ring-amber-300 shadow-lg shadow-amber-400/50"
+            ? "bg-swarm-gold text-swarm-canvas scale-125 ring-2 ring-swarm-gold/60 shadow-lg shadow-swarm-gold/50"
             : outgoingCount > 0
-            ? "bg-[#1a1505] border-2 border-amber-400 text-amber-300 shadow-md shadow-amber-400/30 hover:scale-110"
-            : "bg-[#181a24] border border-amber-500/40 text-amber-300 hover:scale-110 hover:border-amber-400 hover:bg-amber-500/20"
+            ? "bg-swarm-surfaceHi border-2 border-swarm-gold text-swarm-text shadow-md shadow-swarm-gold/20 hover:scale-110"
+            : "bg-swarm-surfaceHi border border-swarm-borderHi/60 text-swarm-textDim hover:scale-110 hover:border-swarm-gold"
         }`}
         title="Right Port (Drag wire or drop here to connect)"
         onPointerDown={(e) => {
@@ -233,7 +233,7 @@ export default function CanvasNode({ id, box, zoom, children }: Props) {
       >
         <span
           className={`size-2 rounded-full ${
-            outgoingCount > 0 ? "bg-amber-400 animate-pulse" : "bg-amber-400"
+            outgoingCount > 0 ? "bg-swarm-gold animate-pulse" : "bg-swarm-textDim"
           }`}
         />
       </div>
@@ -241,10 +241,10 @@ export default function CanvasNode({ id, box, zoom, children }: Props) {
       {/* Bottom Socket (Bottom Side Connector) */}
       <div
         data-input-socket="true"
-        className={`absolute left-1/2 -bottom-2.5 -translate-x-1/2 size-5 rounded-full flex items-center justify-center cursor-crosshair transition-all z-30 opacity-70 hover:opacity-100 ${
+        className={`absolute left-1/2 -bottom-2.5 -translate-x-1/2 size-5 rounded-full flex items-center justify-center cursor-crosshair transition-all z-30 opacity-75 hover:opacity-100 ${
           isConnectingTarget
-            ? "bg-amber-400 text-black scale-125 animate-bounce shadow-md shadow-amber-400/50 opacity-100"
-            : "bg-[#181a24] border border-amber-500/40 hover:scale-110 hover:border-amber-400 hover:bg-amber-500/20"
+            ? "bg-swarm-gold text-swarm-canvas scale-125 animate-bounce shadow-md shadow-swarm-gold/50 opacity-100"
+            : "bg-swarm-surfaceHi border border-swarm-borderHi/60 hover:scale-110 hover:border-swarm-gold"
         }`}
         title="Bottom Port (Drag wire or drop here to connect)"
         onPointerDown={(e) => {
@@ -259,7 +259,7 @@ export default function CanvasNode({ id, box, zoom, children }: Props) {
           }
         }}
       >
-        <span className="size-1.5 rounded-full bg-amber-400" />
+        <span className="size-1.5 rounded-full bg-swarm-textDim" />
       </div>
 
       {/* Resize grip */}

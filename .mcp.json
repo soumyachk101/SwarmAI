@@ -3,6 +3,15 @@
     "aevum": {
       "type": "sse",
       "url": "http://127.0.0.1:3344/sse"
+    },
+    "pheromone": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/soumyachakraborty/Documents/Projects-939/AI-Agents/swarm-ai/pheromone/pheromone-mcp/dist/server.js",
+        "--project",
+        "/Users/soumyachakraborty/Documents/Projects-939/AI-Agents/swarm-ai"
+      ]
     }
   }
 }

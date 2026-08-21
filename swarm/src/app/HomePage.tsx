@@ -323,7 +323,6 @@ export default function HomePage() {
           },
         ]}
       />
-      <ThemePicker />
       <div className="ml-auto flex shrink-0 items-center gap-0.5">
         <button
           onClick={() => setBoardOpen(!boardOpen)}
@@ -475,6 +474,12 @@ export default function HomePage() {
               onTogglePin={() => setLeftPinned((p) => !p)}
               onClose={() => setLeftOpen(false)}
               topBar={appRow}
+              onOpenProject={handleOpenFolder}
+              onOpenGit={() => setShowGitModal(true)}
+              onOpenExtensions={() => setShowExtensions(true)}
+              onOpenUsage={() => setShowUsage(true)}
+              onOpenSettings={() => setShowSettings(true)}
+              themePickerSlot={<ThemePicker compact />}
             />
           </div>
         )}
@@ -565,34 +570,34 @@ export default function HomePage() {
       {/* Status bar. It used to spend a whole row on the word "no repo"; it now
           carries the four things worth glancing at — where you are, what the
           repo looks like, and whether anything is running or has failed. */}
-      {/* Luxury Pro Status Bar */}
-      <div className="h-7 border-t border-white/[0.07] bg-[#0c0d10]/95 backdrop-blur-xl flex items-center gap-3 px-3 text-mini select-none z-10">
+      {/* Luxury Pro Developer Status Bar */}
+      <div className="h-7 border-t border-white/[0.08] bg-[#07080d]/98 backdrop-blur-2xl flex items-center gap-2.5 px-3 text-mini select-none z-10 font-sans">
         {projectPath && (
           <span
-            className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.07] text-zinc-300 font-mono text-[11px] max-w-[200px] truncate shadow-2xs"
+            className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/[0.08] text-zinc-300 font-mono text-[11px] max-w-[200px] truncate shadow-xs"
             title={projectPath}
           >
-            <Folder size={11} className="text-amber-400/80 shrink-0" />
+            <Folder size={11} className="text-slate-400 shrink-0" />
             <span className="truncate">{projectPath.split(/[\\/]/).filter(Boolean).pop()}</span>
           </span>
         )}
 
         <button
           onClick={() => setShowGitModal(true)}
-          className="flex shrink-0 items-center gap-1.5 px-2.5 py-0.5 rounded-md hover:bg-white/[0.06] text-amber-300 transition-colors cursor-pointer group pro-badge pro-badge-gold shadow-2xs"
+          className="flex shrink-0 items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] hover:border-white/20 text-zinc-200 transition-colors cursor-pointer group shadow-xs"
           title={gitStatus ? `Git Control Hub (Branch: ${gitStatus.branch})` : "Initialize Git Repository"}
         >
-          <GitBranch size={11} className="group-hover:scale-110 transition-transform text-amber-400 shrink-0" />
-          <span className="max-w-[24ch] truncate font-mono font-medium">{gitStatus?.branch ?? "no repo"}</span>
+          <GitBranch size={11} className="group-hover:scale-110 transition-transform text-slate-300 shrink-0" />
+          <span className="max-w-[24ch] truncate font-mono font-medium text-[11px]">{gitStatus?.branch ?? "no repo"}</span>
           {gitStatus && gitStatus.changed > 0 && (
-            <span className="ml-0.5 px-1.5 py-0.2 rounded bg-amber-500/25 text-amber-200 text-[10px] font-mono font-bold">
+            <span className="ml-0.5 px-1.5 py-0.2 rounded bg-white/[0.14] text-white text-[10px] font-mono font-bold border border-white/[0.18]">
               +{gitStatus.changed}
             </span>
           )}
         </button>
 
         <span className="hidden md:flex items-center gap-2 text-[11px] font-mono text-zinc-400 ml-1">
-          <span className="flex items-center gap-1.5 text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20 text-[10px]">
+          <span className="flex items-center gap-1.5 text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20 text-[10px] font-medium">
             <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <span>Swarm Engine</span>
           </span>
@@ -602,15 +607,15 @@ export default function HomePage() {
 
         <span className="ml-auto flex shrink-0 items-center gap-2">
           {erroredAgents > 0 && (
-            <span className="pro-badge text-red-300 border-red-500/30 bg-red-500/10">
+            <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md text-rose-300 border border-rose-500/30 bg-rose-500/10 font-mono text-[10px]">
               {erroredAgents} failed
             </span>
           )}
           <span
-            className="pro-badge pro-badge-gold"
+            className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white/[0.05] border border-white/[0.12] text-zinc-200 text-[11px] font-mono font-semibold shadow-xs"
             title={`${busyAgents} of ${totalAgents} agents working`}
           >
-            <span className={`size-1.5 rounded-full ${busyAgents > 0 ? "bg-amber-400 animate-pulse" : "bg-zinc-500"}`} />
+            <span className={`size-1.5 rounded-full ${busyAgents > 0 ? "bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(52,211,153,0.8)]" : "bg-zinc-500"}`} />
             <span>{busyAgents}/{totalAgents} active</span>
           </span>
         </span>

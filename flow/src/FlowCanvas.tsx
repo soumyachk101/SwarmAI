@@ -5,6 +5,7 @@ import { DEFAULT_CAMERA, GRID, clampZoom, screenToWorld, type Camera } from "./c
 import { useCanvasStore } from "./canvasStore.js";
 import CanvasNode from "./CanvasNode.js";
 import CanvasControls from "./CanvasControls.js";
+import SwarmTelemetryHUD from "./SwarmTelemetryHUD.js";
 
 import CanvasEdges from "./CanvasEdges.js";
 import FlowCommandBar, { type FlowAgentTarget } from "./FlowCommandBar.js";
@@ -263,6 +264,7 @@ export default function FlowCanvas({
       </div>
 
       <CanvasHint used={hasNavigated} />
+      <SwarmTelemetryHUD agents={agentsMeta} />
       <CanvasControls swarmId={swarmId} ids={ids} view={size} />
     </div>
   );

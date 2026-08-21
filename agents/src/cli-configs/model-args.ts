@@ -6,9 +6,9 @@
  */
 
 /** Reasoning/effort levels, in the vocabulary Lead speaks. */
-export type EffortLevel = "low" | "medium" | "high" | "xhigh" | "max";
+export type EffortLevel = "low" | "medium" | "high" | "xhigh" | "max" | "ultracode" | "ultra";
 
-export const EFFORT_LEVELS: EffortLevel[] = ["low", "medium", "high", "xhigh", "max"];
+export const EFFORT_LEVELS: EffortLevel[] = ["low", "medium", "high", "xhigh", "max", "ultracode", "ultra"];
 
 /** Loose spoken model names → the alias the CLI expects. */
 function normaliseModel(cli: string, model: string): string {
@@ -33,6 +33,20 @@ function normaliseModel(cli: string, model: string): string {
   return model.trim();
 }
 
+/** Normalise human-friendly or UI effort labels to valid CLI keywords */
+export function normaliseEffort(effort?: string): EffortLevel | undefined {
+  if (!effort) return undefined;
+  const e = effort.trim().toLowerCase();
+  if (e === "ultracode" || e === "ultra") return "ultracode";
+  if (e === "max" || e === "max effort" || e === "maximum") return "max";
+  if (e === "xhigh" || e === "extra high" || e === "extra-high" || e === "extra_high") return "xhigh";
+  if (e === "high") return "high";
+  if (e === "medium" || e === "med") return "medium";
+  if (e === "low" || e === "light") return "low";
+  if (e === "auto") return "ultracode";
+  return (EFFORT_LEVELS as string[]).includes(e) ? (e as EffortLevel) : undefined;
+}
+
 /**
  * Flags that select a model and/or an effort level for one CLI.
  * Unknown CLI, or a CLI without the concept, yields nothing.
@@ -44,12 +58,11 @@ export function modelArgs(
 ): string[] {
   const args: string[] = [];
   const m = model?.trim() ? normaliseModel(cli, model) : undefined;
-  const e = effort?.trim().toLowerCase();
-  const validEffort = e && (EFFORT_LEVELS as string[]).includes(e) ? e : undefined;
+  const validEffort = normaliseEffort(effort);
 
   switch (cli) {
     case "claude":
-      // --model <alias|full-name>, --effort <low|medium|high|xhigh|max>
+      // --model <alias|full-name>, --effort <low|medium|high|xhigh|max|ultracode>
       if (m) args.push("--model", m);
       if (validEffort) args.push("--effort", validEffort);
       break;

@@ -630,12 +630,8 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
 
     const dispatchToAgent = async (targetId: string, text: string) => {
       try {
-        // Step 1: Send line clear (\x15 = Ctrl+U) + prompt text directly into PTY
-        await invoke("write_to_terminal", { paneId: targetId, data: `\x15${text}` });
-        // Step 2: Micro debounce (40ms) so Node/Ink readline absorbs the input characters
-        await new Promise((r) => setTimeout(r, 45));
-        // Step 3: Send Enter keycode to immediately trigger autonomous execution
-        await invoke("write_to_terminal", { paneId: targetId, data: "\r\n" });
+        // Send line clear (\x15 = Ctrl+U) + prompt text + \r directly into PTY
+        await invoke("write_to_terminal", { paneId: targetId, data: `\x15${text}\r` });
       } catch (err) {
         console.error(`[Flow Dispatch] Failed to dispatch to ${targetId}:`, err);
       }

@@ -29,7 +29,7 @@ import { envForCli } from "../cli-configs/env.js";
 import { agentsHost } from "./host.js";
 import { useAgentsStore } from "./agentsStore.js";
 import { TauriPheromone as Pheromone } from "@swarm/pheromone/tauri";
-import { withPermissionBypass, MCP_CAPABLE_CLIS } from "../cli-configs/index.js";
+import { withPermissionBypass, MCP_CAPABLE_CLIS, normaliseEffort } from "../cli-configs/index.js";
 import { CLI_BY_COMMAND } from "../index.js";
 import { ensureMCPConfigForCLI, type PheromoneBridge } from "./ensureMcpConfig.js";
 import { ensureCliWorkspaceTrust } from "./ensureWorkspaceTrust.js";
@@ -302,9 +302,10 @@ function getCliModelPresets(cli: string): CliModelPreset {
       switchCommand: "/model",
       defaultModel: "Opus 5 (1M Context)",
       supportsEffort: true,
-      defaultEffort: "Max",
+      defaultEffort: "UltraCode",
       effortLevels: [
-        { id: "max", label: "Max Effort", isHighlight: true },
+        { id: "ultracode", label: "UltraCode", isHighlight: true },
+        { id: "max", label: "Max Effort" },
         { id: "xhigh", label: "Extra High" },
         { id: "high", label: "High" },
         { id: "medium", label: "Medium" },
@@ -588,11 +589,13 @@ export default function AgentPane({
     sendTerminal(`\x15/model ${modelId}\r`);
   };
 
-  const handleSelectEffort = (effort: string) => {
-    setCurrentEffort(effort);
+  const handleSelectEffort = (effortId: string, effortLabel?: string) => {
+    const label = effortLabel || effortId;
+    setCurrentEffort(label);
     setEffortMenuOpen(false);
-    useAgentsStore.getState().updateAgent(paneId, { effort });
-    sendTerminal(`\x15/effort ${effort.toLowerCase()}\r`);
+    useAgentsStore.getState().updateAgent(paneId, { effort: label });
+    const cleanCmd = normaliseEffort(effortId) || effortId.toLowerCase().split(" ")[0];
+    sendTerminal(`\x15/effort ${cleanCmd}\r`);
   };
 
   const handleCheckUsage = () => {
@@ -1592,7 +1595,7 @@ export default function AgentPane({
               {/* What this swarm is running — dynamically displays selected model & effort */}
               {(currentModel || currentEffort) && paneWidth >= 280 && (
                 <span
-                  className="shrink-0 rounded-md border border-swarm-gold/30 bg-swarm-gold/10 px-1.5 py-0.5 text-[10px] font-mono text-swarm-goldHi font-medium"
+                  className="shrink-0 rounded-lg border border-white/[0.16] bg-white/[0.08] px-2 py-0.5 text-[10px] font-mono text-zinc-200 font-semibold shadow-xs"
                   title={`Running ${currentModel}${currentEffort ? ` at ${currentEffort} effort` : ""}`}
                 >
                   {[currentModel.replace(" (1M Context)", " 1M").replace(" (1M)", " 1M"), currentEffort].filter(Boolean).join(" · ")}
@@ -1971,7 +1974,7 @@ export default function AgentPane({
                           {cliPreset.effortLevels.map((eff) => (
                             <button
                               key={eff.id}
-                              onClick={() => handleSelectEffort(eff.label)}
+                              onClick={() => handleSelectEffort(eff.id, eff.label)}
                               className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-xs text-left text-swarm-textDim hover:bg-white/[0.08] hover:text-swarm-text transition-colors"
                             >
                               <span className={eff.isHighlight ? "font-bold text-swarm-goldHi" : ""}>{eff.label}</span>

@@ -10,3 +10,4 @@ export {
   type Camera, type Rect,
 } from "./camera.js";
 export { default as FlowMark } from "./FlowMark.js";
+export { default as SwarmTelemetryHUD } from "./SwarmTelemetryHUD.js";

@@ -17,7 +17,7 @@ import { useThemeStore } from "@/shared/themeStore";
 /** Must match the `w-[19rem]` on the panel below — the clamp needs a number. */
 const MENU_W = 304;
 
-export default function ThemePicker() {
+export default function ThemePicker({ compact = false }: { compact?: boolean }) {
   const themeId = useThemeStore((s) => s.themeId);
   const setThemeId = useThemeStore((s) => s.setThemeId);
   const [open, setOpen] = useState(false);
@@ -72,54 +72,87 @@ export default function ThemePicker() {
 
   return (
     <div className="relative" onClick={(e) => e.stopPropagation()}>
-      <button
-        ref={btnRef}
-        onClick={() => {
-          setRect(btnRef.current?.getBoundingClientRect() ?? null);
-          setOpen((v) => !v);
-        }}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        aria-label={`Theme: ${current.label}`}
-        className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border transition-all cursor-pointer shadow-xs ${
-          open
-            ? "bg-amber-500/20 text-amber-300 border-amber-500/40 ring-1 ring-amber-500/25"
-            : "bg-white/[0.03] text-zinc-300 border-white/[0.08] hover:bg-white/[0.07] hover:border-amber-500/30 hover:text-amber-300 hover:-translate-y-0.5 active:translate-y-0"
-        }`}
-        title={`Theme: ${current.label} (Click to switch)`}
-      >
-        <span
-          className="size-2 rounded-full ring-1 ring-white/20 shrink-0"
-          style={{ backgroundColor: current.swatch[0] }}
-        />
-        <Palette size={13} className="shrink-0 text-amber-400" />
-        <span className="text-[11px] font-medium font-sans truncate max-w-[90px] hidden sm:inline">
-          {current.label}
-        </span>
-      </button>
+      {compact ? (
+        <button
+          ref={btnRef}
+          onClick={() => {
+            setRect(btnRef.current?.getBoundingClientRect() ?? null);
+            setOpen((v) => !v);
+          }}
+          aria-haspopup="menu"
+          aria-expanded={open}
+          aria-label={`Theme: ${current.label}`}
+          className={`relative size-9 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer ${
+            open
+              ? "text-white bg-white/[0.16] border border-white/[0.3] shadow-md"
+              : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06]"
+          }`}
+          title={`Theme: ${current.label} (Click to switch)`}
+        >
+          <Palette size={18} />
+          <span
+            className="absolute bottom-1.5 right-1.5 size-2 rounded-full ring-1 ring-black/80 shadow-xs"
+            style={{ backgroundColor: current.swatch[0] }}
+          />
+        </button>
+      ) : (
+        <button
+          ref={btnRef}
+          onClick={() => {
+            setRect(btnRef.current?.getBoundingClientRect() ?? null);
+            setOpen((v) => !v);
+          }}
+          aria-haspopup="menu"
+          aria-expanded={open}
+          aria-label={`Theme: ${current.label}`}
+          className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border transition-all cursor-pointer shadow-xs ${
+            open
+              ? "bg-white/[0.14] text-white border-white/[0.3] ring-1 ring-white/20"
+              : "bg-white/[0.03] text-zinc-300 border-white/[0.08] hover:bg-white/[0.07] hover:border-white/30 hover:text-white hover:-translate-y-0.5 active:translate-y-0"
+          }`}
+          title={`Theme: ${current.label} (Click to switch)`}
+        >
+          <span
+            className="size-2 rounded-full ring-1 ring-white/20 shrink-0"
+            style={{ backgroundColor: current.swatch[0] }}
+          />
+          <Palette size={13} className="shrink-0 text-slate-300" />
+          <span className="text-[11px] font-medium font-sans truncate max-w-[90px] hidden sm:inline">
+            {current.label}
+          </span>
+        </button>
+      )}
 
       {open &&
         rect &&
         createPortal(
           <>
-            <div className="fixed inset-0 z-[200]" onClick={() => setOpen(false)} />
+            <div className="fixed inset-0 z-[300]" onClick={() => setOpen(false)} />
             <div
               ref={menuRef}
               role="menu"
               aria-label="Choose theme"
-              className="fixed z-[201] w-[20rem] overflow-y-auto scrollbar-sleek rounded-xl bg-zinc-950/95 backdrop-blur-2xl border border-white/[0.12] p-2 shadow-2xl animate-fade-in"
-              style={{
-                top: rect.bottom + 6,
-                right: Math.min(
-                  Math.max(8, window.innerWidth - rect.right),
-                  Math.max(8, window.innerWidth - MENU_W - 8),
-                ),
-                maxHeight: Math.max(160, window.innerHeight - rect.bottom - 16),
-              }}
+              className="fixed z-[301] w-[20rem] overflow-y-auto scrollbar-sleek rounded-2xl bg-[#0d0f17]/98 backdrop-blur-2xl border border-white/[0.14] p-2 shadow-2xl shadow-black/90 animate-fade-in"
+              style={
+                rect.left < 200
+                  ? {
+                      left: Math.min(rect.right + 8, window.innerWidth - 330),
+                      bottom: Math.max(12, window.innerHeight - rect.bottom),
+                      maxHeight: Math.min(480, window.innerHeight - 32),
+                    }
+                  : {
+                      top: rect.bottom + 6,
+                      right: Math.min(
+                        Math.max(8, window.innerWidth - rect.right),
+                        Math.max(8, window.innerWidth - MENU_W - 8),
+                      ),
+                      maxHeight: Math.max(160, window.innerHeight - rect.bottom - 16),
+                    }
+              }
             >
-              <div className="px-2 pb-1.5 pt-0.5 text-micro font-semibold uppercase tracking-wider text-zinc-400 flex items-center justify-between">
+              <div className="px-2 pb-1.5 pt-0.5 text-micro font-semibold uppercase tracking-wider text-zinc-400 flex items-center justify-between border-b border-white/[0.06] mb-1.5">
                 <span>Color Themes</span>
-                <span className="text-[10px] font-mono text-amber-400/80 font-normal">{THEMES.length} Available</span>
+                <span className="text-[10px] font-mono text-slate-300 font-normal">{THEMES.length} Available</span>
               </div>
               {THEMES.map((t) => (
                 <ThemeRow

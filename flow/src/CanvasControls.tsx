@@ -28,13 +28,13 @@ export default function CanvasControls({
   const STEP = 1.25;
 
   const btn =
-    "flex size-7 items-center justify-center rounded-md text-swarm-textDim transition-colors hover:bg-swarm-gold/15 hover:text-swarm-goldHi disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-swarm-textDim";
+    "flex size-7 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-white/[0.12] hover:text-white disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-zinc-500 cursor-pointer";
 
   return (
     // The whole bar is interactive, not just the buttons: with the container
     // pointer-events-none, a press on its padding or between two buttons fell
     // through to the canvas and started a pan under the panel.
-    <div className="absolute bottom-3 right-3 z-30 pointer-events-auto flex items-center gap-0.5 rounded-xl glass-hi glass-sheen px-1.5 py-1.5 font-sans antialiased shadow-xl border border-white/[0.08]">
+    <div className="absolute bottom-3 right-3 z-30 pointer-events-auto flex items-center gap-0.5 rounded-xl bg-[#0c0d14]/95 backdrop-blur-2xl px-1.5 py-1.5 font-sans antialiased shadow-2xl border border-white/[0.12]">
       <button type="button" className={btn}
         // Tidy re-lays panes from the world origin, which is very often not
         // where the camera is — without the fit that follows, the button looks
@@ -54,7 +54,7 @@ export default function CanvasControls({
         <Crosshair className="size-3.5" />
       </button>
 
-      <span className="mx-0.5 h-4 w-px bg-swarm-border/60" />
+      <span className="mx-0.5 h-4 w-px bg-white/[0.12]" />
 
       <button type="button" className={btn} onClick={() => setZoom(swarmId, zoom / STEP, view.w, view.h)}
         disabled={zoom <= MIN_ZOOM} title="Zoom out" aria-label="Zoom out">
@@ -65,7 +65,7 @@ export default function CanvasControls({
         onClick={() => setZoom(swarmId, 1, view.w, view.h)}
         title="Reset zoom to 100%"
         aria-label={`Zoom ${Math.round(zoom * 100)} percent. Reset to 100%`}
-        className="h-7 min-w-11 rounded-md px-1 text-micro font-semibold tabular-nums text-swarm-textDim transition-colors hover:bg-swarm-gold/15 hover:text-swarm-goldHi"
+        className="h-7 min-w-11 rounded-md px-1 text-micro font-semibold tabular-nums text-zinc-300 transition-colors hover:bg-white/[0.12] hover:text-white cursor-pointer"
       >
         {Math.round(zoom * 100)}%
       </button>

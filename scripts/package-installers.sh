@@ -24,12 +24,16 @@ if [ -d "$APP_SRC" ]; then
     rm -rf "$TMP_DMG_DIR"
     cp -f "$DMG_SRC" "$RELEASES_DIR/macOS/SwarmAI.dmg"
     cp -f "$DMG_SRC" "$RELEASES_DIR/macOS/SwarmAI_0.1.0_aarch64.dmg"
-    echo "✅ macOS DMG ready at: releases/macOS/SwarmAI.dmg"
+    mkdir -p "$PROJECT_ROOT/download-site/releases/macOS"
+    cp -f "$DMG_SRC" "$PROJECT_ROOT/download-site/releases/macOS/SwarmAI.dmg"
+    echo "✅ macOS DMG ready at: releases/macOS/SwarmAI.dmg and download-site/releases/macOS/SwarmAI.dmg"
 elif [ -f "$DMG_SRC" ]; then
     echo "🍎 Copying existing macOS DMG installer..."
     cp -f "$DMG_SRC" "$RELEASES_DIR/macOS/SwarmAI.dmg"
     cp -f "$DMG_SRC" "$RELEASES_DIR/macOS/SwarmAI_0.1.0_aarch64.dmg"
-    echo "✅ macOS DMG ready at: releases/macOS/SwarmAI.dmg"
+    mkdir -p "$PROJECT_ROOT/download-site/releases/macOS"
+    cp -f "$DMG_SRC" "$PROJECT_ROOT/download-site/releases/macOS/SwarmAI.dmg"
+    echo "✅ macOS DMG ready at: releases/macOS/SwarmAI.dmg and download-site/releases/macOS/SwarmAI.dmg"
 fi
 
 # 2. Check for Windows NSIS / MSI

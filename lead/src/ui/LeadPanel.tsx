@@ -56,29 +56,32 @@ export function LeadModeSelect() {
     <div className="relative shrink-0">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-micro font-medium text-amber-300 transition-colors hover:bg-amber-500/20"
+        className="flex items-center gap-1.5 rounded-lg border border-white/[0.16] bg-white/[0.06] px-2.5 py-1 text-xs font-semibold text-white transition-all hover:bg-white/[0.12] hover:border-white/30 cursor-pointer shadow-xs"
         title={`${lead.customName || lead.cliName} leads as ${mode} — switch role`}
       >
-        <ModeIcon size={12} className="text-amber-400" />
-        <span className="font-semibold">{mode}</span>
-        <ChevronDown size={10} className="opacity-70" />
+        <ModeIcon size={13} className="text-slate-300" />
+        <span>{mode}</span>
+        <ChevronDown size={11} className="opacity-70" />
       </button>
       {open && (
-        <div className="absolute right-0 top-full z-[130] mt-1 min-w-56 animate-fade-in rounded-lg glass-hi p-1.5 shadow-2xl border border-zinc-700/60 bg-zinc-950/95 backdrop-blur-xl">
+        <div className="absolute right-0 top-full z-[130] mt-1 min-w-56 animate-fade-in rounded-2xl p-1.5 shadow-2xl shadow-black/90 border border-white/[0.14] bg-[#0d0f17]/98 backdrop-blur-2xl">
           {MODES.map((m) => {
             const Icon = MODE_ICONS[m];
             return (
               <button
                 key={m}
                 onClick={() => applyMode(m)}
-                className={`flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-xs transition-all ${
+                className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-xs transition-all cursor-pointer ${
                   mode === m
-                    ? "bg-amber-500/15 text-amber-300 font-semibold"
-                    : "text-zinc-300 hover:bg-zinc-800/60 hover:text-white"
+                    ? "bg-white/[0.12] text-white font-semibold border border-white/[0.18]"
+                    : "text-zinc-300 hover:bg-white/[0.06] hover:text-white"
                 }`}
               >
-                <Icon size={14} className="shrink-0 text-amber-400" />
-                <span>{MODE_LABELS[m]}</span>
+                <Icon size={14} className="shrink-0 text-slate-300" />
+                <div className="flex-1">
+                  <div className="font-semibold leading-tight">{m}</div>
+                  <div className="text-[10px] text-zinc-400 font-normal leading-tight">{MODE_LABELS[m]}</div>
+                </div>
               </button>
             );
           })}
@@ -212,14 +215,14 @@ export default function LeadPanel() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      {/* Lead Mission Control Header Bar with BridgeMind Luxury Styling */}
-      <div className="border-b border-white/[0.06] bg-zinc-950/80 px-3 py-2.5 flex flex-col gap-2 backdrop-blur-xl">
+      {/* Lead Mission Control Header Bar with Obsidian Luxury Styling */}
+      <div className="border-b border-white/[0.06] bg-[#0c0e14]/90 px-3 py-2 flex flex-col gap-2 backdrop-blur-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="flex size-5 items-center justify-center rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30 shadow-xs">
-              <LeadCrown size={12} />
+            <div className="flex size-6 items-center justify-center rounded-lg bg-white/[0.08] text-white border border-white/[0.14] shadow-xs">
+              <LeadCrown size={13} />
             </div>
-            <span className="text-xs font-bold text-zinc-100">
+            <span className="text-xs font-semibold text-white">
               {lead.customName || lead.cliName}
             </span>
           </div>
@@ -227,7 +230,7 @@ export default function LeadPanel() {
         </div>
 
         {/* Quick Goal Dispatch Input */}
-        <div className="flex items-center gap-1.5 bg-black/40 border border-zinc-700/60 rounded-xl px-3 py-1.5 focus-within:border-amber-500/60 focus-within:ring-1 focus-within:ring-amber-500/20 transition-all shadow-inner">
+        <div className="flex items-center gap-1.5 bg-black/50 border border-white/[0.12] rounded-xl px-3 py-1.5 focus-within:border-white/40 focus-within:ring-1 focus-within:ring-white/20 transition-all shadow-inner">
           <input
             ref={inputRef}
             type="text"
@@ -237,11 +240,11 @@ export default function LeadPanel() {
               if (e.key === "Enter") handleDispatchToLead();
             }}
             placeholder="Type mission here (e.g. Build authentication flow with unit tests)..."
-            className="w-full bg-transparent text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none font-sans"
+            className="w-full bg-transparent text-xs text-white placeholder-zinc-500 focus:outline-none font-sans"
           />
           <button
             onClick={() => window.dispatchEvent(new CustomEvent("swarm:voice:toggle", { detail: { mode: "lead" } }))}
-            className="p-1 rounded-md text-zinc-400 hover:text-amber-300 hover:bg-zinc-800 transition-colors shrink-0"
+            className="p-1 rounded-md text-zinc-400 hover:text-white hover:bg-white/[0.08] transition-colors shrink-0 cursor-pointer"
             title="Dictate with voice"
           >
             <Mic size={14} />
@@ -249,7 +252,7 @@ export default function LeadPanel() {
           <select
             value={workerCli}
             onChange={(e) => setWorkerCli(e.target.value)}
-            className="bg-zinc-900 text-[11px] font-mono text-zinc-300 border border-zinc-700/60 rounded-lg px-2 py-1 focus:outline-none focus:border-amber-500/50 cursor-pointer shrink-0"
+            className="bg-black/60 text-[11px] font-mono text-zinc-200 border border-white/[0.12] rounded-lg px-2.5 py-1 focus:outline-none focus:border-white/40 cursor-pointer shrink-0"
             title="Choose which CLI engine to dispatch worker tasks to"
           >
             <option value="auto">Auto (Board CLI)</option>
@@ -262,16 +265,16 @@ export default function LeadPanel() {
           <button
             onClick={handleInstantParallelDispatch}
             disabled={isDispatching}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/35 hover:bg-amber-500/25 hover:border-amber-500/60 transition-all shrink-0 cursor-pointer shadow-xs active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white hover:bg-zinc-200 text-black transition-all shrink-0 cursor-pointer shadow-xs active:scale-95"
             title="Instant parallel dispatch: decompose & launch worker agents in worktrees immediately"
           >
-            <Layers size={13} className="text-amber-400" />
+            <Layers size={13} className="text-black" />
             <span>Parallel Dispatch</span>
           </button>
           <button
             onClick={() => handleDispatchToLead()}
             disabled={isDispatching}
-            className="p-1.5 rounded-lg bg-zinc-800/80 text-zinc-300 hover:bg-amber-500/20 hover:text-amber-300 border border-zinc-700/60 hover:border-amber-500/40 transition-colors shrink-0 cursor-pointer shadow-xs"
+            className="p-1.5 rounded-lg bg-white/[0.08] text-white hover:bg-white/[0.16] border border-white/[0.14] transition-colors shrink-0 cursor-pointer shadow-xs"
             title="Send mission directive to Lead Agent"
           >
             <Send size={13} />

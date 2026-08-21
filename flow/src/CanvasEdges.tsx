@@ -45,7 +45,7 @@ export default function CanvasEdges({ mouseWorld }: Props) {
   ) => {
     const dx = Math.abs(to.x - from.x);
     const dy = Math.abs(to.y - from.y);
-    const offset = Math.max(50, Math.max(dx, dy) * 0.45);
+    const offset = Math.max(40, Math.min(180, Math.max(dx, dy) * 0.45));
 
     let cx1 = from.x;
     let cy1 = from.y;
@@ -62,7 +62,12 @@ export default function CanvasEdges({ mouseWorld }: Props) {
     else if (to.port === "right") cx2 += offset;
     else if (to.port === "top") cy2 -= offset;
     else if (to.port === "bottom") cy2 += offset;
-    else cx2 += (to.x > from.x ? -offset : offset);
+    else if (to.port) cx2 += (to.x > from.x ? -offset : offset);
+    else {
+      // Elastic free dragging: smooth lead
+      cx2 = to.x;
+      cy2 = to.y;
+    }
 
     return `M ${from.x} ${from.y} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${to.x} ${to.y}`;
   };
@@ -70,17 +75,17 @@ export default function CanvasEdges({ mouseWorld }: Props) {
   return (
     <svg className="pointer-events-none absolute left-0 top-0 overflow-visible z-[5]">
       <defs>
-        {/* Core Gold Neon Gradient */}
+        {/* Core Theme Accent Gradient */}
         <linearGradient id="edgeGoldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#d97706" stopOpacity="0.8" />
-          <stop offset="50%" stopColor="#fbbf24" stopOpacity="1" />
-          <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.9" />
+          <stop offset="0%" stopColor="var(--swarm-border-hi-hex, #64748b)" stopOpacity="0.85" />
+          <stop offset="50%" stopColor="var(--swarm-gold-hex, #fafcff)" stopOpacity="1" />
+          <stop offset="100%" stopColor="var(--swarm-gold-hi-hex, #94a3b8)" stopOpacity="0.9" />
         </linearGradient>
 
         {/* Ambient Neural Glow Filter */}
         <filter id="synapseGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="4" result="blur1" />
-          <feGaussianBlur stdDeviation="8" result="blur2" />
+          <feGaussianBlur stdDeviation="2.5" result="blur1" />
+          <feGaussianBlur stdDeviation="5.5" result="blur2" />
           <feMerge>
             <feMergeNode in="blur2" />
             <feMergeNode in="blur1" />
@@ -117,9 +122,9 @@ export default function CanvasEdges({ mouseWorld }: Props) {
             <path
               d={pathStr}
               fill="none"
-              stroke="#0f172a"
-              strokeWidth={8}
-              strokeOpacity={0.8}
+              stroke="var(--swarm-canvas-hex, #060709)"
+              strokeWidth={7.5}
+              strokeOpacity={0.95}
             />
 
             {/* Ambient Neon Glow Layer */}
@@ -127,8 +132,8 @@ export default function CanvasEdges({ mouseWorld }: Props) {
               d={pathStr}
               fill="none"
               stroke="url(#edgeGoldGrad)"
-              strokeWidth={isHovered ? 4.5 : 3}
-              strokeOpacity={isHovered ? 1 : 0.75}
+              strokeWidth={isHovered ? 4 : 2.5}
+              strokeOpacity={isHovered ? 1 : 0.9}
               filter="url(#synapseGlow)"
               className="transition-all duration-200"
             />
@@ -137,60 +142,57 @@ export default function CanvasEdges({ mouseWorld }: Props) {
             <path
               d={pathStr}
               fill="none"
-              stroke="#ffffff"
-              strokeWidth={1.5}
-              strokeDasharray="8 14"
-              strokeOpacity={0.6}
+              stroke="var(--swarm-gold-hi-hex, #ffffff)"
+              strokeWidth={1.2}
+              strokeDasharray="6 12"
+              strokeOpacity={0.8}
               className="animate-[dash_1.8s_linear_infinite]"
             />
 
             {/* Live Traveling Neural Energy Pulse 1 */}
-            <circle r="4" fill="#fbbf24" filter="url(#synapseGlow)">
+            <circle r="3.5" fill="var(--swarm-gold-hi-hex, #ffffff)" filter="url(#synapseGlow)">
               <animateMotion dur="2.2s" repeatCount="indefinite" path={pathStr} />
             </circle>
-            <circle r="2" fill="#ffffff">
+            <circle r="1.5" fill="#ffffff">
               <animateMotion dur="2.2s" repeatCount="indefinite" path={pathStr} />
             </circle>
 
-            {/* Live Traveling Neural Energy Pulse 2 (Staggered) */}
-            <circle r="3.5" fill="#38bdf8" filter="url(#synapseGlow)">
+            {/* Live Traveling Neural Energy Pulse 2 */}
+            <circle r="3" fill="var(--swarm-gold-hex, #cbd5e1)" filter="url(#synapseGlow)">
               <animateMotion dur="2.2s" begin="1.1s" repeatCount="indefinite" path={pathStr} />
             </circle>
-            <circle r="1.5" fill="#ffffff">
+            <circle r="1.2" fill="var(--swarm-gold-hi-hex, #ffffff)">
               <animateMotion dur="2.2s" begin="1.1s" repeatCount="indefinite" path={pathStr} />
             </circle>
 
             {/* Midpoint Synapse Connection Hub Pill */}
             <foreignObject
-              x={midX - 54}
-              y={midY - 14}
-              width={108}
-              height={28}
+              x={midX - (isHovered ? 48 : 36)}
+              y={midY - 12}
+              width={isHovered ? 96 : 72}
+              height={24}
               className="overflow-visible pointer-events-auto"
             >
               <div
                 onMouseEnter={() => setHoveredEdge(edge.id)}
                 onMouseLeave={() => setHoveredEdge(null)}
-                className={`flex items-center justify-between gap-1 px-2 py-0.5 rounded-full border transition-all duration-200 shadow-lg select-none backdrop-blur-md ${
-                  isHovered
-                    ? "bg-red-950/90 border-red-500/50 text-red-200 scale-105"
-                    : "bg-[#0b0e17]/90 border-amber-500/30 text-amber-300 hover:border-amber-400"
+                className={`flex items-center justify-center transition-all duration-200 select-none ${
+                  isHovered ? "scale-105" : ""
                 }`}
               >
                 {isHovered ? (
                   <button
                     onClick={() => removeEdge(edge.id)}
-                    className="flex w-full items-center justify-center gap-1 text-[10px] font-bold text-red-300 hover:text-red-100 cursor-pointer"
-                    title="Disconnect this pipeline link"
+                    className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#18080a] border border-rose-500/70 text-rose-200 hover:bg-rose-900/80 hover:text-white shadow-2xl text-[10px] font-bold cursor-pointer transition-colors"
+                    title="Disconnect wire pipeline"
                   >
-                    <X size={11} className="text-red-400" />
+                    <X size={10} className="text-rose-400" />
                     <span>Disconnect</span>
                   </button>
                 ) : (
-                  <div className="flex w-full items-center justify-center gap-1 text-[10px] font-semibold text-zinc-300">
-                    <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse shadow-sm shadow-emerald-400" />
-                    <span className="text-amber-300 font-mono">Sync</span>
-                    <ArrowRight size={10} className="text-zinc-500" />
+                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#060709]/95 border border-white/[0.2] text-zinc-300 shadow-xl backdrop-blur-xl">
+                    <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
+                    <span className="text-[10px] font-mono font-medium text-zinc-300">Sync</span>
                   </div>
                 )}
               </div>
@@ -212,13 +214,13 @@ export default function CanvasEdges({ mouseWorld }: Props) {
             <path
               d={pathStr}
               fill="none"
-              stroke="#fbbf24"
+              stroke="#f1f5f9"
               strokeWidth={3}
               strokeDasharray="6 8"
               filter="url(#synapseGlow)"
               className="animate-[dash_0.8s_linear_infinite]"
             />
-            <circle cx={mouseWorld.x} cy={mouseWorld.y} r={6} fill="#fbbf24" className="animate-ping opacity-75" />
+            <circle cx={mouseWorld.x} cy={mouseWorld.y} r={6} fill="#f1f5f9" className="animate-ping opacity-75" />
             <circle cx={mouseWorld.x} cy={mouseWorld.y} r={4} fill="#ffffff" />
           </g>
         );
