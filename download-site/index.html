@@ -9,7 +9,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 
   <style>
     /* ══════════════════════════════════════════════════════════════
@@ -638,21 +637,153 @@
       overflow-x: auto;
     }
 
-    /* ─── Mermaid Architecture Diagrams ─── */
-    .mermaid-box {
-      background: #0a0c10;
+    /* ─── Custom Luxury Architecture Flow Diagrams ─── */
+    .arch-flow-wrap {
+      background: #080a0e;
       border: 1px solid var(--border-medium);
-      border-radius: var(--radius-md);
-      padding: 24px 16px;
-      margin: 20px 0 28px;
+      border-radius: var(--radius-xl);
+      padding: 32px 24px;
+      margin: 24px 0 32px;
       display: flex;
-      justify-content: center;
-      overflow-x: auto;
+      flex-direction: column;
+      gap: 20px;
+      position: relative;
     }
 
-    .mermaid {
-      font-family: 'JetBrains Mono', monospace !important;
-      font-size: 12px !important;
+    .arch-flow-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      position: relative;
+    }
+
+    .arch-node {
+      background: rgba(15, 18, 25, 0.95);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 180px;
+      box-shadow: var(--shadow-subtle);
+      transition: all 0.15s ease;
+    }
+
+    .arch-node.primary {
+      border-color: var(--border-platinum);
+      background: rgba(22, 27, 38, 0.95);
+    }
+
+    .arch-node-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .arch-node-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .arch-node-desc {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .arch-arrow {
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ─── Benchmark Gantt & Comparison Bar System ─── */
+    .benchmark-card {
+      background: #080a0e;
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      margin: 20px 0 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .benchmark-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 12px;
+    }
+
+    .benchmark-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .benchmark-speedup-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-emerald);
+      background: var(--accent-emerald-soft);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 3px 10px;
+      border-radius: 9999px;
+    }
+
+    .track-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .track-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .timeline-bar-wrapper {
+      width: 100%;
+      height: 36px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .timeline-segment {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-primary);
+      border-right: 1px solid rgba(0, 0, 0, 0.4);
+      white-space: nowrap;
+      padding: 0 8px;
     }
 
     /* ─── Engineering Blog & Research System ─── */
@@ -950,43 +1081,81 @@
       </p>
     </div>
 
-    <!-- Master Mermaid Architecture Flow -->
-    <div class="mermaid-box">
-      <pre class="mermaid">
-flowchart TD
-    User["Developer Prompt / Mission Goal"] --> Lead["Lead Steward Orchestrator"]
-    
-    subgraph SwarmMind ["SwarmMind Decomposition Engine"]
-        Lead --> TaskA["Task 1: Auth & API Layer"]
-        Lead --> TaskB["Task 2: UI State & Canvas"]
-        Lead --> TaskC["Task 3: Unit Tests & CI"]
-    end
+    <!-- Master Architecture Flow Box -->
+    <div class="arch-flow-wrap">
+      <!-- Row 1: Developer Input to Lead Steward -->
+      <div class="arch-flow-row">
+        <div class="arch-node primary">
+          <span class="arch-node-tag">Initiator</span>
+          <div class="arch-node-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span>Developer Mission Goal</span>
+          </div>
+          <span class="arch-node-desc">Single high-level directive or PR description</span>
+        </div>
 
-    subgraph GitWorktrees ["Isolated Ephemeral Git Worktrees"]
-        TaskA --> W1["Worktree 1: branch feature/auth"]
-        TaskB --> W2["Worktree 2: branch feature/ui"]
-        TaskC --> W3["Worktree 3: branch feature/tests"]
-    end
+        <div class="arch-arrow">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </div>
 
-    subgraph ActiveWorkers ["Autonomous Worker CLIs"]
-        W1 --> C1["Claude Code Opus 5"]
-        W2 --> C2["OpenAI Codex 5.6 Sol"]
-        W3 --> C3["OpenCode DeepSeek R1"]
-    end
+        <div class="arch-node primary">
+          <span class="arch-node-tag">Orchestrator</span>
+          <div class="arch-node-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            <span>Lead Steward Hub</span>
+          </div>
+          <span class="arch-node-desc">Autonomous subtask decomposition & safety locks</span>
+        </div>
+      </div>
 
-    subgraph SharedMemory ["Pheromone Shared Memory Synapse"]
-        C1 <-->|"Broadcast API Contracts"| Phero[("Pheromone SQLite Vector Store")]
-        C2 <-->|"Read Architecture Decisions"| Phero
-        C3 <-->|"Read Implementation Diff"| Phero
-    end
+      <!-- Row 2: Parallel Worktrees & Workers -->
+      <div class="arch-flow-row" style="margin-top: 10px;">
+        <!-- Worker 1 -->
+        <div class="arch-node">
+          <span class="arch-node-tag" style="color:var(--accent-emerald);">Worktree #1 · feature/auth</span>
+          <div class="arch-node-title">Claude Code Opus 5</div>
+          <span class="arch-node-desc">Decomposes auth schemas & session management</span>
+        </div>
 
-    subgraph MergeStudio ["Merge & Conflict Resolver"]
-        C1 --> M["3-Way Dry Run Conflict Check"]
-        C2 --> M
-        C3 --> M
-        M --> MainBranch["Primary main Branch (Clean Fast-Forward)"]
-    end
-      </pre>
+        <!-- Worker 2 -->
+        <div class="arch-node">
+          <span class="arch-node-tag" style="color:#38bdf8;">Worktree #2 · feature/canvas</span>
+          <div class="arch-node-title">Codex CLI 5.6 Sol</div>
+          <span class="arch-node-desc">Builds React Flow canvas & socket synapsing</span>
+        </div>
+
+        <!-- Worker 3 -->
+        <div class="arch-node">
+          <span class="arch-node-tag" style="color:#a855f7;">Worktree #3 · feature/tests</span>
+          <div class="arch-node-title">OpenCode DeepSeek R1</div>
+          <span class="arch-node-desc">Generates end-to-end integration test suites</span>
+        </div>
+      </div>
+
+      <!-- Row 3: Memory Synapse & 3-Way Merge -->
+      <div class="arch-flow-row" style="margin-top: 10px;">
+        <div class="arch-node primary" style="min-width: 260px;">
+          <span class="arch-node-tag">Shared Memory Synapse</span>
+          <div class="arch-node-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            <span>Pheromone SQLite Vector Store</span>
+          </div>
+          <span class="arch-node-desc">Real-time contract broadcasting across workers</span>
+        </div>
+
+        <div class="arch-arrow">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </div>
+
+        <div class="arch-node primary" style="min-width: 240px;">
+          <span class="arch-node-tag">Conflict-Free Integration</span>
+          <div class="arch-node-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>3-Way Fast-Forward Merge</span>
+          </div>
+          <span class="arch-node-desc">Clean validation into primary main branch</span>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -1157,17 +1326,20 @@ npm install -g opencode-ai
           </p>
 
           <h2 class="docs-h2">CLI Process Architecture</h2>
-          <div class="mermaid-box">
-            <pre class="mermaid">
-graph LR
-    SwarmApp["Swarm Tauri Core"] --> PTY["Raw Pseudo-Terminal PTY"]
-    PTY --> Claude["Claude Code CLI"]
-    PTY --> Codex["Codex CLI"]
-    PTY --> OpenCode["OpenCode CLI"]
-    Claude --> MCP["Pheromone MCP Bridge"]
-    Codex --> MCP
-    OpenCode --> MCP
-            </pre>
+          <div class="arch-flow-wrap" style="padding:16px;">
+            <div class="arch-flow-row">
+              <div class="arch-node primary">
+                <span class="arch-node-tag">Core Engine</span>
+                <div class="arch-node-title">Swarm Tauri Core</div>
+                <span class="arch-node-desc">Raw PTY multiplexer & terminal host</span>
+              </div>
+              <div class="arch-arrow">→</div>
+              <div class="arch-node">
+                <span class="arch-node-tag">Worker Processes</span>
+                <div class="arch-node-title">Claude Code · Codex · OpenCode</div>
+                <span class="arch-node-desc">Isolated process instances with MCP bridges</span>
+              </div>
+            </div>
           </div>
         </article>
 
@@ -1196,13 +1368,26 @@ Space + Drag        Pan Flow Canvas
             Pheromone is a lightweight, embedded SQLite vector database stored inside your project's <code>.pheromone/</code> folder.
           </p>
 
-          <div class="mermaid-box">
-            <pre class="mermaid">
-flowchart LR
-    Agent1["Lead Architect"] -->|"Writes Decision"| Storage[("SQLite Vector DB\n.pheromone/memory.db")]
-    Storage -->|"Semantic Search"| Agent2["Frontend Worker"]
-    Storage -->|"Context Bridge"| Agent3["Backend Worker"]
-            </pre>
+          <div class="arch-flow-wrap" style="padding:16px;">
+            <div class="arch-flow-row">
+              <div class="arch-node primary">
+                <span class="arch-node-tag">Writer</span>
+                <div class="arch-node-title">Lead / Backend Worker</div>
+                <span class="arch-node-desc">Tags & writes API contract to memory</span>
+              </div>
+              <div class="arch-arrow">→</div>
+              <div class="arch-node primary">
+                <span class="arch-node-tag">Local Storage</span>
+                <div class="arch-node-title">.pheromone/memory.db</div>
+                <span class="arch-node-desc">SQLite vector embeddings & fast index</span>
+              </div>
+              <div class="arch-arrow">→</div>
+              <div class="arch-node">
+                <span class="arch-node-tag">Reader</span>
+                <div class="arch-node-title">Frontend / QA Workers</div>
+                <span class="arch-node-desc">Semantic context retrieval via MCP</span>
+              </div>
+            </div>
           </div>
 
           <h2 class="docs-h2">Memory Schema</h2>
@@ -1221,21 +1406,25 @@ flowchart LR
             Instead of running all AI bots in the same folder where they overwrite each other's edits, Swarm AI provisions a separate Git worktree for each agent under <code>.swarm/worktrees/&lt;task-id&gt;</code>.
           </p>
 
-          <div class="mermaid-box">
-            <pre class="mermaid">
-gitGraph
-    commit id: "Initial Commit"
-    branch feature/backend-api
-    checkout feature/backend-api
-    commit id: "Claude: REST Endpoints"
-    checkout main
-    branch feature/frontend-ui
-    checkout feature/frontend-ui
-    commit id: "Codex: React Canvas UI"
-    checkout main
-    merge feature/backend-api id: "3-Way Safe Merge 1"
-    merge feature/frontend-ui id: "3-Way Safe Merge 2"
-            </pre>
+          <div class="arch-flow-wrap" style="padding:16px;">
+            <div class="arch-flow-row">
+              <div class="arch-node">
+                <span class="arch-node-tag" style="color:var(--accent-emerald);">Branch 1</span>
+                <div class="arch-node-title">feature/backend-api</div>
+                <span class="arch-node-desc">Worker 1: REST endpoints & DB schema</span>
+              </div>
+              <div class="arch-node">
+                <span class="arch-node-tag" style="color:#38bdf8;">Branch 2</span>
+                <div class="arch-node-title">feature/frontend-ui</div>
+                <span class="arch-node-desc">Worker 2: React canvas & state</span>
+              </div>
+              <div class="arch-arrow">→</div>
+              <div class="arch-node primary">
+                <span class="arch-node-tag">Resolver</span>
+                <div class="arch-node-title">3-Way Fast-Forward Merge</div>
+                <span class="arch-node-desc">Safe validation into primary main branch</span>
+              </div>
+            </div>
           </div>
         </article>
 
@@ -1399,22 +1588,7 @@ gitGraph
   </footer>
 
   <script>
-    // Initialize Mermaid Dark Mode
     document.addEventListener("DOMContentLoaded", () => {
-      mermaid.initialize({
-        startOnLoad: true,
-        theme: 'dark',
-        themeVariables: {
-          darkMode: true,
-          background: '#0a0c10',
-          primaryColor: '#161922',
-          primaryTextColor: '#fafcff',
-          primaryBorderColor: '#334155',
-          lineColor: '#94a3b8',
-          secondaryColor: '#0f1218',
-          tertiaryColor: '#050608'
-        }
-      });
       detectPlatform();
     });
 
@@ -1444,8 +1618,6 @@ gitGraph
       const targetArticle = document.getElementById('doc-' + docId);
       if (targetArticle) {
         targetArticle.classList.add('active');
-        // Re-render any mermaid diagrams inside the tab
-        mermaid.init(undefined, targetArticle.querySelectorAll('.mermaid'));
       }
 
       const activeNav = Array.from(document.querySelectorAll('.docs-nav-item')).find(el => 
@@ -1477,27 +1649,41 @@ gitGraph
           Swarm AI replaces the single-thread model with a Lead Steward orchestrator. The Lead decomposes the goal into orthogonal subtasks, creates isolated Git worktrees, and launches worker agents simultaneously.
         </p>
 
-        <div class="mermaid-box">
-          <pre class="mermaid">
-gantt
-    title Single Thread vs Swarm Concurrency (Minutes)
-    dateFormat  X
-    axisFormat %s min
+        <!-- Benchmark Comparison Grid -->
+        <div class="benchmark-card">
+          <div class="benchmark-header">
+            <span class="benchmark-title">Wall-Clock Execution Timeline Comparison</span>
+            <span class="benchmark-speedup-badge">8.4x FASTER (-88% TIME)</span>
+          </div>
 
-    section Monolithic Single Thread
-    DB Schema Setup       :a1, 0, 4
-    REST Endpoints        :a2, after a1, 6
-    React Canvas UI       :a3, after a2, 8
-    Unit Tests & QA       :a4, after a3, 4
+          <!-- Track 1: Sequential Single-Thread -->
+          <div class="track-row">
+            <div class="track-label-row">
+              <span style="color:var(--text-primary);">Monolithic Single-Thread Bot (Sequential)</span>
+              <span style="font-family:'JetBrains Mono',monospace; color:var(--accent-amber);">22.0 min total</span>
+            </div>
+            <div class="timeline-bar-wrapper">
+              <div class="timeline-segment" style="width: 18%; background: #334155;">DB Schema (4m)</div>
+              <div class="timeline-segment" style="width: 27%; background: #475569;">REST API (6m)</div>
+              <div class="timeline-segment" style="width: 36%; background: #64748b;">React UI (8m)</div>
+              <div class="timeline-segment" style="width: 19%; background: #334155;">QA Tests (4m)</div>
+            </div>
+          </div>
 
-    section Swarm AI (Parallel 4 CLIs)
-    Lead Decomposition    :b1, 0, 1
-    DB Schema (Worker 1)  :b2, after b1, 2
-    REST API (Worker 2)   :b3, after b1, 2
-    React UI (Worker 3)   :b4, after b1, 2
-    Unit Tests (Worker 4) :b5, after b1, 2
-    3-Way Merge & Verify  :b6, after b2, 1
-          </pre>
+          <!-- Track 2: Swarm AI Parallel -->
+          <div class="track-row">
+            <div class="track-label-row">
+              <span style="color:var(--text-primary); font-weight:700;">Swarm AI (4 Parallel Workers + Worktrees)</span>
+              <span style="font-family:'JetBrains Mono',monospace; color:var(--accent-emerald); font-weight:700;">2.6 min total</span>
+            </div>
+            <div class="timeline-bar-wrapper" style="border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05);">
+              <div class="timeline-segment" style="width: 20%; background: #1e293b;">Lead Decomp (30s)</div>
+              <div class="timeline-segment" style="width: 60%; background: rgba(16,185,129,0.25); color: var(--accent-emerald); border-color: rgba(16,185,129,0.4);">
+                Workers 1..4 in Parallel (2.0m)
+              </div>
+              <div class="timeline-segment" style="width: 20%; background: #1e293b;">3-Way Merge (30s)</div>
+            </div>
+          </div>
         </div>
 
         <h2 class="docs-h2">3. Benchmark Results</h2>
@@ -1550,8 +1736,6 @@ gantt
       body.innerHTML = BLOG_PAPERS[paperId] || '<p>Article not found.</p>';
       modal.classList.add('open');
       document.body.style.overflow = 'hidden';
-      // Render Mermaid diagrams inside the modal
-      mermaid.init(undefined, body.querySelectorAll('.mermaid'));
     }
 
     function closeBlogModal(event) {
