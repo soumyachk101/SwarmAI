@@ -35,6 +35,7 @@ export default function SwarmTelemetryHUD({ agents = [] }: { agents?: FlowAgentM
 
   const baselineTokensRef = useRef<number | null>(null);
   const lastTokensRef = useRef<number>(0);
+  const lastTimeRef = useRef<number>(Date.now());
 
   const isAnyRunning = agents.some((a) => a.status === "running" || a.status === "launching" || a.status === "busy");
 
@@ -65,15 +66,16 @@ export default function SwarmTelemetryHUD({ agents = [] }: { agents?: FlowAgentM
             const cost = (currentSession / 1_000_000) * 4.5;
             setSessionCost(cost);
 
-            // Compute live stream velocity from tick-to-tick delta
+            // Compute strictly measured live stream velocity from elapsed delta
+            const now = Date.now();
+            const elapsedSec = Math.max(0.5, (now - (lastTimeRef.current || now)) / 1000);
             if (lastTokensRef.current > 0 && rawTotal > lastTokensRef.current) {
               const delta = rawTotal - lastTokensRef.current;
-              setLiveVelocity(Math.max(16, Math.round(delta / 2)));
-            } else if (isAnyRunning) {
-              setLiveVelocity(38);
+              setLiveVelocity(Math.round(delta / elapsedSec));
             } else {
               setLiveVelocity(0);
             }
+            lastTimeRef.current = now;
             lastTokensRef.current = rawTotal;
 
             // Prompt cache read ratio
