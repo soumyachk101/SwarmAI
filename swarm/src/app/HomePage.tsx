@@ -41,6 +41,8 @@ import ThemePicker from "@/shared/ThemePicker";
 import OverflowMenu from "@/shared/OverflowMenu";
 import CommandPalette from "@/shared/CommandPalette";
 import GitControlModal from "@/features/git/GitControlModal";
+import UserGuideModal from "@/features/help/UserGuideModal";
+import { BookOpen } from "lucide-react";
 
 
 /**
@@ -81,6 +83,7 @@ export default function HomePage() {
   const [showUsage, setShowUsage] = useState(false);
   const [showPalette, setShowPalette] = useState(false);
   const [showGitModal, setShowGitModal] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
   const [gitStatus, setGitStatus] = useState<{
     branch: string;
     changed: number;
@@ -313,6 +316,13 @@ export default function HomePage() {
             hint: "Token usage per CLI",
             icon: Gauge,
             onSelect: () => setShowUsage(true),
+          },
+          {
+            id: "guide",
+            label: "User Guide & Privacy",
+            hint: "How to use Swarm AI & privacy policy",
+            icon: BookOpen,
+            onSelect: () => setShowGuide(true),
           },
           {
             id: "settings",
@@ -624,6 +634,7 @@ export default function HomePage() {
       {showSettings && <SettingsPage onClose={() => setShowSettings(false)} />}
       {showExtensions && <ExtensionsMarketplace onClose={() => setShowExtensions(false)} />}
       {showUpdates && <UpdateCheckerModal isOpen={showUpdates} onClose={() => setShowUpdates(false)} />}
+      {showGuide && <UserGuideModal isOpen={showGuide} onClose={() => setShowGuide(false)} />}
       {showGitModal && (
         <GitControlModal
           isOpen={showGitModal}

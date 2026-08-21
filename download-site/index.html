@@ -1526,28 +1526,105 @@ CREATE TABLE IF NOT EXISTS synapses (
             When multiple autonomous agents operate inside the same working tree, concurrent disk writes cause catastrophic race conditions: partial AST writes, broken build states, and corrupted files.
           </p>
 
-          <h2 class="docs-h2">2. Ephemeral Worktree Lifecycle</h2>
-          <div class="docs-code-block">
-# 1. Swarm provisions dedicated worktree for Worker 1
+          <h2 class="docs-h2">2. Ephemeral Worktree Diagrammatic Lifecycle</h2>
+          <p class="docs-p">
+            Each parallel task follows a deterministic 6-stage lifecycle, ensuring complete file isolation and safe atomic integration into your primary codebase:
+          </p>
+
+          <!-- Diagrammatic Worktree Pipeline Flow -->
+          <div class="arch-flow-wrap" style="gap:16px; padding:24px;">
+            <!-- Stage 1 & 2 -->
+            <div class="arch-flow-row" style="justify-content:space-between; width:100%;">
+              <div class="arch-node primary" style="flex:1;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span class="arch-node-tag" style="color:var(--accent-emerald);">Stage 01 · Provisioning</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-muted);">git worktree add</span>
+                </div>
+                <div class="arch-node-title">Isolated Worktree Spawn</div>
+                <span class="arch-node-desc">Creates <code>.swarm/worktrees/task-auth-01</code> on branch <code>swarm/task-auth-01</code> branched from <code>main</code>.</span>
+                <div class="docs-code-block" style="margin:6px 0 0; padding:8px 12px; font-size:11px;">
 git worktree add -b swarm/task-auth-01 .swarm/worktrees/task-auth-01 main
+                </div>
+              </div>
 
-# 2. Worker 2 gets isolated branch for Frontend UI
-git worktree add -b swarm/task-ui-02 .swarm/worktrees/task-ui-02 main
+              <div class="arch-arrow" style="display:flex; flex-direction:column; gap:2px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
 
-# 3. Each agent executes in complete isolation on local disk
+              <div class="arch-node" style="flex:1;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span class="arch-node-tag" style="color:#38bdf8;">Stage 02 · Lock Registry</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-muted);">.swarm/locks.json</span>
+                </div>
+                <div class="arch-node-title">File Ownership Declaration</div>
+                <span class="arch-node-desc">Lead registers write-locks for <code>src/auth/**</code> and grants read-only access to sibling workers.</span>
+                <div class="docs-code-block" style="margin:6px 0 0; padding:8px 12px; font-size:11px;">
+{ "task_id": "auth-01", "write_paths": ["src/auth/**"], "read_only": true }
+                </div>
+              </div>
+            </div>
+
+            <!-- Stage 3 & 4 -->
+            <div class="arch-flow-row" style="justify-content:space-between; width:100%;">
+              <div class="arch-node" style="flex:1;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span class="arch-node-tag" style="color:#a855f7;">Stage 03 · Execution</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-muted);">Autonomous PTY</span>
+                </div>
+                <div class="arch-node-title">Parallel Worker Generation</div>
+                <span class="arch-node-desc">Claude Code / Codex edits files in its isolated worktree without touching other workers' active buffers.</span>
+                <div class="docs-code-block" style="margin:6px 0 0; padding:8px 12px; font-size:11px;">
 cd .swarm/worktrees/task-auth-01 && claude --model claude-opus-5
+                </div>
+              </div>
 
-# 4. On mission completion: Swarm performs 3-way dry-run diff
+              <div class="arch-arrow" style="display:flex; flex-direction:column; gap:2px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+
+              <div class="arch-node primary" style="flex:1;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span class="arch-node-tag" style="color:var(--accent-amber);">Stage 04 · Validation</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-muted);">git merge-tree</span>
+                </div>
+                <div class="arch-node-title">3-Way Dry-Run Conflict Check</div>
+                <span class="arch-node-desc">Performs in-memory 3-way merge validation across all completed worker branches before modifying git tree.</span>
+                <div class="docs-code-block" style="margin:6px 0 0; padding:8px 12px; font-size:11px;">
 git merge-tree --write-tree main swarm/task-auth-01 swarm/task-ui-02
+                </div>
+              </div>
+            </div>
 
-# 5. Clean fast-forward merge into primary branch
-git checkout main
-git merge swarm/task-auth-01 --ff-only
-git merge swarm/task-ui-02 --ff-only
+            <!-- Stage 5 & 6 -->
+            <div class="arch-flow-row" style="justify-content:space-between; width:100%;">
+              <div class="arch-node primary" style="flex:1;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span class="arch-node-tag" style="color:var(--accent-emerald);">Stage 05 · Integration</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-muted);">Fast-Forward</span>
+                </div>
+                <div class="arch-node-title">Atomic Fast-Forward Merge</div>
+                <span class="arch-node-desc">Integrates validated feature branches directly into primary <code>main</code> branch with zero merge commits.</span>
+                <div class="docs-code-block" style="margin:6px 0 0; padding:8px 12px; font-size:11px;">
+git checkout main && git merge swarm/task-auth-01 --ff-only
+                </div>
+              </div>
 
-# 6. Automatic cleanup of ephemeral worktrees
+              <div class="arch-arrow" style="display:flex; flex-direction:column; gap:2px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+
+              <div class="arch-node" style="flex:1;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span class="arch-node-tag" style="color:var(--text-muted);">Stage 06 · Cleanup</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-muted);">git worktree remove</span>
+                </div>
+                <div class="arch-node-title">Ephemeral Worktree Pruning</div>
+                <span class="arch-node-desc">Automatically unmounts ephemeral folders and deletes temporary task branches to maintain clean disk state.</span>
+                <div class="docs-code-block" style="margin:6px 0 0; padding:8px 12px; font-size:11px;">
 git worktree remove --force .swarm/worktrees/task-auth-01
-git worktree remove --force .swarm/worktrees/task-ui-02
+                </div>
+              </div>
+            </div>
           </div>
 
           <h2 class="docs-h2">3. File Ownership Safety Locks</h2>
