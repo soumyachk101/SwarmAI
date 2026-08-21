@@ -1,19 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Server, Puzzle, Download } from "lucide-react";
+import { X, Server, Puzzle, Download, BookOpen, ShieldCheck } from "lucide-react";
 import ProvidersSection from "./ProvidersSection";
 import ModelsSection from "./ModelsSection";
+import UpdatesSection from "./UpdatesSection";
+import UserGuideSection from "./UserGuideSection";
+import PrivacySection from "./PrivacySection";
 
 interface SettingsPageProps {
   onClose: () => void;
 }
 
-// Only sections that are actually implemented get a nav entry — a nav item that
-// opens a "coming soon" panel is a dead end.
-import UpdatesSection from "./UpdatesSection";
-
-type SectionId = "models" | "providers" | "updates";
+type SectionId = "models" | "providers" | "guide" | "privacy" | "updates";
 
 interface NavItem {
   id: SectionId;
@@ -22,8 +21,10 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { id: "models", label: "Models", icon: Server },
-  { id: "providers", label: "Providers", icon: Puzzle },
+  { id: "models", label: "Models & Defaults", icon: Server },
+  { id: "providers", label: "API Providers", icon: Puzzle },
+  { id: "guide", label: "User Guide & Docs", icon: BookOpen },
+  { id: "privacy", label: "Privacy & Security", icon: ShieldCheck },
   { id: "updates", label: "Updates & Releases", icon: Download },
 ];
 
@@ -42,6 +43,10 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
     switch (activeSection) {
       case "providers":
         return <ProvidersSection />;
+      case "guide":
+        return <UserGuideSection />;
+      case "privacy":
+        return <PrivacySection />;
       case "updates":
         return <UpdatesSection />;
       case "models":
