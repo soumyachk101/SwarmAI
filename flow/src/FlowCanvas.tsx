@@ -21,6 +21,7 @@ export interface FlowAgentMeta {
   name: string;
   cli?: string;
   isLead?: boolean;
+  status?: string;
 }
 
 interface Props {
