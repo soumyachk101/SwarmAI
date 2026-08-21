@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { type PortSide, useCanvasStore } from "./canvasStore.js";
 import { type Camera } from "./camera.js";
-import { X, ArrowRight } from "lucide-react";
+import { X } from "lucide-react";
 
 interface Props {
   camera?: Camera;
@@ -56,13 +56,13 @@ export default function CanvasEdges({ mouseWorld }: Props) {
     else if (from.port === "right") cx1 += offset;
     else if (from.port === "top") cy1 -= offset;
     else if (from.port === "bottom") cy1 += offset;
-    else cx1 += (to.x > from.x ? offset : -offset);
+    else cx1 += to.x > from.x ? offset : -offset;
 
     if (to.port === "left") cx2 -= offset;
     else if (to.port === "right") cx2 += offset;
     else if (to.port === "top") cy2 -= offset;
     else if (to.port === "bottom") cy2 += offset;
-    else if (to.port) cx2 += (to.x > from.x ? -offset : offset);
+    else if (to.port) cx2 += to.x > from.x ? -offset : offset;
     else {
       // Elastic free dragging: smooth lead
       cx2 = to.x;
@@ -107,32 +107,39 @@ export default function CanvasEdges({ mouseWorld }: Props) {
 
         return (
           <g key={edge.id} className="pointer-events-auto group">
-            {/* Wider transparent hit zone for hovering */}
+            {/* Wider transparent hit zone for hovering and double-click to disconnect */}
             <path
               d={pathStr}
               fill="none"
               stroke="transparent"
-              strokeWidth={32}
+              strokeWidth={36}
               className="cursor-pointer"
               onMouseEnter={() => setHoveredEdge(edge.id)}
               onMouseLeave={() => setHoveredEdge(null)}
-            />
+              onDoubleClick={(e) => {
+                e.stopPropagation();
+                removeEdge(edge.id);
+              }}
+            >
+              <title>Double-click wire to disconnect</title>
+            </path>
 
             {/* Base dark backdrop cable track */}
             <path
               d={pathStr}
               fill="none"
               stroke="var(--swarm-canvas-hex, #060709)"
-              strokeWidth={7.5}
+              strokeWidth={isHovered ? 9 : 7.5}
               strokeOpacity={0.95}
+              className="transition-all duration-200"
             />
 
             {/* Ambient Neon Glow Layer */}
             <path
               d={pathStr}
               fill="none"
-              stroke="url(#edgeGoldGrad)"
-              strokeWidth={isHovered ? 4 : 2.5}
+              stroke={isHovered ? "var(--swarm-err-hex, #f43f5e)" : "url(#edgeGoldGrad)"}
+              strokeWidth={isHovered ? 4.5 : 2.5}
               strokeOpacity={isHovered ? 1 : 0.9}
               filter="url(#synapseGlow)"
               className="transition-all duration-200"
@@ -142,15 +149,15 @@ export default function CanvasEdges({ mouseWorld }: Props) {
             <path
               d={pathStr}
               fill="none"
-              stroke="var(--swarm-gold-hi-hex, #ffffff)"
-              strokeWidth={1.2}
+              stroke={isHovered ? "#fda4af" : "var(--swarm-gold-hi-hex, #ffffff)"}
+              strokeWidth={isHovered ? 1.8 : 1.2}
               strokeDasharray="6 12"
-              strokeOpacity={0.8}
+              strokeOpacity={isHovered ? 1 : 0.8}
               className="animate-[dash_1.8s_linear_infinite]"
             />
 
             {/* Live Traveling Neural Energy Pulse 1 */}
-            <circle r="3.5" fill="var(--swarm-gold-hi-hex, #ffffff)" filter="url(#synapseGlow)">
+            <circle r={isHovered ? 4 : 3.5} fill={isHovered ? "#f43f5e" : "var(--swarm-gold-hi-hex, #ffffff)"} filter="url(#synapseGlow)">
               <animateMotion dur="2.2s" repeatCount="indefinite" path={pathStr} />
             </circle>
             <circle r="1.5" fill="#ffffff">
@@ -158,45 +165,35 @@ export default function CanvasEdges({ mouseWorld }: Props) {
             </circle>
 
             {/* Live Traveling Neural Energy Pulse 2 */}
-            <circle r="3" fill="var(--swarm-gold-hex, #cbd5e1)" filter="url(#synapseGlow)">
+            <circle r={isHovered ? 3.5 : 3} fill={isHovered ? "#fb7185" : "var(--swarm-gold-hex, #cbd5e1)"} filter="url(#synapseGlow)">
               <animateMotion dur="2.2s" begin="1.1s" repeatCount="indefinite" path={pathStr} />
             </circle>
             <circle r="1.2" fill="var(--swarm-gold-hi-hex, #ffffff)">
               <animateMotion dur="2.2s" begin="1.1s" repeatCount="indefinite" path={pathStr} />
             </circle>
 
-            {/* Midpoint Synapse Connection Hub Pill */}
-            <foreignObject
-              x={midX - (isHovered ? 48 : 36)}
-              y={midY - 12}
-              width={isHovered ? 96 : 72}
-              height={24}
-              className="overflow-visible pointer-events-auto"
-            >
-              <div
-                onMouseEnter={() => setHoveredEdge(edge.id)}
-                onMouseLeave={() => setHoveredEdge(null)}
-                className={`flex items-center justify-center transition-all duration-200 select-none ${
-                  isHovered ? "scale-105" : ""
-                }`}
+            {/* Micro Floating Tooltip Badge only visible on wire hover */}
+            {isHovered && (
+              <foreignObject
+                x={midX - 75}
+                y={midY - 14}
+                width={150}
+                height={28}
+                className="overflow-visible pointer-events-auto"
               >
-                {isHovered ? (
-                  <button
-                    onClick={() => removeEdge(edge.id)}
-                    className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#18080a] border border-rose-500/70 text-rose-200 hover:bg-rose-900/80 hover:text-white shadow-2xl text-[10px] font-bold cursor-pointer transition-colors"
-                    title="Disconnect wire pipeline"
-                  >
-                    <X size={10} className="text-rose-400" />
-                    <span>Disconnect</span>
-                  </button>
-                ) : (
-                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#060709]/95 border border-white/[0.2] text-zinc-300 shadow-xl backdrop-blur-xl">
-                    <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
-                    <span className="text-[10px] font-mono font-medium text-zinc-300">Sync</span>
-                  </div>
-                )}
-              </div>
-            </foreignObject>
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeEdge(edge.id);
+                  }}
+                  className="flex items-center justify-center gap-1 px-2.5 py-1 rounded-full bg-[#18080a]/95 border border-rose-500/80 text-rose-200 shadow-2xl text-[10px] font-mono font-medium backdrop-blur-xl animate-fade-in cursor-pointer hover:bg-rose-950 hover:scale-105 transition-all select-none"
+                  title="Double-click wire or click here to disconnect"
+                >
+                  <X size={11} className="text-rose-400 shrink-0" />
+                  <span>Double-click to disconnect</span>
+                </div>
+              </foreignObject>
+            )}
           </g>
         );
       })}
