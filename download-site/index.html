@@ -1042,7 +1042,7 @@
 
     <div class="hero-actions">
       <div class="download-primary-row">
-        <a href="releases/macOS/SwarmAI.dmg" class="btn-download-hero" id="auto-download-btn">
+        <a href="https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_aarch64.dmg" class="btn-download-hero" id="auto-download-btn">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="7 10 12 15 17 10" />
@@ -1184,13 +1184,13 @@
           <p class="os-card-desc">Universal package for Apple Silicon (M1/M2/M3/M4) and Intel x64.</p>
         </div>
         <div class="os-file-list">
-          <a href="releases/macOS/SwarmAI.dmg" class="os-file-btn">
+          <a href="https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_aarch64.dmg" id="download-macos-arm" class="os-file-btn">
             <span>Apple Silicon (.dmg)</span>
-            <span class="os-file-meta">6.3 MB</span>
+            <span class="os-file-meta">5.7 MB</span>
           </a>
-          <a href="releases/macOS/SwarmAI.dmg" class="os-file-btn">
+          <a href="https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_aarch64.dmg" id="download-macos-intel" class="os-file-btn">
             <span>Intel x64 (.dmg)</span>
-            <span class="os-file-meta">6.3 MB</span>
+            <span class="os-file-meta">5.7 MB</span>
           </a>
         </div>
       </div>
@@ -1207,13 +1207,13 @@
           <p class="os-card-desc">Windows 10 / 11 64-bit installer with integrated PowerShell terminal bridge.</p>
         </div>
         <div class="os-file-list">
-          <a href="releases/windows/SwarmAI_Setup.exe" class="os-file-btn">
+          <a href="https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_x64-setup.exe" id="download-win-exe" class="os-file-btn">
             <span>Installer (.exe)</span>
-            <span class="os-file-meta">86.3 MB</span>
+            <span class="os-file-meta">3.9 MB</span>
           </a>
-          <a href="releases/windows/SwarmAI.msi" class="os-file-btn">
+          <a href="https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_x64_en-US.msi" id="download-win-msi" class="os-file-btn">
             <span>Enterprise (.msi)</span>
-            <span class="os-file-meta">88.7 MB</span>
+            <span class="os-file-meta">5.5 MB</span>
           </a>
         </div>
       </div>
@@ -1230,13 +1230,13 @@
           <p class="os-card-desc">Portable AppImage and Debian packages for Linux workstations.</p>
         </div>
         <div class="os-file-list">
-          <a href="releases/linux/SwarmAI.AppImage" class="os-file-btn">
+          <a href="https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_amd64.AppImage" id="download-linux-appimage" class="os-file-btn">
             <span>Universal AppImage</span>
-            <span class="os-file-meta">95.2 MB</span>
+            <span class="os-file-meta">79.5 MB</span>
           </a>
-          <a href="releases/linux/SwarmAI.deb" class="os-file-btn">
+          <a href="https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_amd64.deb" id="download-linux-deb" class="os-file-btn">
             <span>Debian / Ubuntu (.deb)</span>
-            <span class="os-file-meta">89.4 MB</span>
+            <span class="os-file-meta">5.8 MB</span>
           </a>
         </div>
       </div>
@@ -1798,10 +1798,10 @@ Active Worktrees        Count of mounted git worktree directory handles
       <div>
         <div class="footer-col-title">Downloads</div>
         <ul class="footer-links-list">
-          <li><a href="releases/macOS/SwarmAI.dmg" class="footer-link">macOS (.dmg)</a></li>
-          <li><a href="releases/windows/SwarmAI_Setup.exe" class="footer-link">Windows (.exe)</a></li>
-          <li><a href="releases/linux/SwarmAI.AppImage" class="footer-link">Linux (.AppImage)</a></li>
-          <li><a href="releases/android/SwarmAI.apk" class="footer-link">Android (.apk)</a></li>
+          <li><a href="https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_aarch64.dmg" id="footer-download-macos" class="footer-link">macOS (.dmg)</a></li>
+          <li><a href="https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_x64-setup.exe" id="footer-download-win" class="footer-link">Windows (.exe)</a></li>
+          <li><a href="https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_amd64.AppImage" id="footer-download-linux" class="footer-link">Linux (.AppImage)</a></li>
+          <li><a href="https://github.com/soumyachk101/SwarmAI/releases" target="_blank" class="footer-link">All Releases & Tags</a></li>
         </ul>
       </div>
 
@@ -1833,25 +1833,96 @@ Active Worktrees        Count of mounted git worktree directory handles
   </footer>
 
   <script>
+    const GITHUB_REPO = 'soumyachk101/SwarmAI';
+    const FALLBACK_DOWNLOADS = {
+      mac_arm: 'https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_aarch64.dmg',
+      mac_intel: 'https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_aarch64.dmg',
+      win_exe: 'https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_x64-setup.exe',
+      win_msi: 'https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_x64_en-US.msi',
+      linux_appimage: 'https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_amd64.AppImage',
+      linux_deb: 'https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_amd64.deb',
+      all_releases: 'https://github.com/soumyachk101/SwarmAI/releases/latest'
+    };
+
     document.addEventListener("DOMContentLoaded", () => {
       detectPlatform();
+      fetchLatestRelease();
     });
 
     // OS Detection Script
-    function detectPlatform() {
+    function detectPlatform(macUrl, winUrl, linuxUrl) {
       const userAgent = window.navigator.userAgent.toLowerCase();
       const btn = document.getElementById('auto-download-btn');
       const text = document.getElementById('auto-download-text');
+      if (!btn || !text) return;
+
+      const macLink = macUrl || FALLBACK_DOWNLOADS.mac_arm;
+      const winLink = winUrl || FALLBACK_DOWNLOADS.win_exe;
+      const linuxLink = linuxUrl || FALLBACK_DOWNLOADS.linux_appimage;
 
       if (userAgent.includes('mac')) {
-        btn.href = 'releases/macOS/SwarmAI.dmg';
+        btn.href = macLink;
         text.innerText = 'Download for macOS (.dmg)';
       } else if (userAgent.includes('win')) {
-        btn.href = 'releases/windows/SwarmAI_Setup.exe';
+        btn.href = winLink;
         text.innerText = 'Download for Windows (.exe)';
       } else if (userAgent.includes('linux')) {
-        btn.href = 'releases/linux/SwarmAI.AppImage';
+        btn.href = linuxLink;
         text.innerText = 'Download for Linux (.AppImage)';
+      } else {
+        btn.href = macLink;
+        text.innerText = 'Download for macOS (.dmg)';
+      }
+    }
+
+    async function fetchLatestRelease() {
+      try {
+        const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!data.assets || !Array.isArray(data.assets)) return;
+
+        const macArm = data.assets.find(a => a.name.endsWith('.dmg') && (a.name.includes('aarch64') || a.name.includes('arm64'))) || data.assets.find(a => a.name.endsWith('.dmg'));
+        const macIntel = data.assets.find(a => a.name.endsWith('.dmg') && (a.name.includes('x64') || a.name.includes('x86_64'))) || macArm;
+        const winExe = data.assets.find(a => a.name.endsWith('.exe'));
+        const winMsi = data.assets.find(a => a.name.endsWith('.msi'));
+        const linuxAppImage = data.assets.find(a => a.name.endsWith('.AppImage'));
+        const linuxDeb = data.assets.find(a => a.name.endsWith('.deb'));
+
+        function updateBtn(id, asset, fallbackUrl) {
+          const el = document.getElementById(id);
+          if (!el) return;
+          if (asset && asset.browser_download_url) {
+            el.href = asset.browser_download_url;
+            const meta = el.querySelector('.os-file-meta');
+            if (meta && asset.size) {
+              meta.textContent = (asset.size / (1024 * 1024)).toFixed(1) + ' MB';
+            }
+          } else if (fallbackUrl) {
+            el.href = fallbackUrl;
+          }
+        }
+
+        updateBtn('download-macos-arm', macArm, FALLBACK_DOWNLOADS.mac_arm);
+        updateBtn('download-macos-intel', macIntel, FALLBACK_DOWNLOADS.mac_intel);
+        updateBtn('download-win-exe', winExe, FALLBACK_DOWNLOADS.win_exe);
+        updateBtn('download-win-msi', winMsi, FALLBACK_DOWNLOADS.win_msi);
+        updateBtn('download-linux-appimage', linuxAppImage, FALLBACK_DOWNLOADS.linux_appimage);
+        updateBtn('download-linux-deb', linuxDeb, FALLBACK_DOWNLOADS.linux_deb);
+
+        updateBtn('footer-download-macos', macArm, FALLBACK_DOWNLOADS.mac_arm);
+        updateBtn('footer-download-win', winExe, FALLBACK_DOWNLOADS.win_exe);
+        updateBtn('footer-download-linux', linuxAppImage, FALLBACK_DOWNLOADS.linux_appimage);
+
+        detectPlatform(macArm?.browser_download_url, winExe?.browser_download_url, linuxAppImage?.browser_download_url);
+
+        if (data.tag_name) {
+          document.querySelectorAll('.brand-badge').forEach(badge => {
+            badge.textContent = data.tag_name + ' PRO';
+          });
+        }
+      } catch (err) {
+        console.warn('Using default release download links:', err);
       }
     }
 
