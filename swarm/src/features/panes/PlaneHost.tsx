@@ -12,7 +12,7 @@ import {
   BoardLogo, BoardStrip, themeForKind, type StripItem,
   LeadCrown, BrandGlyph, cliBrand, shellBrand, AgentMark,
 } from "@swarm/board";
-import { FlowCanvas, FlowMark, useCanvasStore } from "@swarm/flow";
+import { FlowCanvas, FlowMark, useCanvasStore, SwarmTelemetryHUD } from "@swarm/flow";
 import { OpenVsxLogo, OpenVsxPane } from "@swarm/extension";
 import { invoke } from "@tauri-apps/api/core";
 import { AgentPane } from "@swarm/agents/ui";
@@ -159,13 +159,20 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
     { kind: "snap"; id: GridLayout } | { kind: "pane"; id: string } | null
   >(null);
 
-  // Auto-refit terminals whenever layout shape or count changes to eliminate CLI shape glitches
+  // Auto-refit terminals on multi-frame cadence whenever view mode, grid, or layout geometry changes
   useEffect(() => {
-    const handle = requestAnimationFrame(() => {
-      refitTerminals();
-    });
-    return () => cancelAnimationFrame(handle);
-  }, [agents.length, gridLayout, maximizedPane, activeWorkspaceId, fit, refitTerminals]);
+    refitTerminals();
+    const t1 = setTimeout(() => refitTerminals(), 40);
+    const t2 = setTimeout(() => refitTerminals(), 120);
+    const t3 = setTimeout(() => refitTerminals(), 250);
+    const t4 = setTimeout(() => refitTerminals(), 450);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      clearTimeout(t4);
+    };
+  }, [agents.length, gridLayout, maximizedPane, activeWorkspaceId, fit, view, canvasView, refitTerminals]);
   // Live cursor position. A ref, not state: the ghost is moved by writing
   // transform straight to the DOM (see below), and only the very first frame
   // of the drag reads this during render.
@@ -903,6 +910,11 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
               );
             })}
           </div>
+        )}
+
+        {/* Live Swarm Telemetry HUD also active on Board View */}
+        {!canvasView && count > 0 && (
+          <SwarmTelemetryHUD agents={flowAgentsMeta} />
         )}
 
         {/* Overflow hint — the PEEK sliver alone (~34px of the next row's

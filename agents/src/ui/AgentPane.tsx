@@ -1591,11 +1591,11 @@ export default function AgentPane({
               {agent.role && (
                 <RoleBadge role={agent.role} branchName={agent.branchName} />
               )}
-              <span className="truncate">{displayName}</span>
+              <span className="truncate max-w-[130px]" title={displayName}>{displayName}</span>
               {/* What this swarm is running — dynamically displays selected model & effort */}
-              {(currentModel || currentEffort) && paneWidth >= 280 && (
+              {(currentModel || currentEffort) && paneWidth >= 330 && (
                 <span
-                  className="shrink-0 rounded-lg border border-white/[0.16] bg-white/[0.08] px-2 py-0.5 text-[10px] font-mono text-zinc-200 font-semibold shadow-xs"
+                  className="shrink-0 rounded-md border border-white/[0.12] bg-white/[0.06] px-1.5 py-0.5 text-[9px] font-mono text-zinc-300 font-medium shadow-xs"
                   title={`Running ${currentModel}${currentEffort ? ` at ${currentEffort} effort` : ""}`}
                 >
                   {[currentModel.replace(" (1M Context)", " 1M").replace(" (1M)", " 1M"), currentEffort].filter(Boolean).join(" · ")}
