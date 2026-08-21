@@ -660,6 +660,7 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
     name: swarm.customName || swarm.cliName || swarm.cli || swarm.id,
     cli: swarm.cli,
     isLead: swarm.isLead,
+    status: agentStatuses[swarm.id] || "idle",
   }));
 
   return (

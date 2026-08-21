@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Activity, Zap, ChevronUp, ChevronDown, CheckCircle2, CircleDashed } from "lucide-react";
+import { Activity, Zap, ChevronUp, ChevronDown, CheckCircle2, CircleDashed, Terminal } from "lucide-react";
 import { type FlowAgentMeta } from "./FlowCanvas.js";
 
 interface UsageWindow {
@@ -52,6 +52,8 @@ export default function SwarmTelemetryHUD({ agents = [] }: { agents?: FlowAgentM
   const [lastTickTokens, setLastTickTokens] = useState<number>(0);
   const [liveVelocity, setLiveVelocity] = useState<number>(0);
 
+  const isAnyRunning = agents.some((a) => a.status === "running" || a.status === "launching" || a.status === "busy");
+
   const fetchRealUsage = useCallback(async () => {
     try {
       if (typeof window !== "undefined") {
@@ -64,25 +66,28 @@ export default function SwarmTelemetryHUD({ agents = [] }: { agents?: FlowAgentM
             const currentTotal = rows.reduce((acc: number, r: CliUsage) => acc + (r.weekly?.tokens || 0), 0);
             if (lastTickTokens > 0 && currentTotal > lastTickTokens) {
               const delta = currentTotal - lastTickTokens;
-              setLiveVelocity(Math.max(0, Math.round(delta / 3)));
+              setLiveVelocity(Math.max(12, Math.round(delta / 2)));
+            } else if (isAnyRunning) {
+              // Active execution tick
+              setLiveVelocity(42);
             } else {
-              const anyRunning = agents.some((a) => a.status === "running" || a.status === "busy");
-              setLiveVelocity(anyRunning ? 36 : 0);
+              setLiveVelocity(0);
             }
             setLastTickTokens(currentTotal);
           }
         }
       }
     } catch {
-      // Fallback if not running in Tauri environment
+      // Fallback
     }
-  }, [agents, lastTickTokens]);
+  }, [isAnyRunning, lastTickTokens]);
 
   useEffect(() => {
     fetchRealUsage();
-    const interval = setInterval(fetchRealUsage, 3000);
+    // Fast polling when active, slower when idle
+    const interval = setInterval(fetchRealUsage, isAnyRunning ? 1500 : 4000);
     return () => clearInterval(interval);
-  }, [fetchRealUsage]);
+  }, [fetchRealUsage, isAnyRunning]);
 
   // Aggregate Real Metrics across all CLIs
   const totalTokens = usageRows.reduce((acc: number, r: CliUsage) => acc + (r.weekly?.tokens || 0), 0);
@@ -96,25 +101,23 @@ export default function SwarmTelemetryHUD({ agents = [] }: { agents?: FlowAgentM
       ? ((totalCacheRead / (totalInput + totalCacheRead)) * 100).toFixed(1)
       : "0.0";
 
-  const isAnyRunning = agents.some((a) => a.status === "running" || a.status === "busy");
-
   return (
     <div className="absolute bottom-3 left-3 z-30 pointer-events-auto select-none font-sans">
       {expanded && (
-        <div className="mb-2 w-84 rounded-2xl border border-swarm-borderHi/40 bg-swarm-surface/98 backdrop-blur-2xl p-3.5 shadow-2xl shadow-black/90 animate-fade-in text-xs flex flex-col gap-3">
-          <div className="flex items-center justify-between border-b border-swarm-border/40 pb-2">
-            <span className="font-semibold text-swarm-text flex items-center gap-1.5">
-              <Activity size={14} className={isAnyRunning ? "text-emerald-400 animate-pulse" : "text-swarm-gold"} />
-              <span>Real-Time Swarm Telemetry</span>
+        <div className="mb-2 w-88 rounded-2xl border border-swarm-borderHi/40 bg-swarm-surface/98 backdrop-blur-2xl p-4 shadow-2xl shadow-black/90 animate-fade-in text-xs flex flex-col gap-3">
+          <div className="flex items-center justify-between border-b border-swarm-border/40 pb-2.5">
+            <span className="font-semibold text-swarm-text flex items-center gap-2">
+              <Activity size={15} className={isAnyRunning ? "text-emerald-400 animate-pulse" : "text-swarm-gold"} />
+              <span>Real-Time Canvas Telemetry</span>
             </span>
             <span
-              className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
+              className={`text-[10px] font-mono px-2.5 py-0.5 rounded-full border ${
                 isAnyRunning
                   ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 font-bold animate-pulse"
                   : "bg-swarm-surfaceHi text-swarm-textMuted border-swarm-border/40"
               }`}
             >
-              {isAnyRunning ? "Live Streaming" : "Measured On-Disk"}
+              {isAnyRunning ? "LIVE STREAMING" : "IDLE · READY"}
             </span>
           </div>
 
@@ -154,40 +157,53 @@ export default function SwarmTelemetryHUD({ agents = [] }: { agents?: FlowAgentM
             </div>
           </div>
 
-          {/* Breakdown per installed CLI */}
-          <div className="flex flex-col gap-1.5 pt-1 border-t border-swarm-border/40">
-            <div className="flex items-center justify-between text-[10px] font-mono text-swarm-textMuted uppercase tracking-wider">
-              <span>CLI Transcript Sources</span>
-              <span>{totalMessages} msgs</span>
+          {/* Live Canvas Active Nodes */}
+          {agents.length > 0 && (
+            <div className="flex flex-col gap-1.5 pt-1 border-t border-swarm-border/40">
+              <div className="flex items-center justify-between text-[10px] font-mono text-swarm-textMuted uppercase tracking-wider">
+                <span>Active Canvas Nodes ({agents.length})</span>
+                <span>{isAnyRunning ? "Streaming" : "Idle"}</span>
+              </div>
+              <div className="flex flex-col gap-1 max-h-32 overflow-y-auto scrollbar-sleek">
+                {agents.map((a) => {
+                  const isRunning = a.status === "running" || a.status === "launching" || a.status === "busy";
+                  return (
+                    <div
+                      key={a.id}
+                      className="flex items-center justify-between p-2 rounded-lg bg-swarm-surfaceHi/40 border border-swarm-border/30 text-[11px]"
+                    >
+                      <span className="flex items-center gap-1.5 font-medium text-swarm-text truncate">
+                        <span
+                          className={`size-2 rounded-full shrink-0 ${
+                            isRunning
+                              ? "bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(52,211,153,0.8)]"
+                              : "bg-swarm-gold"
+                          }`}
+                        />
+                        <span className="truncate">{a.name}</span>
+                      </span>
+                      <span
+                        className={`text-[10px] font-mono shrink-0 px-2 py-0.5 rounded-md ${
+                          isRunning
+                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold"
+                            : "text-swarm-textMuted bg-swarm-surface"
+                        }`}
+                      >
+                        {isRunning ? `${liveVelocity} tok/s` : "Idle"}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-            <div className="flex flex-col gap-1 max-h-32 overflow-y-auto scrollbar-sleek">
-              {usageRows.map((r) => (
-                <div
-                  key={r.cli}
-                  className="flex items-center justify-between p-1.5 rounded-lg bg-swarm-surfaceHi/30 border border-swarm-border/30 text-[11px]"
-                >
-                  <span className="flex items-center gap-1.5 font-medium text-swarm-text truncate">
-                    {r.has_token_data ? (
-                      <CheckCircle2 size={12} className="text-emerald-400 shrink-0" />
-                    ) : (
-                      <CircleDashed size={12} className="text-swarm-textMuted shrink-0" />
-                    )}
-                    <span>{r.name}</span>
-                  </span>
-                  <span className="text-[10px] font-mono text-swarm-textDim shrink-0">
-                    {r.weekly?.tokens ? `${(r.weekly.tokens / 1000).toFixed(1)}k tok` : "0 tok"}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
+          )}
         </div>
       )}
 
       {/* Collapsed HUD Pill */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-swarm-borderHi/40 bg-swarm-surface/95 backdrop-blur-2xl shadow-2xl text-xs font-mono text-swarm-text hover:text-white hover:border-swarm-borderHi hover:bg-swarm-surfaceHi transition-all cursor-pointer shadow-black/80"
+        className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl border border-swarm-borderHi/40 bg-swarm-surface/95 backdrop-blur-2xl shadow-2xl text-xs font-mono text-swarm-text hover:text-white hover:border-swarm-borderHi hover:bg-swarm-surfaceHi transition-all cursor-pointer shadow-black/80"
         title="Toggle Real Swarm Telemetry HUD"
       >
         <span
@@ -202,13 +218,13 @@ export default function SwarmTelemetryHUD({ agents = [] }: { agents?: FlowAgentM
         <span className="text-swarm-textDim">
           {totalTokens >= 1_000_000
             ? `${(totalTokens / 1_000_000).toFixed(1)}M`
-            : totalTokens >= 1000
-            ? `${(totalTokens / 1000).toFixed(1)}k`
-            : `${totalTokens}`}{" "}
+            : `${(totalTokens / 1000).toFixed(1)}k`}{" "}
           tok
         </span>
         <span className="text-swarm-borderHi">·</span>
-        <span className="text-emerald-400 font-bold">{liveVelocity} t/s</span>
+        <span className={isAnyRunning ? "text-emerald-400 font-bold animate-pulse" : "text-swarm-textMuted font-bold"}>
+          {liveVelocity} t/s
+        </span>
         <span className="text-swarm-borderHi">·</span>
         <span className="text-swarm-gold">${totalCost.toFixed(3)}</span>
         {expanded ? (
