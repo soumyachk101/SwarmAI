@@ -33,10 +33,11 @@ export default function SwarmTelemetryHUD({ agents = [] }: { agents?: FlowAgentM
   const [sessionCost, setSessionCost] = useState<number>(0);
   const [cacheHitPct, setCacheHitPct] = useState<string>("0.0");
 
-  // Draggable floating position
+  // Draggable floating position (persisted, zero-lag direct DOM drag)
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
+  const currentPosRef = useRef<{ x: number; y: number }>({ x: 12, y: 12 });
   const dragStartRef = useRef<{ startX: number; startY: number; posX: number; posY: number; target: "pill" | "header" }>({
     startX: 0,
     startY: 0,
@@ -44,6 +45,7 @@ export default function SwarmTelemetryHUD({ agents = [] }: { agents?: FlowAgentM
     posY: 0,
     target: "pill",
   });
+  const rafRef = useRef<number | null>(null);
 
   const baselineTokensRef = useRef<number | null>(null);
   const lastTokensRef = useRef<number>(0);
@@ -108,7 +110,7 @@ export default function SwarmTelemetryHUD({ agents = [] }: { agents?: FlowAgentM
 
   useEffect(() => {
     fetchRealUsage();
-    const interval = setInterval(fetchRealUsage, isAnyRunning ? 1500 : 3500);
+    const interval = setInterval(fetchRealUsage, isAnyRunning ? 2000 : 4000);
     return () => clearInterval(interval);
   }, [fetchRealUsage, isAnyRunning]);
 
@@ -120,7 +122,7 @@ export default function SwarmTelemetryHUD({ agents = [] }: { agents?: FlowAgentM
     setLiveVelocity(0);
   };
 
-  // Drag start handler (works on both pill and expanded card header)
+  // High-performance 120fps Direct DOM Drag Handlers
   const startDrag = (e: React.PointerEvent, target: "pill" | "header") => {
     if ((e.target as HTMLElement).closest("button")) return;
 
@@ -132,6 +134,7 @@ export default function SwarmTelemetryHUD({ agents = [] }: { agents?: FlowAgentM
     const currentY = position ? position.y : rect.top;
 
     isDraggingRef.current = false;
+    currentPosRef.current = { x: currentX, y: currentY };
     dragStartRef.current = {
       startX: e.clientX,
       startY: e.clientY,
@@ -149,25 +152,42 @@ export default function SwarmTelemetryHUD({ agents = [] }: { agents?: FlowAgentM
     const dx = e.clientX - dragStartRef.current.startX;
     const dy = e.clientY - dragStartRef.current.startY;
 
-    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+    if (!isDraggingRef.current && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) {
       isDraggingRef.current = true;
     }
 
-    if (isDraggingRef.current) {
+    if (isDraggingRef.current && containerRef.current) {
       const cardWidth = expanded ? 360 : 260;
-      const cardHeight = expanded ? 280 : 40;
+      const cardHeight = expanded ? 280 : 42;
       const newX = Math.max(8, Math.min(window.innerWidth - cardWidth, dragStartRef.current.posX + dx));
       const newY = Math.max(8, Math.min(window.innerHeight - cardHeight, dragStartRef.current.posY + dy));
-      setPosition({ x: newX, y: newY });
+
+      currentPosRef.current = { x: newX, y: newY };
+
+      // Direct style write: zero React re-renders during active drag
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => {
+        if (containerRef.current) {
+          containerRef.current.style.position = "fixed";
+          containerRef.current.style.left = `${newX}px`;
+          containerRef.current.style.top = `${newY}px`;
+          containerRef.current.style.bottom = "auto";
+        }
+      });
     }
   };
 
   const onDragEnd = (e: React.PointerEvent) => {
     if (!dragStartRef.current.startX) return;
 
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+
     if (!isDraggingRef.current && dragStartRef.current.target === "pill") {
-      // It was a click on the collapsed pill -> toggle expanded
+      // It was a pure click -> toggle expanded state
       setExpanded((prev) => !prev);
+    } else if (isDraggingRef.current) {
+      // Finalize position to React state once at end of drag
+      setPosition(currentPosRef.current);
     }
 
     isDraggingRef.current = false;
@@ -187,7 +207,7 @@ export default function SwarmTelemetryHUD({ agents = [] }: { agents?: FlowAgentM
     <div
       ref={containerRef}
       style={containerStyle}
-      className="z-50 pointer-events-auto select-none font-sans flex flex-col items-start"
+      className="z-50 pointer-events-auto select-none font-sans flex flex-col items-start will-change-transform touch-none"
     >
       {expanded && (
         <div className="mb-2 w-88 rounded-2xl border border-swarm-borderHi/50 bg-swarm-surface/98 backdrop-blur-2xl p-4 shadow-2xl shadow-black/90 animate-fade-in text-xs flex flex-col gap-3">
@@ -207,7 +227,7 @@ export default function SwarmTelemetryHUD({ agents = [] }: { agents?: FlowAgentM
             <div className="flex items-center gap-1.5">
               <button
                 onClick={handleResetSession}
-                className="p-1 rounded-md text-swarm-textMuted hover:text-swarm-text hover:bg-swarm-surfaceHi transition-colors"
+                className="p-1 rounded-md text-swarm-textMuted hover:text-swarm-text hover:bg-swarm-surfaceHi transition-colors cursor-pointer"
                 title="Reset active project session counter"
               >
                 <RotateCcw size={12} />
@@ -223,7 +243,7 @@ export default function SwarmTelemetryHUD({ agents = [] }: { agents?: FlowAgentM
               </span>
               <button
                 onClick={() => setExpanded(false)}
-                className="p-1 rounded-md text-swarm-textMuted hover:text-swarm-text hover:bg-swarm-surfaceHi transition-colors ml-0.5"
+                className="p-1 rounded-md text-swarm-textMuted hover:text-swarm-text hover:bg-swarm-surfaceHi transition-colors ml-0.5 cursor-pointer"
                 title="Collapse HUD"
               >
                 <X size={12} />
