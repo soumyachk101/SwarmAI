@@ -1,418 +1,264 @@
-# Swarm AI — Comprehensive Feature & Improvement Report
+# Report: Feature Improvements for Multi-Agent AI Development Platforms
 
-**Date:** 2026-08-24 
-**Scope:** Multi-agent AI orchestration platform (Tauri desktop app, React, Node.js, Rust) 
-**Goal:** Identify modifications and new features that make the platform more developer-friendly, user-friendly, and impactful for agent assignment workflows
+**Prepared for:** Swarm AI / Pheromone Platform
+**Date:** 2026-08-24
+**Scope:** Agent assignment workflows, multi-agent orchestration, collaboration features, UI/UX improvements, productivity features, developer experience enhancements
 
 ---
 
 ## Executive Summary
 
-Swarm AI already has a strong foundation — shared project memory (Pheromone), git worktree isolation, Lead planner, SwarmMind orchestrator, and 10+ CLI agent adapters. This report identifies **high-impact improvements** across 6 categories:
+The AI development tooling landscape in 2025–2026 is shifting rapidly from single-agent assistants toward multi-agent swarms. Tools like Claude Code CLI, Aider, OpenHands, Cursor, Windsurf, and Gemini CLI have each carved out niches, but none fully solves the problem of **coordinating multiple AI agents on a shared codebase**. The biggest gaps are in: agent lifecycle management (spawning, delegating, retiring), cross-agent context handoffs, role-based task assignment, real-time collaboration visibility, and developer control over autonomous behavior.
 
-| Category | Priority Features | Expected Impact |
-|----------|------------------|-----------------|
-| **Agent Assignment UX** | Natural language task creation, visual agent pairing, one-click dispatch | High — reduces friction at the core workflow |
-| **Observability & Transparency** | Real-time agent status dashboard, live log streaming, progress indicators | High — developer trust and debugging |
-| **Safety & Guardrails** | Granular permission model, approval gates, audit logs, sandboxing | Critical — fixes C-1/C-2 from audit |
-| **Collaboration Features** | Agent-to-agent messaging UI, handoff visualization, shared notes | Medium — improves multi-agent coordination |
-| **Productivity Enhancements** | Task templates, agent presets, keyboard shortcuts, batch operations | Medium — speeds up repeat workflows |
-| **Developer Experience** | Better error messages, recovery flows, offline mode, plugin marketplace | Medium — reduces cognitive load |
+This report identifies **5 priority areas** with **25+ actionable feature recommendations**, ranked by impact and implementation effort. The highest-value quick wins are: a visual agent board with drag-and-drop task assignment, improved handoff protocol between agents, MCP tool orchestration across agents, and agent role/persona templates. Medium-term investments should focus on swarm intelligence patterns (consensus, peer review, leader election) and a unified terminal experience. Long-term bets include autonomous goal decomposition, self-healing agent swarms, and natural-language task assignment.
 
 ---
 
-## Part 1: Critical Fixes (Block These Before Adding Features)
+## 1. Current Landscape
 
-From the existing AUDIT-REPORT.md, these must be addressed first:
+### 1.1 Existing Tools — What They Do Well
 
-### 1.1 Fix Hardcoded `bypassPermissions` (CRITICAL)
-- **Problem:** Every spawned agent gets ALL permission gates removed — no audit trail, no opt-in
-- **Fix:** Make permission mode configurable per-task. Default to standard mode. Add an explicit `--allow-dangerous` flag the user must manually enable
-- **Impact:** Security vulnerability fix; also improves UX by making agent behavior predictable
+| Tool | Strengths | Weaknesses |
+|------|-----------|------------|
+| **Claude Code CLI** | Best-in-class terminal UX, extended thinking, MCP tool use, permission modes | Single-agent only, no native swarm/board |
+| **Aider** | Git-native (commits per change), multi-file editing, model flexibility | Terminal-only, no visual board, limited orchestration |
+| **OpenHands** | Full software-engineering agent (web browsing, shell, code) | Heavy, slow, single-agent focus |
+| **Cursor** | IDE-native, autocomplete + chat, agent mode | Closed-source, limited extensibility |
+| **Windsurf** | IDE-native "flow" paradigm, agentic actions | Newer, smaller ecosystem |
+| **Gemini CLI** | Free tier, long context, Google ecosystem | Fewer integrations, less mature |
+| **Codex CLI** | OpenAI's agentic CLI, sandboxed execution | Limited availability, early-stage |
 
-### 1.2 Fix Lead MCP Sync Polling Loop (CRITICAL)
-- **Problem:** `readFileSync` in a 150ms loop blocks the Node event loop
-- **Fix:** Use `fs.watch()` or `fswatch` event-driven approach for message polling
-- **Impact:** App performance under load; eliminates hangs when WebSocket/IPC operations compete for the thread
+### 1.2 What's Missing Across the Board
 
-### 1.3 Fix Path Injection on Windows (HIGH)
-- **Problem:** `execSync` with string interpolation in `whisper-cpp.ts` allows command injection
-- **Fix:** Use `execFileSync` with argument array
-- **Impact:** Security fix for Windows users
-
----
-
-## Part 2: Agent Assignment UX Improvements
-
-### 2.1 Natural Language Task Creation (HIGH Priority)
-
-**Current state:** Users type goals into Lead dock → Lead breaks them down → shows draft cards → user approves → SwarmMind dispatches.
-
-**Improvement:** Allow users to create tasks directly in natural language without waiting for Lead:
-- Quick-add input on the Board: "Fix the login timeout bug in auth.service.ts"
-- Auto-suggest: CLI agent, role (builder/reviewer/scout), and affected files
-- One-click confirmation dispatches immediately
-
-**Why it matters:** Reduces the Lead dependency for simple tasks. Users who know what they want shouldn't need an AI planner as an intermediary.
-
-### 2.2 Visual Agent Pairing & Task Cards (HIGH Priority)
-
-**Current state:** Task cards show basic info (title, status, description).
-
-**Improvement:**
-- Show assigned agent avatar/icon on each card
-- Color-code by role (Builder=green, Reviewer=blue, Scout=amber, Coordinator=purple)
-- Dependency lines between cards (visual graph of task relationships)
-- Progress bar per task (agent output tokens, files changed, elapsed time)
-
-**Why it matters:** At a glance, developers understand who's doing what and which tasks block others. This is the #1 UX pattern in tools like Linear and Jira that developers already know.
-
-### 2.3 One-Click Reassign / Re-prioritize (MEDIUM Priority)
-
-**Current state:** Tasks flow through a fixed pipeline: Backlog → Todo → In Progress → Review → Done.
-
-**Improvement:**
-- Drag-and-drop reassignment between agents (not just columns)
-- Priority slider on each card (P0/P1/P2/P3)
-- Quick "move to top of queue" button
-- Blocked-on indicator (shows which dependency is holding this task)
-
-**Why it matters:** Real projects need dynamic re-prioritization. Static pipelines break when something urgent comes in.
-
-### 2.4 Agent Workload Balancing (MEDIUM Priority)
-
-**Current state:** SwarmMind dispatches based on file locks and dependencies, not agent capacity.
-
-**Improvement:**
-- Show agent workload (tasks assigned, tokens used, time active)
-- SwarmMind auto-balances: if Agent A has 3 tasks and Agent B has 0, prefer B for new tasks
-- "Busy" indicator on agent panes when they're actively processing
-
-**Why it matters:** Prevents one agent from becoming a bottleneck while others idle.
+1. **No standard for multi-agent coordination** — Every tool is single-agent. Swarm-level coordination (delegation, handoff, consensus) is absent from mainstream tools.
+2. **No visual task-to-agent mapping** — Developers cannot visually see which agent owns which task or file.
+3. **Fragmented context** — Each agent has its own context window; cross-agent knowledge transfer is manual and lossy.
+4. **No role-based specialization** — Agents are generic; there's no concept of "frontend agent," "backend agent," "reviewer," "tester."
+5. **Limited observability** — Debugging multi-agent workflows is like debugging distributed systems without tracing.
 
 ---
 
-## Part 3: Observability & Transparency
+## 2. Priority 1: Agent Assignment & Orchestration
 
-### 3.1 Real-Time Agent Status Dashboard (HIGH Priority)
+These features give developers direct control over which agent does what, when, and how.
 
-**Current state:** Agents appear as terminal panes. Status is visible only by watching the pane.
+### 2.1 Visual Agent Board (Kanban-style)
+- **What:** A board view (Backlog → Todo → In Progress → Review → Done) where each card is a task or subtask.
+- **How:** Drag-and-drop cards onto agent panes to assign. Color-coded by agent role. Filter by agent, priority, or status.
+- **Impact:** High — makes agent workload immediately visible; reduces the "who's doing what" coordination tax.
+- **Effort:** Medium — requires board UI + integration with agent pane lifecycle.
+- **Already present in your codebase:** `pheromone-mcp` has task cards and a board system. This feature is partially built.
 
-**Improvement:**
-- Dedicated "Swarm" plane showing all active agents in a grid
-- Per-agent: status badge (idle/thinking/writing/error), task name, elapsed time, tokens used
-- Click to expand → shows last 5 actions, current file being edited
-- Global view: total tasks, completion rate, estimated time to finish
+### 2.2 Role-Based Agent Templates
+- **What:** Pre-configured agent personas with specialized , model preferences, and tool sets.
+- **Examples:**
+ - `frontend-dev` → React/Vue specialist, uses browser tools, prefers Claude Sonnet
+ - `backend-dev` → API/database specialist, uses shell + DB tools, prefers Opus for complex logic
+ - `reviewer` → Code review persona, uses git diff tools, prefers Haiku for speed
+ - `tester` → Test-writing specialist, uses test framework tools
+ - `architect` → High-level design, prefers extended thinking models
+- **Impact:** High — reduces prompt engineering burden; agents start productive immediately.
+- **Effort:** Low-Medium — just a template system + UI for selection.
 
-**Why it matters:** Developers need to know "is the swarm making progress?" without watching 6 terminal panes. This is the single most requested feature in multi-agent tools.
+### 2.3 Intelligent Task Decomposition
+- **What:** When a user submits a large task (e.g., "Add user authentication"), the system automatically breaks it into subtasks and assigns them to appropriate agents.
+- **How:** Use an LLM to decompose the task, then use the board system to create cards and assign them.
+- **Impact:** High — transforms "I need to write 5 files" into "5 agents work in parallel."
+- **Effort:** Medium — requires a decomposition prompt + board integration.
 
-### 3.2 Live Log Streaming & Search (HIGH Priority)
+### 2.4 Agent-to-Agent Delegation Protocol
+- **What:** Agents can hand off subtasks to other agents with structured handoff messages (context, constraints, expected output).
+- **How:** When agent A encounters a task outside its expertise, it sends a `handoff` event to the swarm. Agent B picks it up with full context.
+- **Impact:** High — eliminates the "I can't do this, you do it" dead-end; enables fluid specialization.
+- **Effort:** Medium — requires a message protocol + queue system.
+- **Already present in your codebase:** `handoffQueue.ts`, `excerptForHandoff` exist. This is being built.
 
-**Current state:** Agent output streams to terminal panes only. No centralized logging.
-
-**Improvement:**
-- Central log view that captures output from ALL agents
-- Filter by agent, task, log level (info/warning/error)
-- Search across all agent logs with Pheromone (existing search infrastructure)
-- Pin/unpin important log entries
-- Export logs for debugging
-
-**Why it matters:** When something goes wrong, developers need to find the error across multiple agents. Terminal panes make this impossible at scale.
-
-### 3.3 Agent Thought Visualization (MEDIUM Priority)
-
-**Current state:** Agent reasoning is hidden inside the terminal.
-
-**Improvement:**
-- When Claude Code (or other agents) emits thinking blocks, surface them in a collapsible panel
-- Show "Currently planning..." / "Writing file X..." / "Running test Y" as structured status updates
-- Parse agent output for tool calls (Read, Write, Bash, Edit) and display as an action timeline
-
-**Why it matters:** Developers want to understand agent reasoning without reading full terminal output. This reduces anxiety about what agents are doing.
-
-### 3.4 Diff Preview Before Merge (MEDIUM Priority)
-
-**Current state:** SwarmMind merges worktrees automatically after approval. Diff is generated but not visually presented.
-
-**Improvement:**
-- Side-by-side diff view before merge approval
-- Per-file diff with syntax highlighting
-- "Accept all" / "Review file by file" / "Reject" buttons
-- Show which agent wrote each change
-
-**Why it matters:** The #1 developer concern is "what did this agent change?" A visual diff before merge builds trust.
+### 2.5 Swarm Mode: Parallel Agent Execution
+- **What:** Spawn multiple agents simultaneously on independent subtasks, then merge results.
+- **How:** User selects N agents + a decomposition strategy (parallel, pipeline, consensus). Each agent gets its own git worktree (already supported).
+- **Impact:** High — linear speedup for parallelizable work.
+- **Effort:** Low — your codebase already has worktree isolation per agent.
 
 ---
 
-## Part 4: Safety & Guardrails (Beyond the Audit Fixes)
+## 3. Priority 2: Developer Experience & UX
 
-### 4.1 Granular Permission Modes (HIGH Priority)
+### 3.1 Unified Terminal Experience
+- **Problem:** Currently, each agent pane has its own terminal. Switching between them is jarring.
+- **Solution:** A single terminal surface that can broadcast commands to all agents, or route to a specific one. Tab-based or split-pane routing.
+- **Impact:** High — reduces cognitive load when working with 3+ agents.
 
-**Current state:** Binary — either bypassPermissions or not.
+### 3.2 Agent Status HUD
+- **What:** A persistent heads-up display showing: which agents are active, what they're working on, token usage, time elapsed, and estimated completion.
+- **How:** Floating pill (already built) + expanded card view. Color-coded status (idle, thinking, writing, error).
+- **Impact:** Medium-High — gives the developer an at-a-glance view of swarm health.
+- **Already present:** Your HUD system (`HUD pill`, velocity tracking) is already built and impressive.
 
-**Improvement:**
-- 4 permission levels per agent:
- - **Read-only:** Can read files, search, but not write or execute
- - **Workspace:** Can read/write within the project folder only
- - **Network-allowed:** Can also make HTTP requests (for API calls)
- - **Full access:** Can run shell commands, install packages, modify system
-- Per-task permission assignment (task board shows current permission level)
-- Permission escalation requires user approval with one-click button
+### 3.3 Smart Agent Naming & Organization
+- **What:** Allow users to name agents meaningfully ("Auth-Refactor-Bot", "Bug-Fixer-1") and group them into projects/workspaces.
+- **How:** Simple rename UI (already present) + workspace folders (partially present).
+- **Impact:** Medium — reduces confusion when managing 5+ agents.
 
-**Why it matters:** Different tasks need different trust levels. A "scout" agent should never have write access. A "builder" shouldn't run arbitrary shell commands without approval.
+### 3.4 One-Click Agent Spawning
+- **What:** A toolbar button or keyboard shortcut to spawn a new agent with pre-configured role, model, and working directory.
+- **How:** "Spawn Frontend Agent" → creates a new pane with the frontend-dev role template, correct cwd, and appropriate model.
+- **Impact:** High — reduces the friction of setting up a new agent from ~30 seconds to ~2 seconds.
 
-### 4.2 Human-in-the-Loop Checkpoints (MEDIUM Priority)
-
-**Current state:** Human approves the plan once, then agents run autonomously.
-
-**Improvement:**
-- Configurable checkpoints: agent pauses after N tool calls, after file writes, or at task completion
-- "Approve / Modify / Cancel" options at each checkpoint
-- Suggested action preview: "Agent wants to run `npm test` — approve?"
-
-**Why it matters:** Especially for longer tasks, developers want to steer the agent mid-flight without killing the whole process.
-
-### 4.3 Rollback & Recovery (MEDIUM Priority)
-
-**Current state:** If a merge goes wrong, developer must manually fix.
-
-**Improvement:**
-- Auto-commit before each agent starts work
-- One-click rollback to pre-agent state
-- Agent session replay: re-run the agent's actions step by step
-- Failed task → automatic branch preservation with clear label
-
-**Why it matters:** Developers need confidence that they can undo anything an agent does. Without rollback, they'll never trust agents with real code.
-
-### 4.4 Sandboxed Execution Environment (MEDIUM Priority)
-
-**Current state:** Agents run with full system access (via bypassPermissions).
-
-**Improvement:**
-- Option to run agents in a containerized sandbox (Docker/Podman)
-- Network restrictions: block external connections for read-only agents
-- Filesystem sandbox: agents can only access the project directory
-- Auto-cleanup: sandbox destroyed when agent finishes
-
-**Why it matters:** For teams or less-trusted agents, sandboxing prevents accidental (or malicious) system changes.
+### 3.5 Auto-Save & Restore Sessions
+- **What:** Automatically persist agent sessions (transcripts, working directory, model config) so developers can resume exactly where they left off.
+- **How:** Save session state to localStorage/IndexedDB on interval + on close. Restore on app launch.
+- **Impact:** Medium — prevents context loss across app restarts.
 
 ---
 
-## Part 5: Collaboration Features
+## 4. Priority 3: Collaboration Features
 
-### 5.1 Agent Messaging UI (MEDIUM Priority)
+### 4.1 Cross-Agent Context Sharing
+- **What:** A shared memory pool (like Pheromone's project memory) that all agents can read from and write to, with versioning and conflict resolution.
+- **How:** Each agent can `memorize()` facts into the shared pool. Other agents can `recall()` them. Use a simple key-value store with timestamps.
+- **Impact:** High — eliminates redundant work (agent B doesn't re-discover what agent A already found).
 
-**Current state:** Agents communicate via file-based handoffs and JSONL message bus. No visual interface.
+### 4.2 Agent Communication Bus
+- **What:** A pub/sub message bus where agents can broadcast updates, ask questions, and respond to each other without developer intervention.
+- **How:** Events like `agent:completed`, `agent:blocked`, `agent:needs-input` flow through the bus. Other agents subscribe to relevant events.
+- **Impact:** Medium-High — enables emergent swarm intelligence patterns.
 
-**Improvement:**
-- Show message bus activity in real-time
-- Click on a message → see full handoff content
-- Agent-to-agent messages appear as notification cards
-- Thread view: follow a conversation between two agents
+### 4.3 Conflict Detection & Resolution
+- **What:** When two agents edit the same file, the system detects the conflict and either auto-merges or asks the developer to resolve.
+- **How:** Monitor git status in each agent's worktree. If two agents modify the same file, flag it.
+- **Impact:** High — prevents silent data loss when agents work in parallel.
 
-**Why it matters:** The message bus exists but is invisible. Making it visible helps developers understand how agents coordinate.
+### 4.4 Peer Review Between Agents
+- **What:** After agent A completes a task, agent B (the "reviewer" role) automatically reviews the changes.
+- **How:** Reviewer agent reads the diff, checks for bugs/style issues, and either approves or requests changes.
+- **Impact:** Medium-High — catches errors before they reach the developer.
 
-### 5.2 Shared Scratchpad / Whiteboard (LOW-MEDIUM Priority)
-
-**Current state:** Agents share memory via Pheromone, but there's no shared scratch space.
-
-**Improvement:**
-- Shared markdown scratchpad per project
-- Agents can read/write to scratchpad (like a shared notebook)
-- Human can pin important notes that all agents see
-- Scratchpad changes appear as live updates
-
-**Why it matters:** Sometimes you want to jot a quick note ("don't touch the auth module") that every agent should see. Pheromone is for structured knowledge; scratchpad is for ephemeral context.
-
-### 5.3 Agent Profile & Specialization (LOW-MEDIUM Priority)
-
-**Current state:** All agents are generic — same capabilities regardless of task.
-
-**Improvement:**
-- Create named agent profiles: "Frontend Specialist", "Test Writer", "Security Reviewer"
-- Each profile has: preferred CLI, role, file patterns it owns, tool permissions
-- Profiles persist across sessions and can be shared between projects
-- Auto-suggest profile based on task description
-
-**Why it matters:** In real teams, people specialize. Giving agents specializations improves quality and reduces conflicts.
+### 4.5 Shared Task Commentary
+- **What:** Allow the developer to leave comments on task cards that all agents can see and respond to.
+- **How:** Comment thread on each board card. Agents can read and reply.
+- **Impact:** Medium — improves human-AI coordination.
 
 ---
 
-## Part 6: Productivity Enhancements
+## 5. Priority 4: Productivity & Automation
 
-### 6.1 Task Templates (MEDIUM Priority)
+### 5.1 Smart Context Injection
+- **What:** Automatically inject relevant project context (recent files, git history, project structure) into each agent's prompt.
+- **How:** On agent spawn, scan the project for `README.md`, `CLAUDE.md`, recent commits, and active files. Inject into the .
+- **Impact:** High — agents understand the project faster, produce better results.
 
-**Current state:** Every task is created fresh from Lead's decomposition.
+### 5.2 Task Templates & Playbooks
+- **What:** Pre-built task sequences that automate common workflows.
+- **Examples:**
+ - "Refactor a module" → spawn reviewer → spawn refactorer → spawn tester → merge
+ - "Fix a bug" → spawn debugger → spawn fixer → spawn tester → merge
+ - "Add a feature" → spawn planner → spawn implementer → spawn reviewer → merge
+- **Impact:** High — one-click complex workflows.
 
-**Improvement:**
-- Save task configurations as templates: "Bug fix workflow", "Feature implementation", "Code review"
-- Templates include: CLI agent, role, permission level, required steps
-- One-click template application: select template, fill in description, dispatch
-- Community templates (import/export)
+### 5.3 Intelligent Agent Scaling
+- **What:** Automatically spawn additional agents when the current ones are overloaded, and retire idle agents.
+- **How:** Monitor token usage, response time, and task queue depth. Scale up/down accordingly.
+- **Impact:** Medium — optimizes resource usage.
 
-**Why it matters:** Developers repeat the same workflows. Templates reduce setup time from minutes to seconds.
+### 5.4 Persistent Project Memory
+- **What:** A project-level knowledge base that accumulates over time (decisions, patterns, gotchas, team conventions).
+- **How:** Agents automatically memorize important facts. The project memory grows with each session.
+- **Impact:** High — the platform gets smarter with use.
+- **Already present:** Pheromone's project memory system is the foundation for this.
 
-### 6.2 Keyboard-Driven Workflow (MEDIUM Priority)
-
-**Current state:** Mouse-heavy UI for task management and agent dispatch.
-
-**Improvement:**
-- Command palette (Cmd+K) for all actions:
- - "Create task: fix login bug"
- - "Dispatch all ready tasks"
- - "Approve task #3"
- - "Switch to Agent 2 pane"
-- Keyboard shortcuts for board navigation (j/k to move between cards, Enter to expand)
-- Voice commands for common actions (via existing Whisper infrastructure)
-
-**Why it matters:** Developers prefer keyboard-driven workflows. A command palette is the #1 UX pattern in developer tools (VS Code, Linear, Slack).
-
-### 6.3 Batch Operations (LOW-MEDIUM Priority)
-
-**Current state:** One task at a time for approve/reject/retry.
-
-**Improvement:**
-- Select multiple tasks → batch approve/reject
-- "Approve all ready" button
-- Bulk reassign tasks to different agents
-- "Retry all failed tasks" with one click
-
-**Why it matters:** When you have 10 tasks in review, approving one by one is tedious.
-
-### 6.4 Smart Notifications (LOW Priority)
-
-**Current state:** No notification system for agent events.
-
-**Improvement:**
-- Desktop notification when: agent finishes, task needs review, agent encounters error
-- Notification grouping: "3 tasks completed" instead of 3 separate notifications
-- Quiet hours: don't notify during focus time
-- Per-agent notification preferences
-
-**Why it matters:** Developers shouldn't have to watch the board constantly. Smart notifications let them focus and get alerted only when action is needed.
+### 5.5 Keyboard-Driven Workflow
+- **What:** Full keyboard navigation for all actions: spawn agents, assign tasks, switch panes, approve/reject changes.
+- **How:** Vim-style or VS Code-style keybindings. Power-user focused.
+- **Impact:** Medium — dramatically speeds up expert users.
 
 ---
 
-## Part 7: Plugin & Extension Ecosystem
+## 6. Priority 5: Integration & Extensibility
 
-### 7.1 Plugin Marketplace (LOW-MEDIUM Priority)
+### 6.1 MCP Tool Orchestration
+- **What:** Allow agents to share MCP tools. If agent A has access to a database MCP, agent B can use it too.
+- **How:** Central MCP config that all agents inherit from, with per-agent overrides.
+- **Impact:** Medium-High — eliminates redundant MCP setup per agent.
 
-**Current state:** SwarmPlugins registry exists but no UI for browsing/installing.
+### 6.2 Plugin System
+- **What:** A plugin API for extending agent capabilities (custom tools, custom roles, custom workflows).
+- **How:** JavaScript/TypeScript plugins with a well-defined API surface.
+- **Impact:** Medium — enables community contributions.
 
-**Improvement:**
-- Marketplace pane with categories: "Productivity", "Agents", "Integrations", "Themes"
-- One-click install from marketplace
-- Plugin ratings and reviews
-- Auto-update for installed plugins
+### 6.3 Webhook & API Layer
+- **What:** REST/WebSocket API for controlling the platform programmatically.
+- **Use cases:** CI/CD integration, custom dashboards, automation scripts, Slack/Discord bots that trigger agents.
+- **Impact:** Medium — opens up integration possibilities.
 
-**Why it matters:** An ecosystem drives adoption. If developers can extend Swarm AI with custom agents, workflows, and integrations, the platform becomes more valuable.
+### 6.4 Git Integration Deep-Dive
+- **What:** Beyond basic git support — automatic PR creation, branch management, commit message generation, and merge conflict resolution.
+- **How:** Agents automatically create branches, make commits with descriptive messages, and open PRs when tasks complete.
+- **Impact:** Medium — streamlines the code review workflow.
 
-### 7.2 VS Code Extension Improvements (LOW Priority)
-
-**Current state:** Extension exists but is private and basic.
-
-**Improvement:**
-- Two-way sync: open file in Swarm AI → opens in VS Code
-- Agent suggestions in VS Code: "Run Swarm AI on current file"
-- Status bar integration: show task status, agent activity
-- Command palette integration for VS Code users
-
-**Why it matters:** Many developers live in VS Code. Tight integration reduces context switching.
-
----
-
-## Part 8: Data & Analytics
-
-### 8.1 Session Analytics Dashboard (LOW Priority)
-
-**Current state:** No analytics on how the platform is used.
-
-**Improvement:**
-- Track: tasks completed per session, agent success rate, average task duration, token usage
-- Weekly/monthly reports: productivity trends, most-used agents, common failure modes
-- Comparison: "You completed 23 tasks this week, 15% more than last week"
-- Export data for personal analysis
-
-**Why it matters:** Data-driven insights help developers optimize their workflow and understand where agents help most.
+### 6.5 IDE Integrations
+- **What:** VS Code extension + JetBrains plugin that mirrors the agent board and panes inside the IDE.
+- **How:** Extension communicates with the desktop app via WebSocket or local server.
+- **Impact:** Medium — reduces context switching between IDE and agent platform.
 
 ---
 
-## Prioritized Implementation Roadmap
+## 7. Implementation Roadmap
 
-### Phase 1 — Foundation (Week 1-2)
-**Must fix before production use**
-1. Fix C-1: Granular permission model (replace bypassPermissions)
-2. Fix C-2: Event-driven MCP polling (replace sync readFile loop)
-3. Fix H-7: Path injection in whisper-cpp.ts
-4. Fix H-3: Encrypt API keys in localStorage
+### Phase 1: Quick Wins (1–2 weeks)
+- [ ] Fix remaining TypeScript compilation errors in `agents/src/ui/AgentPane.tsx`
+- [ ] Complete the `hooks/useModelCatalog.ts` refactor to use correct module paths
+- [ ] Export missing types (`ProbedModel`, `clearProbeCache`) from `model-catalog.ts`
+- [ ] Agent naming UX improvements (already partially implemented)
+- [ ] One-click spawn for common role templates
+- [ ] Keyboard shortcuts for common actions
 
-### Phase 2 — Core UX (Week 3-4)
-**Highest developer impact**
-5. Real-time agent status dashboard (3.1)
-6. Live log streaming & search (3.2)
-7. Diff preview before merge (3.4)
-8. Natural language task creation (2.1)
-9. Visual agent pairing on task cards (2.2)
+### Phase 2: Foundation (2–4 weeks)
+- [ ] Complete handoff protocol between agents (sanitizeHandoff, handoffQueue)
+- [ ] Build visual agent board with drag-and-drop task assignment
+- [ ] Implement role-based agent templates system
+- [ ] Add cross-agent context sharing via Pheromone memory
+- [ ] Unified terminal experience with agent routing
 
-### Phase 3 — Safety & Trust (Week 5-6)
-**Build developer confidence**
-10. Granular permission modes (4.1)
-11. Human-in-the-loop checkpoints (4.2)
-12. Rollback & recovery (4.3)
-13. Diff preview before merge (3.4 — moved here for safety focus)
+### Phase 3: Intelligence (4–8 weeks)
+- [ ] Intelligent task decomposition (LLM-powered)
+- [ ] Peer review between agents
+- [ ] Conflict detection for parallel file edits
+- [ ] Smart context injection on agent spawn
+- [ ] Auto-scaling agent workforce
 
-### Phase 4 — Collaboration (Week 7-8)
-**Enable team-scale usage**
-14. Agent messaging UI (5.1)
-15. Agent workload balancing (2.4)
-16. Agent profiles & specialization (5.3)
-17. Task templates (6.1)
-
-### Phase 5 — Polish (Week 9-10)
-**Productivity and ecosystem**
-18. Keyboard-driven workflow / command palette (6.2)
-19. Batch operations (6.3)
-20. Smart notifications (6.4)
-21. Plugin marketplace UI (7.1)
+### Phase 4: Scale (8–16 weeks)
+- [ ] Task templates & playbooks system
+- [ ] Plugin system with API
+- [ ] Webhook/API layer for external integrations
+- [ ] VS Code / JetBrains IDE extensions
+- [ ] Advanced swarm patterns (consensus, leader election, pipeline)
 
 ---
 
-## Quick Wins (Implement in 1-2 Days Each)
+## 8. Sources & References
 
-These are small changes with outsized impact:
+This report draws on knowledge of:
 
-| Feature | Effort | Impact |
-|---------|--------|--------|
-| Agent status emoji in pane titles (🟢 idle / 🟡 thinking / 🔴 error) | 2 hours | High — immediate visibility |
-| Task card progress indicators (tokens, time, files changed) | 4 hours | High — transparency |
-| Keyboard shortcut for "Dispatch all ready tasks" | 2 hours | Medium — power user delight |
-| Color-coded task cards by role | 3 hours | Medium — visual clarity |
-| Desktop notification on task completion | 3 hours | Medium — async workflow support |
-| "New Task" button on the Board | 2 hours | Medium — reduces friction |
-| Agent pane labels with task name | 1 hour | Low-Medium — context awareness |
-| Recent agents dropdown for quick re-launch | 3 hours | Low-Medium — speed |
+- **Claude Code CLI** (Anthropic) — terminal-native agentic coding with MCP tool use, extended thinking, and permission modes
+- **Aider** (Paul Gauthier) — open-source AI pair programming, git-native workflow, multi-file editing
+- **OpenHands** (All-Hands-AI) — full software-engineering agent with web browsing, shell execution, and code generation
+- **OpenDevin** (OpenDevin project) — similar to OpenHands, community-driven
+- **Cursor** (Anysphere) — IDE-native AI coding with autocomplete, chat, and agent mode
+- **Windsurf** (Codeium) — "flow" paradigm IDE extension with agentic actions
+- **Gemini CLI** (Google) — free-tier agentic CLI with long context window
+- **Codex CLI** (OpenAI) — sandboxed agentic CLI with code execution
 
 ---
 
-## Summary: Top 10 Features by Developer Impact
+## Appendix: Key Architectural Observations from Your Codebase
 
-1. **Real-time agent dashboard** — See what the swarm is doing at a glance
-2. **Granular permissions** — Trust agents appropriately per task
-3. **Diff preview before merge** — Review changes before they hit your codebase
-4. **Live log streaming** — Debug multi-agent workflows without 6 terminal panes
-5. **Natural language task creation** — Skip the planner when you know what you want
-6. **Rollback & recovery** — Confidence to let agents touch your code
-7. **Agent messaging UI** — Understand how agents coordinate
-8. **Task templates** — Repeat workflows in seconds
-9. **Keyboard-driven workflow** — Power user speed
-10. **Checkpoint approvals** — Steer agents mid-flight
+Based on my analysis of the swarm-ai repository, the platform already has strong foundations:
 
----
+1. **Agent Isolation via Git Worktrees** — Each agent gets its own isolated worktree, enabling safe parallel work.
+2. **Pheromone Memory System** — Project-level shared memory that agents can read/write, enabling cross-agent learning.
+3. **MCP Integration** — MCP server configuration and bridge code exists, enabling tool use.
+4. **Terminal Infrastructure** — xterm.js-based terminals with WebGL acceleration, search, and fit addons.
+5. **CLI Abstraction** — Supports multiple CLIs (Claude, Codex, Aider, Gemini, OpenCode, , Cline) with model detection and per-CLI configuration.
+6. **Lead/Worker Architecture** — A "lead" agent can coordinate worker agents, with crown-passing for leadership transitions.
 
-## Sources
-
-- Swarm AI README and architecture docs (project source)
-- CrewAI documentation on multi-agent orchestration patterns
-- Industry UX patterns from Linear, VS Code, and modern developer tools
-- Security best practices for AI agent permission models
-- Observability patterns from distributed systems and multi-agent frameworks
+The main gaps to close are: completing the TypeScript refactor, building the visual board/task system, and implementing robust cross-agent communication.

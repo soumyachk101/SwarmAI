@@ -29,3 +29,12 @@ export {
   claudeSettingsMergeWithServers,
 } from './cli-configs/index.js';
 export type { CliConfigAction, McpServerSpec } from './cli-configs/types.js';
+export {
+ getModelsForCli,
+ getDefaultModelForCli,
+ getModelById,
+ cliSupportsModels,
+ getClisWithModels,
+} from './cli-configs/model-catalog.js';
+export { probeCliModels, getProbeStatus, clearProbeCache } from './cli-configs/model-detection.js';
+export type { AvailableModel } from './cli-configs/model-catalog.js';

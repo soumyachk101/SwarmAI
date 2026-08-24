@@ -16,6 +16,9 @@ export {
 export { permissionBypassArgs, withPermissionBypass } from './permission-bypass.js';
 export { envForCli } from './env.js';
 export { modelArgs, normaliseEffort, supportsModel, supportsEffort, EFFORT_LEVELS } from './model-args.js';
+export { getModelsForCli, getDefaultModelForCli, getModelById, cliSupportsModels, getClisWithModels, groupModelsByProvider } from './model-catalog.js';
+export type { AvailableModel } from './model-catalog.js';
+export { probeCliModels, clearProbeCache, getProbeStatus } from './model-detection.js';
 export type { EffortLevel } from './model-args.js';
 export type { ApiKeys } from './env.js';
 

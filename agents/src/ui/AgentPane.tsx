@@ -28,14 +28,16 @@ import { BrandGlyph, cliBrand, AgentMark } from "@swarm/board";
 import { envForCli } from "../cli-configs/env.js";
 import { agentsHost } from "./host.js";
 import { useAgentsStore } from "./agentsStore.js";
-import { TauriPheromone as Pheromone } from "@swarm/pheromone/tauri";
 import { withPermissionBypass, MCP_CAPABLE_CLIS, normaliseEffort } from "../cli-configs/index.js";
+import { getModelsForCli, getDefaultModelForCli, getModelById, cliSupportsModels } from "../cli-configs/model-catalog.js";
+import { probeCliModels, clearProbeCache } from "../cli-configs/model-detection.js";
 import { CLI_BY_COMMAND } from "../index.js";
 import { ensureMCPConfigForCLI, type PheromoneBridge } from "./ensureMcpConfig.js";
 import { ensureCliWorkspaceTrust } from "./ensureWorkspaceTrust.js";
 import { excerptForHandoff, looksLikeTerminalGarbage, stripTerminalNoise } from "./sanitizeHandoff.js";
 import { isAlreadySpawned, isTrackedAsSpawned, markSpawned, saveTranscript, takeTranscript } from "./spawnGuard.js";
 import { withHandoffLock } from "./handoffQueue.js";
+import { TauriPheromone as Pheromone } from "@swarm/pheromone/tauri";
 import RoleBadge from "./RoleBadge.js";
 import { LeadCrown } from "@swarm/board";
 import { PANE_HEADER_CLASS, PANE_TITLE_CLASS, themeForKind } from "@swarm/board";
@@ -282,134 +284,77 @@ export interface EffortOption {
   isHighlight?: boolean;
 }
 
-export interface CliModelPreset {
-  brandName: string;
-  brandColor: string;
-  switchCommand: string;
-  defaultModel: string;
-  models: ModelOption[];
-  supportsEffort: boolean;
-  effortLevels?: EffortOption[];
-  defaultEffort?: string;
+
+// Dynamic model list from catalog + runtime probing
+// Brand metadata is still defined here; model lists come from model-catalog.ts
+const CLI_BRAND_META: Record<string, { brandName: string; brandColor: string; supportsEffort: boolean; effortLevels?: EffortOption[]; defaultEffort?: string }> = {
+ "claude": { brandName: "Claude Code Models", brandColor: "#D97757", supportsEffort: true, defaultEffort: "UltraCode", effortLevels: [
+ { id: "ultracode", label: "UltraCode", isHighlight: true },
+ { id: "max", label: "Max Effort" },
+ { id: "xhigh", label: "Extra High" },
+ { id: "high", label: "High" },
+ { id: "medium", label: "Medium" },
+ { id: "low", label: "Low" },
+ ]},
+ "codex": { brandName: "Codex Models", brandColor: "#10A37F", supportsEffort: true, defaultEffort: "High", effortLevels: [
+ { id: "ultra", label: "Ultra", isHighlight: true },
+ { id: "xhigh", label: "Extra High" },
+ { id: "high", label: "High" },
+ { id: "medium", label: "Medium" },
+ { id: "light", label: "Light" },
+ ]},
+ "opencode": { brandName: "OpenCode Models", brandColor: "#A855F7", supportsEffort: false },
+ "agy": { brandName: "AGY Models", brandColor: "#4285F4", supportsEffort: false },
+ "aider": { brandName: "Aider Models", brandColor: "#14B8A6", supportsEffort: false },
+ "cline": { brandName: "Cline Models", brandColor: "#6C5CE7", supportsEffort: false },
+ "kilo": { brandName: "Kilo Models", brandColor: "#F59E0B", supportsEffort: false },
+};
+
+function getCliBrandMeta(cli: string) {
+ const c = (cli || "").toLowerCase();
+ return CLI_BRAND_META[c] ?? { brandColor: "#E5A93C", supportsEffort: false };
 }
 
-function getCliModelPresets(cli: string): CliModelPreset {
-  const c = (cli || "").toLowerCase();
-  if (c === "claude" || c === "claude-code") {
-    return {
-      brandName: "Claude Code Models",
-      brandColor: "#D97757",
-      switchCommand: "/model",
-      defaultModel: "Opus 5 (1M Context)",
-      supportsEffort: true,
-      defaultEffort: "UltraCode",
-      effortLevels: [
-        { id: "ultracode", label: "UltraCode", isHighlight: true },
-        { id: "max", label: "Max Effort" },
-        { id: "xhigh", label: "Extra High" },
-        { id: "high", label: "High" },
-        { id: "medium", label: "Medium" },
-        { id: "low", label: "Low" },
-      ],
-      models: [
-        { id: "opus[1m]", label: "Opus 5 (1M Context)", is1M: true, pricing: "$5/$25 Mtok" },
-        { id: "fable[1m]", label: "Fable 5 (1M Context)", is1M: true, pricing: "$4/$20 Mtok" },
-        { id: "sonnet[1m]", label: "Sonnet 5 (1M Context)", is1M: true, pricing: "$3/$15 Mtok" },
-        { id: "fable", label: "Fable 5 (Reasoning)", is1M: true, pricing: "$4/$20 Mtok" },
-        { id: "opus", label: "Opus 5 (Recommended)", is1M: true, pricing: "$5/$25 Mtok" },
-        { id: "sonnet", label: "Sonnet 5 (Routine)", is1M: false, pricing: "$3/$15 Mtok" },
-        { id: "haiku", label: "Haiku 4.5 (Fast)", is1M: false, pricing: "$1/$5 Mtok" },
-      ],
-    };
-  }
-  if (c === "codex" || c === "openai") {
-    return {
-      brandName: "Codex Models",
-      brandColor: "#10A37F",
-      switchCommand: "/model",
-      defaultModel: "5.6 Sol",
-      supportsEffort: true,
-      defaultEffort: "High",
-      effortLevels: [
-        { id: "ultra", label: "Ultra", isHighlight: true },
-        { id: "xhigh", label: "Extra High" },
-        { id: "high", label: "High" },
-        { id: "medium", label: "Medium" },
-        { id: "light", label: "Light" },
-      ],
-      models: [
-        { id: "5.6-sol", label: "5.6 Sol", is1M: true },
-        { id: "5.6-terra", label: "5.6 Terra", is1M: true },
-        { id: "5.6-luna", label: "5.6 Luna", is1M: true },
-        { id: "5.5", label: "5.5", is1M: false },
-        { id: "5.4", label: "5.4", is1M: false },
-        { id: "5.4-mini", label: "5.4 Mini", is1M: false },
-      ],
-    };
-  }
-  if (c === "opencode") {
-    return {
-      brandName: "OpenCode Models",
-      brandColor: "#A855F7",
-      switchCommand: "/model",
-      defaultModel: "Nemotron 3.5 Lightning Free",
-      supportsEffort: false,
-      models: [
-        { id: "opencode/nemotron-3.5-lightning", label: "Nemotron 3.5 Lightning Free (Zen)", pricing: "Free" },
-        { id: "opencode/nemotron-3-ultra", label: "Nemotron 3 Ultra Free (Zen)", pricing: "Free" },
-        { id: "opencode/zen", label: "OpenCode Zen", pricing: "Free" },
-        { id: "opencode/deepseek-v4-flash", label: "DeepSeek V4 Flash Free", pricing: "Free" },
-        { id: "opencode/laguna-s-2.1", label: "Laguna S 2.1 Free", pricing: "Free" },
-        { id: "opencode/hy3", label: "Hy3 Free", pricing: "Free" },
-        { id: "opencode/mimo-v2.5", label: "MiMo V2.5 Free", pricing: "Free" },
-      ],
-    };
-  }
-  if (c === "agy" || c === "antigravity") {
-    return {
-      brandName: "Antigravity Models",
-      brandColor: "#4285F4",
-      switchCommand: "/model",
-      defaultModel: "Gemini 3.7 Flash",
-      supportsEffort: false,
-      models: [
-        { id: "gemini-3.7-flash", label: "Gemini 3.7 Flash (Ultra Realtime)", is1M: true },
-        { id: "gemini-3.6-flash", label: "Gemini 3.6 Flash (1M Context)", is1M: true },
-        { id: "gemini-3.5-flash", label: "Gemini 3.5 Flash", is1M: true },
-        { id: "gemini-3.1-pro", label: "Gemini 3.1 Pro (2M Context)", is1M: true },
-        { id: "claude-5-sonnet", label: "Claude 5 Sonnet", is1M: true },
-        { id: "deepseek-r1", label: "DeepSeek-R1 (671B CoT)", is1M: false },
-      ],
-    };
-  }
-  if (c === "aider") {
-    return {
-      brandName: "Aider Models",
-      brandColor: "#14B8A6",
-      switchCommand: "/model",
-      defaultModel: "Claude 3.7 Sonnet",
-      supportsEffort: false,
-      models: [
-        { id: "sonnet", label: "Claude 3.7 Sonnet" },
-        { id: "o3-mini", label: "OpenAI o3-mini" },
-        { id: "gpt-4o", label: "GPT-4o" },
-        { id: "deepseek/deepseek-reasoner", label: "DeepSeek R1" },
-        { id: "deepseek/deepseek-chat", label: "DeepSeek V3" },
-        { id: "gemini/gemini-2.5-pro", label: "Gemini 2.5 Pro" },
-      ],
-    };
-  }
-  return {
-    brandName: "CLI Models",
-    brandColor: "#E5A93C",
-    switchCommand: "/model",
-    defaultModel: "Default Model",
-    supportsEffort: false,
-    models: [
-      { id: "default", label: "Default CLI Model" },
-    ],
-  };
+// React hook: loads models from static catalog + runtime CLI probing.
+// Returns a reactive list of ModelOption for the given CLI.
+function useDynamicModels(cli: string): ModelOption[] {
+ const [models, setModels] = useState<ModelOption[]>([]);
+
+ useEffect(() => {
+ // Static catalog (instant)
+ const base = getModelsForCli(cli);
+ setModels(base.map(m => ({
+ id: m.id,
+ label: m.label,
+ is1M: m.is1M,
+ pricing: m.pricing,
+ })));
+
+ // Runtime probe (best-effort, debounced, Node-only)
+ if (!cliSupportsModels(cli)) return;
+ const timer = setTimeout(async () => {
+ try {
+ const detected = await probeCliModels(cli);
+ if (detected.length > 0) {
+ setModels(prev => prev.map(m => {
+ const entry = getModelById(cli, m.id);
+ if (entry && detected.includes(entry.cliFlag)) {
+ return { ...m, _probed: true as const };
+ }
+ return m;
+ }));
+ }
+ } catch {
+ // Probe unavailable — static catalog is the fallback
+ }
+ }, 600);
+
+ return () => clearTimeout(timer);
+ }, [cli]);
+
+ return models;
 }
+
 
 export default function AgentPane({
   paneId,
@@ -461,7 +406,9 @@ export default function AgentPane({
   const compactHeader = paneWidth > 0 && paneWidth < COMPACT_HEADER_WIDTH;
   const refitCount = useAgentsStore((s) => s.refitCount);
 
-  const cliPreset = useMemo(() => getCliModelPresets(agent.cli), [agent.cli]);
+ const brandMeta = getCliBrandMeta(agent.cli);
+ const dynamicModels = useDynamicModels(agent.cli);
+ const defaultModelLabel = getDefaultModelForCli(agent.cli)?.label ?? "";
 
   const [promptInput, setPromptInput] = useState("");
   const promptTextareaRef = useRef<HTMLTextAreaElement>(null);
@@ -473,7 +420,7 @@ export default function AgentPane({
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
   const [handoffMenuOpen, setHandoffMenuOpen] = useState(false);
   const [handoffSuccess, setHandoffSuccess] = useState<string | null>(null);
-  const [currentModel, setCurrentModel] = useState(agent.model || cliPreset.defaultModel);
+  const [currentModel, setCurrentModel] = useState(agent.model || defaultModelLabel);
   const [currentEffort, setCurrentEffort] = useState(agent.effort || "Max");
 
   const modelMenuRef = useRef<HTMLDivElement>(null);
@@ -1906,10 +1853,10 @@ export default function AgentPane({
                     <button
                       onClick={() => { setModelMenuOpen(!modelMenuOpen); setEffortMenuOpen(false); setSettingsMenuOpen(false); }}
                       className="flex items-center gap-1.5 text-xs text-swarm-textDim hover:text-swarm-text transition-colors font-medium group"
-                      title={`${cliPreset.brandName}: ${currentModel}`}
+                      title={`${brandMeta.brandName}: ${currentModel}`}
                     >
                       {/* Dynamic Brand Glyph */}
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={cliPreset.brandColor} strokeWidth="2.8" strokeLinecap="round" className="shrink-0">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={brandMeta.brandColor} strokeWidth="2.8" strokeLinecap="round" className="shrink-0">
                         <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07l14.14-14.14" />
                       </svg>
                       <span className="font-semibold text-swarm-text/90 max-w-[150px] truncate">
@@ -1921,10 +1868,10 @@ export default function AgentPane({
                     {modelMenuOpen && (
                       <div className="absolute bottom-full left-0 mb-2 min-w-[230px] rounded-xl border border-white/[0.12] bg-[#141720] p-1.5 shadow-2xl z-50 animate-fade-in">
                         <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase flex items-center justify-between">
-                          <span style={{ color: cliPreset.brandColor }}>{cliPreset.brandName}</span>
-                          <span className="text-[9px] font-mono text-swarm-gold">{cliPreset.switchCommand}</span>
+                          <span style={{ color: brandMeta.brandColor }}>{brandMeta.brandName}</span>
+                          <span className="text-[9px] font-mono text-swarm-gold">{`/model`}</span>
                         </div>
-                        {cliPreset.models.map((m) => (
+                        {dynamicModels.map((m) => (
                           <button
                             key={m.id}
                             onClick={() => handleSelectModel(m.id, m.label)}
@@ -1955,7 +1902,7 @@ export default function AgentPane({
                   </div>
 
                   {/* Effort Selector Dropdown — only for CLIs that support reasoning effort (Claude, Codex) */}
-                  {cliPreset.supportsEffort && cliPreset.effortLevels && cliPreset.effortLevels.length > 0 && (
+                  {brandMeta.supportsEffort && brandMeta.effortLevels && brandMeta.effortLevels.length > 0 && (
                     <div ref={effortMenuRef} className="relative">
                       <button
                         onClick={() => { setEffortMenuOpen(!effortMenuOpen); setModelMenuOpen(false); setSettingsMenuOpen(false); }}
@@ -1971,7 +1918,7 @@ export default function AgentPane({
                           <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase">
                             Effort Level
                           </div>
-                          {cliPreset.effortLevels.map((eff) => (
+                          {brandMeta.effortLevels.map((eff) => (
                             <button
                               key={eff.id}
                               onClick={() => handleSelectEffort(eff.id, eff.label)}
