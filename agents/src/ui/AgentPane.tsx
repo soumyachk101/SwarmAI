@@ -830,7 +830,7 @@ export default function AgentPane({
     const hasValidSize = () => {
       if (!terminalRef.current) return false;
       const rect = terminalRef.current.getBoundingClientRect();
-      return rect.width > 0 && rect.height > 0;
+      return rect.width >= 100 && rect.height >= 80;
     };
 
     // Background loops for a live pty: the 10s handoff sync and the reader
@@ -1331,7 +1331,7 @@ export default function AgentPane({
                   // measurement bakes in a half-settled grid layout (the
                   // misaligned-border bug). Wait until two measurements agree.
                   const { rows, cols } = terminal;
-                  if (cols !== lastCols || rows !== lastRows) {
+                  if (cols < 35 || rows < 5 || cols !== lastCols || rows !== lastRows) {
                     lastCols = cols;
                     lastRows = rows;
                     fitAndSync();

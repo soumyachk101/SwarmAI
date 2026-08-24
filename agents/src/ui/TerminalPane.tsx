@@ -175,7 +175,7 @@ export default function TerminalPane({
     const hasValidSize = () => {
       if (!terminalRef.current) return false;
       const rect = terminalRef.current.getBoundingClientRect();
-      return rect.width > 0 && rect.height > 0;
+      return rect.width >= 100 && rect.height >= 80;
     };
 
     const spawnProcess = async () => {
@@ -362,7 +362,7 @@ export default function TerminalPane({
                   // non-zero measurement bakes in a half-laid-out width — the
                   // ragged right edge. Wait until two measurements agree.
                   const { rows, cols } = terminal;
-                  if (cols !== lastCols || rows !== lastRows) {
+                  if (cols < 35 || rows < 5 || cols !== lastCols || rows !== lastRows) {
                     lastCols = cols;
                     lastRows = rows;
                     fitAndSync();

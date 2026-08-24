@@ -5,6 +5,10 @@
  * and parsing the output. This is a best-effort enhancement — the static
  * catalog (model-catalog.ts) is always the ground truth.
  *
+ * IMPORTANT: All Node.js imports are lazy (inside functions) so this module
+ * can be safely imported in the Tauri webview / browser environment where
+ * `node:child_process` is not available.
+ *
  * Detection strategy per CLI:
  * - Claude Code: parse `--help` for `--model` option description
  * - Codex CLI: parse `--help` for `--model` flag
@@ -14,10 +18,22 @@
  * installing/upgrading a CLI to re-probe.
  */
 
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
+// ─── Node.js lazy imports ────────────────────────────────────────────────────
+// Top-level `import { execFile } from "node:child_process"` crashes in Tauri's
+// webview (browser env). Importing inside functions keeps the module safe to
+// load everywhere — the probe simply becomes a no-op when Node.js is absent.
 
-const execFileAsync = promisify(execFile);
+async function getExecFileAsync(): Promise<((cmd: string, args: string[], opts: Record<string, unknown>) => Promise<{ stdout: string }>) | null> {
+ try {
+ const { execFile } = await import("node:child_process");
+ const { promisify } = await import("node:util");
+ return promisify(execFile);
+ } catch {
+ return null;
+ }
+}
+
+// ─── Constants ───────────────────────────────────────────────────────────────
 
 const PROBE_TIMEOUT = 5_000;
 const MAX_BUFFER = 64 * 1024;
@@ -36,6 +52,9 @@ const CLI_COMMANDS: Record<string, string> = {
 // ─── Probe helpers ───────────────────────────────────────────────────────────
 
 async function probeHelp(command: string, args: string[]): Promise<string | null> {
+ const execFileAsync = await getExecFileAsync();
+ if (!execFileAsync) return null;
+
  try {
  const { stdout } = await execFileAsync(command, args, {
  timeout: PROBE_TIMEOUT,
@@ -129,6 +148,7 @@ const probeCache = new Map<string, { models: string[]; detectedAt: number }>();
 /**
  * Probe the installed CLI for available models.
  * Returns model cliFlags that were detected, or empty array if probing failed.
+ * Safe to call in browser environment — returns [] when Node.js is unavailable.
  */
 export async function probeCliModels(cliId: string): Promise<string[]> {
  const command = CLI_COMMANDS[cliId];

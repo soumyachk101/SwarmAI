@@ -62,7 +62,7 @@ import { useProjectStore } from "../openFiles.js";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import WorkspaceCreateDialog from "./WorkspaceCreateDialog.js";
 
-const MIN_WIDTH = 180;
+const MIN_WIDTH = 250;
 const MAX_WIDTH = 550;
 const WIDTH_KEY = "swarm.sidebarWidth";
 
@@ -1104,7 +1104,7 @@ export default function ADEWorktreeSidebar({
   // 280px on every app start is the kind of small betrayal that reads as a bug.
   const [sidebarWidth, setSidebarWidth] = useState(() => {
     const saved = Number(localStorage.getItem(WIDTH_KEY));
-    return Number.isFinite(saved) && saved > 0 ? clampWidth(saved) : 280;
+    return Number.isFinite(saved) && saved > 0 ? clampWidth(saved) : 300;
   });
   const [isResizing, setIsResizing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -2010,10 +2010,14 @@ function ProjectGroup({
                 onChange={(e) => onEditChange(e.target.value)}
                 onBlur={onCommitRename}
                 onKeyDown={(e) => { if (e.key === "Enter") onCommitRename(); if (e.key === "Escape") onCancelRename(); }}
-                className="bg-transparent border-b border-white text-sm font-bold text-zinc-100 outline-none font-sans"
+                className="bg-transparent border-b border-white text-xs font-bold text-zinc-100 outline-none font-sans w-full"
               />
             ) : (
-              <span className="text-xs font-bold text-zinc-100 truncate tracking-tight font-sans" onDoubleClick={onStartRename}>
+              <span
+                className="text-xs font-bold text-zinc-100 truncate tracking-tight font-sans block"
+                title={ws.name}
+                onDoubleClick={onStartRename}
+              >
                 {ws.name}
               </span>
             )}
