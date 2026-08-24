@@ -650,13 +650,13 @@ export default function ADERightDock({ projectPath, onClose }: Props) {
  : { width: `min(${dockWidth}px, 45vw)`, minWidth: RIGHT_DOCK_MIN }
  }
  >
- <div
- className={`shrink-0 flex ${
- collapsed
- ? "flex-col items-stretch gap-0.5 py-1"
- : "items-center border-b border-swarm-border/40"
- }`}
- >
+        <div
+          className={`shrink-0 flex overflow-x-auto scrollbar-none ${
+            collapsed
+              ? "flex-col items-stretch gap-0.5 py-1"
+              : "items-center border-b border-swarm-border/40"
+          }`}
+        >
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const active = activeTab === tab.id;

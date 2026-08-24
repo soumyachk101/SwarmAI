@@ -229,56 +229,61 @@ export default function LeadPanel() {
           <LeadModeSelect />
         </div>
 
-        {/* Quick Goal Dispatch Input */}
-        <div className="flex items-center gap-1.5 bg-black/50 border border-white/[0.12] rounded-xl px-3 py-1.5 focus-within:border-white/40 focus-within:ring-1 focus-within:ring-white/20 transition-all shadow-inner">
-          <input
-            ref={inputRef}
-            type="text"
-            value={missionInput}
-            onChange={(e) => setMissionInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleDispatchToLead();
-            }}
-            placeholder="Type mission here (e.g. Build authentication flow with unit tests)..."
-            className="w-full bg-transparent text-xs text-white placeholder-zinc-500 focus:outline-none font-sans"
-          />
-          <button
-            onClick={() => window.dispatchEvent(new CustomEvent("swarm:voice:toggle", { detail: { mode: "lead" } }))}
-            className="p-1 rounded-md text-zinc-400 hover:text-white hover:bg-white/[0.08] transition-colors shrink-0 cursor-pointer"
-            title="Dictate with voice"
-          >
-            <Mic size={14} />
-          </button>
-          <select
-            value={workerCli}
-            onChange={(e) => setWorkerCli(e.target.value)}
-            className="bg-black/60 text-[11px] font-mono text-zinc-200 border border-white/[0.12] rounded-lg px-2.5 py-1 focus:outline-none focus:border-white/40 cursor-pointer shrink-0"
-            title="Choose which CLI engine to dispatch worker tasks to"
-          >
-            <option value="auto">Auto (Board CLI)</option>
-            <option value="claude">Claude Code</option>
-            <option value="opencode">OpenCode Zen</option>
-            <option value="codex">Codex CLI</option>
-            <option value="agy">Antigravity</option>
-            <option value="aider">Aider</option>
-          </select>
-          <button
-            onClick={handleInstantParallelDispatch}
-            disabled={isDispatching}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white hover:bg-zinc-200 text-black transition-all shrink-0 cursor-pointer shadow-xs active:scale-95"
-            title="Instant parallel dispatch: decompose & launch worker agents in worktrees immediately"
-          >
-            <Layers size={13} className="text-black" />
-            <span>Parallel Dispatch</span>
-          </button>
-          <button
-            onClick={() => handleDispatchToLead()}
-            disabled={isDispatching}
-            className="p-1.5 rounded-lg bg-white/[0.08] text-white hover:bg-white/[0.16] border border-white/[0.14] transition-colors shrink-0 cursor-pointer shadow-xs"
-            title="Send mission directive to Lead Agent"
-          >
-            <Send size={13} />
-          </button>
+        {/* Quick Goal Dispatch Input with Responsive 2-Row Layout */}
+        <div className="flex flex-col gap-2 bg-black/50 border border-white/[0.12] rounded-xl p-2.5 focus-within:border-white/40 focus-within:ring-1 focus-within:ring-white/20 transition-all shadow-inner">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <input
+              ref={inputRef}
+              type="text"
+              value={missionInput}
+              onChange={(e) => setMissionInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleDispatchToLead();
+              }}
+              placeholder="Type mission here (e.g. Build authentication flow)..."
+              className="flex-1 min-w-0 bg-transparent text-xs text-white placeholder-zinc-500 focus:outline-none font-sans"
+            />
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent("swarm:voice:toggle", { detail: { mode: "lead" } }))}
+              className="p-1 rounded-md text-zinc-400 hover:text-white hover:bg-white/[0.08] transition-colors shrink-0 cursor-pointer"
+              title="Dictate with voice"
+            >
+              <Mic size={14} />
+            </button>
+            <button
+              onClick={() => handleDispatchToLead()}
+              disabled={isDispatching}
+              className="p-1.5 rounded-lg bg-white/[0.08] text-white hover:bg-white/[0.16] border border-white/[0.14] transition-colors shrink-0 cursor-pointer shadow-xs"
+              title="Send mission directive to Lead Agent"
+            >
+              <Send size={13} />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2 pt-1 border-t border-white/[0.06]">
+            <select
+              value={workerCli}
+              onChange={(e) => setWorkerCli(e.target.value)}
+              className="flex-1 min-w-0 bg-black/60 text-[11px] font-mono text-zinc-200 border border-white/[0.12] rounded-lg px-2 py-1 focus:outline-none focus:border-white/40 cursor-pointer"
+              title="Choose which CLI engine to dispatch worker tasks to"
+            >
+              <option value="auto">Auto (Board CLI)</option>
+              <option value="claude">Claude Code</option>
+              <option value="opencode">OpenCode Zen</option>
+              <option value="codex">Codex CLI</option>
+              <option value="agy">Antigravity</option>
+              <option value="aider">Aider</option>
+            </select>
+            <button
+              onClick={handleInstantParallelDispatch}
+              disabled={isDispatching}
+              className="flex items-center justify-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-white hover:bg-zinc-200 text-black transition-all shrink-0 cursor-pointer shadow-xs active:scale-95"
+              title="Instant parallel dispatch: decompose & launch worker agents in worktrees immediately"
+            >
+              <Layers size={13} className="text-black" />
+              <span>Parallel Dispatch</span>
+            </button>
+          </div>
         </div>
       </div>
 
