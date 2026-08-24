@@ -75,7 +75,7 @@ export class Orchestrator {
       worktree = await this.worktree.create(task.id);
     }
 
-    const agentId = `agent-${task.id}-${Date.now()}`;
+    const agentId = `agent-${task.id}-${crypto.randomUUID().slice(0, 8)}`;
     this.registry.register({
       id: agentId,
       taskId: task.id,

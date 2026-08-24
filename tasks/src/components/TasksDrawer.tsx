@@ -86,6 +86,23 @@ export default function TasksDrawer({
 
   if (!open && !dragPreview) return null;
 
+  const handleQuickAdd = (task: { title: string; description?: string; role?: string; files?: string[] }) => {
+    const newTask: TaskCard = {
+      id: `task-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      title: task.title,
+      description: task.description || '',
+      column: 'todo',
+      sortOrder: tasks.length,
+      assignedRole: task.role,
+      owns: task.files || [],
+      reads: [],
+      dependsOn: [],
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+    onTasksChange([...tasks, newTask]);
+  };
+
   return (
     <div ref={boardRef} data-agent-board-selection-surface
       data-agent-board-drag-preview={dragPreview ? 'true' : undefined}
@@ -104,7 +121,11 @@ export default function TasksDrawer({
         ...style,
       }}
     >
-      <TasksDrawerHeader selectedCount={selectedCount} onClose={onClose} />
+      <TasksDrawerHeader
+        selectedCount={selectedCount}
+        onClose={onClose}
+        onQuickAdd={handleQuickAdd}
+      />
       {tasks.length === 0 ? (
         <div className="flex-1 flex items-center justify-center text-mini text-swarm-textMuted italic">No tasks — create one to start tracking</div>
       ) : (

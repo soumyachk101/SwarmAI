@@ -55,6 +55,9 @@ interface CommandPaletteProps {
   onOpenFolder: () => void;
   onOpenUpdates?: () => void;
   onOpenGit?: () => void;
+  onOpenDashboard?: () => void;
+  onOpenTemplates?: () => void;
+  onOpenDiff?: () => void;
 }
 
 export default function CommandPalette({
@@ -65,6 +68,9 @@ export default function CommandPalette({
   onOpenFolder,
   onOpenUpdates,
   onOpenGit,
+  onOpenDashboard,
+  onOpenTemplates,
+  onOpenDiff,
 }: CommandPaletteProps) {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -282,6 +288,39 @@ export default function CommandPalette({
     },
 
     // Views & Tools
+    {
+      id: "swarm-dashboard",
+      category: "Views & Tools",
+      label: "/dashboard",
+      hint: "Open Swarm Live Observability & Log stream",
+      icon: <Activity size={16} className="text-emerald-400" />,
+      action: () => {
+        onOpenDashboard?.();
+        onClose();
+      },
+    },
+    {
+      id: "task-templates",
+      category: "Views & Tools",
+      label: "/templates",
+      hint: "1-Click Multi-Agent Workflow Templates",
+      icon: <Layers size={16} className="text-swarm-gold" />,
+      action: () => {
+        onOpenTemplates?.();
+        onClose();
+      },
+    },
+    {
+      id: "diff-preview",
+      category: "Views & Tools",
+      label: "/diff",
+      hint: "Preview git worktree changes before merge",
+      icon: <FileCode2 size={16} className="text-cyan-400" />,
+      action: () => {
+        onOpenDiff?.();
+        onClose();
+      },
+    },
     {
       id: "voice-toggle",
       category: "Views & Tools",

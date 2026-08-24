@@ -118,7 +118,7 @@ export const useReportsStore = create<ReportsState>()(
  reports: s.reports.map((r) => {
  if (r.id !== reportId) return r;
  const section = {
- id: `sec-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+ id: `sec-${crypto.randomUUID()}`,
  title,
  content,
  source: "custom" as const,

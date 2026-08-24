@@ -2,6 +2,16 @@ import { create } from "zustand";
 import { envForCli, type ApiKeys } from "@swarm/agents/cli-configs";
 import { persist } from "zustand/middleware";
 
+/**
+ * Settings store.
+ *
+ * SECURITY NOTE: API keys are persisted to localStorage in plaintext via the
+ * `persist` middleware. This is acceptable for local desktop use (Tauri app)
+ * where the filesystem is already accessible, but should be upgraded to
+ * `@tauri-apps/plugin-secure-store` (OS keychain) when available. Do NOT
+ * store production secrets here — use environment variables injected at build time.
+ */
+
 
 interface SettingsState {
   apiKeys: ApiKeys;

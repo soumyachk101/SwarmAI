@@ -212,6 +212,7 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
     // a pane is dragged and dropped onto another (positions swap). Otherwise
     // clicking anywhere in a pane would reshuffle the Focus grid.
     if (maximizedPane || !t.closest("[data-pane-drag]")) return;
+    if (endDrag.current) endDrag.current();
     // The whole drag lives in this closure so `finish` can unregister exactly
     // the listeners this gesture added — component-level handlers are rebuilt
     // every render, and a re-render between mousedown and mouseup would leave
@@ -360,7 +361,7 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
       id: `devchat-${Date.now()}`,
       cli: "devchat",
       cliName: "AI Copilot Chat",
-      kind: "devchat" as any,
+      kind: "devchat",
       plane: "board",
     };
     addAgent(swarm);

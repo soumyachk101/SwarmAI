@@ -42,7 +42,10 @@ import OverflowMenu from "@/shared/OverflowMenu";
 import CommandPalette from "@/shared/CommandPalette";
 import GitControlModal from "@/features/git/GitControlModal";
 import UserGuideModal from "@/features/help/UserGuideModal";
-import { BookOpen } from "lucide-react";
+import SwarmDashboardModal from "@/features/dashboard/SwarmDashboardModal";
+import DiffPreviewModal from "@/features/diff/DiffPreviewModal";
+import TaskTemplatesModal from "@/features/templates/TaskTemplatesModal";
+import { BookOpen, Activity, FileDiff, Layers } from "lucide-react";
 
 
 /**
@@ -84,6 +87,9 @@ export default function HomePage() {
   const [showPalette, setShowPalette] = useState(false);
   const [showGitModal, setShowGitModal] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
+  const [showDiffModal, setShowDiffModal] = useState(false);
+  const [showTemplatesModal, setShowTemplatesModal] = useState(false);
   const [gitStatus, setGitStatus] = useState<{
     branch: string;
     changed: number;
@@ -302,6 +308,27 @@ export default function HomePage() {
             hint: "Commit, push, pull, branches",
             icon: FolderGit2,
             onSelect: () => setShowGitModal(true),
+          },
+          {
+            id: "dashboard",
+            label: "Swarm Dashboard",
+            hint: "Live agent metrics & logs",
+            icon: Activity,
+            onSelect: () => setShowDashboard(true),
+          },
+          {
+            id: "templates",
+            label: "Task Templates",
+            hint: "Pre-configured multi-agent workflows",
+            icon: Layers,
+            onSelect: () => setShowTemplatesModal(true),
+          },
+          {
+            id: "diff",
+            label: "Diff Preview",
+            hint: "Worktree changes before merge",
+            icon: FileDiff,
+            onSelect: () => setShowDiffModal(true),
           },
           {
             id: "extensions",
@@ -617,20 +644,44 @@ export default function HomePage() {
 
         <span className="ml-auto flex shrink-0 items-center gap-2">
           {erroredAgents > 0 && (
-            <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md text-rose-300 border border-rose-500/30 bg-rose-500/10 font-mono text-[10px]">
+            <button
+              onClick={() => setShowDashboard(true)}
+              className="flex items-center gap-1.5 px-2 py-0.5 rounded-md text-rose-300 border border-rose-500/30 bg-rose-500/10 font-mono text-[10px] hover:bg-rose-500/20 transition-all cursor-pointer"
+            >
               {erroredAgents} failed
-            </span>
+            </button>
           )}
-          <span
-            className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white/[0.05] border border-white/[0.12] text-zinc-200 text-[11px] font-mono font-semibold shadow-xs"
-            title={`${busyAgents} of ${totalAgents} agents working`}
+          <button
+            onClick={() => setShowDashboard(true)}
+            className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white/[0.05] border border-white/[0.12] text-zinc-200 text-[11px] font-mono font-semibold shadow-xs hover:bg-white/[0.1] hover:border-swarm-gold/40 transition-all cursor-pointer"
+            title={`${busyAgents} of ${totalAgents} agents working — Click to open Swarm Dashboard`}
           >
             <span className={`size-1.5 rounded-full ${busyAgents > 0 ? "bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(52,211,153,0.8)]" : "bg-zinc-500"}`} />
             <span>{busyAgents}/{totalAgents} active</span>
-          </span>
+          </button>
         </span>
       </div>
 
+      {showDashboard && (
+        <SwarmDashboardModal
+          open={showDashboard}
+          projectPath={projectPath}
+          onClose={() => setShowDashboard(false)}
+        />
+      )}
+      {showDiffModal && (
+        <DiffPreviewModal
+          open={showDiffModal}
+          projectPath={projectPath}
+          onClose={() => setShowDiffModal(false)}
+        />
+      )}
+      {showTemplatesModal && (
+        <TaskTemplatesModal
+          open={showTemplatesModal}
+          onClose={() => setShowTemplatesModal(false)}
+        />
+      )}
       {showSettings && <SettingsPage onClose={() => setShowSettings(false)} />}
       {showExtensions && <ExtensionsMarketplace onClose={() => setShowExtensions(false)} />}
       {showUpdates && <UpdateCheckerModal isOpen={showUpdates} onClose={() => setShowUpdates(false)} />}
@@ -650,6 +701,9 @@ export default function HomePage() {
         onOpenFolder={handleOpenFolder}
         onOpenUpdates={() => setShowUpdates(true)}
         onOpenGit={() => setShowGitModal(true)}
+        onOpenDashboard={() => setShowDashboard(true)}
+        onOpenTemplates={() => setShowTemplatesModal(true)}
+        onOpenDiff={() => setShowDiffModal(true)}
       />
 
       {/* Global voice hotkeys: Ctrl+Win (type anywhere) · Ctrl+Alt (Agent). */}
