@@ -110,7 +110,7 @@ export default function SwarmTelemetryHUD({ agents = [] }: { agents?: FlowAgentM
 
   useEffect(() => {
     fetchRealUsage();
-    const interval = setInterval(fetchRealUsage, isAnyRunning ? 2000 : 4000);
+    const interval = setInterval(fetchRealUsage, isAnyRunning ? 6000 : 10000);
     return () => clearInterval(interval);
   }, [fetchRealUsage, isAnyRunning]);
 

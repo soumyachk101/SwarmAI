@@ -943,7 +943,7 @@ export default function AgentPane({
         } catch (e) {
           console.error("is_process_alive check failed:", e);
         }
-      }, 2000);
+      }, 6000);
     };
 
     const spawnProcess = async () => {

@@ -3608,134 +3608,156 @@ fn add_split(w: &mut UsageWindow, t: TokenSplit) {
     w.cache_read_tokens += t.cache_read;
 }
 
+static CLI_USAGE_CACHE: std::sync::Mutex<Option<(i64, Vec<CliUsage>)>> = std::sync::Mutex::new(None);
+
 #[tauri::command]
 async fn cli_usage(clis: Vec<String>) -> Result<Vec<CliUsage>, String> {
-    let home: PathBuf = std::env::var_os("USERPROFILE")
-        .or_else(|| std::env::var_os("HOME"))
-        .map(PathBuf::from)
-        .ok_or("no home directory")?;
     let now = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map_err(|e| e.to_string())?
         .as_millis() as i64;
-    let five_hour_cutoff = now - 5 * 3_600_000;
-    let week_cutoff = now - 7 * 24 * 3_600_000;
 
-    let mut report = Vec::new();
-    for cli in clis {
-        let Some((name, roots)) = usage_sources(&cli) else { continue };
-        let installed = find_cli_executable(&cli).is_some();
-
-        let mut usage = CliUsage {
-            cli: cli.clone(),
-            name: name.to_string(),
-            installed,
-            has_token_data: false,
-            five_hour: UsageWindow::default(),
-            weekly: UsageWindow::default(),
-            last_activity: 0,
-            plan: cli_plan(&home, &cli),
-        };
-
-        let mut files = Vec::new();
-        for parts in roots {
-            let mut dir = home.clone();
-            for part in *parts {
-                dir = dir.join(part);
-            }
-            if dir.is_dir() {
-                collect_jsonl(&dir, week_cutoff, &mut files, 0);
+    // Fast path: return from RAM cache if refreshed within 5 seconds
+    if let Ok(guard) = CLI_USAGE_CACHE.lock() {
+        if let Some((cached_at, ref cached_report)) = *guard {
+            if now - cached_at < 5000 {
+                return Ok(cached_report.clone());
             }
         }
+    }
 
-        for file in files {
-            let Ok(text) = fs::read_to_string(&file) else { continue };
-            let (mut in_week, mut in_five) = (false, false);
-            for line in text.lines() {
-                if line.is_empty() {
-                    continue;
-                }
-                let Ok(entry) = serde_json::from_str::<serde_json::Value>(line) else { continue };
-                let Some(ts) = entry.get("timestamp").and_then(|t| t.as_str()) else { continue };
-                let Some(at) = parse_ts_millis(ts) else { continue };
-                if at > usage.last_activity {
-                    usage.last_activity = at;
-                }
-                if at < week_cutoff {
-                    continue;
-                }
-                in_week = true;
-                let recent = at >= five_hour_cutoff;
-                in_five |= recent;
+    let report = tokio::task::spawn_blocking(move || -> Result<Vec<CliUsage>, String> {
+        let home: PathBuf = std::env::var_os("USERPROFILE")
+            .or_else(|| std::env::var_os("HOME"))
+            .map(PathBuf::from)
+            .ok_or("no home directory")?;
+        let five_hour_cutoff = now - 5 * 3_600_000;
+        let week_cutoff = now - 7 * 24 * 3_600_000;
 
-                usage.weekly.messages += 1;
-                if usage.weekly.started_at == 0 || at < usage.weekly.started_at {
-                    usage.weekly.started_at = at;
+        let mut report = Vec::new();
+        for cli in clis {
+            let Some((name, roots)) = usage_sources(&cli) else { continue };
+            let installed = find_cli_executable(&cli).is_some();
+
+            let mut usage = CliUsage {
+                cli: cli.clone(),
+                name: name.to_string(),
+                installed,
+                has_token_data: false,
+                five_hour: UsageWindow::default(),
+                weekly: UsageWindow::default(),
+                last_activity: 0,
+                plan: cli_plan(&home, &cli),
+            };
+
+            let mut files = Vec::new();
+            for parts in roots {
+                let mut dir = home.clone();
+                for part in *parts {
+                    dir = dir.join(part);
                 }
-                if recent {
-                    usage.five_hour.messages += 1;
-                    if usage.five_hour.started_at == 0 || at < usage.five_hour.started_at {
-                        usage.five_hour.started_at = at;
+                if dir.is_dir() {
+                    collect_jsonl(&dir, week_cutoff, &mut files, 0);
+                }
+            }
+
+            for file in files {
+                let Ok(text) = fs::read_to_string(&file) else { continue };
+                let (mut in_week, mut in_five) = (false, false);
+                for line in text.lines() {
+                    if line.is_empty() {
+                        continue;
                     }
-                }
+                    let Ok(entry) = serde_json::from_str::<serde_json::Value>(line) else { continue };
+                    let Some(ts) = entry.get("timestamp").and_then(|t| t.as_str()) else { continue };
+                    let Some(at) = parse_ts_millis(ts) else { continue };
+                    if at > usage.last_activity {
+                        usage.last_activity = at;
+                    }
+                    if at < week_cutoff {
+                        continue;
+                    }
+                    in_week = true;
+                    let recent = at >= five_hour_cutoff;
+                    in_five |= recent;
 
-                if let Some(tok) = entry
-                    .get("message")
-                    .and_then(|m| m.get("usage"))
-                    .map(tokens_in)
-                {
-                    usage.has_token_data = true;
-                    add_split(&mut usage.weekly, tok);
+                    usage.weekly.messages += 1;
+                    if usage.weekly.started_at == 0 || at < usage.weekly.started_at {
+                        usage.weekly.started_at = at;
+                    }
                     if recent {
-                        add_split(&mut usage.five_hour, tok);
+                        usage.five_hour.messages += 1;
+                        if usage.five_hour.started_at == 0 || at < usage.five_hour.started_at {
+                            usage.five_hour.started_at = at;
+                        }
+                    }
+
+                    if let Some(tok) = entry
+                        .get("message")
+                        .and_then(|m| m.get("usage"))
+                        .map(tokens_in)
+                    {
+                        usage.has_token_data = true;
+                        add_split(&mut usage.weekly, tok);
+                        if recent {
+                            add_split(&mut usage.five_hour, tok);
+                        }
                     }
                 }
+                if in_week {
+                    usage.weekly.sessions += 1;
+                }
+                if in_five {
+                    usage.five_hour.sessions += 1;
+                }
             }
-            if in_week {
-                usage.weekly.sessions += 1;
-            }
-            if in_five {
-                usage.five_hour.sessions += 1;
-            }
-        }
 
-        // Also incorporate stats-cache.json for Claude Code so historical cumulative usage is never lost
-        if cli == "claude" {
-            let stats_path = home.join(".claude").join("stats-cache.json");
-            if let Ok(raw) = fs::read_to_string(&stats_path) {
-                if let Ok(val) = serde_json::from_str::<serde_json::Value>(&raw) {
-                    if let Some(model_usage) = val.get("modelUsage").and_then(|m| m.as_object()) {
-                        let mut total_in = 0u64;
-                        let mut total_out = 0u64;
-                        let mut total_cache_read = 0u64;
-                        let mut total_cache_write = 0u64;
-                        for (_, stats) in model_usage {
-                            total_in += stats.get("inputTokens").and_then(|v| v.as_u64()).unwrap_or(0);
-                            total_out += stats.get("outputTokens").and_then(|v| v.as_u64()).unwrap_or(0);
-                            total_cache_read += stats.get("cacheReadInputTokens").and_then(|v| v.as_u64()).unwrap_or(0);
-                            total_cache_write += stats.get("cacheCreationInputTokens").and_then(|v| v.as_u64()).unwrap_or(0);
-                        }
-                        if total_in > 0 || total_out > 0 {
-                            usage.has_token_data = true;
-                            let split = TokenSplit {
-                                input: total_in,
-                                output: total_out,
-                                cache_write: total_cache_write,
-                                cache_read: total_cache_read,
-                            };
-                            if usage.weekly.tokens == 0 {
-                                add_split(&mut usage.weekly, split);
-                                usage.weekly.messages = val.get("totalMessages").and_then(|v| v.as_u64()).unwrap_or(0);
-                                usage.weekly.sessions = val.get("totalSessions").and_then(|v| v.as_u64()).unwrap_or(0);
+            // Also incorporate stats-cache.json for Claude Code so historical cumulative usage is never lost
+            if cli == "claude" {
+                let stats_path = home.join(".claude").join("stats-cache.json");
+                if let Ok(raw) = fs::read_to_string(&stats_path) {
+                    if let Ok(val) = serde_json::from_str::<serde_json::Value>(&raw) {
+                        if let Some(model_usage) = val.get("modelUsage").and_then(|m| m.as_object()) {
+                            let mut total_in = 0u64;
+                            let mut total_out = 0u64;
+                            let mut total_cache_read = 0u64;
+                            let mut total_cache_write = 0u64;
+                            for (_, stats) in model_usage {
+                                total_in += stats.get("inputTokens").and_then(|v| v.as_u64()).unwrap_or(0);
+                                total_out += stats.get("outputTokens").and_then(|v| v.as_u64()).unwrap_or(0);
+                                total_cache_read += stats.get("cacheReadInputTokens").and_then(|v| v.as_u64()).unwrap_or(0);
+                                total_cache_write += stats.get("cacheCreationInputTokens").and_then(|v| v.as_u64()).unwrap_or(0);
+                            }
+                            if total_in > 0 || total_out > 0 {
+                                usage.has_token_data = true;
+                                let split = TokenSplit {
+                                    input: total_in,
+                                    output: total_out,
+                                    cache_write: total_cache_write,
+                                    cache_read: total_cache_read,
+                                };
+                                if usage.weekly.tokens == 0 {
+                                    add_split(&mut usage.weekly, split);
+                                    usage.weekly.messages = val.get("totalMessages").and_then(|v| v.as_u64()).unwrap_or(0);
+                                    usage.weekly.sessions = val.get("totalSessions").and_then(|v| v.as_u64()).unwrap_or(0);
+                                }
                             }
                         }
                     }
                 }
             }
-        }
 
-        report.push(usage);
+            report.push(usage);
+        }
+        Ok(report)
+    })
+    .await
+    .map_err(|e| e.to_string())??;
+
+    if let Ok(mut guard) = CLI_USAGE_CACHE.lock() {
+        *guard = Some((now, report.clone()));
     }
+
     Ok(report)
 }
 
