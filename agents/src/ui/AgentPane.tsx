@@ -1050,17 +1050,8 @@ export default function AgentPane({
 
         if (disposed || !terminal) return;
 
-        // Deliberately NOT "running" yet. spawn_terminal returning only means
-        // the pty exists; the CLI has drawn nothing. Flipping state here tore
-        // the "Starting…" overlay down over an empty black rectangle and, worse,
-        // made the stall hint below unreachable — the old guard compared against
-        // a `spawnState` captured when this long-lived effect was created, so it
-        // never matched. The first byte of pty output is the honest signal, and
-        // it is what cancels this timer.
+        setSpawnState("running");
         setStalled(false);
-        stallTimer = setTimeout(() => {
-          if (!disposed) setStalled(true);
-        }, STALL_HINT_MS);
 
         startLoops();
 

@@ -373,14 +373,11 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
   // is a running swarm and can lose real work if killed by accident.
   const NON_AGENT_KINDS = new Set(["shell", "browser", "toolbox", "emulator", "openvsx", "devchat"]);
   const handleRemove = (id: string) => {
-    const swarm = agents.find((b) => b.id === id);
-    const isAgentPane = !!swarm && !NON_AGENT_KINDS.has(swarm.kind ?? "");
-    if (isAgentPane && !window.confirm("Close this agent? Its running session will be killed.")) return;
-    // A real close kills the pty, so drop the reattach record with it — and
-    // the pane's canvas geometry, which nothing else will ever collect.
     forgetSpawn(id);
     useCanvasStore.getState().removeNode(id);
-    invoke("kill_terminal", { paneId: id }).finally(() => removeAgent(id));
+    removeAgent(id);
+    invoke("kill_terminal", { paneId: id }).catch(console.error);
+    requestAnimationFrame(() => refitTerminals());
   };
   const toggleMaximize = (id: string) => {
     setMaximizedPane(maximizedPane === id ? null : id);

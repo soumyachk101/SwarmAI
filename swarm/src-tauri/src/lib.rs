@@ -524,11 +524,12 @@ async fn kill_terminal(
         sessions.remove(&pane_id)
     };
     if let Some(session) = session {
-        if let Ok(mut session) = session.lock() {
-            // Kill the child process explicitly, then reap it.
-            let _ = session.child.kill();
-            let _ = session.child.wait();
-        }
+        std::thread::spawn(move || {
+            if let Ok(mut session) = session.lock() {
+                let _ = session.child.kill();
+                let _ = session.child.try_wait();
+            }
+        });
     }
     Ok(())
 }
