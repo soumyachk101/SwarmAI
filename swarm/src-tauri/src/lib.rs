@@ -3417,7 +3417,7 @@ async fn stop_openvsx(pane_id: String, state: State<'_, OpenVsxState>) -> Result
 // of them writes its plan's quota anywhere local, so this reports measured
 // usage — never an invented "% of limit".
 
-#[derive(Debug, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct UsageWindow {
     /// Cost-equivalent tokens: the only figure that tracks a plan's limit.
     /// A raw sum is meaningless because a cached context is re-read in full on
@@ -3439,7 +3439,7 @@ pub struct UsageWindow {
     pub started_at: i64,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CliUsage {
     pub cli: String,
     pub name: String,
@@ -3626,7 +3626,7 @@ async fn cli_usage(clis: Vec<String>) -> Result<Vec<CliUsage>, String> {
         }
     }
 
-    let report = tokio::task::spawn_blocking(move || -> Result<Vec<CliUsage>, String> {
+    let report = tauri::async_runtime::spawn_blocking(move || -> Result<Vec<CliUsage>, String> {
         let home: PathBuf = std::env::var_os("USERPROFILE")
             .or_else(|| std::env::var_os("HOME"))
             .map(PathBuf::from)
