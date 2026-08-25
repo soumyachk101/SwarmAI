@@ -9,5 +9,6 @@ export type {
  CatalogModel,
 } from './useModelCatalog.js';
 export type {
- UseAutoModelDetectionResult,
+ AutoModelDetectionState,
+ DetectedModel,
 } from './useAutoModelDetection.js';

@@ -39,4 +39,4 @@ export {
 export { probeCliModels, getProbeStatus, clearProbeCache } from './cli-configs/model-detection.js';
 export { useAutoModelDetection } from './hooks/useAutoModelDetection.js';
 export type { AvailableModel } from './cli-configs/model-catalog.js';
-export type { UseAutoModelDetectionResult } from './hooks/useAutoModelDetection.js';
+export type { AutoModelDetectionState, DetectedModel } from './hooks/useAutoModelDetection.js';
