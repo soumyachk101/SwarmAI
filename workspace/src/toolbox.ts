@@ -69,7 +69,11 @@ export function mergeMcpJson(existing: string | null, toolbox: Toolbox): string 
  }
 
  // Preserve all existing servers; deep-merge toolbox entries on top.
- const existingServers = ((root.mcpServers as Record<string, unknown>) || {}) as Record<string, Record<string, unknown>>;
+ // Guard against non-object values (arrays, strings) from corrupt or non-standard files.
+ const existingServers: Record<string, Record<string, unknown>> =
+ root.mcpServers && typeof root.mcpServers === "object" && !Array.isArray(root.mcpServers)
+ ? (root.mcpServers as Record<string, Record<string, unknown>>)
+ : {};
  const merged: Record<string, Record<string, unknown>> = { ...existingServers };
 
  for (const s of toolbox.mcpServers) {

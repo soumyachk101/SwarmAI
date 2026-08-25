@@ -30,7 +30,7 @@ import { agentsHost } from "./host.js";
 import { useAgentsStore } from "./agentsStore.js";
 import { withPermissionBypass, MCP_CAPABLE_CLIS, normaliseEffort } from "../cli-configs/index.js";
 import { getModelsForCli, getDefaultModelForCli, getModelById, cliSupportsModels } from "../cli-configs/model-catalog.js";
-import { probeCliModels, clearProbeCache } from "../cli-configs/model-detection.js";
+import { useAutoModelDetection } from "../hooks/useAutoModelDetection.js";
 import { CLI_BY_COMMAND } from "../index.js";
 import { ensureMCPConfigForCLI, type PheromoneBridge } from "./ensureMcpConfig.js";
 import { ensureCliWorkspaceTrust } from "./ensureWorkspaceTrust.js";
@@ -315,45 +315,7 @@ function getCliBrandMeta(cli: string) {
  return CLI_BRAND_META[c] ?? { brandColor: "#E5A93C", supportsEffort: false };
 }
 
-// React hook: loads models from static catalog + runtime CLI probing.
-// Returns a reactive list of ModelOption for the given CLI.
-function useDynamicModels(cli: string): ModelOption[] {
- const [models, setModels] = useState<ModelOption[]>([]);
 
- useEffect(() => {
- // Static catalog (instant)
- const base = getModelsForCli(cli);
- setModels(base.map(m => ({
- id: m.id,
- label: m.label,
- is1M: m.is1M,
- pricing: m.pricing,
- })));
-
- // Runtime probe (best-effort, debounced, Node-only)
- if (!cliSupportsModels(cli)) return;
- const timer = setTimeout(async () => {
- try {
- const detected = await probeCliModels(cli);
- if (detected.length > 0) {
- setModels(prev => prev.map(m => {
- const entry = getModelById(cli, m.id);
- if (entry && detected.includes(entry.cliFlag)) {
- return { ...m, _probed: true as const };
- }
- return m;
- }));
- }
- } catch {
- // Probe unavailable — static catalog is the fallback
- }
- }, 600);
-
- return () => clearTimeout(timer);
- }, [cli]);
-
- return models;
-}
 
 
 export default function AgentPane({
@@ -407,7 +369,7 @@ export default function AgentPane({
   const refitCount = useAgentsStore((s) => s.refitCount);
 
  const brandMeta = getCliBrandMeta(agent.cli);
- const dynamicModels = useDynamicModels(agent.cli);
+
  const defaultModelLabel = getDefaultModelForCli(agent.cli)?.label ?? "";
 
   const [promptInput, setPromptInput] = useState("");
@@ -416,12 +378,21 @@ export default function AgentPane({
   const [selectedCommandIndex, setSelectedCommandIndex] = useState(0);
 
   const [modelMenuOpen, setModelMenuOpen] = useState(false);
+  const [modelSearchQuery, setModelSearchQuery] = useState("");
   const [effortMenuOpen, setEffortMenuOpen] = useState(false);
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
   const [handoffMenuOpen, setHandoffMenuOpen] = useState(false);
   const [handoffSuccess, setHandoffSuccess] = useState<string | null>(null);
   const [currentModel, setCurrentModel] = useState(agent.model || defaultModelLabel);
   const [currentEffort, setCurrentEffort] = useState(agent.effort || "Max");
+
+  // Auto-select the default model when CLI changes (dynamic model switching)
+  useEffect(() => {
+    const defaultLabel = getDefaultModelForCli(agent.cli)?.label;
+    if (defaultLabel && (!agent.model || agent.model !== defaultLabel)) {
+      setCurrentModel(defaultLabel);
+    }
+  }, [agent.cli, agent.model]);
 
   const modelMenuRef = useRef<HTMLDivElement>(null);
   const effortMenuRef = useRef<HTMLDivElement>(null);
@@ -531,9 +502,13 @@ export default function AgentPane({
   const handleSelectModel = (modelId: string, modelLabel: string) => {
     setCurrentModel(modelLabel);
     setModelMenuOpen(false);
+    setModelSearchQuery("");
+    autoModelDetection.markUserChosen();
     useAgentsStore.getState().updateAgent(paneId, { model: modelId });
     // \x15 (Ctrl+U) clears any existing prompt draft characters in terminal readline
-    sendTerminal(`\x15/model ${modelId}\r`);
+    const entry = getModelById(agent.cli, modelId) || detectedModels.find(m => m.id === modelId);
+    const cliFlag = entry?.cliFlag || modelId;
+    sendTerminal(`\x15/model ${cliFlag}\r`);
   };
 
   const handleSelectEffort = (effortId: string, effortLabel?: string) => {
@@ -680,6 +655,13 @@ export default function AgentPane({
       console.error(`write_to_terminal failed for ${paneId}:`, e),
     );
   };
+
+ // Auto-detect models via Tauri probe (replaces Node.js-based probing)
+ // Probes the actual CLI binary on the Rust side and auto-selects the best model.
+ const autoModelDetection = useAutoModelDetection(agent.cli, paneId);
+ const detectedModels = autoModelDetection.detectedModels;
+ const detectedSelectedModel = autoModelDetection.selectedModel;
+ const isDetectingModels = autoModelDetection.isDetecting;
 
   useEffect(() => {
     if (!terminalRef.current) return;
@@ -1119,7 +1101,7 @@ export default function AgentPane({
                   useAgentsStore.getState().updateAgent(paneId, { initialPrompt: undefined });
                   setTimeout(() => {
                     if (!disposed) {
-                      writeToProcess(pText + "\r");
+                      sendTerminal(pText + "\r");
                     }
                   }, 1200);
                 }
@@ -1132,7 +1114,7 @@ export default function AgentPane({
                 useAgentsStore.getState().updateAgent(paneId, { initialPrompt: undefined });
                 setTimeout(() => {
                   if (!disposed) {
-                    writeToProcess(pText + "\r");
+                    sendTerminal(pText + "\r");
                   }
                 }, 1200);
               }
@@ -1851,43 +1833,80 @@ export default function AgentPane({
                         <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07l14.14-14.14" />
                       </svg>
                       <span className="font-semibold text-swarm-text/90 max-w-[150px] truncate">
-                        {currentModel.replace(" (1M Context)", " 1M").replace(" (1M)", " 1M")}
+                        {isDetectingModels ? (
+                          <span className="flex items-center gap-1">
+                            <Loader2 size={10} className="animate-spin text-swarm-gold/70" />
+                            <span className="text-swarm-gold/80">Detecting...</span>
+                          </span>
+                        ) : (
+                          currentModel.replace(" (1M Context)", " 1M").replace(" (1M)", " 1M")
+                        )}
                       </span>
-                      <ChevronDown size={12} className="text-swarm-textMuted/70 group-hover:text-swarm-text shrink-0" />
+                      {!isDetectingModels && (
+                        <ChevronDown size={12} className="text-swarm-textMuted/70 group-hover:text-swarm-text shrink-0" />
+                      )}
                     </button>
 
                     {modelMenuOpen && (
-                      <div className="absolute bottom-full left-0 mb-2 min-w-[230px] rounded-xl border border-white/[0.12] bg-[#141720] p-1.5 shadow-2xl z-50 animate-fade-in">
+                      <div className="absolute bottom-full left-0 mb-2 min-w-[260px] max-w-[340px] rounded-xl border border-white/[0.12] bg-[#141720] p-1.5 shadow-2xl z-50 animate-fade-in flex flex-col">
                         <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase flex items-center justify-between">
                           <span style={{ color: brandMeta.brandColor }}>{brandMeta.brandName}</span>
-                          <span className="text-[9px] font-mono text-swarm-gold">{`/model`}</span>
+                          <div className="flex items-center gap-1.5">
+                            {autoModelDetection.error && (
+                              <span className="text-[9px] font-mono text-swarm-err" title={autoModelDetection.error}>probe failed</span>
+                            )}
+                            <span className="text-[9px] font-mono text-swarm-gold">{`${detectedModels.length} models`}</span>
+                          </div>
                         </div>
-                        {dynamicModels.map((m) => (
-                          <button
-                            key={m.id}
-                            onClick={() => handleSelectModel(m.id, m.label)}
-                            className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-xs text-left text-swarm-textDim hover:bg-white/[0.08] hover:text-swarm-text transition-colors group"
-                          >
-                            <div className="flex items-center gap-1.5 min-w-0 pr-2">
-                              <span className="truncate">{m.label}</span>
-                              {m.is1M && (
-                                <span className="shrink-0 px-1 py-0.2 rounded text-[9px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
-                                  1M
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-1.5 shrink-0">
-                              {m.pricing && (
-                                <span className="text-[10px] tabular-nums text-swarm-textMuted/60 group-hover:text-swarm-textMuted/90">
-                                  {m.pricing}
-                                </span>
-                              )}
-                              {(currentModel === m.id || currentModel === m.label) && (
-                                <Check size={12} className="text-swarm-gold ml-0.5" />
-                              )}
-                            </div>
-                          </button>
-                        ))}
+
+                        {detectedModels.length > 5 && (
+                          <div className="px-1 py-1">
+                            <input
+                              type="text"
+                              value={modelSearchQuery}
+                              onChange={(e) => setModelSearchQuery(e.target.value)}
+                              placeholder="Search models..."
+                              className="w-full bg-white/[0.05] border border-white/[0.1] rounded-lg px-2 py-1 text-[11px] text-swarm-text placeholder:text-swarm-textMuted/50 focus:outline-none focus:border-swarm-gold/50"
+                              onClick={(e) => e.stopPropagation()}
+                              autoFocus
+                            />
+                          </div>
+                        )}
+
+                        <div className="max-h-[260px] overflow-y-auto custom-scrollbar flex flex-col gap-0.5">
+                          {detectedModels
+                            .filter((m) => {
+                              if (!modelSearchQuery.trim()) return true;
+                              const q = modelSearchQuery.toLowerCase();
+                              return m.label.toLowerCase().includes(q) || m.cliFlag.toLowerCase().includes(q) || (m.provider && m.provider.toLowerCase().includes(q));
+                            })
+                            .map((m) => (
+                              <button
+                                key={m.id}
+                                onClick={() => handleSelectModel(m.id, m.label)}
+                                className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-xs text-left text-swarm-textDim hover:bg-white/[0.08] hover:text-swarm-text transition-colors group"
+                              >
+                                <div className="flex items-center gap-1.5 min-w-0 pr-2">
+                                  <span className="truncate">{m.label}</span>
+                                  {m.is1M && (
+                                    <span className="shrink-0 px-1 py-0.2 rounded text-[9px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                                      1M
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  {m.pricing && (
+                                    <span className="text-[10px] tabular-nums text-swarm-textMuted/60 group-hover:text-swarm-textMuted/90">
+                                      {m.pricing}
+                                    </span>
+                                  )}
+                                  {(currentModel === m.id || currentModel === m.label) && (
+                                    <Check size={12} className="text-swarm-gold ml-0.5" />
+                                  )}
+                                </div>
+                              </button>
+                            ))}
+                        </div>
                       </div>
                     )}
                   </div>

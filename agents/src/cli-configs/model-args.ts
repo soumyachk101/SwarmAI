@@ -37,7 +37,8 @@ function normaliseModel(cli: string, model: string): string {
 export function normaliseEffort(effort?: string): EffortLevel | undefined {
   if (!effort) return undefined;
   const e = effort.trim().toLowerCase();
-  if (e === "ultracode" || e === "ultra") return "ultracode";
+  if (e === "ultracode") return "ultracode";
+  if (e === "ultra") return "ultra";
   if (e === "max" || e === "max effort" || e === "maximum") return "max";
   if (e === "xhigh" || e === "extra high" || e === "extra-high" || e === "extra_high") return "xhigh";
   if (e === "high") return "high";
@@ -76,7 +77,7 @@ export function modelArgs(
       break;
 
     case "opencode":
-      if (m && m.includes("/")) args.push("-m", m);
+      if (m && m.includes("/")) args.push("--model", m);
       break;
 
     case "aider":

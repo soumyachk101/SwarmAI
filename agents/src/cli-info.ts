@@ -1,4 +1,4 @@
-export type CLISlug = 'claude-code' | 'codex-cli' | 'aider' | 'antigravity-cli' | 'opencode' | 'kimi-code' | 'cline' | 'cursor' | 'kiro' | 'kilo';
+export type CLISlug = 'claude-code' | 'codex-cli' | 'aider' | 'antigravity-cli' | 'opencode' | 'kimi-code' | 'cline' | 'cursor' | 'kiro' | 'kilo' | 'goose';
 
 export interface CLIInfo {
   id: CLISlug;
@@ -23,7 +23,8 @@ export const CLI_METADATA: CLIInfo[] = [
   { id: 'cline',            name: 'Cline',            description: 'Claude-powered coding agent',   command: 'cline',    installCmd: 'npm install -g cline',                        docsUrl: 'https://github.com/cline/cline' },
   { id: 'cursor',           name: 'Cursor CLI',       description: 'Cursor editor AI CLI',          command: 'cursor',   installCmd: '# Install Cursor IDE — CLI ships with the app\ncursor --version', docsUrl: 'https://cursor.com/downloads' },
   { id: 'kiro',             name: 'Kiro CLI',         description: 'Kiro AI coding helper',         command: 'kiro',     installCmd: 'npm install -g kiro-cli',                     docsUrl: 'https://kiro.dev' },
-  { id: 'kilo',             name: 'Kilo',             description: 'Kilo AI terminal agent',        command: 'kilo',     installCmd: 'npm install -g kilo-ai',                      docsUrl: 'https://kilo.ai' },
+  { id: 'kilo',             name: 'Kilo',             description: 'Kilo AI coding agent',        command: 'kilo',     installCmd: 'npm install -g @kilocodeai/cli',                      docsUrl: 'https://kilo.ai' },
+ { id: 'goose', name: 'Goose', description: 'Block open-source Rust agent', command: 'goose', installCmd: 'cargo install goose-cli', docsUrl: 'https://goose-docs.ai' },
 ];
 
 export const CLI_BY_COMMAND: Record<string, CLIInfo> = Object.fromEntries(

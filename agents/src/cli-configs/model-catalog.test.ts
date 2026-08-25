@@ -14,7 +14,7 @@ describe("model-catalog", () => {
  it("returns Claude Code models", () => {
  const models = getModelsForCli("claude");
  expect(models.length).toBeGreaterThan(0);
- expect(models[0].cliFlag).toBe("opus");
+ expect(models[0].cliFlag).toBe("opus[1m]");
  expect(models[0].provider).toBe("anthropic");
  expect(models[0].is1M).toBe(true);
  });
@@ -34,7 +34,7 @@ describe("model-catalog", () => {
 
  it("returns OpenCode models with provider prefix", () => {
  const models = getModelsForCli("opencode");
- expect(models.some(m => m.cliFlag === "opencode/nemotron-3.5-lightning")).toBe(true);
+ expect(models.some(m => m.cliFlag === "opencode/claude-opus-5")).toBe(true);
  });
 
  it("returns Aider models with mixed providers", () => {
@@ -56,17 +56,17 @@ describe("model-catalog", () => {
  });
 
  describe("getDefaultModelForCli", () => {
- it("returns first model for Claude (Opus)", () => {
+ it("returns first model for Claude (Opus 1M)", () => {
  const default_ = getDefaultModelForCli("claude");
  expect(default_).toBeDefined();
- expect(default_!.cliFlag).toBe("opus");
+ expect(default_!.cliFlag).toBe("opus[1m]");
  expect(default_!.is1M).toBe(true);
  });
 
  it("returns first model for Codex", () => {
  const default_ = getDefaultModelForCli("codex");
  expect(default_).toBeDefined();
- expect(default_!.cliFlag).toBe("5.6-sol");
+ expect(default_!.cliFlag).toBe("5.6-terra");
  });
 
  it("returns undefined for CLIs without models", () => {
@@ -169,7 +169,7 @@ describe("model-catalog", () => {
  // Verify that the static catalog covers the flag mappings in model-args.ts
  const claudeFlags = MODEL_CATALOG["claude"]?.map(m => m.cliFlag.toLowerCase()) ?? [];
  // These are the flags model-args normalizes to
- const requiredClaudeFlags = ["opus", "sonnet", "haiku", "fable", "opus[1m]", "sonnet[1m]", "fable[1m]"];
+ const requiredClaudeFlags = ["opus[1m]", "sonnet", "haiku", "fable", "sonnet[1m]", "fable[1m]"];
  for (const flag of requiredClaudeFlags) {
  expect(claudeFlags).toContain(flag);
  }

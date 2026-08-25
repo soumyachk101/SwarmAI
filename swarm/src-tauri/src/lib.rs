@@ -1,7 +1,7 @@
 use portable_pty::{native_pty_system, Child, CommandBuilder, MasterPty, PtySize};
 use rusqlite::{Connection, params};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
@@ -1124,6 +1124,374 @@ async fn run_command(command: String, args: Vec<String>) -> Result<String, Strin
         return Err(format!("{} failed: {}", command, stderr));
     }
     Ok(String::from_utf8_lossy(&output.stdout).to_string())
+}
+
+/// Probe a CLI binary for its available models by running `<cli> --help`
+/// and parsing the output. Returns a list of detected model identifiers.
+/// If the CLI is not installed or `--help` doesn't mention models,
+#[tauri::command]
+async fn run_cli_probe(cli: String, _timeout_ms: u64) -> Result<Vec<String>, String> {
+	let Some(binary) = find_cli_executable(&cli) else {
+		return Ok(Vec::new());
+	};
+
+	let mut detected: Vec<String> = Vec::new();
+
+	// Specialized real-time CLI probing
+	match cli.as_str() {
+		"opencode" => {
+			if let Ok(output) = std::process::Command::new(&binary)
+				.arg("models")
+				.stdout(std::process::Stdio::piped())
+				.stderr(std::process::Stdio::null())
+				.output()
+			{
+				if output.status.success() {
+					let text = String::from_utf8_lossy(&output.stdout);
+					for line in text.lines() {
+						let trimmed = line.trim();
+						if !trimmed.is_empty() && (trimmed.contains('/') || trimmed.contains('-') || trimmed.contains('.')) && !trimmed.contains("Commands:") && !trimmed.contains("Options:") && !trimmed.starts_with('█') && !trimmed.starts_with('▀') {
+							detected.push(trimmed.to_string());
+						}
+					}
+				}
+			}
+		}
+		"claude" => {
+			detected.extend(vec![
+				"opus[1m]".to_string(),
+				"sonnet".to_string(),
+				"sonnet[1m]".to_string(),
+				"fable".to_string(),
+				"fable[1m]".to_string(),
+				"haiku".to_string(),
+			]);
+		}
+		"codex" => {
+			detected.extend(vec![
+				"5.6-terra".to_string(),
+				"5.6-sol".to_string(),
+				"5.6-luna".to_string(),
+				"5.5".to_string(),
+				"5.4".to_string(),
+				"o3".to_string(),
+				"o3-mini".to_string(),
+				"o4-mini".to_string(),
+				"o1-pro".to_string(),
+				"gpt-5.1".to_string(),
+				"gpt-5.1-codex".to_string(),
+				"gpt-5".to_string(),
+			]);
+		}
+		"agy" => {
+			detected.extend(vec![
+				"gemini-3.7-flash".to_string(),
+				"gemini-3.7-pro".to_string(),
+				"gemini-3.6-flash".to_string(),
+				"gemini-3.5-flash".to_string(),
+				"gemini-3.1-pro".to_string(),
+				"gemini-3.0-pro".to_string(),
+			]);
+		}
+		_ => {}
+	}
+
+	if detected.is_empty() {
+		let output = match std::process::Command::new(&binary)
+			.arg("--help")
+			.stdout(std::process::Stdio::piped())
+			.stderr(std::process::Stdio::null())
+			.output()
+		{
+			Ok(o) => o,
+			Err(_) => return Ok(Vec::new()),
+		};
+
+		let stdout = if output.status.success() {
+			String::from_utf8_lossy(&output.stdout).to_string()
+		} else {
+			let fallback = std::process::Command::new(&binary)
+				.stdout(std::process::Stdio::piped())
+				.stderr(std::process::Stdio::null())
+				.output()
+				.ok();
+			fallback
+				.as_ref()
+				.and_then(|o| String::from_utf8(o.stdout.clone()).ok())
+				.unwrap_or_default()
+		};
+
+		detected = parse_model_flags_from_help(&stdout, &cli);
+	}
+
+	if detected.is_empty() {
+		detected = detect_models_from_config(&cli);
+	}
+
+	let mut seen = std::collections::HashSet::new();
+	detected.retain(|m| seen.insert(m.clone()));
+
+	Ok(detected)
+}
+
+/// Level 2 detection: read CLI config files to find available models.
+/// This catches models that --help doesn't mention (e.g. API-based CLIs).
+fn detect_models_from_config(cli: &str) -> Vec<String> {
+ let home = match std::env::var("HOME").or_else(|_| std::env::var("USERPROFILE")) {
+ Ok(h) => h,
+ Err(_) => return Vec::new(),
+ };
+
+ match cli {
+ "claude" => {
+ // Claude Code: read ~/.claude/settings.json for last used model
+ let settings_path = PathBuf::from(&home).join(".claude").join("settings.json");
+ if let Ok(content) = fs::read_to_string(settings_path) {
+ if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+ let mut models = Vec::new();
+ // Check for model preferences in settings
+ if let Some(model) = json.get("model").and_then(|v| v.as_str()) {
+ models.push(model.to_lowercase());
+ }
+ // Check for recent models
+ if let Some(recent) = json.get("recentModels").and_then(|v| v.as_array()) {
+ for m in recent {
+ if let Some(s) = m.as_str() {
+ models.push(s.to_lowercase());
+ }
+ }
+ }
+ return models;
+ }
+ }
+ Vec::new()
+ }
+ "opencode" => {
+ // OpenCode: read ~/.config/opencode/config.json for preferred models
+ let candidates = [
+ PathBuf::from(&home).join(".config").join("opencode").join("config.json"),
+ PathBuf::from(&home).join(".config").join("opencode").join("config.yaml"),
+ PathBuf::from(&home).join(".opencode").join("config.json"),
+ ];
+ for path in &candidates {
+ if let Ok(content) = fs::read_to_string(path) {
+ if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+ let mut models = Vec::new();
+ if let Some(model) = json.get("model").and_then(|v| v.as_str()) {
+ models.push(model.to_lowercase());
+ }
+ if let Some(models_arr) = json.get("models").and_then(|v| v.as_array()) {
+ for m in models_arr {
+ if let Some(s) = m.as_str() {
+ models.push(s.to_lowercase());
+ }
+ }
+ }
+ if !models.is_empty() { return models; }
+ }
+ }
+ }
+ Vec::new()
+ }
+ "codex" => {
+ // Codex: read ~/.codex/config.json
+ let path = PathBuf::from(&home).join(".codex").join("config.json");
+ if let Ok(content) = fs::read_to_string(path) {
+ if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+ if let Some(model) = json.get("model").and_then(|v| v.as_str()) {
+ return vec![model.to_lowercase()];
+ }
+ }
+ }
+ Vec::new()
+ }
+ "agy" => {
+ // Antigravity: check for stored auth/model preferences
+ let candidates = [
+ PathBuf::from(&home).join(".config").join("antigravity").join("config.json"),
+ PathBuf::from(&home).join(".antigravity").join("config.json"),
+ ];
+ for path in &candidates {
+ if let Ok(content) = fs::read_to_string(path) {
+ if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+ if let Some(model) = json.get("model").and_then(|v| v.as_str()) {
+ return vec![model.to_lowercase()];
+ }
+ }
+ }
+ }
+ Vec::new()
+ }
+ _ => Vec::new(),
+ }
+}
+
+/// Parse model flag strings out of a CLI's `--help` output text.
+/// Locates the `--model` option line, then dispatches to a CLI-specific
+/// parser based on the `cli` argument.
+fn parse_model_flags_from_help(help_text: &str, cli: &str) -> Vec<String> {
+ let lower = help_text.to_lowercase();
+
+ // Find the --model option line and grab the description that follows
+ let model_section = lower
+ .match_indices("--model")
+ .next()
+ .and_then(|(idx, _)| {
+ let rest = &lower[idx..];
+ // Capture until next option flag (line starting with -) or double newline
+ let end = rest
+ .match_indices('\n')
+ .filter(|(_, s)| s.len() > 1 && s.chars().nth(1) == Some('-'))
+ .next()
+ .map(|(i, _)| i)
+ .unwrap_or(rest.len());
+ Some(rest[..end].to_string())
+ });
+
+ let section = match model_section {
+ Some(s) if s.len() > 20 => s,
+ _ => return Vec::new(),
+ };
+
+ // Remove the "--model" prefix itself
+ let desc = section.trim_start_matches("--model").trim();
+
+ // CLI-specific extraction
+ match cli {
+ "claude" => extract_claude_flags(desc),
+ "codex" => extract_codex_flags(desc),
+ "agy" => extract_agy_flags(desc),
+ "aider" => extract_aider_flags(desc),
+ "kilo" => extract_kilo_flags(desc),
+ "cline" => extract_cline_flags(desc),
+ "cursor" | "kiro" | "kimi" => extract_editor_flags(desc),
+ _ => extract_generic_flags(desc),
+ }
+}
+
+/// Split a string on common delimiters (comma, pipe, space) and return
+/// unique tokens that look like model identifiers.
+fn tokenize_candidates(desc: &str) -> Vec<String> {
+ let mut seen = std::collections::HashSet::new();
+ let mut results = Vec::new();
+
+ // Split on comma, pipe, backtick, or whitespace
+ let binding = desc
+ .replace(',', " ")
+ .replace('|', " ")
+ .replace('`', " ");
+ let raw_tokens: Vec<&str> = binding
+ .split_whitespace()
+ .collect();
+ for token in raw_tokens {
+ let clean = token.trim().to_lowercase();
+ if clean.is_empty() || clean.len() < 2 || clean.len() > 40 {
+ continue;
+ }
+ // Filter out common non-model words
+ let skip = [
+ "the", "and", "for", "use", "specify", "available", "models", "model",
+ "default", "option", "flag", "set", "list", "of", "all", "in", "to",
+ "with", "or", "by", "current", "name", "string", "type", "api", "key",
+ ];
+ if skip.contains(&clean.as_str()) {
+ continue;
+ }
+ if seen.insert(clean.clone()) {
+ results.push(clean);
+ }
+ }
+ results
+}
+
+fn extract_claude_flags(desc: &str) -> Vec<String> {
+	let candidates = tokenize_candidates(desc);
+	let mut flags = Vec::new();
+	for s in candidates {
+		let clean = s.trim_matches('\'').trim_matches('"').trim_matches(',').to_lowercase();
+		if clean.starts_with("opus") || clean.starts_with("sonnet") || clean.starts_with("haiku") || clean.starts_with("fable") || clean.starts_with("claude-") {
+			flags.push(clean);
+		}
+	}
+	if flags.iter().any(|f| f.starts_with("opus")) && !flags.contains(&"opus[1m]".to_string()) {
+		flags.push("opus[1m]".to_string());
+	}
+	if flags.iter().any(|f| f.starts_with("sonnet")) && !flags.contains(&"sonnet[1m]".to_string()) {
+		flags.push("sonnet[1m]".to_string());
+	}
+	if flags.iter().any(|f| f.starts_with("fable")) && !flags.contains(&"fable[1m]".to_string()) {
+		flags.push("fable[1m]".to_string());
+	}
+	flags
+}
+
+fn extract_codex_flags(desc: &str) -> Vec<String> {
+ let candidates = tokenize_candidates(desc);
+ // Codex uses version strings like "5.6-sol", "5.5", etc.
+ candidates
+ .into_iter()
+ .filter(|s| s.contains('.') || s.chars().any(|c| c.is_ascii_digit()))
+ .collect()
+}
+
+fn extract_agy_flags(desc: &str) -> Vec<String> {
+ let candidates = tokenize_candidates(desc);
+ // Keep tokens that look like model identifiers (gemini-, claude-, deepseek-)
+ candidates
+ .into_iter()
+ .filter(|s| s.starts_with("gemini-") || s.starts_with("claude-") || s.starts_with("deepseek-"))
+ .collect()
+}
+
+fn extract_aider_flags(desc: &str) -> Vec<String> {
+ let candidates = tokenize_candidates(desc);
+ // Aider uses model names like "sonnet", "o3-mini", "deepseek/xxx"
+ candidates
+ .into_iter()
+ .filter(|s| {
+ let t = s.trim_start_matches('[').trim_end_matches(']');
+ matches!(t, "sonnet" | "opus" | "haiku" | "o3-mini" | "gpt-4o" | "deepseek" | "gemini")
+ || s.contains('/')
+ })
+ .collect()
+}
+
+fn extract_kilo_flags(desc: &str) -> Vec<String> {
+ let candidates = tokenize_candidates(desc);
+ // Kilo uses OpenAI model identifiers (gpt-4o, o3, o1, o4-mini, etc.)
+ candidates
+ .into_iter()
+ .filter(|s| {
+ let t = s.trim_start_matches('[').trim_end_matches(']');
+ // Known OpenAI model families Kilo supports
+ matches!(t, "gpt-4o" | "gpt-4o-mini" | "gpt-4-turbo" | "gpt-4" | "o3" | "o4-mini" | "o1-pro" | "o1" | "o3-mini")
+ || t.starts_with("gpt-")
+ || t.starts_with("o") && t.chars().nth(1).map(|c| c.is_ascii_digit()).unwrap_or(false)
+ })
+ .collect()
+}
+
+fn extract_cline_flags(desc: &str) -> Vec<String> {
+ let candidates = tokenize_candidates(desc);
+ // Cline supports Claude models and some OpenAI models
+ candidates
+ .into_iter()
+ .filter(|s| {
+ let t = s.trim_start_matches('[').trim_end_matches(']');
+ matches!(t, "sonnet" | "opus" | "haiku" | "gpt-4o" | "gpt-4")
+ })
+ .collect()
+}
+
+fn extract_editor_flags(desc: &str) -> Vec<String> {
+ // Cursor, Kiro, — model selection is done through their editor/IDE,
+ // not via CLI --model flags. Return generic tokenized result for catalog
+ // matching, but these CLIs typically won't have usable flags from --help.
+ tokenize_candidates(desc)
+}
+
+fn extract_generic_flags(desc: &str) -> Vec<String> {
+ tokenize_candidates(desc)
 }
 
 #[tauri::command]
@@ -3280,13 +3648,16 @@ struct EditorServer {
 /// Resolve a usable editor server: an explicit path, then openvscode-server on
 /// PATH, then VS Code's built-in web server.
 fn resolve_editor_server(explicit: Option<String>) -> Result<EditorServer, String> {
-    if let Some(p) = explicit {
-        let p = p.trim();
-        if !p.is_empty() {
-            let backend = if p.contains("openvscode") { EditorBackend::OpenVsx } else { EditorBackend::CodeServeWeb };
-            return Ok(EditorServer { exe: p.to_string(), backend });
-        }
-    }
+ if let Some(p) = explicit {
+		let p = p.trim();
+		if !p.is_empty() {
+			if !std::path::Path::new(p).exists() {
+				return Err(format!("Editor server binary not found at: {}. Expected an executable like openvscode-server or the full path to VS Code code binary. If the path was valid before but now fails, try clearing the saved path and re-detecting.", p));
+			}
+			let backend = if p.contains("openvscode") { EditorBackend::OpenVsx } else { EditorBackend::CodeServeWeb };
+			return Ok(EditorServer { exe: p.to_string(), backend });
+		}
+	}
     if which_on_path("openvscode-server").is_some() {
         return Ok(EditorServer { exe: "openvscode-server".into(), backend: EditorBackend::OpenVsx });
     }
@@ -3315,7 +3686,8 @@ async fn start_openvsx(
     pane_id: String,
     bin: Option<String>,
     port: u16,
-    extensions: Option<Vec<String>>,
+    working_dir: Option<String>,
+	extensions: Option<Vec<String>>,
     env: Option<HashMap<String, String>>,
     state: State<'_, OpenVsxState>,
 ) -> Result<u16, String> {
@@ -3349,6 +3721,11 @@ async fn start_openvsx(
         .arg("--port")
         .arg(port.to_string())
         .arg("--without-connection-token");
+
+	if let Some(ref wd) = working_dir {
+		cmd.current_dir(wd);
+		cmd.arg("--folder").arg(wd.clone());
+	}
 
     // Agent extensions spawn their own MCP servers as children of this process,
     // so anything set here (SWARM_PANE_ID, SWARM_LEAD) reaches them — the
@@ -3893,11 +4270,11 @@ pub fn run() {
             create_worktree,
             merge_worktree,
             remove_worktree,
-            get_pheromone_mcp_path,
             ensure_dir,
             copy_dir,
             remove_dir,
             run_command,
+ run_cli_probe,
             launch_cdp_browser,
             cdp_ws_url,
             stop_cdp_browser,

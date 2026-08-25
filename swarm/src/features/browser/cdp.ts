@@ -24,6 +24,10 @@ export class CdpClient {
  private constructor(ws: WebSocket) {
  this.ws = ws;
  this.ws.onmessage = (ev) => this.handle(ev.data);
+ // If the socket dies unexpectedly, reject every pending command so callers
+ // don't hang until the per-request timeout (15 s).
+ this.ws.onclose = () => this.close();
+ this.ws.onerror = () => this.close();
  }
 
  static connect(wsUrl: string, timeoutMs = 10_000): Promise<CdpClient> {
@@ -40,6 +44,10 @@ export class CdpClient {
  ws.onerror = () => {
  clearTimeout(timer);
  reject(new Error("CDP connection failed"));
+ };
+ ws.onclose = () => {
+ clearTimeout(timer);
+ reject(new Error("CDP connection closed"));
  };
  });
  }
