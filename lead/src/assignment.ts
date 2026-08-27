@@ -1,40 +1,49 @@
 import type { LeadTask, Assignment } from './types.js';
 
 export interface AssignmentStrategy {
-  name: string;
-  assign(tasks: LeadTask[]): Assignment[];
+ name: string;
+ assign(tasks: LeadTask[]): Assignment[];
 }
 
 export class DefaultAssignmentStrategy implements AssignmentStrategy {
-  name = 'default';
-  private availableClis = ['opencode', 'claude', 'codex', 'kilo', 'cline', 'agy'];
+ name = 'default';
+ private availableClis = ['claude', 'codex', 'opencode', 'kilo', 'cline', 'agy'];
 
-  assign(tasks: LeadTask[]): Assignment[] {
-    const assignments: Assignment[] = [];
+ assign(tasks: LeadTask[]): Assignment[] {
+ const assignments: Assignment[] = [];
 
-    assignments.push({
-      taskId: 'coordinator',
-      cli: 'opencode',
-      role: 'coordinator',
-    });
+ if (tasks.length > 0) {
+ assignments.push({
+ taskId: 'coordinator',
+ cli: 'claude',
+ role: 'coordinator',
+ });
+ }
 
-    for (const task of tasks) {
-      const cli = this.availableClis[Math.floor(Math.random() * this.availableClis.length)];
-      assignments.push({
-        taskId: task.id,
-        cli: task.suggestedCli || cli,
-        role: task.suggestedRole === 'scout' ? 'scout' : 'builder',
-      });
-    }
+ for (const task of tasks) {
+ const cli = task.suggestedCli && this.availableClis.includes(task.suggestedCli)
+ ? task.suggestedCli
+ : this.availableClis[Math.floor(Math.random() * this.availableClis.length)];
+ const role = task.suggestedRole === 'scout'
+ ? 'scout'
+ : task.suggestedRole === 'reviewer'
+ ? 'reviewer'
+ : 'builder';
+ assignments.push({
+ taskId: task.id,
+ cli,
+ role,
+ });
+ }
 
-    if (tasks.length > 0) {
-      assignments.push({
-        taskId: 'reviewer',
-        cli: 'opencode',
-        role: 'reviewer',
-      });
-    }
+ if (tasks.length > 0) {
+ assignments.push({
+ taskId: 'reviewer',
+ cli: 'claude',
+ role: 'reviewer',
+ });
+ }
 
-    return assignments;
-  }
+ return assignments;
+ }
 }

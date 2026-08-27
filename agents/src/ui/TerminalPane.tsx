@@ -362,7 +362,7 @@ export default function TerminalPane({
                   // non-zero measurement bakes in a half-laid-out width — the
                   // ragged right edge. Wait until two measurements agree.
                   const { rows, cols } = terminal;
-                  if (cols < 35 || rows < 5 || cols !== lastCols || rows !== lastRows) {
+                  if (cols < 10 || rows < 3 || cols !== lastCols || rows !== lastRows) {
                     lastCols = cols;
                     lastRows = rows;
                     fitAndSync();

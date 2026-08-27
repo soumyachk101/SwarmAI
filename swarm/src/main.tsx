@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import HomePage from './app/HomePage';
 import { registerHosts } from './host/registerHosts';
 import { initTheme } from './shared/themeStore';
+import { ToastProvider } from "./shared/ToastProvider";
 import 'xterm/css/xterm.css';
 import './app/globals.css';
 
@@ -50,6 +51,8 @@ registerHosts();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <HomePage />
+    <ToastProvider>
+ <HomePage />
+ </ToastProvider>
   </React.StrictMode>
 );

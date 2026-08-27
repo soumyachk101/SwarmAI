@@ -715,9 +715,9 @@ function DevToolsPanel({ projectPath }: { projectPath: string | null }) {
   ] as const;
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-swarm-canvas">
+    <div className="flex h-full flex-col overflow-hidden bg-[#0c0e14]/95 backdrop-blur-2xl border-r border-white/[0.08]">
       {/* Sub-tab Navigation Bar */}
-      <div className="flex shrink-0 items-center border-b border-swarm-border/40 bg-swarm-surface/60 p-1 gap-0.5 overflow-x-auto scrollbar-none">
+      <div className="flex shrink-0 items-center border-b border-white/[0.08] bg-[#0c0e14]/80 backdrop-blur-xl px-2 py-1.5 gap-0.5 overflow-x-auto">
         {SUB_TABS.map((t) => {
           const Icon = t.icon;
           const active = subTab === t.id;
@@ -1037,7 +1037,7 @@ function FleetPanel({ onSelectWorkspace }: { onSelectWorkspace: (wsId: string) =
               <div
                 key={a.id}
                 onClick={() => a.workspaceId && onSelectWorkspace(a.workspaceId)}
-                className="group flex flex-col gap-1 rounded-xl border border-swarm-border/50 bg-swarm-surface/60 p-2.5 transition-all hover:border-swarm-gold/50 hover:bg-swarm-gold/[0.04] cursor-pointer shadow-sm"
+                className="group flex flex-col gap-1 rounded-xl border border-white/[0.1] bg-white/[0.04] p-2.5 transition-all hover:border-swarm-gold/40 hover:bg-swarm-gold/[0.06] cursor-pointer shadow-sm backdrop-blur-sm"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">

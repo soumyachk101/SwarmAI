@@ -36,10 +36,14 @@ import {
   Columns3,
   Mic,
   FolderGit2,
+ History,
 } from "lucide-react";
 import ThemePicker from "@/shared/ThemePicker";
 import OverflowMenu from "@/shared/OverflowMenu";
 import CommandPalette from "@/shared/CommandPalette";
+import ShortcutsModal from "@/shared/ShortcutsModal";
+import OnboardingModal, { useOnboarding } from "@/shared/OnboardingModal";
+import CommandHistoryPopup from "@/shared/CommandHistoryPopup";
 import GitControlModal from "@/features/git/GitControlModal";
 import UserGuideModal from "@/features/help/UserGuideModal";
 import SwarmDashboardModal from "@/features/dashboard/SwarmDashboardModal";
@@ -90,7 +94,10 @@ export default function HomePage() {
   const [showDashboard, setShowDashboard] = useState(false);
   const [showDiffModal, setShowDiffModal] = useState(false);
   const [showTemplatesModal, setShowTemplatesModal] = useState(false);
-  const [gitStatus, setGitStatus] = useState<{
+  const [showHistory, setShowHistory] = useState(false);
+ const [showShortcuts, setShowShortcuts] = useState(false);
+ const onboarding = useOnboarding();
+ const [gitStatus, setGitStatus] = useState<{
     branch: string;
     changed: number;
   } | null>(null);

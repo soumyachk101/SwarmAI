@@ -553,3 +553,27 @@ select:focus {
     display: none;
   }
 }
+/* Toast & animation utilities */
+.animate-slide-up {
+ animation: slide-up 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes slide-up {
+ from { opacity: 0; transform: translateY(12px) scale(0.96); }
+ to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-slide-out {
+ animation: slide-out 0.2s ease-in forwards;
+}
+@keyframes slide-out {
+ to { opacity: 0; transform: translateX(40px) scale(0.95); }
+}
+.skeleton {
+ background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+ background-size: 200% 100%;
+ animation: shimmer 1.5s ease-in-out infinite;
+ border-radius: 0.375rem;
+}
+@keyframes shimmer {
+ 0% { background-position: -200% 0; }
+ 100% { background-position: 200% 0; }
+}
