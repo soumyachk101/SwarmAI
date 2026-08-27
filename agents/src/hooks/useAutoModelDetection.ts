@@ -146,10 +146,29 @@ export function useAutoModelDetection(
 					cli: cliId,
 					timeoutMs: 5000,
 				});
-				const existingIds = new Set(existing.map((m) => m.id));
+
+				// The Rust probe returns cliFlag values (e.g. "opus[1m]")
+				// while the catalog uses different id values ("claude-opus-5-1m").
+				// Build lookups against ALL fields so cross-format dedup works.
+				const existingByCliFlag = new Set(
+					existing.filter((m) => m.cliFlag).map((m) => m.cliFlag!.toLowerCase()),
+				);
+				const existingById = new Set(
+					existing.map((m) => m.id.toLowerCase()),
+				);
+				const existingByLabel = new Set(
+					existing.map((m) => m.label.toLowerCase()),
+				);
 
 				const newModels: DetectedModel[] = probedIds
-					.filter((id: string) => !existingIds.has(id))
+					.filter((id: string) => {
+						const key = id.toLowerCase();
+						return (
+							!existingById.has(key) &&
+							!existingByCliFlag.has(key) &&
+							!existingByLabel.has(key)
+						);
+					})
 					.map((id: string) => ({
 						id,
 						label: id,
@@ -158,7 +177,18 @@ export function useAutoModelDetection(
 					}));
 
 				if (newModels.length > 0) {
-					setDetectedModels((prev) => [...prev, ...newModels]);
+					setDetectedModels((prev) => {
+						// Merge deduping: guard against any duplicates already in state
+						const existingKeys = new Set([
+							...prev.map((m) => m.id.toLowerCase()),
+							...prev.filter((m) => m.cliFlag).map((m) => m.cliFlag!.toLowerCase()),
+							...prev.map((m) => m.label.toLowerCase()),
+						]);
+						const deduped = newModels.filter(
+							(m) => !existingKeys.has(m.id.toLowerCase()),
+						);
+						return deduped.length > 0 ? [...prev, ...deduped] : prev;
+					});
 				}
 			} catch {
 				// Best-effort probe failure — don't disrupt existing catalog models

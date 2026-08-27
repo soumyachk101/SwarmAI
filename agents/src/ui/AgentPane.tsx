@@ -1550,13 +1550,13 @@ export default function AgentPane({
             aria-pressed={isLead}
             aria-label={isLead ? "Demote from Lead" : "Make Lead"}
           >
-            <LeadCrown size={12} />
+            <LeadCrown size={14} />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); syncNowRef.current?.(); }}
             disabled={syncing}
             className={`p-1.5 rounded-md transition-colors disabled:cursor-default ${
-              syncing ? "text-swarm-gold" : "text-swarm-textDim hover:bg-swarm-border/60 hover:text-swarm-text"
+              syncing ? "text-swarm-gold shadow-[0_0_6px_rgb(var(--swarm-gold)/0.2)]" : "text-swarm-textDim hover:bg-swarm-border/50 hover:text-swarm-text"
             }`}
             title={
               syncing
@@ -1567,7 +1567,7 @@ export default function AgentPane({
             }
             aria-label="Sync to shared mind"
           >
-            <RefreshCw size={12} className={syncing ? "animate-spin" : ""} />
+            <RefreshCw size={14} className={syncing ? "animate-spin" : ""} />
           </button>
           {/* Instant Swarm Handoff */}
           <div className="relative" ref={handoffMenuRef}>
@@ -1591,7 +1591,7 @@ export default function AgentPane({
               }
               aria-label="Handoff to agent"
             >
-              <ArrowRightLeft size={12} />
+              <ArrowRightLeft size={14} />
             </button>
             {handoffSuccess && (
               <span className="absolute right-0 top-full mt-1 z-40 rounded-md bg-emerald-950/90 border border-emerald-500/50 px-2 py-1 text-[10px] text-emerald-400 whitespace-nowrap animate-fade-in font-medium">
@@ -1625,7 +1625,7 @@ export default function AgentPane({
               and "what this pane DOES" (view controls). Six identically styled
               icons in one undivided row read as a single blob when you're
               scanning a grid of panes for the right one. */}
-          <span aria-hidden className="mx-0.5 h-3.5 w-px bg-swarm-border/70" />
+          <span aria-hidden className="mx-1 h-4 w-px bg-swarm-border/40" />
           {compactHeader ? (
             <div className="relative" ref={menuRef}>
               <button
@@ -1711,18 +1711,29 @@ export default function AgentPane({
         {/* xterm canvas */}
         <div
           onClick={handleTerminalContainerClick}
-          className="flex-1 relative min-h-0 p-2 cursor-text"
+          className="flex-1 relative min-h-0 cursor-text"
         >
           <div
             ref={terminalRef}
-            className={`absolute inset-2 overflow-hidden ${spawnState === "notFound" ? "invisible" : ""}`}
+            className={`absolute inset-0 overflow-hidden ${spawnState === "notFound" ? "invisible" : ""}`}
           />
         </div>
 
-        {/* Floating Prompt Bar at the bottom */}
-        {spawnState === "running" && (
-          <div className="relative shrink-0 p-3 pt-0 z-20">
-            <div className="relative rounded-2xl border border-white/[0.12] bg-[#0c0e14] p-3 shadow-2xl transition-all focus-within:border-white/[0.22] flex items-stretch gap-3">
+ {/* Floating Prompt Bar at the bottom */}
+ {spawnState === "running" && (
+ <div className="relative shrink-0 z-20">
+ {/* Brand-colored accent glow line */}
+ <div
+ className="absolute -top-px left-4 right-4 h-px rounded-full"
+ style={{
+ background: `linear-gradient(90deg, transparent, ${brandMeta.brandColor}90, ${brandMeta.brandColor}50, transparent)`,
+ filter: `blur(0.5px) drop-shadow(0 0 3px ${brandMeta.brandColor}60)`
+ }}
+ />
+ <div className="p-2.5 pt-3">
+ <div className="relative rounded-2xl border border-white/[0.08] bg-[#0c0e14]/[0.97] backdrop-blur-2xl shadow-2xl shadow-black/50 transition-all duration-200 focus-within:border-white/[0.18] focus-within:shadow-black/60 flex items-center gap-2.5">
+ {/* Subtle inner sheen */}
+ <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
               {/* Left Column: Input + Bottom Controls */}
               <div className="flex-1 flex flex-col justify-between min-w-0 gap-2 relative">
                 {/* Slash Command Autocomplete Suggestion Popup */}
@@ -2006,6 +2017,7 @@ export default function AgentPane({
               </div>
             </div>
           </div>
+ </div>
         )}
 
         {/* CLI not found — rich install card, replaces xterm entirely */}

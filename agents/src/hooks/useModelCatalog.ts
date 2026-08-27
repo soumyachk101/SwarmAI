@@ -76,16 +76,21 @@ export function useModelCatalog(
  const [probedModels, setProbedModels] = useState<Map<string, CatalogModel>>(new Map());
  const [probing, setProbing] = useState(false);
 
- // Merge static + probed models (probed overrides static on id collision)
+ // Merge static + probed models (probed overrides static on cliFlag collision)
  const models: CatalogModel[] = useMemo(() => {
- const merged = new Map<string, CatalogModel>();
+ const byFlag = new Map<string, CatalogModel>();
  for (const m of staticModels) {
- merged.set(m.id, { ...m, source: "static" });
+ byFlag.set(m.cliFlag.toLowerCase(), { ...m, source: "static" });
  }
- for (const [id, m] of probedModels) {
- merged.set(id, m);
+ for (const [flag, m] of probedModels) {
+ const key = flag.toLowerCase();
+ if (byFlag.has(key)) {
+ byFlag.set(key, { ...m, source: "probed" });
+ } else {
+ byFlag.set(key, m);
  }
- return Array.from(merged.values()).sort((a, b) => {
+ }
+ return Array.from(byFlag.values()).sort((a, b) => {
  if (a.is1M && !b.is1M) return -1;
  if (!a.is1M && b.is1M) return 1;
  return a.label.localeCompare(b.label);
