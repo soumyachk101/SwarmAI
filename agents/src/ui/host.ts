@@ -7,17 +7,20 @@
 import type { ApiKeys } from '../cli-configs/env.js';
 
 export interface AgentsHost {
-  /** Provider keys, turned into CLI env vars by envForCli. */
-  apiKeys(): ApiKeys;
-  /** Files the user has open in this folder — used for the memory hint. */
-  openFilesFor(folder: string | null | undefined): string[];
-  /** Workspace a newly-added pane belongs to when the caller doesn't say. */
-  activeWorkspaceId(): string;
-  /** Show the dock where a crowned pane renders. */
-  revealLeadDock(): void;
-  /** Publish the crowned agent's charter where its MCP server can serve it.
-   *  Never typed into the CLI — see AgentPane. */
-  publishLeadRole(folder: string | null | undefined, mode: string): void;
+ /** Provider keys, turned into CLI env vars by envForCli. */
+ apiKeys(): ApiKeys;
+ /** Files the user has open in this folder — used for the memory hint. */
+ openFilesFor(folder: string | null | undefined): string[];
+ /** Workspace a newly-added pane belongs to when the caller doesn't say. */
+ activeWorkspaceId(): string;
+ /** Show the dock where a crowned pane renders. */
+ revealLeadDock(): void;
+ /** Publish the crowned agent's charter where its MCP server can serve it.
+ * Never typed into the CLI — see AgentPane. */
+ publishLeadRole(folder: string | null | undefined, mode: string): void;
+ /** Whether spawned agents should receive permission-bypass flags.
+ * Defaults to false (safe). The app shell wires this to a user preference. */
+ permissionBypassEnabled(): boolean;
 }
 
 const EMPTY_KEYS: ApiKeys = {
@@ -25,17 +28,18 @@ const EMPTY_KEYS: ApiKeys = {
 };
 
 let host: AgentsHost = {
-  apiKeys: () => EMPTY_KEYS,
-  openFilesFor: () => [],
-  activeWorkspaceId: () => '',
-  revealLeadDock: () => {},
-  publishLeadRole: () => {},
+ apiKeys: () => EMPTY_KEYS,
+ openFilesFor: () => [],
+ activeWorkspaceId: () => '',
+ revealLeadDock: () => {},
+ publishLeadRole: () => {},
+ permissionBypassEnabled: () => false,
 };
 
 export function setAgentsHost(next: AgentsHost): void {
-  host = next;
+ host = next;
 }
 
 export function agentsHost(): AgentsHost {
-  return host;
+ return host;
 }

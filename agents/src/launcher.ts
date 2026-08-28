@@ -36,7 +36,10 @@ export class AgentLauncher {
  }
 
  async launch(options: LaunchOptions): Promise<LaunchResult> {
- const sessionId = `${options.agentType}-${Date.now()}`;
+ const suffix = typeof crypto !== 'undefined' && crypto.randomUUID
+ ? crypto.randomUUID().slice(0, 8)
+ : Math.random().toString(36).slice(2, 10);
+ const sessionId = `${options.agentType}-${suffix}`;
 
  const injectionContext: InjectionContext = {
  task: options.task,
@@ -66,10 +69,9 @@ export class AgentLauncher {
  const command = adapter.getCommand(launchContext);
  const injectionText = adapter.formatContext(pheromoneContext);
 
- if (injectionText && command.args.length > 0) {
- command.args.splice(0, 0, injectionText);
- } else if (injectionText) {
- command.args.unshift(injectionText);
+ const finalArgs = [...(command.args || [])];
+ if (injectionText) {
+ finalArgs.unshift(injectionText);
  }
 
  this.activeSessions.set(sessionId, { adapter, sessionId });

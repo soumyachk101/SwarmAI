@@ -49,10 +49,14 @@ if (typeof window !== 'undefined') {
 // capabilities it declared. Must run before the first render.
 registerHosts();
 
+import ErrorBoundary from './shared/ErrorBoundary';
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <ToastProvider>
- <HomePage />
- </ToastProvider>
+    <ErrorBoundary>
+      <ToastProvider>
+        <HomePage />
+      </ToastProvider>
+    </ErrorBoundary>
   </React.StrictMode>
 );

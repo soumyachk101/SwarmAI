@@ -94,9 +94,9 @@ export default function SessionLauncher({
   const [taskPrompt, setTaskPrompt] = useState<string>("");
   const [isLaunching, setIsLaunching] = useState<boolean>(false);
 
-  const workspaces = useWorkspaceStore((s) => s.workspaces);
-  const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
-  const activeWorkspace = workspaces.find((w) => w.id === activeWorkspaceId);
+  const workspaces = useWorkspaceStore((s) => s.workspaces) ?? [];
+  const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId) ?? "";
+  const activeWorkspace = Array.isArray(workspaces) ? workspaces.find((w) => w.id === activeWorkspaceId) : undefined;
   const rawProjectPath = activeWorkspace?.boundProjectPath || "~/Desktop/SwarmAI";
   const displayPath = rawProjectPath.replace(/^\/(Users|home)\/[^/]+/, "~");
 

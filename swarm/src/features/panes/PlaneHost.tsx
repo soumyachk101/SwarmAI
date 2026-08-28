@@ -319,7 +319,7 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
   // Other workspaces' panes stay mounted-but-unrendered — their agents keep
   // running while you work in another folder.
   const items = agents.filter(
-    (b) => b.workspaceId === activeWorkspaceId && !b.isLead && paneInPlane(b, plane),
+    (b) => (b.workspaceId || "") === (activeWorkspaceId || "") && !b.isLead && paneInPlane(b, plane),
   );
 
   /* ── adds (into the active plane) ─────────────────────────────
@@ -499,53 +499,45 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
   const isAuto = !!preset?.auto;
   const colsFor = (): number => {
     if (count <= 1) return 1;
-    if (isAuto) return Math.min(count, autoCols(count, fit.aspect));
+    if (isAuto) return Math.max(1, Math.min(count, autoCols(count, fit.aspect)));
     if (preset) return Math.max(1, Math.min(preset.cols, count));
     switch (gridLayout) {
       case "rows": return 1;
-      case "cols": return count;
-      // Master is one tall pane beside a stack of the rest — always two
-      // columns. It used to fall through to the default branch and report a
-      // column count its own template never used, which made the overflow
-      // count below lie about how many panes were off-screen.
+      case "cols": return Math.max(1, count);
       case "master": return 2;
-      case "grid": return Math.ceil(Math.sqrt(count));
-      case 1: case 2: case 3: case 4: return Math.min(gridLayout, count);
-      // Anything unrecognised (a layout persisted by an older build) gets the
-      // Auto shape rather than a second, differently-tuned guess.
-      default: return Math.min(count, autoCols(count, fit.aspect));
+      case "grid": return Math.max(1, Math.ceil(Math.sqrt(count)));
+      case 1: case 2: case 3: case 4: return Math.max(1, Math.min(gridLayout, count));
+      default: return Math.max(1, Math.min(count, autoCols(count, fit.aspect)));
     }
   };
   const isMaster = gridLayout === "master" && !maximizedPane && count > 1;
   const focusMode = !!preset?.focus && !maximizedPane && count > 0;
   const focus4 = gridLayout === "focus4";
-  // Focus renders on a 12-track grid (divisible by 3 and 4) so the spotlight +
-  // side block up top and the 4-column overflow block below all line up.
-  const cols = focusMode ? 12 : colsFor();
+  const cols = Math.max(1, focusMode ? 12 : colsFor());
 
-  // How many rows the content actually needs, then how many of them share one
-  // screen. Focus: 2 rows up top (spotlight height); panes 4+ overflow into a
-  // 4-wide grid below, scrolling.
-  const totalRows = focusMode
-    ? 2 + Math.ceil(Math.max(0, count - 3) / 4)
-    : isMaster
-    ? Math.max(1, count - 1)
-    : Math.max(1, Math.ceil(count / cols));
-  // Never reserve more rows than the layout fills. A 2×2 preset holding two
-  // panes used to keep the second row's height back and leave a dead band
-  // under them; the same happened to every grid preset as panes were closed.
-  const rowsPerPage = Math.min(
-    totalRows,
-    focusMode ? 2
-      : isAuto ? fit.rows
-      : preset ? preset.rows ?? 1
-      : gridLayout === "rows" ? 1
-      : isMaster ? totalRows
-      : fit.rows,
+  const totalRows = Math.max(
+    1,
+    focusMode
+      ? 2 + Math.ceil(Math.max(0, count - 3) / 4)
+      : isMaster
+      ? Math.max(1, count - 1)
+      : Math.ceil(count / cols)
+  );
+  const rowsPerPage = Math.max(
+    1,
+    Math.min(
+      totalRows,
+      focusMode ? 2
+        : isAuto ? Math.max(1, fit.rows)
+        : preset ? preset.rows ?? 1
+        : gridLayout === "rows" ? 1
+        : isMaster ? totalRows
+        : Math.max(1, fit.rows),
+    )
   );
   const overflow = totalRows > rowsPerPage;
   const subtract = (overflow ? PEEK : 0) + GAP * (rowsPerPage - 1);
-  const rowVal = `max(${MIN_ROW}px, calc((100cqh - ${subtract}px) / ${rowsPerPage}))`;
+  const rowVal = `max(${MIN_ROW}px, calc((100cqh - ${subtract}px) / ${rowsPerPage || 1}))`;
   const hiddenCount = !overflow ? 0 : focusMode ? count - 3 : Math.max(0, count - cols * rowsPerPage);
   const [scrollBelow, setScrollBelow] = useState(hiddenCount);
 

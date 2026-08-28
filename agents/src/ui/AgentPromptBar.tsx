@@ -357,17 +357,9 @@ function AgentPromptBar({
  </button>
  </div>
 
- {/* Right Column: Send + Settings */}
- <div className="flex flex-col justify-between items-center gap-1.5 shrink-0">
- <button
- onClick={onSendPrompt}
- disabled={!promptInput.trim()}
- className="flex size-7.5 items-center justify-center rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-swarm-textDim hover:text-swarm-text disabled:opacity-30 transition-all"
- title="Send to agent (Enter)"
- >
- <Send size={13} className="text-swarm-text/80" />
- </button>
-
+ {/* Right Actions: Tools Menu + Send Button */}
+ <div className="flex items-center gap-1.5 shrink-0 self-end pb-0.5">
+ {/* CLI Shortcuts / Tools */}
  <div ref={settingsMenuRef} className="relative">
  <button
  onClick={() => {
@@ -375,7 +367,7 @@ function AgentPromptBar({
  setModelMenuOpen(false);
  setEffortMenuOpen(false);
  }}
- className="flex size-7.5 items-center justify-center rounded-xl bg-white/[0.03] border border-white/[0.08] text-swarm-textMuted hover:text-swarm-text hover:bg-white/[0.08] transition-colors"
+ className="flex size-7 items-center justify-center rounded-xl bg-white/[0.04] border border-white/[0.08] text-swarm-textMuted hover:text-swarm-text hover:bg-white/[0.08] transition-colors"
  title="CLI Shortcuts & Tools"
  >
  <SlidersHorizontal size={13} />
@@ -383,7 +375,7 @@ function AgentPromptBar({
 
  {settingsMenuOpen && (
  <div className="absolute bottom-full right-0 mb-2 min-w-[185px] rounded-xl border border-white/[0.12] bg-[#141720] p-1.5 shadow-2xl z-50 animate-fade-in">
- <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase">
+ <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase border-b border-white/[0.06] mb-1">
  Commands
  </div>
  {[
@@ -408,6 +400,16 @@ function AgentPromptBar({
  </div>
  )}
  </div>
+
+ {/* Send Button */}
+ <button
+ onClick={onSendPrompt}
+ disabled={!promptInput.trim()}
+ className="flex size-7 items-center justify-center rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 hover:text-amber-200 disabled:opacity-30 disabled:hover:bg-white/[0.04] disabled:hover:text-swarm-textDim disabled:bg-white/[0.04] disabled:border-white/[0.08] transition-all cursor-pointer"
+ title="Send to agent (Enter)"
+ >
+ <Send size={13} className="ml-0.5" />
+ </button>
  </div>
  </div>
  </div>

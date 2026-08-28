@@ -21,7 +21,7 @@ export function launchPresetSession({
 }: LaunchSessionParams) {
   const store = useAgentsStore.getState();
   const workspaceStore = useWorkspaceStore.getState();
-  const activeWorkspaceId = workspaceStore.activeWorkspaceId || "default";
+  const activeWorkspaceId = workspaceStore.activeWorkspaceId || "";
 
   const isTerminal = selectedCliId === "terminal";
   const cliMeta = CLI_METADATA.find((c) => c.id === selectedCliId);
@@ -47,7 +47,7 @@ export function launchPresetSession({
         initialPrompt: basePrompt || undefined,
       };
       store.addAgent(agent);
-      store.setGridLayout(sessionCount > 1 ? "cols2" : "cols");
+      store.setGridLayout(sessionCount > 1 ? "cols2" : "auto");
     } else if (preset === "pair") {
       // 1 Builder + 1 Reviewer
       const builderPrompt = basePrompt

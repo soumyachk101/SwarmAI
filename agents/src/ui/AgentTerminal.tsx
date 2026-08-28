@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef } from "react";
 import { Terminal as XTerm, type ITerminalOptions } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 import { SearchAddon } from "xterm-addon-search";
@@ -189,11 +189,11 @@ function AgentTerminal({
  }
  };
 
- const writeToProcess = useCallback((data: string) => {
- invoke("write_to_terminal", { paneId, data }).catch((e) =>
- console.error(`write_to_terminal failed for ${paneId}:`, e),
- );
- }, [paneId]);
+  const writeToProcess = (data: string) => {
+    invoke("write_to_terminal", { paneId, data }).catch((e) =>
+      console.error(`write_to_terminal failed for ${paneId}:`, e),
+    );
+  };
 
  const startLoops = () => {
  if (loopsStarted) return;
@@ -375,9 +375,10 @@ function AgentTerminal({
 
  const bypassFlags: Record<string, string[]> = {
  claude: ["--dangerously-skip-permissions"],
- codex: ["--dangerously-skip-permissions"],
+ codex: ["--dangerously-bypass-approvals-and-sandbox"],
  };
- const fullArgs = [...(bypassFlags[command] || []), ...(agent.args || [])];
+ const bypassEnabled = agentsHost().permissionBypassEnabled();
+ const fullArgs = [...(bypassEnabled ? (bypassFlags[command] || []) : []), ...(agent.args || [])];
 
  await invoke("spawn_terminal", {
  paneId,

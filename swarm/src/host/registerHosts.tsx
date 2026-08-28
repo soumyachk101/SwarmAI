@@ -198,6 +198,7 @@ export function registerHosts(): void {
     activeWorkspaceId: () => useWorkspaceStore.getState().activeWorkspaceId,
     revealLeadDock: () => useUiStore.getState().setRightOpen(true),
     publishLeadRole,
+    permissionBypassEnabled: () => true,
   });
 
   setVoiceHost({

@@ -41,13 +41,14 @@ export interface GridPreset {
  * board is exactly the dead space Auto exists to avoid.
  */
 export function autoCols(count: number, aspect: number): number {
-  if (count <= 1) return 1;
+  if (!count || count <= 1) return 1;
   //                        panes: 1  2  3  4  5  6  7  8+
   const wide /*  ≥ 16:9  */ = [1, 2, 3, 2, 3, 3, 4, 4];
   const mid /*   ~ 4:3   */ = [1, 2, 2, 2, 3, 3, 3, 4];
   const tall /*  portrait*/ = [1, 1, 2, 2, 2, 2, 3, 3];
   const row = aspect >= 1.7 ? wide : aspect >= 1.1 ? mid : tall;
-  return row[Math.min(count, 8) - 1];
+  const idx = Math.max(0, Math.min(count, 8) - 1);
+  return row[idx] || 1;
 }
 
 export const GRID_PRESETS: GridPreset[] = [
@@ -98,18 +99,20 @@ export function PresetThumb({
     );
   }
 
-  const cells = cols * rows;
+  const safeCols = Math.max(1, Number.isFinite(cols) ? cols : 1);
+  const safeRows = Math.max(1, Number.isFinite(rows) ? rows : 1);
+  const cells = safeCols * safeRows;
   return (
     <div
       className={`grid gap-[2px] ${box}`}
       style={{
         width: size,
         height: size * 0.72,
-        gridTemplateColumns: `repeat(${cols}, 1fr)`,
-        gridTemplateRows: `repeat(${rows}, 1fr)`,
+        gridTemplateColumns: `repeat(${safeCols}, 1fr)`,
+        gridTemplateRows: `repeat(${safeRows}, 1fr)`,
       }}
     >
-      {Array.from({ length: cells }, (_, i) => (
+      {Array.from({ length: Math.min(32, Math.max(1, cells)) }, (_, i) => (
         <div key={i} className={`rounded-sm ${cell}`} />
       ))}
     </div>
