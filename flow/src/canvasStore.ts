@@ -66,6 +66,19 @@ interface CanvasState {
 const MIN_W = 260;
 const MIN_H = 160;
 
+// Debounced localStorage to avoid ~60 writes/sec during pan/zoom.
+const debouncedSetItem = <T>(storage: Storage) => {
+ let timeout: ReturnType<typeof setTimeout> | null = null;
+ return {
+ getItem: (name: string) => storage.getItem(name),
+ setItem: (name: string, value: string) => {
+ if (timeout) clearTimeout(timeout);
+ timeout = setTimeout(() => storage.setItem(name, value), 500);
+ },
+ removeItem: (name: string) => storage.removeItem(name),
+ };
+};
+
 export const useCanvasStore = create<CanvasState>()(
   persist(
     (set, get) => ({
@@ -185,7 +198,7 @@ export const useCanvasStore = create<CanvasState>()(
     }),
     {
       name: "swarm-canvas",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => debouncedSetItem(localStorage)),
       partialize: (s) => ({ nodes: s.nodes, cameras: s.cameras, topZ: s.topZ, edges: s.edges }),
     },
   ),

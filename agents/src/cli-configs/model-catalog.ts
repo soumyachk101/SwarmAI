@@ -169,7 +169,8 @@ export function createDynamicModel(flag: string, cliId: string): AvailableModel 
     provider = "moonshot";
   }
 
-  const is1M = lower.includes("1m") || lower.includes("2m") || lower.includes("flash") || lower.includes("gemini") || lower.includes("sol") || lower.includes("terra") || lower.includes("luna");
+  const is1M = /^(gemini-2\.5|gemini-2\.0|claude-3\.5-sonnet|claude-3\.5-haiku|claude-fable|gpt-4o|o1|o3)/i.test(lower)
+ || lower.includes('128k') || lower.includes('200k') || lower.includes('1m');
   const isFree = lower.includes(":free") || lower.includes("free") || lower.includes("zen") || lower.startsWith("opencode/");
 
   let label = cleanFlag;
@@ -186,7 +187,18 @@ export function createDynamicModel(flag: string, cliId: string): AvailableModel 
     id: `${cliId}-${cleanFlag.replace(/[/.:]/g, "-")}`,
     label,
     cliFlag: cleanFlag,
-    contextWindow: is1M ? 1_000_000 : 128_000,
+    contextWindow: (() => {
+ let cw = 128_000;
+ if (/gemini-2\.5-(pro|flash)/i.test(lower)) cw = 1_048_576;
+ else if (/gemini-2\.0/i.test(lower)) cw = 1_048_576;
+ else if (/claude-3\.5/i.test(lower)) cw = 200_000;
+ else if (/claude-fable/i.test(lower)) cw = 200_000;
+ else if (/gpt-4o/i.test(lower)) cw = 128_000;
+ else if (/o1/i.test(lower)) cw = 200_000;
+ else if (/deepseek/i.test(lower)) cw = 64_000;
+ if (is1M) cw = Math.max(cw, 1_000_000);
+ return cw;
+ })(),
     provider,
     is1M,
     pricing: isFree ? "Free" : undefined,

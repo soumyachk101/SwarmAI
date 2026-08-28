@@ -110,7 +110,17 @@ export class SearchEngine {
       // skip the full rebuild — it's already in sync.
       try {
         const count = db.exec("SELECT COUNT(*) FROM chunks_fts4");
-        if (count.length > 0 && parseInt(count[0].values[0][0] as string, 10) > 0) return;
+        if (count.length > 0 && parseInt(count[0].values[0][0] as string, 10) > 0) {
+ // Mirror has rows; verify it matches the chunks table count.
+ const chunksCount = db.exec("SELECT COUNT(*) FROM chunks");
+ if (
+ chunksCount.length > 0 &&
+ parseInt(count[0].values[0][0] as string, 10) ===
+ parseInt(chunksCount[0].values[0][0] as string, 10)
+ ) {
+ return; // Mirror is already in sync with chunks
+ }
+ }
       } catch { /* table just created — fall through to rebuild */ }
       // Rebuild from scratch — cheap for the small DB sizes Pheromone handles,
       // and guarantees the mirror reflects the current `chunks` rows.
@@ -164,7 +174,8 @@ export class SearchEngine {
     try {
       const stmt = db.prepare(
         `SELECT id, source_file, chunk_index, content, embedding, created_at, updated_at
-         FROM chunks WHERE embedding IS NOT NULL`
+         FROM chunks WHERE embedding IS NOT NULL
+ LIMIT 200`
       );
       while (stmt.step()) {
         const row = stmt.getAsObject() as any;
@@ -203,7 +214,7 @@ export class SearchEngine {
          FROM chunks_fts4 WHERE chunks_fts4 MATCH ?
          LIMIT ?`
       );
-      stmt.bind([sanitized, limit * 4]);
+      stmt.bind([sanitized, limit * 4]); // FTS4 lacks ORDER BY rank; fetch 4× candidates, rank in JS
       while (stmt.step()) {
         const row = stmt.getAsObject() as any;
         const tf = this.matchinfoTermFrequency(row.mi as Uint8Array);

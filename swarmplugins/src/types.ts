@@ -21,18 +21,22 @@ export interface PluginManifest {
   configSchema?: Record<string, { type: "string" | "boolean" | "number"; label: string; required?: boolean }>;
 }
 
+export interface SwarmPluginConfig {
+ [key: string]: unknown;
+}
+
 export interface SwarmPluginProps {
   projectPath?: string | null;
   activeWorkspaceId?: string;
-  config?: Record<string, any>;
+  config?: SwarmPluginConfig;
   onClose?: () => void;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface SwarmPlugin {
   manifest: PluginManifest;
   /** Main React UI component for the plugin */
-  Component: ComponentType<any>;
+  Component: ComponentType<SwarmPluginProps>;
   /** Optional initialization function when Swarm boots */
-  initialize?: (config?: Record<string, any>) => Promise<void>;
+  initialize?: (config?: SwarmPluginConfig) => Promise<void>;
 }

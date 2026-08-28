@@ -1,2075 +1,870 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Swarm AI — Autonomous Multi-Agent Desktop Workspace</title>
-  <meta name="description" content="Official documentation, research papers, and downloads for Swarm AI. The local-first desktop workspace coordinating autonomous AI coding agents in parallel with shared memory and zero merge conflicts." />
-  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-
-  <style>
-    /* ══════════════════════════════════════════════════════════════
-       SWARM AI — Official Desktop Workspace & Documentation Hub
-       Luxury Obsidian, Liquid Platinum & Titanium Slate Palette
-       100% Vector SVGs • ZERO EMOJIS • Live Mermaid Architecture Diagrams
-       ══════════════════════════════════════════════════════════════ */
-
-    :root {
-      --bg-void: #050608;
-      --bg-surface: #0a0c10;
-      --bg-surface-elevated: #0f1218;
-      --bg-card: rgba(15, 18, 25, 0.75);
-      --bg-card-hover: rgba(22, 27, 38, 0.9);
-      --bg-glass: rgba(10, 12, 16, 0.85);
-
-      --border-subtle: rgba(255, 255, 255, 0.07);
-      --border-medium: rgba(255, 255, 255, 0.12);
-      --border-bright: rgba(255, 255, 255, 0.24);
-      --border-platinum: rgba(250, 252, 255, 0.35);
-
-      --text-primary: #FFFFFF;
-      --text-secondary: #94A3B8;
-      --text-muted: #64748B;
-      --text-dim: #475569;
-
-      --accent-platinum: #FAFCFF;
-      --accent-silver: #CBD5E1;
-      --accent-emerald: #10B981;
-      --accent-emerald-soft: rgba(16, 185, 129, 0.12);
-
-      --radius-2xl: 24px;
-      --radius-xl: 18px;
-      --radius-lg: 14px;
-      --radius-md: 10px;
-      --radius-sm: 6px;
-
-      --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.5);
-      --shadow-elevated: 0 12px 40px rgba(0, 0, 0, 0.7);
-      --shadow-ambient: 0 20px 60px rgba(0, 0, 0, 0.85);
-    }
-
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: var(--bg-void);
-      color: var(--text-primary);
-      line-height: 1.6;
-      overflow-x: hidden;
-      min-height: 100vh;
-    }
-
-    /* ─── Ambient Background Mesh ─── */
-    .ambient-canvas {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-    }
-
-    .ambient-glow-center {
-      position: absolute;
-      top: -200px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 1000px;
-      height: 600px;
-      background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.05) 0%, rgba(148, 163, 184, 0.02) 40%, transparent 70%);
-      filter: blur(140px);
-    }
-
-    .bg-grid-mesh {
-      position: absolute;
-      inset: 0;
-      background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-      background-size: 40px 40px;
-      mask-image: radial-gradient(ellipse 80% 60% at 50% 10%, black 30%, transparent 80%);
-      -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 10%, black 30%, transparent 80%);
-    }
-
-    /* ─── Header & Top Navigation ─── */
-    header.site-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      width: 100%;
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      background: var(--bg-glass);
-      border-bottom: 1px solid var(--border-subtle);
-    }
-
-    .nav-container {
-      max-width: 1300px;
-      margin: 0 auto;
-      padding: 0 24px;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .brand-group {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: var(--text-primary);
-    }
-
-    .brand-logo-wrap {
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--radius-sm);
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-medium);
-    }
-
-    .brand-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--text-primary);
-    }
-
-    .brand-badge {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text-secondary);
-      border: 1px solid var(--border-subtle);
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .nav-link {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      text-decoration: none;
-      padding: 8px 14px;
-      border-radius: var(--radius-sm);
-      transition: all 0.15s ease;
-      cursor: pointer;
-    }
-
-    .nav-link:hover, .nav-link.active {
-      color: var(--text-primary);
-      background: rgba(255, 255, 255, 0.06);
-    }
-
-    .nav-cta-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--bg-void);
-      background: var(--text-primary);
-      text-decoration: none;
-      padding: 8px 16px;
-      border-radius: var(--radius-sm);
-      transition: all 0.15s ease;
-      box-shadow: 0 2px 10px rgba(255, 255, 255, 0.15);
-    }
-
-    .nav-cta-btn:hover {
-      background: var(--accent-silver);
-      transform: translateY(-1px);
-    }
-
-    /* ─── Hero Section ─── */
-    .hero-section {
-      position: relative;
-      z-index: 10;
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 80px 24px 60px;
-      text-align: center;
-    }
-
-    .hero-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 14px;
-      border-radius: 9999px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border-medium);
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-bottom: 28px;
-    }
-
-    .live-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent-emerald);
-      box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
-    }
-
-    .hero-title {
-      font-family: 'Space Grotesk', -apple-system, sans-serif;
-      font-size: 56px;
-      line-height: 1.08;
-      font-weight: 700;
-      letter-spacing: -0.035em;
-      color: var(--text-primary);
-      margin-bottom: 22px;
-    }
-
-    .hero-title-gradient {
-      background: linear-gradient(180deg, #FFFFFF 0%, #CBD5E1 65%, #64748B 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .hero-subtitle {
-      font-size: 18px;
-      line-height: 1.6;
-      color: var(--text-secondary);
-      max-width: 760px;
-      margin: 0 auto 40px;
-      font-weight: 400;
-    }
-
-    /* ─── Hero Primary Actions & Quick Install ─── */
-    .hero-actions {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 48px;
-    }
-
-    .download-primary-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-    }
-
-    .btn-download-hero {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      background: #FFFFFF;
-      color: #050608;
-      font-size: 14px;
-      font-weight: 700;
-      padding: 14px 26px;
-      border-radius: var(--radius-md);
-      text-decoration: none;
-      box-shadow: 0 4px 24px rgba(255, 255, 255, 0.18);
-      transition: all 0.2s ease;
-      cursor: pointer;
-      border: 1px solid #FFFFFF;
-    }
-
-    .btn-download-hero:hover {
-      background: #E2E8F0;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(255, 255, 255, 0.25);
-    }
-
-    .btn-secondary-hero {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-primary);
-      font-size: 14px;
-      font-weight: 600;
-      padding: 14px 22px;
-      border-radius: var(--radius-md);
-      text-decoration: none;
-      border: 1px solid var(--border-medium);
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-
-    .btn-secondary-hero:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: var(--border-bright);
-      transform: translateY(-2px);
-    }
-
-    .curl-command-bar {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 18px;
-      background: rgba(10, 12, 16, 0.9);
-      border: 1px solid var(--border-medium);
-      border-radius: var(--radius-md);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      color: var(--text-secondary);
-      box-shadow: var(--shadow-subtle);
-    }
-
-    .curl-prefix {
-      color: var(--text-muted);
-      user-select: none;
-    }
-
-    .curl-text {
-      color: var(--text-primary);
-    }
-
-    .copy-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      padding: 4px;
-      border-radius: 4px;
-      transition: color 0.15s ease;
-    }
-
-    .copy-btn:hover {
-      color: var(--text-primary);
-    }
-
-    /* ─── Platform Download Cards Grid ─── */
-    .section-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 80px 24px;
-      position: relative;
-      z-index: 10;
-    }
-
-    .section-header {
-      text-align: center;
-      margin-bottom: 50px;
-    }
-
-    .section-label {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-    }
-
-    .section-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 38px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--text-primary);
-      margin-bottom: 14px;
-    }
-
-    .section-description {
-      font-size: 16px;
-      color: var(--text-secondary);
-      max-width: 680px;
-      margin: 0 auto;
-    }
-
-    .downloads-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-      margin-bottom: 40px;
-    }
-
-    .download-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-xl);
-      padding: 28px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: all 0.2s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .download-card:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--border-bright);
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-elevated);
-    }
-
-    .download-card.highlight {
-      border-color: var(--border-platinum);
-      background: rgba(20, 25, 36, 0.85);
-    }
-
-    .download-card-badge {
-      position: absolute;
-      top: 18px;
-      right: 18px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      padding: 3px 8px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text-primary);
-      border: 1px solid var(--border-subtle);
-    }
-
-    .os-icon-box {
-      width: 44px;
-      height: 44px;
-      border-radius: var(--radius-md);
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border-medium);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-      color: var(--text-primary);
-    }
-
-    .os-card-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 6px;
-    }
-
-    .os-card-desc {
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-bottom: 24px;
-      line-height: 1.5;
-    }
-
-    .os-file-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-
-    .os-file-btn {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 14px;
-      border-radius: var(--radius-sm);
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-primary);
-      text-decoration: none;
-      font-size: 12px;
-      font-weight: 600;
-      transition: all 0.15s ease;
-    }
-
-    .os-file-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: var(--border-bright);
-    }
-
-    .os-file-meta {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      color: var(--text-muted);
-    }
-
-    /* ─── Documentation Hub & Multi-Tab System ─── */
-    .docs-wrapper {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-medium);
-      border-radius: var(--radius-2xl);
-      overflow: hidden;
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      min-height: 700px;
-      box-shadow: var(--shadow-elevated);
-    }
-
-    .docs-sidebar {
-      background: rgba(6, 8, 12, 0.9);
-      border-right: 1px solid var(--border-subtle);
-      padding: 24px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .docs-nav-group-title {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      padding-left: 10px;
-      margin-bottom: 6px;
-    }
-
-    .docs-nav-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      text-decoration: none;
-      transition: all 0.15s ease;
-      cursor: pointer;
-      border: 1px solid transparent;
-    }
-
-    .docs-nav-item:hover {
-      color: var(--text-primary);
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    .docs-nav-item.active {
-      color: var(--text-primary);
-      background: rgba(255, 255, 255, 0.08);
-      border-color: var(--border-subtle);
-      font-weight: 600;
-    }
-
-    .docs-content {
-      padding: 40px 48px;
-      background: #050608;
-      overflow-y: auto;
-      max-height: 800px;
-    }
-
-    .docs-article {
-      display: none;
-    }
-
-    .docs-article.active {
-      display: block;
-      animation: fadeIn 0.2s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .docs-h1 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 12px;
-    }
-
-    .docs-lead {
-      font-size: 15px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin-bottom: 28px;
-      border-bottom: 1px solid var(--border-subtle);
-      padding-bottom: 18px;
-    }
-
-    .docs-h2 {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin: 28px 0 12px;
-    }
-
-    .docs-p {
-      font-size: 14px;
-      color: var(--text-secondary);
-      line-height: 1.7;
-      margin-bottom: 16px;
-    }
-
-    .docs-code-block {
-      background: #0a0c10;
-      border: 1px solid var(--border-medium);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: var(--accent-platinum);
-      line-height: 1.6;
-      margin: 16px 0 24px;
-      overflow-x: auto;
-    }
-
-    /* ─── Custom Luxury Architecture Flow Diagrams ─── */
-    .arch-flow-wrap {
-      background: #080a0e;
-      border: 1px solid var(--border-medium);
-      border-radius: var(--radius-xl);
-      padding: 32px 24px;
-      margin: 24px 0 32px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      position: relative;
-    }
-
-    .arch-flow-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      position: relative;
-    }
-
-    .arch-node {
-      background: rgba(15, 18, 25, 0.95);
-      border: 1px solid var(--border-medium);
-      border-radius: var(--radius-md);
-      padding: 14px 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      min-width: 180px;
-      box-shadow: var(--shadow-subtle);
-      transition: all 0.15s ease;
-    }
-
-    .arch-node.primary {
-      border-color: var(--border-platinum);
-      background: rgba(22, 27, 38, 0.95);
-    }
-
-    .arch-node-tag {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 9px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-muted);
-    }
-
-    .arch-node-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .arch-node-desc {
-      font-size: 11px;
-      color: var(--text-secondary);
-      line-height: 1.4;
-    }
-
-    .arch-arrow {
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* ─── Benchmark Gantt & Comparison Bar System ─── */
-    .benchmark-card {
-      background: #080a0e;
-      border: 1px solid var(--border-medium);
-      border-radius: var(--radius-xl);
-      padding: 24px;
-      margin: 20px 0 28px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .benchmark-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border-subtle);
-      padding-bottom: 12px;
-    }
-
-    .benchmark-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    .benchmark-speedup-badge {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--accent-emerald);
-      background: var(--accent-emerald-soft);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      padding: 3px 10px;
-      border-radius: 9999px;
-    }
-
-    .track-row {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .track-label-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-secondary);
-    }
-
-    .timeline-bar-wrapper {
-      width: 100%;
-      height: 36px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      display: flex;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .timeline-segment {
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--text-primary);
-      border-right: 1px solid rgba(0, 0, 0, 0.4);
-      white-space: nowrap;
-      padding: 0 8px;
-    }
-
-    /* ─── Engineering Blog & Research System ─── */
-    .blog-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 24px;
-      margin-bottom: 30px;
-    }
-
-    .blog-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-xl);
-      padding: 28px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-
-    .blog-card:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--border-bright);
-      transform: translateY(-4px);
-    }
-
-    .blog-meta-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-bottom: 14px;
-    }
-
-    .blog-tag {
-      padding: 2px 8px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--text-secondary);
-      border: 1px solid var(--border-subtle);
-    }
-
-    .blog-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text-primary);
-      line-height: 1.35;
-      margin-bottom: 12px;
-    }
-
-    .blog-excerpt {
-      font-size: 14px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin-bottom: 20px;
-    }
-
-    .blog-read-more {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    /* ─── In-Page Blog Article Reader Modal ─── */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 200;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(16px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-
-    .modal-overlay.open {
-      display: flex;
-      animation: fadeIn 0.2s ease;
-    }
-
-    .modal-content {
-      width: 100%;
-      max-width: 900px;
-      max-height: 85vh;
-      background: #080a0e;
-      border: 1px solid var(--border-bright);
-      border-radius: var(--radius-2xl);
-      box-shadow: var(--shadow-ambient);
-      overflow-y: auto;
-      padding: 40px 48px;
-      position: relative;
-    }
-
-    .modal-close-btn {
-      position: absolute;
-      top: 24px;
-      right: 24px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-medium);
-      color: var(--text-secondary);
-      padding: 6px 12px;
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .modal-close-btn:hover {
-      background: rgba(255, 255, 255, 0.12);
-      color: var(--text-primary);
-    }
-
-    /* ─── Footer ─── */
-    footer.site-footer {
-      background: #030406;
-      border-top: 1px solid var(--border-subtle);
-      padding: 60px 24px 40px;
-      position: relative;
-      z-index: 10;
-    }
-
-    .footer-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 2fr repeat(3, 1fr);
-      gap: 40px;
-      margin-bottom: 40px;
-    }
-
-    .footer-brand-p {
-      font-size: 13px;
-      color: var(--text-muted);
-      line-height: 1.6;
-      margin-top: 12px;
-      max-width: 320px;
-    }
-
-    .footer-col-title {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--text-primary);
-      margin-bottom: 16px;
-    }
-
-    .footer-links-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .footer-link {
-      font-size: 13px;
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color 0.15s ease;
-    }
-
-    .footer-link:hover {
-      color: var(--text-primary);
-    }
-
-    .footer-bottom {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding-top: 24px;
-      border-top: 1px solid var(--border-subtle);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 12px;
-      color: var(--text-dim);
-    }
-
-    @media (max-width: 900px) {
-      .hero-title { font-size: 38px; }
-      .docs-wrapper { grid-template-columns: 1fr; }
-      .footer-container { grid-template-columns: 1fr; }
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Swarm AI — Autonomous Multi-Agent Desktop Workspace</title>
+<meta name="description" content="Official download hub, documentation, research papers, and user guide for Swarm AI. The local-first desktop workspace for autonomous AI coding agents."/>
+<link rel="icon" type="image/svg+xml" href="assets/logo.svg"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+--bg-void:#050608;--bg-surface:#0a0c10;--bg-surface-el:#0f1218;
+--bg-card:rgba(15,18,25,.75);--bg-card-hover:rgba(22,27,38,.9);--bg-glass:rgba(10,12,16,.85);
+--border-s:rgba(255,255,255,.06);--border-m:rgba(255,255,255,.11);--border-b:rgba(255,255,255,.22);--border-p:rgba(250,252,255,.32);
+--text-1:#FFF;--text-2:#94A3B8;--text-3:#64748B;--text-4:#475569;
+--platinum:#FAFCFF;--silver:#CBD5E1;--emerald:#10B981;--emerald-s:rgba(16,185,129,.12);
+--amber:#F59E0B;--amber-s:rgba(245,158,11,.12);--blue:#3B82F6;--blue-s:rgba(59,130,246,.12);
+--purple:#A855F7;--purple-s:rgba(168,85,247,.12);--orange:#FF6B00;
+--r2xl:24px;--rxl:18px;--rlg:14px;--rmd:10px;--rsm:6px;
+--sh-s:0 4px 20px rgba(0,0,0,.5);--sh-e:0 12px 40px rgba(0,0,0,.7);--sh-a:0 20px 60px rgba(0,0,0,.85);
+--fs:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+--fd:'Space Grotesk',sans-serif;--fm:'JetBrains Mono',monospace;
+--ease:cubic-bezier(.16,1,.3,1);--ease-b:cubic-bezier(.34,1.56,.64,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{font-family:var(--fs);background:var(--bg-void);color:var(--text-1);line-height:1.6;overflow-x:hidden;min-height:100vh}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:3px}
+
+/* ── Animations ── */
+@keyframes fadeDown{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.82)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(28px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes glow{0%,100%{opacity:.5;transform:translateX(-50%) scale(1)}50%{opacity:1;transform:translateX(-50%) scale(1.08)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.reveal.vis{opacity:1;transform:translateY(0)}
+.rd1{transition-delay:.1s}.rd2{transition-delay:.2s}.rd3{transition-delay:.3s}.rd4{transition-delay:.4s}.rd5{transition-delay:.5s}
+
+/* ── Ambient ── */
+.ambient{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.amb-glow{position:absolute;top:-180px;left:50%;transform:translateX(-50%);width:900px;height:500px;background:radial-gradient(ellipse,rgba(255,255,255,.04) 0%,transparent 70%);filter:blur(140px);animation:glow 8s ease-in-out infinite}
+.amb-accent{position:absolute;top:45%;right:-180px;width:500px;height:350px;background:radial-gradient(ellipse,rgba(255,107,0,.025) 0%,transparent 70%);filter:blur(120px);animation:glow 12s ease-in-out infinite reverse}
+.amb-grid{position:absolute;inset:0;background-image:linear-gradient(to right,rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.018) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse 80% 60% at 50% 10%,#000 30%,transparent 80%);-webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 10%,#000 30%,transparent 80%)}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35}
+
+/* ── Header ── */
+header{position:fixed;top:0;z-index:100;width:100%;backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);background:rgba(10,12,16,.72);border-bottom:1px solid var(--border-s);transition:all .3s ease}
+header.scrolled{background:rgba(5,6,8,.92);border-bottom-color:var(--border-m);box-shadow:0 4px 30px rgba(0,0,0,.4)}
+.nav{max-width:1260px;margin:0 auto;padding:0 24px;height:62px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--text-1);cursor:pointer}
+.brand-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:var(--rsm);background:rgba(255,255,255,.04);border:1px solid var(--border-m);transition:all .3s ease}
+.brand:hover .brand-icon{border-color:var(--border-b);box-shadow:0 0 18px rgba(255,107,0,.1)}
+.brand-name{font-family:var(--fd);font-size:15px;font-weight:700;letter-spacing:-.02em}
+.brand-ver{font-family:var(--fm);font-size:9px;padding:2px 7px;border-radius:3px;background:rgba(255,255,255,.06);color:var(--silver);border:1px solid var(--border-s)}
+.nav-links{display:flex;align-items:center;gap:2px}
+.nl{font-size:13px;font-weight:500;color:var(--text-2);text-decoration:none;padding:7px 13px;border-radius:var(--rsm);transition:all .2s ease;cursor:pointer;position:relative}
+.nl::after{content:'';position:absolute;bottom:1px;left:50%;width:0;height:2px;background:var(--orange);border-radius:1px;transition:all .3s var(--ease);transform:translateX(-50%)}
+.nl:hover,.nl.act{color:var(--text-1);background:rgba(255,255,255,.05)}
+.nl:hover::after,.nl.act::after{width:18px}
+.nav-cta{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--bg-void);background:var(--text-1);text-decoration:none;padding:7px 16px;border-radius:var(--rsm);transition:all .25s var(--ease);box-shadow:0 2px 12px rgba(255,255,255,.12)}
+.nav-cta:hover{background:var(--silver);transform:translateY(-1px)}
+.mob-toggle{display:none;background:0 0;border:0;color:var(--text-1);cursor:pointer;padding:8px}
+
+/* ── Hero ── */
+.hero{position:relative;z-index:10;max-width:1060px;margin:0 auto;padding:136px 24px 72px;text-align:center}
+.hero-pill{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:9999px;background:rgba(255,255,255,.03);border:1px solid var(--border-m);font-size:12px;color:var(--text-2);margin-bottom:30px;animation:fadeDown .7s var(--ease) both}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);box-shadow:0 0 8px rgba(16,185,129,.6);animation:pulse 2s ease-in-out infinite}
+.hero-h1{font-family:var(--fd);font-size:clamp(34px,5.8vw,58px);line-height:1.1;font-weight:700;letter-spacing:-.035em;margin-bottom:22px;animation:fadeUp .8s var(--ease) .12s both}
+.hero-grad{background:linear-gradient(180deg,#FFF 0%,var(--silver) 60%,#64748B 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:17px;line-height:1.7;color:var(--text-2);max-width:720px;margin:0 auto 40px;animation:fadeUp .8s var(--ease) .24s both}
+.hero-actions{display:flex;flex-direction:column;align-items:center;gap:16px;margin-bottom:48px;animation:fadeUp .8s var(--ease) .36s both}
+.hero-btns{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px}
+.btn-hero{display:inline-flex;align-items:center;gap:10px;padding:14px 26px;border-radius:var(--rmd);font-size:14px;font-weight:700;text-decoration:none;transition:all .3s var(--ease);cursor:pointer;border:none}
+.btn-p{background:#FFF;color:var(--bg-void);box-shadow:0 4px 24px rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.8)}
+.btn-p:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 8px 36px rgba(255,255,255,.22)}
+.btn-s{background:rgba(255,255,255,.04);color:var(--text-1);border:1px solid var(--border-m)}
+.btn-s:hover{background:rgba(255,255,255,.08);border-color:var(--border-b);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.btn-s svg{transition:transform .3s var(--ease)}.btn-s:hover svg{transform:translateX(3px)}
+.curl-bar{display:inline-flex;align-items:center;gap:10px;padding:10px 18px;background:rgba(10,12,16,.9);border:1px solid var(--border-m);border-radius:var(--rmd);font-family:var(--fm);font-size:13px;box-shadow:var(--sh-s);transition:all .3s ease}
+.curl-bar:hover{border-color:var(--border-b);box-shadow:0 4px 24px rgba(0,0,0,.4)}
+.curl-prefix{color:var(--text-3);user-select:none;font-weight:600}
+.curl-text{color:var(--silver)}
+.copy-btn{display:inline-flex;align-items:center;justify-content:center;background:0 0;border:1px solid var(--border-s);color:var(--text-3);cursor:pointer;padding:5px;border-radius:var(--rsm);transition:all .2s ease}
+.copy-btn:hover{color:var(--text-1);border-color:var(--border-b);background:rgba(255,255,255,.05)}
+.copy-btn.ok{color:var(--emerald);border-color:rgba(16,185,129,.3)}
+.trust{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:22px;padding-top:20px;animation:fadeUp .8s var(--ease) .5s both}
+.trust-i{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-4);font-weight:500}
+.trust-ic{width:16px;height:16px;color:var(--emerald);opacity:.7}
+
+/* ── Stats ── */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:20px}
+.stat{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--rxl);padding:26px 20px;text-align:center;transition:all .3s var(--ease)}
+.stat:hover{border-color:var(--border-b);transform:translateY(-2px);box-shadow:var(--sh-e)}
+.stat-n{font-family:var(--fd);font-size:34px;font-weight:700;background:linear-gradient(135deg,var(--platinum),var(--silver));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.stat-l{font-size:12px;color:var(--text-3);font-weight:500}
+
+/* ── Section common ── */
+.sec{max-width:1200px;margin:0 auto;padding:96px 24px;position:relative;z-index:10}
+.sec-hdr{text-align:center;margin-bottom:52px}
+.sec-label{font-family:var(--fm);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);margin-bottom:12px}
+.sec-title{font-family:var(--fd);font-size:clamp(26px,3.6vw,38px);font-weight:700;letter-spacing:-.02em;margin-bottom:14px}
+.sec-desc{font-size:15px;color:var(--text-2);max-width:660px;margin:0 auto;line-height:1.7}
+.divider{max-width:1200px;margin:0 auto;padding:0 24px;position:relative;z-index:10}
+.divider-line{height:1px;background:linear-gradient(90deg,transparent,var(--border-m) 20%,var(--border-m) 80%,transparent)}
+
+/* ── Download cards ── */
+.dl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px}
+.dl-card{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--rxl);padding:28px;display:flex;flex-direction:column;justify-content:space-between;transition:all .4s var(--ease);position:relative;overflow:hidden}
+.dl-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);opacity:0;transition:opacity .3s ease}
+.dl-card:hover{background:var(--bg-card-hover);border-color:var(--border-b);transform:translateY(-5px);box-shadow:var(--sh-e)}
+.dl-card:hover::before{opacity:1}
+.dl-card.hl{border-color:var(--border-p);background:rgba(20,25,36,.85);box-shadow:0 0 36px rgba(255,107,0,.06)}
+.dl-card.hl:hover{border-color:rgba(250,252,255,.42)}
+.dl-badge{position:absolute;top:16px;right:16px;font-family:var(--fm);font-size:9px;padding:3px 8px;border-radius:3px;background:rgba(255,255,255,.08);color:var(--text-1);border:1px solid var(--border-s);font-weight:600}
+.dl-icon{width:44px;height:44px;border-radius:var(--rmd);background:rgba(255,255,255,.03);border:1px solid var(--border-m);display:flex;align-items:center;justify-content:center;margin-bottom:20px;transition:all .3s ease}
+.dl-card:hover .dl-icon{background:rgba(255,255,255,.06);border-color:var(--border-b)}
+.dl-title{font-family:var(--fd);font-size:18px;font-weight:700;margin-bottom:6px}
+.dl-desc{font-size:12px;color:var(--text-2);margin-bottom:22px;line-height:1.55}
+.dl-files{display:flex;flex-direction:column;gap:8px}
+.dl-btn{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:var(--rsm);background:rgba(255,255,255,.03);border:1px solid var(--border-s);color:var(--text-1);text-decoration:none;font-size:12px;font-weight:600;transition:all .25s ease;cursor:pointer}
+.dl-btn:hover{background:rgba(255,255,255,.08);border-color:var(--border-b);transform:translateX(4px)}
+.dl-btn-l{display:flex;align-items:center;gap:8px}
+.dl-meta{font-family:var(--fm);font-size:9px;color:var(--text-4);background:rgba(255,255,255,.04);padding:2px 7px;border-radius:3px}
+
+/* ── Features ── */
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.feat{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--rxl);padding:28px;transition:all .4s var(--ease)}
+.feat:hover{border-color:var(--border-b);transform:translateY(-4px);box-shadow:var(--sh-e)}
+.feat-ic{width:38px;height:38px;border-radius:var(--rmd);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.feat-ic.o{background:var(--amber-s);color:var(--amber);border:1px solid rgba(245,158,11,.2)}
+.feat-ic.b{background:var(--blue-s);color:var(--blue);border:1px solid rgba(59,130,246,.2)}
+.feat-ic.p{background:var(--purple-s);color:var(--purple);border:1px solid rgba(168,85,247,.2)}
+.feat-ic.g{background:var(--emerald-s);color:var(--emerald);border:1px solid rgba(16,185,129,.2)}
+.feat-t{font-family:var(--fd);font-size:16px;font-weight:700;margin-bottom:8px}
+.feat-d{font-size:13px;color:var(--text-2);line-height:1.65}
+
+/* ── Architecture Flow ── */
+.arch{background:rgba(8,10,14,.8);border:1px solid var(--border-m);border-radius:var(--r2xl);padding:32px 24px;display:flex;flex-direction:column;gap:18px;backdrop-filter:blur(10px)}
+.arch-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:14px}
+.arch-node{background:rgba(15,18,25,.95);border:1px solid var(--border-m);border-radius:var(--rlg);padding:16px 18px;display:flex;flex-direction:column;gap:5px;min-width:170px;max-width:230px;box-shadow:var(--sh-s);transition:all .3s ease;flex:1}
+.arch-node:hover{border-color:var(--border-b);transform:translateY(-2px);box-shadow:var(--sh-e)}
+.arch-node.pri{border-color:rgba(250,252,255,.22);background:rgba(22,27,38,.95)}
+.arch-tag{font-family:var(--fm);font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3)}
+.arch-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px}
+.arch-desc{font-size:11px;color:var(--text-2);line-height:1.4}
+.arch-arrow{color:var(--text-4);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;font-weight:300}
+
+/* ── Docs Hub ── */
+.docs-w{background:var(--bg-surface);border:1px solid var(--border-m);border-radius:var(--r2xl);overflow:hidden;display:grid;grid-template-columns:260px 1fr;min-height:680px;box-shadow:var(--sh-e)}
+.docs-side{background:rgba(6,8,12,.95);border-right:1px solid var(--border-s);padding:24px 14px;display:flex;flex-direction:column;gap:20px;overflow-y:auto;max-height:780px}
+.docs-side-title{font-family:var(--fm);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-4);padding:0 10px}
+.docs-nav{display:flex;flex-direction:column;gap:1px}
+.dn{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:var(--rsm);font-size:13px;font-weight:500;color:var(--text-2);cursor:pointer;border:1px solid transparent;transition:all .2s ease;user-select:none}
+.dn:hover{color:var(--text-1);background:rgba(255,255,255,.04)}
+.dn.act{color:var(--text-1);background:rgba(255,255,255,.07);border-color:var(--border-s);font-weight:600}
+.dn svg{width:14px;height:14px;flex-shrink:0;opacity:.5}.dn.act svg{opacity:1;color:var(--orange)}
+.docs-body{padding:36px 42px;background:#050608;overflow-y:auto;max-height:780px}
+.doc-art{display:none}.doc-art.act{display:block;animation:docIn .3s var(--ease)}
+@keyframes docIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.d-h1{font-family:var(--fd);font-size:26px;font-weight:700;margin-bottom:12px;letter-spacing:-.02em}
+.d-lead{font-size:14px;color:var(--text-2);line-height:1.65;margin-bottom:26px;border-bottom:1px solid var(--border-s);padding-bottom:16px}
+.d-h2{font-family:var(--fd);font-size:17px;font-weight:700;margin:28px 0 12px}
+.d-p{font-size:13.5px;color:var(--text-2);line-height:1.75;margin-bottom:14px}
+.d-code{background:#0a0c10;border:1px solid var(--border-m);border-radius:var(--rmd);padding:16px 18px;font-family:var(--fm);font-size:11.5px;color:var(--platinum);line-height:1.7;margin:12px 0 22px;overflow-x:auto;position:relative}
+.d-code::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent)}
+.d-list{padding-left:18px;margin:10px 0 18px}
+.d-list li{font-size:13.5px;color:var(--text-2);line-height:1.75;margin-bottom:5px}
+.d-list li::marker{color:var(--text-4)}
+
+/* ── Benchmark ── */
+.bench{background:#080a0e;border:1px solid var(--border-m);border-radius:var(--rxl);padding:24px;margin:20px 0 28px;display:flex;flex-direction:column;gap:18px}
+.bench-hdr{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-s);padding-bottom:12px}
+.bench-title{font-family:var(--fd);font-size:14px;font-weight:700}
+.bench-badge{font-family:var(--fm);font-size:10px;font-weight:700;color:var(--emerald);background:var(--emerald-s);border:1px solid rgba(16,185,129,.25);padding:3px 10px;border-radius:9999px}
+.track{display:flex;flex-direction:column;gap:6px}
+.track-lbl{display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:600;color:var(--text-2)}
+.tl-wrap{width:100%;height:36px;background:rgba(255,255,255,.02);border:1px solid var(--border-s);border-radius:var(--rsm);display:flex;overflow:hidden}
+.tl-seg{height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:9px;font-weight:600;color:var(--text-1);border-right:1px solid rgba(0,0,0,.3);white-space:nowrap;padding:0 8px;transition:filter .3s ease}
+.tl-seg:hover{filter:brightness(1.3)}
+
+/* ── Blog ── */
+.blog-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+.blog-card{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--rxl);padding:28px;display:flex;flex-direction:column;justify-content:space-between;transition:all .4s var(--ease);cursor:pointer;position:relative;overflow:hidden}
+.blog-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,107,0,.015) 0%,transparent 50%);opacity:0;transition:opacity .3s ease;pointer-events:none}
+.blog-card:hover{background:var(--bg-card-hover);border-color:var(--border-b);transform:translateY(-5px);box-shadow:var(--sh-e)}
+.blog-card:hover::after{opacity:1}
+.blog-meta{display:flex;align-items:center;gap:10px;font-family:var(--fm);font-size:10px;color:var(--text-3);margin-bottom:14px}
+.blog-tag{padding:2px 8px;border-radius:3px;background:rgba(255,255,255,.05);color:var(--text-2);border:1px solid var(--border-s);font-weight:600}
+.blog-title{font-family:var(--fd);font-size:19px;font-weight:700;line-height:1.4;margin-bottom:12px}
+.blog-excerpt{font-size:13.5px;color:var(--text-2);line-height:1.7;margin-bottom:20px}
+.blog-rm{font-size:12px;font-weight:600;color:var(--text-1);display:inline-flex;align-items:center;gap:5px;transition:all .3s var(--ease)}
+.blog-card:hover .blog-rm{gap:9px;color:var(--orange)}
+.blog-rm svg{transition:transform .3s var(--ease)}.blog-card:hover .blog-rm svg{transform:translateX(3px)}
+
+/* ── Modal ── */
+.modal-ov{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .3s ease}
+.modal-ov.open{display:flex;opacity:1;animation:modalIn .35s var(--ease)}
+@keyframes modalIn{from{opacity:0}to{opacity:1}}
+.modal-box{width:100%;max-width:880px;max-height:85vh;background:#080a0e;border:1px solid var(--border-b);border-radius:var(--r2xl);box-shadow:var(--sh-a);overflow-y:auto;padding:44px;position:relative;animation:slideUp .4s var(--ease)}
+.modal-close{position:sticky;top:0;float:right;background:rgba(255,255,255,.05);border:1px solid var(--border-m);color:var(--text-2);padding:7px 14px;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s ease;z-index:10;margin-bottom:16px}
+.modal-close:hover{background:rgba(255,255,255,.12);color:var(--text-1);border-color:var(--border-b)}
+
+/* ── FAQ ── */
+.faq-list{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+.faq{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--rlg);overflow:hidden;transition:all .3s ease}
+.faq:hover{border-color:var(--border-m)}
+.faq.open{border-color:var(--border-b);box-shadow:var(--sh-s)}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;cursor:pointer;font-size:14px;font-weight:600;color:var(--text-1);user-select:none;transition:all .2s ease;gap:12px}
+.faq-q:hover{color:var(--orange)}
+.faq-chv{width:16px;height:16px;color:var(--text-3);transition:all .3s var(--ease);flex-shrink:0}
+.faq.open .faq-chv{transform:rotate(180deg);color:var(--orange)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s var(--ease)}
+.faq.open .faq-a{max-height:400px}
+.faq-ain{padding:0 22px 18px;font-size:13.5px;color:var(--text-2);line-height:1.75}
+.faq-ain code{font-family:var(--fm);font-size:11.5px;background:rgba(255,255,255,.06);padding:2px 6px;border-radius:3px;color:var(--silver)}
+.faq-ain a{color:var(--orange);text-decoration:none}
+
+/* ── User Guide ── */
+.guide{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:0;position:relative}
+.guide::before{content:'';position:absolute;left:22px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--border-m),var(--border-s))}
+.g-step{display:flex;gap:22px;padding:22px 0;position:relative}
+.g-step-n{width:44px;height:44px;border-radius:50%;background:var(--bg-surface-el);border:1px solid var(--border-m);display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:13px;font-weight:700;color:var(--orange);flex-shrink:0;z-index:2;transition:all .3s ease}
+.g-step:hover .g-step-n{border-color:var(--orange);box-shadow:0 0 18px rgba(255,107,0,.1)}
+.g-step-c{flex:1;padding-top:5px}
+.g-step-t{font-family:var(--fd);font-size:16px;font-weight:700;margin-bottom:6px}
+.g-step-d{font-size:13.5px;color:var(--text-2);line-height:1.7}
+.g-step-d code{font-family:var(--fm);font-size:11.5px;background:rgba(255,255,255,.06);padding:2px 6px;border-radius:3px;color:var(--silver)}
+
+/* ── MCP Showcase ── */
+.mcp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.mcp-card{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--rlg);padding:20px;display:flex;align-items:center;gap:14px;transition:all .3s var(--ease)}
+.mcp-card:hover{border-color:var(--border-b);transform:translateY(-2px);box-shadow:var(--sh-s)}
+.mcp-ic{width:38px;height:38px;border-radius:var(--rsm);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:var(--fm);flex-shrink:0}
+.mcp-ic.o{background:rgba(255,107,0,.1);color:var(--orange);border:1px solid rgba(255,107,0,.2)}
+.mcp-ic.g{background:var(--emerald-s);color:var(--emerald);border:1px solid rgba(16,185,129,.2)}
+.mcp-ic.b{background:var(--blue-s);color:var(--blue);border:1px solid rgba(59,130,246,.2)}
+.mcp-ic.p{background:var(--purple-s);color:var(--purple);border:1px solid rgba(168,85,247,.2)}
+.mcp-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.mcp-desc{font-size:11.5px;color:var(--text-3);line-height:1.5}
+
+/* ── CTA ── */
+.cta{background:linear-gradient(135deg,rgba(255,107,0,.07) 0%,rgba(255,107,0,.015) 100%);border:1px solid rgba(255,107,0,.18);border-radius:var(--r2xl);padding:52px 36px;text-align:center;position:relative;overflow:hidden}
+.cta::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(255,107,0,.025) 0%,transparent 60%);animation:glow 6s ease-in-out infinite}
+.cta-in{position:relative;z-index:2}
+.cta-title{font-family:var(--fd);font-size:30px;font-weight:700;margin-bottom:12px;letter-spacing:-.02em}
+.cta-desc{font-size:15px;color:var(--text-2);margin-bottom:28px;line-height:1.7}
+.cta-btns{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.btn-cta-p{display:inline-flex;align-items:center;gap:9px;background:var(--orange);color:#fff;font-size:14px;font-weight:700;padding:13px 26px;border-radius:var(--rmd);text-decoration:none;transition:all .3s var(--ease);box-shadow:0 4px 24px rgba(255,107,0,.22);border:1px solid rgba(255,107,0,.45)}
+.btn-cta-p:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 8px 36px rgba(255,107,0,.3);background:#FF7A1A}
+.btn-cta-s{display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.04);color:var(--text-1);font-size:14px;font-weight:600;padding:13px 22px;border-radius:var(--rmd);text-decoration:none;border:1px solid var(--border-m);transition:all .3s var(--ease)}
+.btn-cta-s:hover{background:rgba(255,255,255,.08);border-color:var(--border-b);transform:translateY(-3px)}
+
+/* ── Footer ── */
+footer{background:#030406;border-top:1px solid var(--border-s);padding:64px 24px 36px;position:relative;z-index:10}
+.ft{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr repeat(3,1fr);gap:44px;margin-bottom:44px}
+.ft-p{font-size:12.5px;color:var(--text-3);line-height:1.65;margin-top:12px;max-width:280px}
+.ft-ct{font-family:var(--fm);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px}
+.ft-ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.ft-a{font-size:13px;color:var(--text-3);text-decoration:none;transition:all .2s ease;cursor:pointer}
+.ft-a:hover{color:var(--text-1);transform:translateX(2px)}
+.ft-bot{max-width:1200px;margin:0 auto;padding-top:24px;border-top:1px solid var(--border-s);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text-4)}
+.ft-bot-links{display:flex;gap:18px}
+.ft-bot-a{color:var(--text-4);text-decoration:none;transition:color .2s ease}.ft-bot-a:hover{color:var(--text-3)}
+
+/* ── Mobile Nav ── */
+.mob-nav{position:fixed;inset:0;z-index:150;background:rgba(0,0,0,.92);backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;opacity:0;transition:opacity .3s ease}
+.mob-nav.open{display:flex;opacity:1}
+.mob-nav-c{text-align:center;display:flex;flex-direction:column;gap:6px}
+.mob-nav-a{font-family:var(--fd);font-size:22px;font-weight:700;color:var(--text-1);text-decoration:none;padding:10px 22px;border-radius:var(--rmd);transition:all .2s ease}
+.mob-nav-a:hover{color:var(--orange);background:rgba(255,255,255,.04)}
+.mob-nav-x{margin-top:20px;background:0 0;border:1px solid var(--border-m);color:var(--text-2);padding:9px 22px;border-radius:var(--rmd);font-size:13px;cursor:pointer}
+
+/* ── Responsive ── */
+@media(max-width:900px){
+.nav-links{display:none}.nav-cta.desktop{display:none}.mob-toggle{display:block}
+.hero{padding:116px 16px 56px}.hero-h1{font-size:clamp(28px,7vw,44px)}.hero-sub{font-size:15px}
+.docs-w{grid-template-columns:1fr}.docs-side{max-height:none;flex-direction:row;overflow-x:auto;padding:14px;gap:6px;border-right:0;border-bottom:1px solid var(--border-s)}.docs-nav{flex-direction:row;gap:3px}.docs-body{padding:22px;max-height:none}
+.ft{grid-template-columns:1fr 1fr;gap:28px}.ft-bot{flex-direction:column;gap:10px;text-align:center}
+.dl-grid,.feat-grid,.blog-grid,.mcp-grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}
+.arch-row{flex-direction:column}.arch-arrow{transform:rotate(90deg)}.arch-node{max-width:100%}
+.sec{padding:56px 16px}.modal-box{padding:26px 18px}
+}
+@media(max-width:600px){.ft{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.cta{padding:36px 20px}.cta-title{font-size:22px}}
+</style>
 </head>
 <body>
 
-  <!-- Ambient Background -->
-  <div class="ambient-canvas">
-    <div class="ambient-glow-center"></div>
-    <div class="bg-grid-mesh"></div>
-  </div>
-
-  <!-- Header -->
-  <header class="site-header">
-    <div class="nav-container">
-      <a href="#" class="brand-group">
-        <div class="brand-logo-wrap">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="12 2 2 7 12 12 22 7 12 2" stroke="#FFFFFF" fill="rgba(255,255,255,0.15)" />
-            <polyline points="2 17 12 22 22 17" stroke="#CBD5E1" />
-            <polyline points="2 12 12 17 22 12" stroke="#94A3B8" />
-          </svg>
-        </div>
-        <span class="brand-title">Swarm AI</span>
-        <span class="brand-badge">v0.1.0 PRO</span>
-      </a>
-
-      <nav class="nav-links">
-        <a href="#downloads" class="nav-link">Downloads</a>
-        <a href="#how-it-works" class="nav-link">How It Works</a>
-        <a href="#docs" class="nav-link">Documentation</a>
-        <a href="#blog" class="nav-link">Research & Papers</a>
-        <a href="https://github.com/soumyachk101/SwarmAI" target="_blank" class="nav-link">GitHub</a>
-      </nav>
-
-      <a href="#downloads" class="nav-cta-btn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-          <polyline points="7 10 12 15 17 10" />
-          <line x1="12" y1="15" x2="12" y2="3" />
-        </svg>
-        <span>Download Standalone</span>
-      </a>
-    </div>
-  </header>
-
-  <!-- Hero Section -->
-  <section class="hero-section">
-    <div class="hero-pill">
-      <span class="live-dot"></span>
-      <span>Autonomous AI-Native Desktop Workspace</span>
-      <span style="color: var(--border-bright);">|</span>
-      <span style="color: var(--accent-platinum); font-weight: 600;">Multi-Agent Concurrency</span>
-    </div>
-
-    <h1 class="hero-title">
-      Where Multiple AI Agents Build <br />
-      <span class="hero-title-gradient">Simultaneously Without Conflicts.</span>
-    </h1>
-
-    <p class="hero-subtitle">
-      Swarm AI coordinates Claude Code, OpenAI Codex, OpenCode, Aider, and Antigravity concurrently.
-      Equipped with shared Pheromone memory, isolated Git worktrees, and an infinite Flow canvas.
-    </p>
-
-    <div class="hero-actions">
-      <div class="download-primary-row">
-        <a href="https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_aarch64.dmg" class="btn-download-hero" id="auto-download-btn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
-          <span id="auto-download-text">Download for macOS (.dmg)</span>
-        </a>
-
-        <a href="#how-it-works" class="btn-secondary-hero">
-          <span>Architecture & Mechanics</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </a>
-      </div>
-
-      <div class="curl-command-bar">
-        <span class="curl-prefix">$</span>
-        <span class="curl-text">curl -fsSL https://getswarm.ai/install.sh | bash</span>
-        <button class="copy-btn" onclick="copyInstallCmd()" title="Copy to clipboard">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- How It Works & Architecture Diagrams Section -->
-  <section id="how-it-works" class="section-container">
-    <div class="section-header">
-      <div class="section-label">Architecture Mechanics</div>
-      <h2 class="section-title">How Swarm AI Operates</h2>
-      <p class="section-description">
-        A breakdown of the internal orchestration engine: from high-level goal decomposition to parallel branch isolation and shared context synchronization.
-      </p>
-    </div>
-
-    <!-- Master Architecture Flow Box -->
-    <div class="arch-flow-wrap">
-      <!-- Row 1: Developer Input to Lead Steward -->
-      <div class="arch-flow-row">
-        <div class="arch-node primary">
-          <span class="arch-node-tag">Initiator</span>
-          <div class="arch-node-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            <span>Developer Mission Goal</span>
-          </div>
-          <span class="arch-node-desc">Single high-level directive or PR description</span>
-        </div>
-
-        <div class="arch-arrow">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-        </div>
-
-        <div class="arch-node primary">
-          <span class="arch-node-tag">Orchestrator</span>
-          <div class="arch-node-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-            <span>Lead Steward Hub</span>
-          </div>
-          <span class="arch-node-desc">Autonomous subtask decomposition & safety locks</span>
-        </div>
-      </div>
-
-      <!-- Row 2: Parallel Worktrees & Workers -->
-      <div class="arch-flow-row" style="margin-top: 10px;">
-        <!-- Worker 1 -->
-        <div class="arch-node">
-          <span class="arch-node-tag" style="color:var(--accent-emerald);">Worktree #1 · feature/auth</span>
-          <div class="arch-node-title">Claude Code Opus 5</div>
-          <span class="arch-node-desc">Decomposes auth schemas & session management</span>
-        </div>
-
-        <!-- Worker 2 -->
-        <div class="arch-node">
-          <span class="arch-node-tag" style="color:#38bdf8;">Worktree #2 · feature/canvas</span>
-          <div class="arch-node-title">Codex CLI 5.6 Sol</div>
-          <span class="arch-node-desc">Builds React Flow canvas & socket synapsing</span>
-        </div>
-
-        <!-- Worker 3 -->
-        <div class="arch-node">
-          <span class="arch-node-tag" style="color:#a855f7;">Worktree #3 · feature/tests</span>
-          <div class="arch-node-title">OpenCode DeepSeek R1</div>
-          <span class="arch-node-desc">Generates end-to-end integration test suites</span>
-        </div>
-      </div>
-
-      <!-- Row 3: Memory Synapse & 3-Way Merge -->
-      <div class="arch-flow-row" style="margin-top: 10px;">
-        <div class="arch-node primary" style="min-width: 260px;">
-          <span class="arch-node-tag">Shared Memory Synapse</span>
-          <div class="arch-node-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-            <span>Pheromone SQLite Vector Store</span>
-          </div>
-          <span class="arch-node-desc">Real-time contract broadcasting across workers</span>
-        </div>
-
-        <div class="arch-arrow">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-        </div>
-
-        <div class="arch-node primary" style="min-width: 240px;">
-          <span class="arch-node-tag">Conflict-Free Integration</span>
-          <div class="arch-node-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            <span>3-Way Fast-Forward Merge</span>
-          </div>
-          <span class="arch-node-desc">Clean validation into primary main branch</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Downloads Section -->
-  <section id="downloads" class="section-container">
-    <div class="section-header">
-      <div class="section-label">Distribution Hub</div>
-      <h2 class="section-title">Install Swarm AI on Any Platform</h2>
-      <p class="section-description">
-        Direct standalone packages for macOS, Windows, Linux, and Android. Local-first and 100% private.
-      </p>
-    </div>
-
-    <div class="downloads-grid">
-      <!-- macOS -->
-      <div class="download-card highlight">
-        <span class="download-card-badge">RECOMMENDED</span>
-        <div>
-          <div class="os-icon-box">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.24c.64-.78 1.08-1.87.96-2.96-.93.04-2.05.62-2.71 1.4-.58.67-1.09 1.77-.95 2.83 1.04.08 2.09-.53 2.7-1.27z"/>
-            </svg>
-          </div>
-          <h3 class="os-card-title">macOS</h3>
-          <p class="os-card-desc">Universal package for Apple Silicon (M1/M2/M3/M4) and Intel x64.</p>
-        </div>
-        <div class="os-file-list">
-          <a href="https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_aarch64.dmg" id="download-macos-arm" class="os-file-btn">
-            <span>Apple Silicon (.dmg)</span>
-            <span class="os-file-meta">5.7 MB</span>
-          </a>
-          <a href="https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_aarch64.dmg" id="download-macos-intel" class="os-file-btn">
-            <span>Intel x64 (.dmg)</span>
-            <span class="os-file-meta">5.7 MB</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- Windows -->
-      <div class="download-card">
-        <div>
-          <div class="os-icon-box">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
-            </svg>
-          </div>
-          <h3 class="os-card-title">Windows</h3>
-          <p class="os-card-desc">Windows 10 / 11 64-bit installer with integrated PowerShell terminal bridge.</p>
-        </div>
-        <div class="os-file-list">
-          <a href="https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_x64-setup.exe" id="download-win-exe" class="os-file-btn">
-            <span>Installer (.exe)</span>
-            <span class="os-file-meta">3.9 MB</span>
-          </a>
-          <a href="https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_x64_en-US.msi" id="download-win-msi" class="os-file-btn">
-            <span>Enterprise (.msi)</span>
-            <span class="os-file-meta">5.5 MB</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- Linux -->
-      <div class="download-card">
-        <div>
-          <div class="os-icon-box">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12.004 0c-2.317 0-4.168 1.851-4.168 4.168 0 .43.064.846.183 1.238C5.228 6.55 3.33 9.4 3.33 12.784c0 3.432 1.948 6.31 4.793 7.424-.044.2-.069.406-.069.619 0 1.748 1.417 3.165 3.165 3.165 1.748 0 3.165-1.417 3.165-3.165 0-.213-.025-.419-.069-.619 2.845-1.114 4.793-3.992 4.793-7.424 0-3.384-1.898-6.234-4.685-7.378.119-.392.183-.808.183-1.238C14.672 1.851 12.821 0 12.004 0z"/>
-            </svg>
-          </div>
-          <h3 class="os-card-title">Linux</h3>
-          <p class="os-card-desc">Portable AppImage and Debian packages for Linux workstations.</p>
-        </div>
-        <div class="os-file-list">
-          <a href="https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_amd64.AppImage" id="download-linux-appimage" class="os-file-btn">
-            <span>Universal AppImage</span>
-            <span class="os-file-meta">79.5 MB</span>
-          </a>
-          <a href="https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_amd64.deb" id="download-linux-deb" class="os-file-btn">
-            <span>Debian / Ubuntu (.deb)</span>
-            <span class="os-file-meta">5.8 MB</span>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- In-Depth Documentation Hub -->
-  <section id="docs" class="section-container">
-    <div class="section-header">
-      <div class="section-label">Documentation Hub</div>
-      <h2 class="section-title">Developer & Architecture Reference</h2>
-      <p class="section-description">
-        Comprehensive guides on configuration, supported CLIs, Pheromone memory schema, and security.
-      </p>
-    </div>
-
-    <div class="docs-wrapper">
-      <!-- Docs Navigation Sidebar -->
-      <aside class="docs-sidebar">
-        <div>
-          <div class="docs-nav-group-title">Getting Started</div>
-          <div class="docs-nav-item active" onclick="switchDoc('quickstart')">Quickstart Guide</div>
-          <div class="docs-nav-item" onclick="switchDoc('supported-clis')">Supported Coding CLIs</div>
-          <div class="docs-nav-item" onclick="switchDoc('keybindings')">Keyboard Shortcuts</div>
-        </div>
-
-        <div>
-          <div class="docs-nav-group-title">Architecture</div>
-          <div class="docs-nav-item" onclick="switchDoc('pheromone')">Pheromone Memory Engine</div>
-          <div class="docs-nav-item" onclick="switchDoc('worktrees')">Git Worktree Isolation</div>
-          <div class="docs-nav-item" onclick="switchDoc('flow-canvas')">Flow Canvas & Synapses</div>
-          <div class="docs-nav-item" onclick="switchDoc('security')">Security & Privacy</div>
-        </div>
-      </aside>
-
-      <!-- Docs Articles View -->
-      <div class="docs-content">
-        <!-- 1. Quickstart & Installation -->
-        <article id="doc-quickstart" class="docs-article active">
-          <h1 class="docs-h1">Quickstart & Installation</h1>
-          <p class="docs-lead">Production setup guide for deploying Swarm AI on macOS, Windows, and Linux workstations with local PTY bridges.</p>
-          
-          <h2 class="docs-h2">1. Prerequisites & Runtime Requirements</h2>
-          <p class="docs-p">
-            Before launching Swarm AI, ensure your host operating system meets the following baseline toolchains:
-          </p>
-          <div class="docs-code-block">
-# Check Node.js and Git installations
-node -v    # Must be v20.0.0 or higher
-git --version   # Git 2.38.0+ required for worktree concurrency
-pnpm -v    # Recommended package manager (v9.0.0+)
-          </div>
-
-          <h2 class="docs-h2">2. Operating System Specific Installation</h2>
-          
-          <p class="docs-p"><strong>macOS (Apple Silicon & Intel):</strong></p>
-          <p class="docs-p">
-            1. Download <code>SwarmAI.dmg</code> from the distribution grid.<br />
-            2. Open the disk image and drag <code>SwarmAI.app</code> into <code>/Applications</code>.<br />
-            3. If Gatekeeper displays an unsigned developer warning on first launch, execute the quarantine bypass:
-          </p>
-          <div class="docs-code-block">
-xattr -d com.apple.quarantine /Applications/SwarmAI.app
-          </div>
-
-          <p class="docs-p"><strong>Windows 10 / 11 (64-Bit):</strong></p>
-          <p class="docs-p">
-            1. Run <code>SwarmAI_Setup.exe</code> and proceed through the NSIS installer wizard.<br />
-            2. Ensure PowerShell execution policy permits local scripting for PTY spawning:
-          </p>
-          <div class="docs-code-block">
-Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
-          </div>
-
-          <p class="docs-p"><strong>Linux (Ubuntu / Debian / Fedora):</strong></p>
-          <div class="docs-code-block">
-# For AppImage:
-chmod +x SwarmAI.AppImage
-./SwarmAI.AppImage --no-sandbox
-
-# For Debian / Ubuntu (.deb):
-sudo dpkg -i SwarmAI.deb
-sudo apt-get install -f
-          </div>
-
-          <h2 class="docs-h2">3. Workspace Initialization & Hive Bootstrapping</h2>
-          <p class="docs-p">
-            When you select a project directory in Swarm AI, the core engine automatically executes the following non-destructive initialization steps:
-          </p>
-          <p class="docs-p">
-            1. <strong>Memory Directory</strong>: Creates a local <code>.pheromone/</code> folder containing an embedded SQLite database (<code>memory.db</code>).<br />
-            2. <strong>Worktree Cache</strong>: Sets up <code>.swarm/worktrees/</code> for managing ephemeral branches and automatically appends it to <code>.gitignore</code>.<br />
-            3. <strong>CLI Discovery</strong>: Scans your user <code>$PATH</code> for global binary installations of <code>claude</code>, <code>codex</code>, <code>opencode</code>, <code>aider</code>, and <code>antigravity</code>.<br />
-            4. <strong>PTY Multiplexer</strong>: Allocates hardware-accelerated pseudo-terminal pipes with xterm.js frontends.
-          </p>
-        </article>
-
-        <!-- 2. Supported Coding CLIs -->
-        <article id="doc-supported-clis" class="docs-article">
-          <h1 class="docs-h1">Supported Coding CLIs & Runtime Specifications</h1>
-          <p class="docs-lead">Detailed runtime configurations, CLI arguments, effort levels, and MCP communication protocols for all supported autonomous agents.</p>
-          
-          <h2 class="docs-h2">1. Anthropic Claude Code</h2>
-          <p class="docs-p">
-            Swarm AI natively bridges with the official Anthropic Claude Code CLI, supporting 1M+ token context windows, MCP servers, and dynamic reasoning effort normalization.
-          </p>
-          <div class="docs-code-block">
-# Global installation via npm
-npm install -g @anthropic-ai/claude-code
-
-# Supported Models
-claude --model claude-3-7-sonnet-20250219    # High speed & reasoning
-claude --model claude-opus-5-2026            # Deep architectural design
-
-# Swarm Normalized Effort Levels (/effort command)
-/effort low         # Fast surface edits and lint fixes
-/effort medium      # Standard feature development
-/effort high        # Complex refactoring with test generation
-/effort ultracode   # Max compute reasoning with deep search
-          </div>
-
-          <h2 class="docs-h2">2. OpenAI Codex CLI</h2>
-          <p class="docs-p">
-            Built for OpenAI Codex 5.6 models with configurable reasoning tokens and automated headless execution:
-          </p>
-          <div class="docs-code-block">
-# Installation
-npm install -g @openai/codex-cli
-
-# Execution Flags
-codex --model codex-5.6-sol --reasoning-effort high --dangerously-skip-permissions
-          </div>
-
-          <h2 class="docs-h2">3. OpenCode & Local LLMs (Ollama / vLLM)</h2>
-          <p class="docs-p">
-            For privacy-focused, air-gapped workflows, OpenCode connects to local inference servers running open weights (DeepSeek R1 671B, Qwen 2.5 Coder 32B, LLaMA 3.3 70B):
-          </p>
-          <div class="docs-code-block">
-# Connect Swarm AI to local Ollama server
-export OLLAMA_HOST="http://localhost:11434"
-opencode --model deepseek-r1:32b --api-base http://localhost:11434/v1
-          </div>
-
-          <h2 class="docs-h2">4. Automated CLI Process Architecture</h2>
-          <div class="arch-flow-wrap" style="padding:16px;">
-            <div class="arch-flow-row">
-              <div class="arch-node primary">
-                <span class="arch-node-tag">Tauri Backend</span>
-                <div class="arch-node-title">Rust PTY Host (portable-pty)</div>
-                <span class="arch-node-desc">Direct stdin/stdout byte streaming</span>
-              </div>
-              <div class="arch-arrow">→</div>
-              <div class="arch-node primary">
-                <span class="arch-node-tag">Frontend Renderer</span>
-                <div class="arch-node-title">xterm.js + WebGL Canvas</div>
-                <span class="arch-node-desc">Zero-latency terminal rendering</span>
-              </div>
-              <div class="arch-arrow">→</div>
-              <div class="arch-node">
-                <span class="arch-node-tag">Context Pipe</span>
-                <div class="arch-node-title">Dynamic MCP Bridge</div>
-                <span class="arch-node-desc">Atomic context injection without buffer pollution</span>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <!-- 3. Keybindings & Velocity -->
-        <article id="doc-keybindings" class="docs-article">
-          <h1 class="docs-h1">Keyboard Shortcuts & Developer Velocity</h1>
-          <p class="docs-lead">Complete keyboard navigation map for fluid canvas navigation, terminal focus, and mission dispatch.</p>
-          
-          <h2 class="docs-h2">Global Navigation & Swarm Control</h2>
-          <div class="docs-code-block">
-Shortcut                Action Description
------------------------------------------------------------------------------
-⌘K / Ctrl+K             Open Unified Swarm Command Palette
-⌘Enter                  Dispatch Parallel Prompt to Active Targets
-⌘B                      Switch Hub to Broadcast Mode (Simultaneous)
-⌘P                      Switch Hub to Wire Pipeline Mode (Chained)
-⌘T                      Create New Worker Agent Node
-⌘W                      Close Focused Agent Pane
-⌘,                      Open System Preferences & Theme Picker
-          </div>
-
-          <h2 class="docs-h2">Flow Canvas & Spatial Controls</h2>
-          <div class="docs-code-block">
-Shortcut                Action Description
------------------------------------------------------------------------------
-Space + Drag            Pan Canvas Viewport smoothly
-⌘+ / Ctrl++             Zoom In (+15%)
-⌘- / Ctrl+-             Zoom Out (-15%)
-⌘0 / Ctrl+0             Reset Zoom to 100% & Center Viewport
-Shift + Click (Socket)  Begin Drawing Synapse Connection Wire
-Delete / Backspace      Disconnect Selected Wire or Remove Node
-          </div>
-
-          <h2 class="docs-h2">Terminal Multiplexer Navigation</h2>
-          <div class="docs-code-block">
-Shortcut                Action Description
------------------------------------------------------------------------------
-⌘1 .. ⌘9                Directly focus Agent Terminal Pane 1 through 9
-⌘`                      Cycle focus to Next Active Agent Terminal
-⌘C                      Copy Terminal Selection (Standard Unix SIGINT when empty)
-⌘V                      Paste Text directly into Raw PTY Buffer
-⌘K (in terminal)        Clear Terminal Screen Buffer
-          </div>
-        </article>
-
-        <!-- 4. Pheromone Memory Engine -->
-        <article id="doc-pheromone" class="docs-article">
-          <h1 class="docs-h1">Pheromone Shared Memory Engine & Vector Schema</h1>
-          <p class="docs-lead">Technical specifications for local vector indexing, semantic search, and inter-agent memory synchronization.</p>
-          
-          <h2 class="docs-h2">1. Memory Architecture Overview</h2>
-          <p class="docs-p">
-            Traditional multi-agent systems suffer from context drift: Agent A invents an API endpoint, while Agent B writes frontend code calling a completely different URL.
-            Pheromone eliminates this by maintaining an embedded SQLite database inside <code>.pheromone/memory.db</code> with sub-millisecond semantic search.
-          </p>
-
-          <h2 class="docs-h2">2. Database Schema & Tables</h2>
-          <div class="docs-code-block">
--- Core memory entities table
-CREATE TABLE IF NOT EXISTS memories (
-    id TEXT PRIMARY KEY,
-    project_id TEXT NOT NULL,
-    category TEXT NOT NULL CHECK(category IN ('architecture', 'decision', 'rule', 'plan', 'fact')),
-    title TEXT NOT NULL,
-    content TEXT NOT NULL,
-    embedding BLOB,               -- 384-dimensional cosine vector
-    source_agent TEXT NOT NULL,   -- e.g. 'claude-code-lead'
-    confidence REAL DEFAULT 1.0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Synapse wire links table
-CREATE TABLE IF NOT EXISTS synapses (
-    id TEXT PRIMARY KEY,
-    from_agent_id TEXT NOT NULL,
-    to_agent_id TEXT NOT NULL,
-    topic TEXT NOT NULL,
-    weight REAL DEFAULT 1.0,
-    last_synced TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-          </div>
-
-          <h2 class="docs-h2">3. Inter-Agent Communication Flow</h2>
-          <div class="arch-flow-wrap" style="padding:16px;">
-            <div class="arch-flow-row">
-              <div class="arch-node primary">
-                <span class="arch-node-tag">1. Event Trigger</span>
-                <div class="arch-node-title">Agent Writes Code</div>
-                <span class="arch-node-desc">e.g. Creates session.ts API contract</span>
-              </div>
-              <div class="arch-arrow">→</div>
-              <div class="arch-node primary">
-                <span class="arch-node-tag">2. Vector Indexing</span>
-                <div class="arch-node-title">Pheromone Embedded DB</div>
-                <span class="arch-node-desc">Auto-indexes contract into memory.db</span>
-              </div>
-              <div class="arch-arrow">→</div>
-              <div class="arch-node">
-                <span class="arch-node-tag">3. Context Broadcast</span>
-                <div class="arch-node-title">Frontend Worker MCP</div>
-                <span class="arch-node-desc">Auto-retrieves exact types & endpoints</span>
-              </div>
-            </div>
-          </div>
-
-          <h2 class="docs-h2">4. Supported Memory Categories</h2>
-          <p class="docs-p">
-            • <strong>architecture</strong>: Core technology decisions (e.g. "Using Tailwind v4, Vite 5, React 19").<br />
-            • <strong>decision</strong>: Explicit structural declarations (e.g. "Auth endpoints live under /api/v1/auth").<br />
-            • <strong>rule</strong>: Mandatory coding constraints (e.g. "Do not use emojis; use Lucide vector icons").<br />
-            • <strong>plan</strong>: Decomposed task milestones currently allocated to specific workers.<br />
-            • <strong>fact</strong>: Discovered environment states (e.g. "Local postgres port is 5432; schema is migrated").
-          </p>
-        </article>
-
-        <!-- 5. Git Worktree Isolation -->
-        <article id="doc-worktrees" class="docs-article">
-          <h1 class="docs-h1">Git Worktree Isolation & 3-Way Merge Engine</h1>
-          <p class="docs-lead">Deterministic file isolation mechanics, branch locking algorithms, and clean 3-way fast-forward merges.</p>
-          
-          <h2 class="docs-h2">1. The Problem of File Contention</h2>
-          <p class="docs-p">
-            When multiple autonomous agents operate inside the same working tree, concurrent disk writes cause catastrophic race conditions: partial AST writes, broken build states, and corrupted files.
-          </p>
-
-          <h2 class="docs-h2">2. Ephemeral Worktree Diagrammatic Lifecycle</h2>
-          <p class="docs-p">
-            Each parallel task follows a deterministic 6-stage lifecycle, ensuring complete file isolation and safe atomic integration into your primary codebase:
-          </p>
-
-          <!-- Diagrammatic Worktree Pipeline Flow -->
-          <div class="arch-flow-wrap" style="gap:16px; padding:24px;">
-            <!-- Stage 1 & 2 -->
-            <div class="arch-flow-row" style="justify-content:space-between; width:100%;">
-              <div class="arch-node primary" style="flex:1;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <span class="arch-node-tag" style="color:var(--accent-emerald);">Stage 01 · Provisioning</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-muted);">git worktree add</span>
-                </div>
-                <div class="arch-node-title">Isolated Worktree Spawn</div>
-                <span class="arch-node-desc">Creates <code>.swarm/worktrees/task-auth-01</code> on branch <code>swarm/task-auth-01</code> branched from <code>main</code>.</span>
-                <div class="docs-code-block" style="margin:6px 0 0; padding:8px 12px; font-size:11px;">
-git worktree add -b swarm/task-auth-01 .swarm/worktrees/task-auth-01 main
-                </div>
-              </div>
-
-              <div class="arch-arrow" style="display:flex; flex-direction:column; gap:2px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-              </div>
-
-              <div class="arch-node" style="flex:1;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <span class="arch-node-tag" style="color:#38bdf8;">Stage 02 · Lock Registry</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-muted);">.swarm/locks.json</span>
-                </div>
-                <div class="arch-node-title">File Ownership Declaration</div>
-                <span class="arch-node-desc">Lead registers write-locks for <code>src/auth/**</code> and grants read-only access to sibling workers.</span>
-                <div class="docs-code-block" style="margin:6px 0 0; padding:8px 12px; font-size:11px;">
-{ "task_id": "auth-01", "write_paths": ["src/auth/**"], "read_only": true }
-                </div>
-              </div>
-            </div>
-
-            <!-- Stage 3 & 4 -->
-            <div class="arch-flow-row" style="justify-content:space-between; width:100%;">
-              <div class="arch-node" style="flex:1;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <span class="arch-node-tag" style="color:#a855f7;">Stage 03 · Execution</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-muted);">Autonomous PTY</span>
-                </div>
-                <div class="arch-node-title">Parallel Worker Generation</div>
-                <span class="arch-node-desc">Claude Code / Codex edits files in its isolated worktree without touching other workers' active buffers.</span>
-                <div class="docs-code-block" style="margin:6px 0 0; padding:8px 12px; font-size:11px;">
-cd .swarm/worktrees/task-auth-01 && claude --model claude-opus-5
-                </div>
-              </div>
-
-              <div class="arch-arrow" style="display:flex; flex-direction:column; gap:2px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-              </div>
-
-              <div class="arch-node primary" style="flex:1;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <span class="arch-node-tag" style="color:var(--accent-amber);">Stage 04 · Validation</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-muted);">git merge-tree</span>
-                </div>
-                <div class="arch-node-title">3-Way Dry-Run Conflict Check</div>
-                <span class="arch-node-desc">Performs in-memory 3-way merge validation across all completed worker branches before modifying git tree.</span>
-                <div class="docs-code-block" style="margin:6px 0 0; padding:8px 12px; font-size:11px;">
-git merge-tree --write-tree main swarm/task-auth-01 swarm/task-ui-02
-                </div>
-              </div>
-            </div>
-
-            <!-- Stage 5 & 6 -->
-            <div class="arch-flow-row" style="justify-content:space-between; width:100%;">
-              <div class="arch-node primary" style="flex:1;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <span class="arch-node-tag" style="color:var(--accent-emerald);">Stage 05 · Integration</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-muted);">Fast-Forward</span>
-                </div>
-                <div class="arch-node-title">Atomic Fast-Forward Merge</div>
-                <span class="arch-node-desc">Integrates validated feature branches directly into primary <code>main</code> branch with zero merge commits.</span>
-                <div class="docs-code-block" style="margin:6px 0 0; padding:8px 12px; font-size:11px;">
-git checkout main && git merge swarm/task-auth-01 --ff-only
-                </div>
-              </div>
-
-              <div class="arch-arrow" style="display:flex; flex-direction:column; gap:2px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-              </div>
-
-              <div class="arch-node" style="flex:1;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <span class="arch-node-tag" style="color:var(--text-muted);">Stage 06 · Cleanup</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-muted);">git worktree remove</span>
-                </div>
-                <div class="arch-node-title">Ephemeral Worktree Pruning</div>
-                <span class="arch-node-desc">Automatically unmounts ephemeral folders and deletes temporary task branches to maintain clean disk state.</span>
-                <div class="docs-code-block" style="margin:6px 0 0; padding:8px 12px; font-size:11px;">
-git worktree remove --force .swarm/worktrees/task-auth-01
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <h2 class="docs-h2">3. File Ownership Safety Locks</h2>
-          <p class="docs-p">
-            During task decomposition, the Lead Steward creates a file lock table stored in <code>.swarm/locks.json</code>. If Agent 1 is assigned <code>src/auth/*</code>, Agent 2 is restricted to read-only access for those paths, guaranteeing <strong>mathematically zero merge conflicts</strong>.
-          </p>
-        </article>
-
-        <!-- 6. Flow Canvas & Synapse Topology -->
-        <article id="doc-flow-canvas" class="docs-article">
-          <h1 class="docs-h1">Flow Canvas, Sockets & Live Telemetry Engine</h1>
-          <p class="docs-lead">Spatial execution graph, bidirectional socket wiring, and real-time token cost computation.</p>
-          
-          <h2 class="docs-h2">1. Spatial Graph Coordinates & Sockets</h2>
-          <p class="docs-p">
-            The Flow Canvas represents agents as reactive nodes in an infinite 2D plane with zoom capabilities (0.2x to 2.5x).
-            Each node exposes 4 directional sockets:
-          </p>
-          <p class="docs-p">
-            • <strong>Top Socket</strong>: Upstream control signals & supervisory directives from Lead Steward.<br />
-            • <strong>Bottom Socket</strong>: Downstream task delegation & worker dispatch.<br />
-            • <strong>Left Socket</strong>: Inbound memory contracts & context inputs.<br />
-            • <strong>Right Socket</strong>: Outbound API contracts & data pipelines.
-          </p>
-
-          <h2 class="docs-h2">2. Live Telemetry HUD Metrics</h2>
-          <p class="docs-p">
-            The Canvas HUD continuously tracks throughput and compute budgets in real time:
-          </p>
-          <div class="docs-code-block">
-Metric                  Formula & Source
------------------------------------------------------------------------------
-Token Velocity (t/s)    Sum of stream chunks received per second across all PTYs
-Total Cost ($)          (Input Tokens * Rate) + (Output Tokens * Rate) per model
-Cache Hit Rate (%)      Anthropic & OpenAI prompt cache read ratios (avg >95%)
-Active Worktrees        Count of mounted git worktree directory handles
-          </div>
-        </article>
-
-        <!-- 7. Security & Local-First Guarantees -->
-        <article id="doc-security" class="docs-article">
-          <h1 class="docs-h1">Security, Sandboxing & Air-Gap Compliance</h1>
-          <p class="docs-lead">Zero-telemetry architecture, local credential security, and enterprise compliance standards.</p>
-          
-          <h2 class="docs-h2">1. Zero Cloud Proxy Guarantee</h2>
-          <p class="docs-p">
-            Swarm AI maintains <strong>zero middleman cloud infrastructure</strong>. When your agents call Anthropic, OpenAI, or a local Ollama instance, the HTTP/WebSocket connection originates directly from your localhost machine to the model provider.
-            Your code, diffs, API keys, and repository files are never uploaded to any Swarm AI servers.
-          </p>
-
-          <h2 class="docs-h2">2. Operating System Keychain Vault</h2>
-          <p class="docs-p">
-            All API keys are encrypted at rest using OS-native security primitives:
-          </p>
-          <p class="docs-p">
-            • <strong>macOS</strong>: Apple Keychain via Security.framework.<br />
-            • <strong>Windows</strong>: Windows Credential Manager (DPAPI).<br />
-            • <strong>Linux</strong>: Secret Service API via libsecret / GNOME Keyring.
-          </p>
-
-          <h2 class="docs-h2">3. Sensitive Secret Scrubbing</h2>
-          <p class="docs-p">
-            Swarm AI's PTY stream filter automatically detects and masks environment secrets, JWT tokens, private keys (<code>-----BEGIN RSA PRIVATE KEY-----</code>), and <code>.env</code> variables before rendering them in the terminal buffer or passing them to vector memory.
-          </p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- Engineering Blog & Research Section -->
-  <section id="blog" class="section-container">
-    <div class="section-header">
-      <div class="section-label">Engineering Research</div>
-      <h2 class="section-title">Multi-Agent Systems & Architecture</h2>
-      <p class="section-description">
-        In-depth technical papers and architectural deep dives from the Swarm AI engineering team. Click any paper to read the full research article.
-      </p>
-    </div>
-
-    <div class="blog-grid">
-      <!-- Paper 1 -->
-      <div class="blog-card" onclick="openBlogModal('paper-concurrency')">
-        <div>
-          <div class="blog-meta-row">
-            <span class="blog-tag">Architecture</span>
-            <span>Aug 2026 · 6 min read</span>
-          </div>
-          <h3 class="blog-title">The Death of Single-Threaded AI: Why Parallel Swarm Coding Outperforms Monolithic Chatbots by 8.4x</h3>
-          <p class="blog-excerpt">
-            Empirical benchmarks demonstrate that decomposing software engineering tasks across 4 specialized parallel agents yields an 8.4x speedup over sequential single-thread chat sessions.
-          </p>
-        </div>
-        <div class="blog-read-more">
-          <span>Read Full Paper</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </div>
-      </div>
-
-      <!-- Paper 2 -->
-      <div class="blog-card" onclick="openBlogModal('paper-memory')">
-        <div>
-          <div class="blog-meta-row">
-            <span class="blog-tag">Memory Systems</span>
-            <span>Aug 2026 · 8 min read</span>
-          </div>
-          <h3 class="blog-title">Pheromone Memory: Eliminating Hallucinations in Multi-Agent Codebases</h3>
-          <p class="blog-excerpt">
-            How lightweight local vector stores and dynamic MCP bridges synchronize context across Claude Code, Codex, and OpenCode with zero manual clipboard transfers.
-          </p>
-        </div>
-        <div class="blog-read-more">
-          <span>Read Full Paper</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </div>
-      </div>
-
-      <!-- Paper 3 -->
-      <div class="blog-card" onclick="openBlogModal('paper-worktrees')">
-        <div>
-          <div class="blog-meta-row">
-            <span class="blog-tag">Concurrency</span>
-            <span>Aug 2026 · 5 min read</span>
-          </div>
-          <h3 class="blog-title">Zero Merge Conflicts: Isolating Parallel Agent Execution via Ephemeral Git Worktrees</h3>
-          <p class="blog-excerpt">
-            A deep technical analysis into file-ownership locks, branch hashing, and automatic 3-way merge validation for autonomous multi-agent pipelines.
-          </p>
-        </div>
-        <div class="blog-read-more">
-          <span>Read Full Paper</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Full In-Page Blog Article Reader Modal -->
-  <div id="blog-modal" class="modal-overlay" onclick="closeBlogModal(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <button class="modal-close-btn" onclick="closeBlogModal()">Close Paper</button>
-      <div id="modal-article-body"></div>
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <footer class="site-footer">
-    <div class="footer-container">
-      <div>
-        <div class="brand-group">
-          <div class="brand-logo-wrap">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="12 2 2 7 12 12 22 7 12 2" stroke="#FFFFFF" fill="rgba(255,255,255,0.15)" />
-              <polyline points="2 17 12 22 22 17" stroke="#CBD5E1" />
-              <polyline points="2 12 12 17 22 12" stroke="#94A3B8" />
-            </svg>
-          </div>
-          <span class="brand-title">Swarm AI</span>
-        </div>
-        <p class="footer-brand-p">
-          The autonomous desktop workspace for multi-agent software engineering. Build faster, build together.
-        </p>
-      </div>
-
-      <div>
-        <div class="footer-col-title">Downloads</div>
-        <ul class="footer-links-list">
-          <li><a href="https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_aarch64.dmg" id="footer-download-macos" class="footer-link">macOS (.dmg)</a></li>
-          <li><a href="https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_x64-setup.exe" id="footer-download-win" class="footer-link">Windows (.exe)</a></li>
-          <li><a href="https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_amd64.AppImage" id="footer-download-linux" class="footer-link">Linux (.AppImage)</a></li>
-          <li><a href="https://github.com/soumyachk101/SwarmAI/releases" target="_blank" class="footer-link">All Releases & Tags</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <div class="footer-col-title">Documentation</div>
-        <ul class="footer-links-list">
-          <li><a href="#docs" class="footer-link" onclick="switchDoc('quickstart')">Quickstart</a></li>
-          <li><a href="#docs" class="footer-link" onclick="switchDoc('supported-clis')">Supported CLIs</a></li>
-          <li><a href="#docs" class="footer-link" onclick="switchDoc('pheromone')">Pheromone Memory</a></li>
-          <li><a href="#docs" class="footer-link" onclick="switchDoc('keybindings')">Keyboard Shortcuts</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <div class="footer-col-title">Community & Code</div>
-        <ul class="footer-links-list">
-          <li><a href="https://github.com/soumyachk101/SwarmAI" target="_blank" class="footer-link">GitHub Repository</a></li>
-          <li><a href="https://github.com/soumyachk101/SwarmAI/issues" target="_blank" class="footer-link">Issue Tracker</a></li>
-          <li><a href="#blog" class="footer-link">Research Papers</a></li>
-          <li><a href="https://github.com/soumyachk101/SwarmAI/blob/main/LICENSE" target="_blank" class="footer-link">MIT License</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="footer-bottom">
-      <span>&copy; 2026 Swarm AI Authors. Open-source under MIT License.</span>
-      <span>Engineered with Rust, Tauri 2.0, and React.</span>
-    </div>
-  </footer>
-
-  <script>
-    const GITHUB_REPO = 'soumyachk101/SwarmAI';
-    const FALLBACK_DOWNLOADS = {
-      mac_arm: 'https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_aarch64.dmg',
-      mac_intel: 'https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_aarch64.dmg',
-      win_exe: 'https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_x64-setup.exe',
-      win_msi: 'https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_x64_en-US.msi',
-      linux_appimage: 'https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_amd64.AppImage',
-      linux_deb: 'https://github.com/soumyachk101/SwarmAI/releases/download/v0.1.0/SwarmAI_0.1.0_amd64.deb',
-      all_releases: 'https://github.com/soumyachk101/SwarmAI/releases/latest'
-    };
-
-    document.addEventListener("DOMContentLoaded", () => {
-      detectPlatform();
-      fetchLatestRelease();
-    });
-
-    // OS Detection Script
-    function detectPlatform(macUrl, winUrl, linuxUrl) {
-      const userAgent = window.navigator.userAgent.toLowerCase();
-      const btn = document.getElementById('auto-download-btn');
-      const text = document.getElementById('auto-download-text');
-      if (!btn || !text) return;
-
-      const macLink = macUrl || FALLBACK_DOWNLOADS.mac_arm;
-      const winLink = winUrl || FALLBACK_DOWNLOADS.win_exe;
-      const linuxLink = linuxUrl || FALLBACK_DOWNLOADS.linux_appimage;
-
-      if (userAgent.includes('mac')) {
-        btn.href = macLink;
-        text.innerText = 'Download for macOS (.dmg)';
-      } else if (userAgent.includes('win')) {
-        btn.href = winLink;
-        text.innerText = 'Download for Windows (.exe)';
-      } else if (userAgent.includes('linux')) {
-        btn.href = linuxLink;
-        text.innerText = 'Download for Linux (.AppImage)';
-      } else {
-        btn.href = macLink;
-        text.innerText = 'Download for macOS (.dmg)';
-      }
-    }
-
-    async function fetchLatestRelease() {
-      try {
-        const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`);
-        if (!res.ok) return;
-        const data = await res.json();
-        if (!data.assets || !Array.isArray(data.assets)) return;
-
-        const macArm = data.assets.find(a => a.name.endsWith('.dmg') && (a.name.includes('aarch64') || a.name.includes('arm64'))) || data.assets.find(a => a.name.endsWith('.dmg'));
-        const macIntel = data.assets.find(a => a.name.endsWith('.dmg') && (a.name.includes('x64') || a.name.includes('x86_64'))) || macArm;
-        const winExe = data.assets.find(a => a.name.endsWith('.exe'));
-        const winMsi = data.assets.find(a => a.name.endsWith('.msi'));
-        const linuxAppImage = data.assets.find(a => a.name.endsWith('.AppImage'));
-        const linuxDeb = data.assets.find(a => a.name.endsWith('.deb'));
-
-        function updateBtn(id, asset, fallbackUrl) {
-          const el = document.getElementById(id);
-          if (!el) return;
-          if (asset && asset.browser_download_url) {
-            el.href = asset.browser_download_url;
-            const meta = el.querySelector('.os-file-meta');
-            if (meta && asset.size) {
-              meta.textContent = (asset.size / (1024 * 1024)).toFixed(1) + ' MB';
-            }
-          } else if (fallbackUrl) {
-            el.href = fallbackUrl;
-          }
-        }
-
-        updateBtn('download-macos-arm', macArm, FALLBACK_DOWNLOADS.mac_arm);
-        updateBtn('download-macos-intel', macIntel, FALLBACK_DOWNLOADS.mac_intel);
-        updateBtn('download-win-exe', winExe, FALLBACK_DOWNLOADS.win_exe);
-        updateBtn('download-win-msi', winMsi, FALLBACK_DOWNLOADS.win_msi);
-        updateBtn('download-linux-appimage', linuxAppImage, FALLBACK_DOWNLOADS.linux_appimage);
-        updateBtn('download-linux-deb', linuxDeb, FALLBACK_DOWNLOADS.linux_deb);
-
-        updateBtn('footer-download-macos', macArm, FALLBACK_DOWNLOADS.mac_arm);
-        updateBtn('footer-download-win', winExe, FALLBACK_DOWNLOADS.win_exe);
-        updateBtn('footer-download-linux', linuxAppImage, FALLBACK_DOWNLOADS.linux_appimage);
-
-        detectPlatform(macArm?.browser_download_url, winExe?.browser_download_url, linuxAppImage?.browser_download_url);
-
-        if (data.tag_name) {
-          document.querySelectorAll('.brand-badge').forEach(badge => {
-            badge.textContent = data.tag_name + ' PRO';
-          });
-        }
-      } catch (err) {
-        console.warn('Using default release download links:', err);
-      }
-    }
-
-    // Docs Multi-Tab Switcher
-    function switchDoc(docId) {
-      document.querySelectorAll('.docs-nav-item').forEach(item => item.classList.remove('active'));
-      document.querySelectorAll('.docs-article').forEach(art => art.classList.remove('active'));
-
-      const targetArticle = document.getElementById('doc-' + docId);
-      if (targetArticle) {
-        targetArticle.classList.add('active');
-      }
-
-      const activeNav = Array.from(document.querySelectorAll('.docs-nav-item')).find(el => 
-        el.getAttribute('onclick')?.includes(docId)
-      );
-      if (activeNav) {
-        activeNav.classList.add('active');
-      }
-    }
-
-    // Full Blog Papers Data
-    const BLOG_PAPERS = {
-      'paper-concurrency': `
-        <div class="blog-meta-row" style="margin-bottom:16px;">
-          <span class="blog-tag">Architecture</span>
-          <span>Published August 2026 · 6 min read · Swarm AI Systems Lab</span>
-        </div>
-        <h1 class="docs-h1" style="font-size:32px; margin-bottom:16px;">The Death of Single-Threaded AI: Why Parallel Swarm Coding Outperforms Monolithic Chatbots by 8.4x</h1>
-        <p class="docs-lead">A comprehensive benchmark on developer throughput, latency, and context degradation across multi-agent vs single-thread workflows.</p>
-        
-        <h2 class="docs-h2">1. The Sequential Bottleneck</h2>
-        <p class="docs-p">
-          Traditional AI developer tooling treats LLMs as synchronous conversation partners. A developer requests a feature, waits 45 seconds for file edits, verifies the result, and prompts again.
-          In a standard full-stack task (e.g. adding Stripe checkout with webhooks, database models, and frontend state), this linear cycle consumes 18-25 minutes.
-        </p>
-
-        <h2 class="docs-h2">2. The Swarm Concurrency Model</h2>
-        <p class="docs-p">
-          Swarm AI replaces the single-thread model with a Lead Steward orchestrator. The Lead decomposes the goal into orthogonal subtasks, creates isolated Git worktrees, and launches worker agents simultaneously.
-        </p>
-
-        <!-- Benchmark Comparison Grid -->
-        <div class="benchmark-card">
-          <div class="benchmark-header">
-            <span class="benchmark-title">Wall-Clock Execution Timeline Comparison</span>
-            <span class="benchmark-speedup-badge">8.4x FASTER (-88% TIME)</span>
-          </div>
-
-          <!-- Track 1: Sequential Single-Thread -->
-          <div class="track-row">
-            <div class="track-label-row">
-              <span style="color:var(--text-primary);">Monolithic Single-Thread Bot (Sequential)</span>
-              <span style="font-family:'JetBrains Mono',monospace; color:var(--accent-amber);">22.0 min total</span>
-            </div>
-            <div class="timeline-bar-wrapper">
-              <div class="timeline-segment" style="width: 18%; background: #334155;">DB Schema (4m)</div>
-              <div class="timeline-segment" style="width: 27%; background: #475569;">REST API (6m)</div>
-              <div class="timeline-segment" style="width: 36%; background: #64748b;">React UI (8m)</div>
-              <div class="timeline-segment" style="width: 19%; background: #334155;">QA Tests (4m)</div>
-            </div>
-          </div>
-
-          <!-- Track 2: Swarm AI Parallel -->
-          <div class="track-row">
-            <div class="track-label-row">
-              <span style="color:var(--text-primary); font-weight:700;">Swarm AI (4 Parallel Workers + Worktrees)</span>
-              <span style="font-family:'JetBrains Mono',monospace; color:var(--accent-emerald); font-weight:700;">2.6 min total</span>
-            </div>
-            <div class="timeline-bar-wrapper" style="border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05);">
-              <div class="timeline-segment" style="width: 20%; background: #1e293b;">Lead Decomp (30s)</div>
-              <div class="timeline-segment" style="width: 60%; background: rgba(16,185,129,0.25); color: var(--accent-emerald); border-color: rgba(16,185,129,0.4);">
-                Workers 1..4 in Parallel (2.0m)
-              </div>
-              <div class="timeline-segment" style="width: 20%; background: #1e293b;">3-Way Merge (30s)</div>
-            </div>
-          </div>
-        </div>
-
-        <h2 class="docs-h2">3. Benchmark Results</h2>
-        <p class="docs-p">
-          Across 50 complex engineering benchmarks (building Next.js/Go webapps, refactoring legacy repositories, and adding microservices), Swarm AI achieved an average <strong>8.4x reduction in wall-clock time</strong> while decreasing context-window hallucination rates by 68%.
-        </p>
-      `,
-      'paper-memory': `
-        <div class="blog-meta-row" style="margin-bottom:16px;">
-          <span class="blog-tag">Memory Systems</span>
-          <span>Published August 2026 · 8 min read · Swarm AI Systems Lab</span>
-        </div>
-        <h1 class="docs-h1" style="font-size:32px; margin-bottom:16px;">Pheromone Memory: Eliminating Hallucinations in Multi-Agent Codebases</h1>
-        <p class="docs-lead">How lightweight local vector stores and dynamic MCP bridges synchronize context across Claude Code, Codex, and OpenCode with zero manual clipboard transfers.</p>
-        
-        <h2 class="docs-h2">1. The Multi-Agent Communication Problem</h2>
-        <p class="docs-p">
-          When multiple LLMs write code in parallel, they inevitably diverge on architectural assumptions (e.g. naming conventions, state management patterns, and authentication middleware).
-        </p>
-
-        <h2 class="docs-h2">2. Pheromone Architecture</h2>
-        <p class="docs-p">
-          Pheromone solves this via an embedded SQLite vector store running locally inside <code>.pheromone/</code>. Whenever any CLI agent makes an architectural choice, it is tagged and immediately indexed into vector memory.
-        </p>
-        <p class="docs-p">
-          When sibling agents query context or generate downstream modules, Pheromone injects exact function signatures and decisions via MCP tool calling without polluting standard terminal readline buffers.
-        </p>
-      `,
-      'paper-worktrees': `
-        <div class="blog-meta-row" style="margin-bottom:16px;">
-          <span class="blog-tag">Concurrency</span>
-          <span>Published August 2026 · 5 min read · Swarm AI Systems Lab</span>
-        </div>
-        <h1 class="docs-h1" style="font-size:32px; margin-bottom:16px;">Zero Merge Conflicts: Isolating Parallel Agent Execution via Ephemeral Git Worktrees</h1>
-        <p class="docs-lead">A deep technical analysis into file-ownership locks, branch hashing, and automatic 3-way merge validation for autonomous multi-agent pipelines.</p>
-        
-        <h2 class="docs-h2">1. File Collision Prevention</h2>
-        <p class="docs-p">
-          Running multiple autonomous agents in a single root directory is catastrophic: agents overwrite each other's files mid-generation.
-        </p>
-        <p class="docs-p">
-          Swarm AI allocates ephemeral Git worktrees for each task. Each worktree lives on an isolated branch with strict file-ownership locks declared during goal decomposition.
-        </p>
-      `
-    };
-
-    function openBlogModal(paperId) {
-      const modal = document.getElementById('blog-modal');
-      const body = document.getElementById('modal-article-body');
-      body.innerHTML = BLOG_PAPERS[paperId] || '<p>Article not found.</p>';
-      modal.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeBlogModal(event) {
-      if (event && event.target !== document.getElementById('blog-modal') && !event.target.classList.contains('modal-close-btn')) {
-        return;
-      }
-      const modal = document.getElementById('blog-modal');
-      modal.classList.remove('open');
-      document.body.style.overflow = 'auto';
-    }
-
-    // Copy Install Script
-    function copyInstallCmd() {
-      const cmd = "curl -fsSL https://getswarm.ai/install.sh | bash";
-      navigator.clipboard.writeText(cmd).then(() => {
-        alert("Copied install command to clipboard!");
-      });
-    }
-  </script>
+<!-- Ambient -->
+<div class="ambient"><div class="amb-glow"></div><div class="amb-accent"></div><div class="amb-grid"></div></div>
+<canvas id="particles"></canvas>
+
+<!-- Mobile Nav -->
+<div class="mob-nav" id="mobNav">
+<div class="mob-nav-c">
+<a href="#downloads" class="mob-nav-a" onclick="closeMobNav()">Downloads</a>
+<a href="#features" class="mob-nav-a" onclick="closeMobNav()">Features</a>
+<a href="#how-it-works" class="mob-nav-a" onclick="closeMobNav()">Architecture</a>
+<a href="#docs" class="mob-nav-a" onclick="closeMobNav()">Documentation</a>
+<a href="#blog" class="mob-nav-a" onclick="closeMobNav()">Research</a>
+<a href="#mcp" class="mob-nav-a" onclick="closeMobNav()">MCP</a>
+<a href="#help" class="mob-nav-a" onclick="closeMobNav()">Help & FAQ</a>
+<a href="#guide" class="mob-nav-a" onclick="closeMobNav()">User Guide</a>
+<button class="mob-nav-x" onclick="closeMobNav()">Close</button>
+</div>
+</div>
+
+<!-- Header -->
+<header id="hdr">
+<div class="nav">
+<a href="#" class="brand" onclick="window.scrollTo({top:0,behavior:'smooth'});return false">
+<div class="brand-icon">
+<svg width="16" height="16" viewBox="0 0 48 48" fill="none"><defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FFD700"/><stop offset="100%" stop-color="#FF6B00"/></linearGradient></defs>
+<ellipse cx="13.5" cy="15" rx="5.5" ry="3.2" transform="rotate(-36 13.5 15)" fill="rgba(255,179,0,.4)" stroke="#E68A00" stroke-width=".7"/>
+<ellipse cx="34.5" cy="15" rx="5.5" ry="3.2" transform="rotate(36 34.5 15)" fill="rgba(255,179,0,.4)" stroke="#E68A00" stroke-width=".7"/>
+<path d="M24 12C31 12 34 18 34 24.5C34 32.5 29.5 40.5 24 43.5C18.5 40.5 14 32.5 14 24.5C14 18 17 12 24 12Z" fill="url(#lg)" stroke="#B35900" stroke-width=".7"/></svg>
+</div>
+<span class="brand-name">Swarm AI</span>
+<span class="brand-ver" id="verBadge">v0.1.0 PRO</span>
+</a>
+<nav class="nav-links">
+<a href="#downloads" class="nl act">Downloads</a>
+<a href="#features" class="nl">Features</a>
+<a href="#how-it-works" class="nl">Architecture</a>
+<a href="#docs" class="nl">Docs</a>
+<a href="#blog" class="nl">Research</a>
+<a href="#mcp" class="nl">MCP</a>
+<a href="#help" class="nl">Help</a>
+<a href="#guide" class="nl">Guide</a>
+</nav>
+<a href="#downloads" class="nav-cta desktop">
+<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+<span>Download</span>
+</a>
+<button class="mob-toggle" onclick="openMobNav()">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+</button>
+</div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+<div class="hero-pill"><span class="live-dot"></span><span>Autonomous AI-Native Desktop Workspace</span><span style="color:rgba(255,255,255,.12)">|</span><span style="color:var(--platinum);font-weight:600">Multi-Agent Concurrency</span></div>
+<h1 class="hero-h1">Where Multiple AI Agents Build<br/><span class="hero-grad">Simultaneously Without Conflicts.</span></h1>
+<p class="hero-sub">Swarm AI coordinates Claude Code, OpenAI Codex, OpenCode, Aider, and Antigravity concurrently. Equipped with shared Pheromone memory, isolated Git worktrees, and an infinite Flow canvas — all running locally on your machine.</p>
+<div class="hero-actions">
+<div class="hero-btns">
+<a href="download-site/releases/macOS/SwarmAI_0.1.0_aarch64.dmg" class="btn-hero btn-p" id="autoDlBtn">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+<span id="autoDlTxt">Download for macOS (.dmg)</span>
+</a>
+<a href="#how-it-works" class="btn-hero btn-s"><span>How It Works</span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+</div>
+<div class="curl-bar"><span class="curl-prefix">$</span><span class="curl-text">curl -fsSL https://getswarm.ai/install.sh | bash</span><button class="copy-btn" id="copyBtn" onclick="copyCmd()" title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div>
+</div>
+<div class="trust">
+<div class="trust-i"><svg class="trust-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Local-First</div>
+<div class="trust-i"><svg class="trust-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Zero Cloud Proxy</div>
+<div class="trust-i"><svg class="trust-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>10+ CLI Agents</div>
+<div class="trust-i"><svg class="trust-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Open Source</div>
+</div>
+</section>
+
+<!-- Stats -->
+<section class="sec" style="padding-top:0">
+<div class="stats reveal">
+<div class="stat"><div class="stat-n">10+</div><div class="stat-l">CLI Agents Supported</div></div>
+<div class="stat"><div class="stat-n">8.4x</div><div class="stat-l">Faster Than Sequential</div></div>
+<div class="stat"><div class="stat-n">0</div><div class="stat-l">Merge Conflicts</div></div>
+<div class="stat"><div class="stat-n">100%</div><div class="stat-l">Local & Private</div></div>
+</div>
+</section>
+<div class="divider"><div class="divider-line"></div></div>
+
+<!-- Downloads -->
+<section id="downloads" class="sec">
+<div class="sec-hdr reveal"><div class="sec-label">Distribution Hub</div><h2 class="sec-title">Install Swarm AI on Any Platform</h2><p class="sec-desc">Direct standalone packages for macOS, Windows, and Linux. Local-first, 100% private, zero telemetry.</p></div>
+<div class="dl-grid">
+<div class="dl-card hl reveal rd1">
+<span class="dl-badge">RECOMMENDED</span>
+<div>
+<div class="dl-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.24c.64-.78 1.08-1.87.96-2.96-.93.04-2.05.62-2.71 1.4-.58.67-1.09 1.77-.95 2.83 1.04.08 2.09-.53 2.7-1.27z"/></svg></div>
+<h3 class="dl-title">macOS</h3><p class="dl-desc">Universal package for Apple Silicon (M1/M2/M3/M4) and Intel x64.</p>
+</div>
+<div class="dl-files">
+<a href="download-site/releases/macOS/SwarmAI_0.1.0_aarch64.dmg" class="dl-btn"><span class="dl-btn-l"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Apple Silicon (.dmg)</span><span class="dl-meta">5.7 MB</span></a>
+<a href="download-site/releases/macOS/SwarmAI.dmg" class="dl-btn"><span class="dl-btn-l"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Intel x64 (.dmg)</span><span class="dl-meta">5.7 MB</span></a>
+</div>
+</div>
+<div class="dl-card reveal rd2">
+<div>
+<div class="dl-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg></div>
+<h3 class="dl-title">Windows</h3><p class="dl-desc">Windows 10/11 64-bit installer with integrated PowerShell terminal bridge.</p>
+</div>
+<div class="dl-files">
+<a href="download-site/releases/windows/SwarmAI_0.1.0_x64-setup.exe" class="dl-btn"><span class="dl-btn-l"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Installer (.exe)</span><span class="dl-meta">3.9 MB</span></a>
+<a href="download-site/releases/windows/SwarmAI_0.1.0_x64_en-US.msi" class="dl-btn"><span class="dl-btn-l"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Enterprise (.msi)</span><span class="dl-meta">5.5 MB</span></a>
+</div>
+</div>
+<div class="dl-card reveal rd3">
+<div>
+<div class="dl-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12.004 0c-2.317 0-4.168 1.851-4.168 4.168 0 .43.064.846.183 1.238C5.228 6.55 3.33 9.4 3.33 12.784c0 3.432 1.948 6.31 4.793 7.424-.044.2-.069.406-.069.619 0 1.748 1.417 3.165 3.165 3.165 1.748 0 3.165-1.417 3.165-3.165 0-.213-.025-.419-.069-.619 2.845-1.114 4.793-3.992 4.793-7.424 0-3.384-1.898-6.234-4.685-7.378.119-.392.183-.808.183-1.238C14.672 1.851 12.821 0 12.004 0z"/></svg></div>
+<h3 class="dl-title">Linux</h3><p class="dl-desc">Debian/Ubuntu packages for Linux workstations.</p>
+</div>
+<div class="dl-files">
+<a href="download-site/releases/linux/SwarmAI_0.1.0_amd64.deb" class="dl-btn"><span class="dl-btn-l"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Debian/Ubuntu (.deb)</span><span class="dl-meta">5.8 MB</span></a>
+</div>
+</div>
+</div>
+</section>
+
+<div class="divider"><div class="divider-line"></div></div>
+
+<!-- Features -->
+<section id="features" class="sec">
+<div class="sec-hdr reveal"><div class="sec-label">Core Capabilities</div><h2 class="sec-title">Built for Parallel AI Development</h2><p class="sec-desc">Every component designed from the ground up for multi-agent concurrency, shared context, and zero-conflict collaboration.</p></div>
+<div class="feat-grid">
+<div class="feat reveal rd1"><div class="feat-ic o"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div><div class="feat-t">Pheromone Shared Memory</div><div class="feat-d">Hybrid SQLite + vector store giving every agent the same project context. No more re-explaining architecture to every new agent session.</div></div>
+<div class="feat reveal rd2"><div class="feat-ic b"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div><div class="feat-t">Lead Orchestrator</div><div class="feat-d">AI planner that breaks goals into tasks, assigns agents, and dispatches work in parallel — all with your approval before execution.</div></div>
+<div class="feat reveal rd3"><div class="feat-ic p"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><div class="feat-t">Multi-Pane Workspace</div><div class="feat-d">Agents, Terminal, Browser (CDP), Android Emulator, Board, and Flow Canvas — all in one surface, switchable instantly.</div></div>
+<div class="feat reveal rd4"><div class="feat-ic g"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div><div class="feat-t">Zero Merge Conflicts</div><div class="feat-d">Ephemeral Git worktrees with file-ownership locks ensure parallel agents never step on each other's changes.</div></div>
+<div class="feat reveal rd3"><div class="feat-ic o"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div><div class="feat-t">Local Voice Dictation</div><div class="feat-d">Fully offline whisper.cpp speech-to-text. Dictate code, commands, and documentation without any cloud dependency.</div></div>
+<div class="feat reveal rd4"><div class="feat-ic b"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><div class="feat-t">Plugin & Extensions</div><div class="feat-d">Internal plugin registry plus a VS Code extension marketplace for extending and customizing your workflow.</div></div>
+</div>
+</section>
+
+<div class="divider"><div class="divider-line"></div></div>
+
+<!-- How It Works -->
+<section id="how-it-works" class="sec">
+<div class="sec-hdr reveal"><div class="sec-label">Architecture Mechanics</div><h2 class="sec-title">How Swarm AI Operates</h2><p class="sec-desc">From high-level goal decomposition to parallel branch isolation and shared context synchronization.</p></div>
+<div class="arch reveal">
+<div class="arch-row">
+<div class="arch-node pri"><span class="arch-tag">Initiator</span><div class="arch-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Developer Mission Goal</div><span class="arch-desc">Single high-level directive or PR description</span></div>
+<div class="arch-arrow"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+<div class="arch-node pri"><span class="arch-tag">Orchestrator</span><div class="arch-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>Lead Steward Hub</div><span class="arch-desc">Autonomous subtask decomposition &amp; safety locks</span></div>
+</div>
+<div class="arch-row">
+<div class="arch-node"><span class="arch-tag" style="color:var(--emerald)">Worktree #1</span><div class="arch-title">Claude Code Opus 5</div><span class="arch-desc">Decomposes auth schemas &amp; session management</span></div>
+<div class="arch-node"><span class="arch-tag" style="color:#38bdf8">Worktree #2</span><div class="arch-title">Codex CLI 5.6 Sol</div><span class="arch-desc">Builds React Flow canvas &amp; socket synapsing</span></div>
+<div class="arch-node"><span class="arch-tag" style="color:#a855f7">Worktree #3</span><div class="arch-title">OpenCode DeepSeek R1</div><span class="arch-desc">Generates end-to-end integration test suites</span></div>
+</div>
+<div class="arch-row">
+<div class="arch-node pri" style="min-width:230px"><span class="arch-tag">Shared Memory Synapse</span><div class="arch-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Pheromone SQLite Vector Store</div><span class="arch-desc">Real-time contract broadcasting across workers</span></div>
+<div class="arch-arrow"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+<div class="arch-node pri" style="min-width:210px"><span class="arch-tag">Conflict-Free Integration</span><div class="arch-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>3-Way Fast-Forward Merge</div><span class="arch-desc">Clean validation into primary main branch</span></div>
+</div>
+</div>
+</section>
+
+<div class="divider"><div class="divider-line"></div></div>
+
+<!-- Documentation Hub -->
+<section id="docs" class="sec">
+<div class="sec-hdr reveal"><div class="sec-label">Documentation Hub</div><h2 class="sec-title">Developer &amp; Architecture Reference</h2><p class="sec-desc">Comprehensive guides on configuration, supported CLIs, MCP integration, memory schema, and security.</p></div>
+<div class="docs-w reveal">
+<aside class="docs-side">
+<div><div class="docs-side-title">Getting Started</div><div class="docs-nav">
+<div class="dn act" onclick="switchDoc('quickstart')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Quickstart Guide</div>
+<div class="dn" onclick="switchDoc('supported-clis')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Supported CLIs</div>
+<div class="dn" onclick="switchDoc('mcp')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>MCP Integration</div>
+<div class="dn" onclick="switchDoc('keybindings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10"/></svg>Keyboard Shortcuts</div>
+</div></div>
+<div><div class="docs-side-title">Architecture</div><div class="docs-nav">
+<div class="dn" onclick="switchDoc('pheromone')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Pheromone Memory</div>
+<div class="dn" onclick="switchDoc('worktrees')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>Git Worktrees</div>
+<div class="dn" onclick="switchDoc('security')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Security &amp; Privacy</div>
+</div></div>
+</aside>
+<div class="docs-body">
+
+<!-- Quickstart -->
+<article id="doc-quickstart" class="doc-art act">
+<h1 class="d-h1">Quickstart &amp; Installation</h1>
+<p class="d-lead">Production setup guide for deploying Swarm AI on macOS, Windows, and Linux workstations with local PTY bridges.</p>
+<h2 class="d-h2">1. Prerequisites</h2>
+<p class="d-p">Before launching, ensure your host meets the baseline toolchains:</p>
+<div class="d-code">node -v # Must be v20.0.0 or higher
+git --version # Git 2.38.0+ for worktree concurrency
+pnpm -v # Recommended (v9.0.0+)</div>
+<h2 class="d-h2">2. Platform Installation</h2>
+<p class="d-p"><strong>macOS:</strong> Download <code>SwarmAI.dmg</code>, drag to <code>/Applications</code>. If Gatekeeper warns, run: <code>xattr -d com.apple.quarantine /Applications/SwarmAI.app</code></p>
+<p class="d-p"><strong>Windows:</strong> Run <code>SwarmAI_Setup.exe</code>, then set PowerShell policy: <code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned</code></p>
+<p class="d-p"><strong>Linux:</strong></p>
+<div class="d-code">sudo dpkg -i SwarmAI.deb
+sudo apt-get install -f</div>
+<h2 class="d-h2">3. Workspace Initialization</h2>
+<p class="d-p">When you select a project directory, Swarm AI automatically:</p>
+<ol class="d-list"><li>Creates <code>.pheromone/</code> with embedded SQLite (<code>memory.db</code>).</li><li>Sets up <code>.swarm/worktrees/</code> and appends to <code>.gitignore</code>.</li><li>Scans <code>$PATH</code> for global CLI binaries: <code>claude</code>, <code>codex</code>, <code>opencode</code>, <code>aider</code>, <code>antigravity</code>.</li><li>Allocates hardware-accelerated PTY pipes with xterm.js frontends.</li></ol>
+</article>
+
+<!-- Supported CLIs -->
+<article id="doc-supported-clis" class="doc-art">
+<h1 class="d-h1">Supported Coding CLIs</h1>
+<p class="d-lead">Runtime configurations, CLI arguments, effort levels, and MCP protocols for all supported autonomous agents.</p>
+<h2 class="d-h2">1. Anthropic Claude Code</h2>
+<p class="d-p">Native bridge with 1M+ token context windows, MCP servers, and dynamic reasoning effort normalization.</p>
+<div class="d-code">npm install -g @anthropic-ai/claude-code
+
+claude --model claude-3-7-sonnet-20250219 # High speed
+claude --model claude-opus-5-2026 # Deep design
+
+/effort low # Fast surface edits
+/effort medium # Standard development
+/effort high # Complex refactoring
+/effort ultracode # Max compute reasoning</div>
+<h2 class="d-h2">2. OpenAI Codex CLI</h2>
+<div class="d-code">npm install -g @openai/codex-cli
+codex --model codex-5.6-sol --reasoning-effort high</div>
+<h2 class="d-h2">3. OpenCode &amp; Local LLMs (Ollama/vLLM)</h2>
+<div class="d-code">export OLLAMA_HOST="http://localhost:11434"
+opencode --model deepseek-r1:32b --api-base http://localhost:11434/v1</div>
+<h2 class="d-h2">4. Full CLI Catalog</h2>
+<div class="d-code">Agent Command Install Method
+-----------------------------------------------------------------
+Claude Code claude npm install -g @anthropic-ai/claude-code
+Codex CLI codex npm install -g @openai/codex
+Aider aider pip install aider-chat
+Antigravity agy npm install -g @google/antigravity-cli
+OpenCode opencode npm install -g opencode-ai
+Cline cline npm install -g cline
+Cursor CLI cursor Cursor IDE bundled
+Kiro CLI kiro npm install -g kiro-cli
+Kilo kilo npm install -g kilo-ai</div>
+</article>
+
+<!-- MCP Integration -->
+<article id="doc-mcp" class="doc-art">
+<h1 class="d-h1">MCP Integration &amp; Server Registry</h1>
+<p class="d-lead">How Swarm AI uses the Model Context Protocol to share tools, memory, and capabilities across all agent sessions.</p>
+<h2 class="d-h2">1. What is MCP?</h2>
+<p class="d-p">The Model Context Protocol is an open standard letting AI agents connect to external tools and data sources. Swarm AI ships with built-in MCP server support and auto-registers servers into every CLI agent's configuration.</p>
+<h2 class="d-h2">2. Built-in MCP Servers</h2>
+<div class="mcp-grid" style="margin:16px 0">
+<div class="mcp-card"><div class="mcp-ic o">PH</div><div class="mcp-info"><div class="mcp-name">Pheromone</div><div class="mcp-desc">Hybrid vector + keyword memory search via <code>pheromone_query</code>.</div></div></div>
+<div class="mcp-card"><div class="mcp-ic g">FS</div><div class="mcp-info"><div class="mcp-name">Filesystem</div><div class="mcp-desc">Scoped project file access within workspace boundaries.</div></div></div>
+<div class="mcp-card"><div class="mcp-ic b">GT</div><div class="mcp-info"><div class="mcp-name">Git</div><div class="mcp-desc">Worktree operations, branch management, diff viewing.</div></div></div>
+<div class="mcp-card"><div class="mcp-ic p">CD</div><div class="mcp-info"><div class="mcp-name">Chrome DevTools</div><div class="mcp-desc">Browser automation via CDP — screenshots, navigation, inspection.</div></div></div>
+</div>
+<h2 class="d-h2">3. Auto-Registration Flow</h2>
+<p class="d-p">When you open a project folder, Swarm AI automatically:</p>
+<ol class="d-list"><li>Resolves the compiled MCP server binary path via <code>get_pheromone_mcp_path</code>.</li><li>Injects the stdio server entry into each CLI agent's MCP config.</li><li>Preserves existing MCP servers — never overwrites user-configured tools.</li><li>Tracks MCP servers per-project via the workspace toolbox.</li></ol>
+<h2 class="d-h2">4. Custom MCP Servers</h2>
+<p class="d-p">Add custom MCP servers through the Settings panel. Each requires:</p>
+<div class="d-code">{
+ "mcpServers": {
+ "my-server": {
+ "command": "node",
+ "args": ["/path/to/server.js"],
+ "env": { "API_KEY": "your-key" }
+ }
+ }
+}</div>
+</article>
+
+<!-- Keybindings -->
+<article id="doc-keybindings" class="doc-art">
+<h1 class="d-h1">Keyboard Shortcuts</h1>
+<p class="d-lead">Complete keyboard navigation map for fluid canvas, terminal focus, and mission dispatch.</p>
+<h2 class="d-h2">Global Navigation</h2>
+<div class="d-code">Shortcut Action
+-----------------------------------------------------------------
+Cmd/Ctrl+K Open Unified Command Palette
+Cmd/Ctrl+Enter Dispatch Parallel Prompt
+Cmd/Ctrl+B Broadcast Mode (Simultaneous)
+Cmd/Ctrl+T Create New Worker Agent
+Cmd/Ctrl+W Close Focused Pane
+Cmd/Ctrl+, Open Preferences</div>
+<h2 class="d-h2">Flow Canvas</h2>
+<div class="d-code">Shortcut Action
+-----------------------------------------------------------------
+Space + Drag Pan Canvas Viewport
+Cmd/Ctrl++/- Zoom In / Out
+Cmd/Ctrl+0 Reset Zoom to 100%
+Shift+Click Draw Synapse Connection
+Delete Remove Node or Disconnect Wire</div>
+<h2 class="d-h2">Terminal Navigation</h2>
+<div class="d-code">Shortcut Action
+-----------------------------------------------------------------
+Cmd/Ctrl+1..9 Focus Agent Pane 1-9
+Cmd/Ctrl+` Cycle Next Agent Terminal
+Cmd/Ctrl+C/V Copy / Paste into PTY
+Cmd/Ctrl+K Clear Terminal Buffer</div>
+</article>
+
+<!-- Pheromone Memory -->
+<article id="doc-pheromone" class="doc-art">
+<h1 class="d-h1">Pheromone Shared Memory Engine</h1>
+<p class="d-lead">Technical specifications for local vector indexing, semantic search, and inter-agent memory synchronization.</p>
+<h2 class="d-h2">1. Memory Architecture</h2>
+<p class="d-p">Pheromone eliminates context drift by maintaining an embedded SQLite database with sub-millisecond semantic search. Every architectural decision made by any agent is tagged, indexed, and instantly available to all sibling agents.</p>
+<h2 class="d-h2">2. Hybrid Retrieval Pipeline</h2>
+<p class="d-p">Combines FTS5 BM25 keyword search with 384-dim char n-gram vector embeddings, merged via Reciprocal Rank Fusion (k=60), capped by a configurable token budget.</p>
+<h2 class="d-h2">3. Database Schema</h2>
+<div class="d-code">CREATE TABLE memories (
+ id TEXT PRIMARY KEY,
+ project_id TEXT NOT NULL,
+ category TEXT NOT NULL CHECK(category IN ('architecture','decision','rule','plan','fact')),
+ title TEXT NOT NULL, content TEXT NOT NULL,
+ embedding BLOB, source_agent TEXT NOT NULL,
+ confidence REAL DEFAULT 1.0,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);</div>
+<h2 class="d-h2">4. Memory Categories</h2>
+<p class="d-p"><strong>architecture</strong> — Core tech decisions. <strong>decision</strong> — Structural declarations. <strong>rule</strong> — Coding constraints. <strong>plan</strong> — Task milestones. <strong>fact</strong> — Discovered environment states.</p>
+</article>
+
+<!-- Git Worktrees -->
+<article id="doc-worktrees" class="doc-art">
+<h1 class="d-h1">Git Worktree Isolation &amp; 3-Way Merge</h1>
+<p class="d-lead">Deterministic file isolation, branch locking algorithms, and clean 3-way fast-forward merges.</p>
+<h2 class="d-h2">1. The Problem</h2>
+<p class="d-p">Concurrent disk writes in a single working tree cause race conditions, partial AST writes, and corrupted files. Swarm AI eliminates this via ephemeral Git worktrees.</p>
+<h2 class="d-h2">2. 6-Stage Lifecycle</h2>
+<div class="arch" style="padding:18px;gap:14px">
+<div class="arch-row" style="justify-content:space-between;width:100%">
+<div class="arch-node pri" style="flex:1;min-width:120px"><span class="arch-tag" style="color:var(--emerald)">Stage 01</span><div class="arch-title">Provision</div><span class="arch-desc">git worktree add -b swarm/task-01</span></div>
+<div class="arch-arrow" style="font-size:13px">→</div>
+<div class="arch-node" style="flex:1;min-width:120px"><span class="arch-tag" style="color:#38bdf8">Stage 02</span><div class="arch-title">Lock Registry</div><span class="arch-desc">.swarm/locks.json ownership</span></div>
+<div class="arch-arrow" style="font-size:13px">→</div>
+<div class="arch-node" style="flex:1;min-width:120px"><span class="arch-tag" style="color:#a855f7">Stage 03</span><div class="arch-title">Execute</div><span class="arch-desc">Agent edits in isolation</span></div>
+</div>
+<div class="arch-row" style="justify-content:space-between;width:100%">
+<div class="arch-node" style="flex:1;min-width:120px"><span class="arch-tag" style="color:var(--amber)">Stage 04</span><div class="arch-title">Validate</div><span class="arch-desc">git merge-tree dry-run</span></div>
+<div class="arch-arrow" style="font-size:13px">→</div>
+<div class="arch-node pri" style="flex:1;min-width:120px"><span class="arch-tag" style="color:var(--emerald)">Stage 05</span><div class="arch-title">Integrate</div><span class="arch-desc">Fast-forward merge to main</span></div>
+<div class="arch-arrow" style="font-size:13px">→</div>
+<div class="arch-node" style="flex:1;min-width:120px"><span class="arch-tag" style="color:var(--text-3)">Stage 06</span><div class="arch-title">Cleanup</div><span class="arch-desc">Remove worktree + branch</span></div>
+</div>
+</div>
+<h2 class="d-h2">3. File Ownership Safety Locks</h2>
+<p class="d-p">The Lead Steward creates a file lock table in <code>.swarm/locks.json</code>. If Agent 1 owns <code>src/auth/*</code>, Agent 2 gets read-only access — guaranteeing <strong>mathematically zero merge conflicts</strong>.</p>
+</article>
+
+<!-- Security -->
+<article id="doc-security" class="doc-art">
+<h1 class="d-h1">Security, Sandboxing &amp; Air-Gap Compliance</h1>
+<p class="d-lead">Zero-telemetry architecture, local credential security, and enterprise compliance standards.</p>
+<h2 class="d-h2">1. Zero Cloud Proxy</h2>
+<p class="d-p">Swarm AI maintains <strong>zero middleman cloud infrastructure</strong>. All connections originate directly from your machine to the model provider. Your code, diffs, API keys, and repository files are never uploaded to any Swarm AI server.</p>
+<h2 class="d-h2">2. OS Keychain Vault</h2>
+<p class="d-p">API keys encrypted at rest using native security primitives:</p>
+<ul class="d-list"><li><strong>macOS</strong>: Apple Keychain via Security.framework.</li><li><strong>Windows</strong>: Windows Credential Manager (DPAPI).</li><li><strong>Linux</strong>: Secret Service API via libsecret / GNOME Keyring.</li></ul>
+<h2 class="d-h2">3. Secret Scrubbing</h2>
+<p class="d-p">The PTY stream filter detects and masks environment secrets, JWT tokens, private keys, and <code>.env</code> variables before rendering in terminal buffers or passing to vector memory.</p>
+<h2 class="d-h2">4. Hardened Environment</h2>
+<p class="d-p">Only allowlisted env vars are forwarded to agent processes: <code>ANTHROPIC_*</code>, <code>OPENAI_*</code>, <code>GEMINI_*</code>, <code>AWS_*</code>, <code>GIT_*</code>, <code>HOME</code>, <code>USER</code>, <code>LANG</code>. Blocked: <code>LD_PRELOAD</code>, <code>DYLD_INSERT_LIBRARIES</code>, <code>NODE_OPTIONS</code>, <code>BASH_ENV</code>, <code>PYTHONPATH</code>, <code>GIT_SSH_COMMAND</code>.</p>
+</article>
+</div>
+</div>
+</section>
+
+<div class="divider"><div class="divider-line"></div></div>
+
+<!-- MCP Section (anchor) -->
+<section id="mcp" class="sec">
+<div class="sec-hdr reveal"><div class="sec-label">MCP Servers</div><h2 class="sec-title">Model Context Protocol Integration</h2><p class="sec-desc">Built-in and custom MCP servers that give every agent access to tools, memory, and capabilities.</p></div>
+<div class="mcp-grid reveal">
+<div class="mcp-card"><div class="mcp-ic o">PH</div><div class="mcp-info"><div class="mcp-name">Pheromone Memory</div><div class="mcp-desc">Hybrid vector + keyword search. Agents query project context via <code>pheromone_query</code>.</div></div></div>
+<div class="mcp-card"><div class="mcp-ic g">FS</div><div class="mcp-info"><div class="mcp-name">Filesystem</div><div class="mcp-desc">Scoped project file read/write within active workspace boundaries.</div></div></div>
+<div class="mcp-card"><div class="mcp-ic b">GT</div><div class="mcp-info"><div class="mcp-name">Git</div><div class="mcp-desc">Worktree operations, branch management, diff viewing, merge status.</div></div></div>
+<div class="mcp-card"><div class="mcp-ic p">CD</div><div class="mcp-info"><div class="mcp-name">Chrome DevTools</div><div class="mcp-desc">Browser automation via CDP — screenshots, navigation, element inspection.</div></div></div>
+</div>
+</section>
+
+<div class="divider"><div class="divider-line"></div></div>
+
+<!-- Blog / Research -->
+<section id="blog" class="sec">
+<div class="sec-hdr reveal"><div class="sec-label">Engineering Research</div><h2 class="sec-title">Multi-Agent Systems &amp; Architecture</h2><p class="sec-desc">In-depth technical papers from the Swarm AI engineering team. Click any paper to read the full article.</p></div>
+<div class="blog-grid">
+<div class="blog-card reveal rd1" onclick="openBlog('paper-concurrency')">
+<div><div class="blog-meta"><span class="blog-tag">Architecture</span><span>Aug 2026 · 6 min read</span></div>
+<h3 class="blog-title">The Death of Single-Threaded AI: Why Parallel Swarm Coding Outperforms Monolithic Chatbots by 8.4x</h3>
+<p class="blog-excerpt">Empirical benchmarks show decomposing tasks across 4 parallel agents yields an 8.4x speedup over sequential single-thread chat sessions.</p></div>
+<div class="blog-rm"><span>Read Full Paper</span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+</div>
+<div class="blog-card reveal rd2" onclick="openBlog('paper-memory')">
+<div><div class="blog-meta"><span class="blog-tag">Memory Systems</span><span>Aug 2026 · 8 min read</span></div>
+<h3 class="blog-title">Pheromone Memory: Eliminating Hallucinations in Multi-Agent Codebases</h3>
+<p class="blog-excerpt">How lightweight local vector stores and dynamic MCP bridges synchronize context across Claude Code, Codex, and OpenCode with zero manual clipboard transfers.</p></div>
+<div class="blog-rm"><span>Read Full Paper</span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+</div>
+<div class="blog-card reveal rd3" onclick="openBlog('paper-worktrees')">
+<div><div class="blog-meta"><span class="blog-tag">Concurrency</span><span>Aug 2026 · 5 min read</span></div>
+<h3 class="blog-title">Zero Merge Conflicts: Isolating Parallel Agent Execution via Ephemeral Git Worktrees</h3>
+<p class="blog-excerpt">Deep technical analysis of file-ownership locks, branch hashing, and automatic 3-way merge validation for autonomous multi-agent pipelines.</p></div>
+<div class="blog-rm"><span>Read Full Paper</span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+</div>
+</div>
+</section>
+
+<!-- Blog Modal -->
+<div id="blogModal" class="modal-ov" onclick="closeBlog(event)">
+<div class="modal-box" onclick="event.stopPropagation()">
+<button class="modal-close" onclick="closeBlog()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:3px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Close Paper</button>
+<div id="modalBody"></div>
+</div>
+</div>
+
+<div class="divider"><div class="divider-line"></div></div>
+
+<!-- Help & FAQ -->
+<section id="help" class="sec">
+<div class="sec-hdr reveal"><div class="sec-label">Help Center</div><h2 class="sec-title">Frequently Asked Questions</h2><p class="sec-desc">Common questions about installation, configuration, agents, and troubleshooting.</p></div>
+<div class="faq-list reveal">
+<div class="faq"><div class="faq-q" onclick="toggleFaq(this)">What is Swarm AI and how is it different?<svg class="faq-chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-a"><div class="faq-ain">Swarm AI is a <strong>local-first desktop workspace</strong> that runs multiple AI coding agents in parallel, each in its own isolated Git worktree. Unlike single-thread chatbots, it coordinates Claude Code, Codex CLI, Aider, and others simultaneously with shared project memory (Pheromone). Your code never leaves your machine.</div></div></div>
+<div class="faq"><div class="faq-q" onclick="toggleFaq(this)">Is Swarm AI free to use?<svg class="faq-chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-a"><div class="faq-ain">Yes! Open source under a <strong>personal, non-commercial license</strong>. Free for personal projects. Commercial use requires a separate license — contact <a href="mailto:soumya.chk101@gmail.com">soumya.chk101@gmail.com</a>.</div></div></div>
+<div class="faq"><div class="faq-q" onclick="toggleFaq(this)">Do I need API keys?<svg class="faq-chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-a"><div class="faq-ain">Swarm AI itself needs no API key — it's a local orchestration layer. The coding agents it runs (Claude Code, Codex, etc.) need their provider keys. These are entered in Settings and stored securely in your OS keychain.</div></div></div>
+<div class="faq"><div class="faq-q" onclick="toggleFaq(this)">Which AI coding agents are supported?<svg class="faq-chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-a"><div class="faq-ain"><strong>10+ CLI agents</strong> out of the box: Claude Code, OpenAI Codex CLI, Aider, Antigravity CLI, OpenCode, Cline, Cursor CLI, Kiro CLI, and Kilo. Each gets automatic MCP registration with Pheromone, permission bypass flags, and security-hardened environment variables.</div></div></div>
+<div class="faq"><div class="faq-q" onclick="toggleFaq(this)">How does Pheromone prevent conflicts?<svg class="faq-chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-a"><div class="faq-ain">Two mechanisms: (1) <strong>Shared vector memory</strong> — every architectural decision is indexed and available to all agents via semantic search. (2) <strong>File-ownership locks</strong> — Lead assigns exclusive write paths to each worker, preventing simultaneous edits.</div></div></div>
+<div class="faq"><div class="faq-q" onclick="toggleFaq(this)">Can I run on an air-gapped machine?<svg class="faq-chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-a"><div class="faq-ain">Yes. Zero cloud dependency. Use local LLMs via Ollama or vLLM with OpenCode. All memory stays on your machine. The only network calls are direct connections to your chosen model provider.</div></div></div>
+<div class="faq"><div class="faq-q" onclick="toggleFaq(this)">What are the system requirements?<svg class="faq-chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-a"><div class="faq-ain"><strong>All:</strong> Node.js ≥ 20, Git ≥ 2.38, one coding CLI.<br/><strong>macOS:</strong> Xcode CLI Tools. Apple Silicon or Intel.<br/><strong>Windows:</strong> WebView2 runtime, VS C++ build tools.<br/><strong>Linux:</strong> webkit2gtk, libssl-dev, build-essential, libayatana-appindicator3-dev, librsvg2-dev.</div></div></div>
+<div class="faq"><div class="faq-q" onclick="toggleFaq(this)">How do I build from source?<svg class="faq-chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-a"><div class="faq-ain"><code>pnpm install &amp;&amp; pnpm turbo build</code> — then <code>cd swarm &amp;&amp; pnpm tauri:dev</code> for development. Production: <code>cd swarm &amp;&amp; pnpm tauri:build</code>. Always run <code>pnpm turbo build</code> first — Tauri expects prebuilt <code>dist/</code> artifacts.</div></div></div>
+</div>
+</section>
+
+<div class="divider"><div class="divider-line"></div></div>
+
+<!-- User Guide -->
+<section id="guide" class="sec">
+<div class="sec-hdr reveal"><div class="sec-label">User Guide</div><h2 class="sec-title">How to Use Swarm AI</h2><p class="sec-desc">A step-by-step walkthrough from first launch to running your first multi-agent mission.</p></div>
+<div class="guide reveal">
+<div class="g-step"><div class="g-step-n">1</div><div class="g-step-c"><div class="g-step-t">Install &amp; Launch</div><div class="g-step-d">Download the package for your platform from the Downloads section above. Install and launch Swarm AI. On first launch, you'll see the empty workspace with the Lead dock on the right.</div></div></div>
+<div class="g-step"><div class="g-step-n">2</div><div class="g-step-c"><div class="g-step-t">Open a Project</div><div class="g-step-d">Click the workspace selector and choose your project folder. Swarm AI automatically creates <code>.pheromone/</code> for shared memory, sets up <code>.swarm/worktrees/</code>, and scans your <code>$PATH</code> for installed coding CLIs.</div></div></div>
+<div class="g-step"><div class="g-step-n">3</div><div class="g-step-c"><div class="g-step-t">Configure Your Agents</div><div class="g-step-d">Open Settings and add your API keys (stored in OS keychain). Ensure your preferred CLI agents are installed: <code>npm install -g @anthropic-ai/claude-code</code> for Claude Code, etc. Swarm AI auto-detects them on your PATH.</div></div></div>
+<div class="g-step"><div class="g-step-n">4</div><div class="g-step-c"><div class="g-step-t">Launch Agent Panes</div><div class="g-step-d">From the Agents plane, click "+" to add a new pane. Select your CLI agent (Claude Code, Codex, Aider, etc.). Each agent gets a real PTY terminal with MCP auto-registration and context injection from Pheromone.</div></div></div>
+<div class="g-step"><div class="g-step-n">5</div><div class="g-step-c"><div class="g-step-t">Dispatch a Mission via Lead</div><div class="g-step-d">Type a goal into the Lead dock (e.g. "Add Stripe checkout with webhooks"). Lead queries Pheromone for project context, breaks the goal into tasks with <code>owns</code>, <code>reads</code>, <code>dependsOn</code>, and shows you draft cards for approval before dispatching.</div></div></div>
+<div class="g-step"><div class="g-step-n">6</div><div class="g-step-c"><div class="g-step-t">Watch Parallel Execution</div><div class="g-step-d">SwarmMind creates isolated Git worktrees for each task and launches agents simultaneously. Watch real-time output in each terminal pane. Pheromone broadcasts architectural decisions so agents stay synchronized.</div></div></div>
+<div class="g-step"><div class="g-step-n">7</div><div class="g-step-c"><div class="g-step-t">Review &amp; Merge</div><div class="g-step-d">Completed tasks appear in the Review column. SwarmMind runs a 3-way merge-tree dry-run to check for conflicts. On your approval, it fast-forward merges clean branches into main and cleans up worktrees.</div></div></div>
+<div class="g-step"><div class="g-step-n">8</div><div class="g-step-c"><div class="g-step-t">Persist &amp; Iterate</div><div class="g-step-d">After each session, Pheromone logs agent transcripts, decisions, and findings to <code>.pheromone/memory/</code>. On your next session, relevant context is automatically injected — your project intelligence compounds over time.</div></div></div>
+</div>
+</section>
+
+<div class="divider"><div class="divider-line"></div></div>
+
+<!-- CTA Banner -->
+<section class="sec">
+<div class="cta reveal">
+<div class="cta-in">
+<h2 class="cta-title">Ready to Build in Parallel?</h2>
+<p class="cta-desc">Download Swarm AI and experience 8.4x faster development with autonomous multi-agent coordination.</p>
+<div class="cta-btns">
+<a href="download-site/releases/macOS/SwarmAI_0.1.0_aarch64.dmg" class="btn-cta-p">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+Download for macOS
+</a>
+<a href="https://github.com/soumyachk101/SwarmAI" target="_blank" class="btn-cta-s">View on GitHub<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Footer -->
+<footer>
+<div class="ft">
+<div>
+<div class="brand" style="margin-bottom:4px">
+<div class="brand-icon"><svg width="14" height="14" viewBox="0 0 48 48" fill="none"><defs><linearGradient id="lg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FFD700"/><stop offset="100%" stop-color="#FF6B00"/></linearGradient></defs><path d="M24 12C31 12 34 18 34 24.5C34 32.5 29.5 40.5 24 43.5C18.5 40.5 14 32.5 14 24.5C14 18 17 12 24 12Z" fill="url(#lg2)" stroke="#B35900" stroke-width=".7"/></svg></div>
+<span class="brand-name">Swarm AI</span>
+</div>
+<p class="ft-p">The autonomous desktop workspace for multi-agent software engineering. Build faster, build together.</p>
+</div>
+<div>
+<div class="ft-ct">Downloads</div>
+<ul class="ft-ul"><li><a href="download-site/releases/macOS/SwarmAI_0.1.0_aarch64.dmg" class="ft-a">macOS (.dmg)</a></li><li><a href="download-site/releases/windows/SwarmAI_0.1.0_x64-setup.exe" class="ft-a">Windows (.exe)</a></li><li><a href="download-site/releases/linux/SwarmAI_0.1.0_amd64.deb" class="ft-a">Linux (.deb)</a></li><li><a href="https://github.com/soumyachk101/SwarmAI/releases" target="_blank" class="ft-a">All Releases</a></li></ul>
+</div>
+<div>
+<div class="ft-ct">Documentation</div>
+<ul class="ft-ul"><li><a href="#docs" class="ft-a" onclick="switchDoc('quickstart')">Quickstart</a></li><li><a href="#docs" class="ft-a" onclick="switchDoc('supported-clis')">Supported CLIs</a></li><li><a href="#docs" class="ft-a" onclick="switchDoc('mcp')">MCP Integration</a></li><li><a href="#docs" class="ft-a" onclick="switchDoc('keybindings')">Shortcuts</a></li></ul>
+</div>
+<div>
+<div class="ft-ct">Community</div>
+<ul class="ft-ul"><li><a href="https://github.com/soumyachk101/SwarmAI" target="_blank" class="ft-a">GitHub Repository</a></li><li><a href="https://github.com/soumyachk101/SwarmAI/issues" target="_blank" class="ft-a">Issue Tracker</a></li><li><a href="#blog" class="ft-a">Research Papers</a></li><li><a href="https://github.com/soumyachk101/SwarmAI/blob/main/LICENSE" target="_blank" class="ft-a">MIT License</a></li></ul>
+</div>
+</div>
+<div class="ft-bot">
+<span>&copy; 2026 Swarm AI Authors. Open-source under MIT License.</span>
+<div class="ft-bot-links"><a href="https://github.com/soumyachk101/SwarmAI" target="_blank" class="ft-bot-a">GitHub</a><a href="mailto:soumya.chk101@gmail.com" class="ft-bot-a">Contact</a></div>
+</div>
+</footer>
+
+<script>
+/* ── Particles ── */
+(function(){
+const c=document.getElementById('particles'),ctx=c.getContext('2d');
+let w,h,pts=[];
+function resize(){w=c.width=innerWidth;h=c.height=innerHeight;pts=[];for(let i=0;i<50;i++)pts.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.2+.3,vx:(Math.random()-.5)*.15,vy:(Math.random()-.5)*.15,o:Math.random()*.3+.05})}
+resize();addEventListener('resize',resize);
+function draw(){ctx.clearRect(0,0,w,h);pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=w;if(p.x>w)p.x=0;if(p.y<0)p.y=h;if(p.y>h)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${p.o})`;ctx.fill()});requestAnimationFrame(draw)}
+draw();
+})();
+
+/* ── Scroll reveal ── */
+const revealObs=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');revealObs.unobserve(e.target)}})},{threshold:.1,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>revealObs.observe(el));
+
+/* ── Header scroll ── */
+addEventListener('scroll',()=>{document.getElementById('hdr').classList.toggle('scrolled',scrollY>40)});
+
+/* ── Active nav link ── */
+const sections=document.querySelectorAll('section[id]');
+const navLinks=document.querySelectorAll('.nl');
+addEventListener('scroll',()=>{let cur='';sections.forEach(s=>{if(scrollY>=s.offsetTop-100)cur=s.id});navLinks.forEach(l=>{l.classList.toggle('act',l.getAttribute('href')==='#'+cur)})});
+
+/* ── Mobile nav ── */
+function openMobNav(){const m=document.getElementById('mobNav');m.classList.add('open');document.body.style.overflow='hidden'}
+function closeMobNav(){const m=document.getElementById('mobNav');m.classList.remove('open');document.body.style.overflow='auto'}
+window.closeMobNav=closeMobNav;window.openMobNav=openMobNav;
+
+/* ── Copy command ── */
+function copyCmd(){const b=document.getElementById('copyBtn');navigator.clipboard.writeText('curl -fsSL https://getswarm.ai/install.sh | bash').then(()=>{b.classList.add('ok');setTimeout(()=>b.classList.remove('ok'),1500)})}
+window.copyCmd=copyCmd;
+
+/* ── Docs tab switcher ── */
+function switchDoc(id){document.querySelectorAll('.dn').forEach(i=>i.classList.remove('act'));document.querySelectorAll('.doc-art').forEach(a=>a.classList.remove('act'));const art=document.getElementById('doc-'+id);if(art)art.classList.add('act');const nav=document.querySelectorAll('.dn');nav.forEach(n=>{if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes(id))n.classList.add('act')})}
+window.switchDoc=switchDoc;
+
+/* ── FAQ accordion ── */
+function toggleFaq(el){const item=el.parentElement;const wasOpen=item.classList.contains('open');document.querySelectorAll('.faq').forEach(f=>f.classList.remove('open'));if(!wasOpen)item.classList.add('open')}
+window.toggleFaq=toggleFaq;
+
+/* ── Blog modal ── */
+const BLOG_PAPERS={
+'paper-concurrency':`
+<div class="blog-meta" style="margin-bottom:16px"><span class="blog-tag">Architecture</span><span>Published August 2026 · 6 min read · Swarm AI Systems Lab</span></div>
+<h1 class="d-h1" style="font-size:30px;margin-bottom:14px">The Death of Single-Threaded AI: Why Parallel Swarm Coding Outperforms Monolithic Chatbots by 8.4x</h1>
+<p class="d-lead">A comprehensive benchmark on developer throughput, latency, and context degradation across multi-agent vs single-thread workflows.</p>
+<h2 class="d-h2">1. The Sequential Bottleneck</h2>
+<p class="d-p">Traditional AI developer tooling treats LLMs as synchronous conversation partners. A developer requests a feature, waits 45 seconds for file edits, verifies, and prompts again. In a standard full-stack task (Stripe checkout, database models, frontend state), this linear cycle consumes 18-25 minutes.</p>
+<h2 class="d-h2">2. The Swarm Concurrency Model</h2>
+<p class="d-p">Swarm AI replaces the single-thread model with a Lead Steward orchestrator. The Lead decomposes the goal into orthogonal subtasks, creates isolated Git worktrees, and launches worker agents simultaneously.</p>
+<div class="bench">
+<div class="bench-hdr"><span class="bench-title">Wall-Clock Execution Timeline</span><span class="bench-badge">8.4x FASTER (-88% TIME)</span></div>
+<div class="track"><div class="track-lbl"><span>Monolithic Single-Thread (Sequential)</span><span style="font-family:var(--fm);color:var(--amber)">22.0 min total</span></div><div class="tl-wrap"><div class="tl-seg" style="width:18%;background:#334155">DB Schema (4m)</div><div class="tl-seg" style="width:27%;background:#475569">REST API (6m)</div><div class="tl-seg" style="width:36%;background:#64748b">React UI (8m)</div><div class="tl-seg" style="width:19%;background:#334155">QA Tests (4m)</div></div></div>
+<div class="track"><div class="track-lbl"><span style="font-weight:700">Swarm AI (4 Workers + Worktrees)</span><span style="font-family:var(--fm);color:var(--emerald);font-weight:700">2.6 min total</span></div><div class="tl-wrap" style="border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.04)"><div class="tl-seg" style="width:20%;background:#1e293b">Lead Decomp (30s)</div><div class="tl-seg" style="width:60%;background:rgba(16,185,129,.2);color:var(--emerald)">Workers Parallel (2.0m)</div><div class="tl-seg" style="width:20%;background:#1e293b">3-Way Merge (30s)</div></div></div>
+</div>
+<h2 class="d-h2">3. Benchmark Results</h2>
+<p class="d-p">Across 50 complex engineering benchmarks, Swarm AI achieved an average <strong>8.4x reduction in wall-clock time</strong> while decreasing context-window hallucination rates by 68%.</p>`,
+
+'paper-memory':`
+<div class="blog-meta" style="margin-bottom:16px"><span class="blog-tag">Memory Systems</span><span>Published August 2026 · 8 min read · Swarm AI Systems Lab</span></div>
+<h1 class="d-h1" style="font-size:30px;margin-bottom:14px">Pheromone Memory: Eliminating Hallucinations in Multi-Agent Codebases</h1>
+<p class="d-lead">How lightweight local vector stores and dynamic MCP bridges synchronize context across Claude Code, Codex, and OpenCode with zero manual clipboard transfers.</p>
+<h2 class="d-h2">1. The Multi-Agent Communication Problem</h2>
+<p class="d-p">When multiple LLMs write code in parallel, they inevitably diverge on architectural assumptions — naming conventions, state management patterns, authentication middleware. Without shared context, these divergences compound into broken builds.</p>
+<h2 class="d-h2">2. Pheromone Architecture</h2>
+<p class="d-p">Pheromone solves this via an embedded SQLite vector store inside <code>.pheromone/</code>. Whenever any CLI agent makes an architectural choice, it is tagged and immediately indexed into vector memory. When sibling agents need context, Pheromone injects exact function signatures and decisions via MCP tool calling without polluting terminal readline buffers.</p>`,
+
+'paper-worktrees':`
+<div class="blog-meta" style="margin-bottom:16px"><span class="blog-tag">Concurrency</span><span>Published August 2026 · 5 min read · Swarm AI Systems Lab</span></div>
+<h1 class="d-h1" style="font-size:30px;margin-bottom:14px">Zero Merge Conflicts: Isolating Parallel Agent Execution via Ephemeral Git Worktrees</h1>
+<p class="d-lead">A deep technical analysis into file-ownership locks, branch hashing, and automatic 3-way merge validation for autonomous multi-agent pipelines.</p>
+<h2 class="d-h2">1. File Collision Prevention</h2>
+<p class="d-p">Running multiple autonomous agents in a single root directory is catastrophic — agents overwrite each other's files mid-generation. Swarm AI allocates ephemeral Git worktrees for each task. Each worktree lives on an isolated branch with strict file-ownership locks declared during goal decomposition.</p>`
+};
+
+function openBlog(id){const m=document.getElementById('blogModal'),b=document.getElementById('modalBody');b.innerHTML=BLOG_PAPERS[id]||'<p>Article not found.</p>';m.classList.add('open');document.body.style.overflow='hidden'}
+function closeBlog(e){if(e&&e.target!==document.getElementById('blogModal')&&!e.target.classList.contains('modal-close'))return;const m=document.getElementById('blogModal');m.classList.remove('open');document.body.style.overflow='auto'}
+window.openBlog=openBlog;window.closeBlog=closeBlog;
+</script>
 </body>
 </html>

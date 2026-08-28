@@ -25,7 +25,7 @@ import {
 import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { BrandGlyph, cliBrand, AgentMark } from "@swarm/board";
-import { envForCli } from "../cli-configs/env.js";
+import { envForCli, type ApiKeys } from "../cli-configs/env.js";
 import { agentsHost } from "./host.js";
 import { useAgentsStore } from "./agentsStore.js";
 import { withPermissionBypass, MCP_CAPABLE_CLIS, normaliseEffort } from "../cli-configs/index.js";
@@ -604,7 +604,7 @@ export default function AgentPane({
         // restore leaves the container size unchanged, so the canvas stays
         // stale (ghosted/overlapping glyphs) unless we force a redraw too.
         terminalInstance.current.refresh(0, terminalInstance.current.rows - 1);
-      } catch {}
+      } catch (err) { console.warn('[AgentPane] operation failed:', err); }
     }
   }, [refitCount]);
 
@@ -704,7 +704,7 @@ export default function AgentPane({
       try {
         const hf = await pheromoneInstance.readMemoryFile("agents/handoffs.md");
         existingHandoff = hf.content;
-      } catch {}
+      } catch (err) { console.warn('[AgentPane] operation failed:', err); }
 
       const handoffHeader = "# Handoffs\n\nWhat each agent left for the next one.\n";
       const priorBody = existingHandoff.includes("# Handoffs")
@@ -721,10 +721,10 @@ export default function AgentPane({
       // Resolve the best available project dir — needed for Pheromone.create()
       let saveDir = spawnDir;
       if (!saveDir) {
-        try { saveDir = await invoke<string>("get_project_path"); } catch {}
+        try { saveDir = await invoke<string>("get_project_path"); } catch (err) { console.warn('[AgentPane] operation failed:', err); }
       }
       if (!saveDir) {
-        try { saveDir = await invoke<string>("get_home_dir"); } catch {}
+        try { saveDir = await invoke<string>("get_home_dir"); } catch (err) { console.warn('[AgentPane] operation failed:', err); }
       }
 
       if (!saveDir) {
@@ -761,7 +761,7 @@ export default function AgentPane({
             if (!summary) return;
             try {
               // Overwrite the session file with enriched content
-              const enrichedContent = `# ${agent.cliName} Session Summary\n\nDate: ${dateStr}\nAgent: ${agent.cli}\nProject: ${saveDir}\n\n## Changes\n\n${summary.changes.map((c: string) => `- ${c}`).join('\n')}\n\n## Decisions\n\n${summary.decisions.map((d: any) => `- [${d.type}] ${d.description}`).join('\n')}\n\n## Raw Transcript\n\n\`\`\`\n${cleanTranscript}\n\`\`\`\n`;
+              const enrichedContent = `# ${agent.cliName} Session Summary\n\nDate: ${dateStr}\nAgent: ${agent.cli}\nProject: ${saveDir}\n\n## Changes\n\n${summary.changes.map((c: string) => `- ${c}`).join('\n')}\n\n## Decisions\n\n${summary.decisions.map((d: { type: string; description: string }) => `- [${d.type}] ${d.description}`).join('\n')}\n\n## Raw Transcript\n\n\`\`\`\n${cleanTranscript}\n\`\`\`\n`;
               await pheromoneInstance.writeMemoryFile(
                 `agents/sessions/${sessionId}.md`,
                 enrichedContent,
@@ -779,7 +779,7 @@ export default function AgentPane({
                 try {
                   const fileData = await pheromoneInstance.readMemoryFile(targetFile);
                   existingContent = fileData.content;
-                } catch {}
+                } catch (err) { console.warn('[AgentPane] operation failed:', err); }
 
                 await pheromoneInstance.writeMemoryFile(
                   targetFile,
@@ -1252,12 +1252,12 @@ export default function AgentPane({
             if (webglRef.current === webgl) webglRef.current = null;
             try {
               webgl.dispose();
-            } catch {}
+            } catch (err) { console.warn('[AgentPane] operation failed:', err); }
             // dispose() hands rendering back to the DOM renderer, but only the
             // rows xterm redraws next — force the visible ones now.
             try {
               terminal?.refresh(0, (terminal.rows ?? 1) - 1);
-            } catch {}
+            } catch (err) { console.warn('[AgentPane] operation failed:', err); }
           });
         } catch (e) {
           console.warn("[AgentPane] WebGL renderer unavailable, using fallback:", e);
@@ -2074,7 +2074,7 @@ interface ExtractedSummary {
 async function generateAIExtractedSummary(
   transcript: string,
   cliName: string,
-  apiKeys: any
+  apiKeys: ApiKeys
 ): Promise<ExtractedSummary | null> {
   const prompt = `Analyze this raw command line coding session transcript for the AI assistant "${cliName}".
 Extract:

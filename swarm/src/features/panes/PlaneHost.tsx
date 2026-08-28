@@ -26,6 +26,7 @@ import { PipelineBoard, type TaskCard } from "@swarm/tasks";
 import { X, Columns3 } from "lucide-react";
 import SwarmLogo from "@/shared/SwarmLogo";
 import { useAgentsStore, type Agent, type GridLayout } from "@swarm/agents/ui";
+import { useShallow } from "zustand/shallow";
 import { useWorkspaceStore } from "@swarm/workspace";
 import { WorktreeSelect as WorktreeSelect, ToolboxPane } from "@swarm/workspace/ui";
 import { useExtensionStore, isAgentExtension } from "@swarm/extension";
@@ -98,30 +99,33 @@ interface Props {
 }
 
 export default function PlaneHost({ workingDir, leading, reserveRight }: Props) {
-  const agents = useAgentsStore((s) => s.agents);
-  const addAgent = useAgentsStore((s) => s.addAgent);
-  const setAgentStatus = useAgentsStore((s) => s.setAgentStatus);
-  const removeAgent = useAgentsStore((s) => s.removeAgent);
-  const updateAgent = useAgentsStore((s) => s.updateAgent);
-  const maximizedPane = useAgentsStore((s) => s.maximizedPane);
-  const setMaximizedPane = useAgentsStore((s) => s.setMaximizedPane);
-  const swapAgents = useAgentsStore((s) => s.swapAgents);
-  const refitTerminals = useAgentsStore((s) => s.refitTerminals);
-  const gridLayout = useAgentsStore((s) => s.gridLayout);
-  const setGridLayout = useAgentsStore((s) => s.setGridLayout);
-  const agentStatuses = useAgentsStore((s) => s.agentStatuses);
+  const {
+  agents, addAgent, setAgentStatus, removeAgent, updateAgent,
+  maximizedPane, setMaximizedPane, swapAgents, refitTerminals,
+  gridLayout, setGridLayout, agentStatuses,
+  } = useAgentsStore(useShallow((s) => ({
+  agents: s.agents, addAgent: s.addAgent, setAgentStatus: s.setAgentStatus,
+  removeAgent: s.removeAgent, updateAgent: s.updateAgent,
+  maximizedPane: s.maximizedPane, setMaximizedPane: s.setMaximizedPane,
+  swapAgents: s.swapAgents, refitTerminals: s.refitTerminals,
+  gridLayout: s.gridLayout, setGridLayout: s.setGridLayout,
+  agentStatuses: s.agentStatuses,
+  })));
 
-  const workspaces = useWorkspaceStore((s) => s.workspaces);
-  const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
-  const updateWorkspace = useWorkspaceStore((s) => s.updateWorkspace);
+  const {
+  workspaces, activeWorkspaceId, updateWorkspace,
+  } = useWorkspaceStore(useShallow((s) => ({
+  workspaces: s.workspaces, activeWorkspaceId: s.activeWorkspaceId, updateWorkspace: s.updateWorkspace,
+  })));
+
+  const {
+  active, view, setView, fullscreen, toggleFullscreen,
+  } = usePlaneStore(useShallow((s) => ({
+  active: s.active, view: s.view, setView: s.setView,
+  fullscreen: s.fullscreen, toggleFullscreen: s.toggleFullscreen,
+  })));
   const activeWorkspace = workspaces.find((w) => w.id === activeWorkspaceId);
-
-  const active = usePlaneStore((s) => s.active);
-  const view = usePlaneStore((s) => s.view);
-  const setView = usePlaneStore((s) => s.setView);
-  const fullscreen = usePlaneStore((s) => s.fullscreen);
-  const toggleFullscreen = usePlaneStore((s) => s.toggleFullscreen);
-  const plane = planeFor(active);
+ const plane = planeFor(active);
   // Only the board plane has two geometries; browser and emulator are grids.
   const canvasView = plane.kind === "board" && view === "flow" && !maximizedPane;
 
@@ -894,7 +898,7 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
                   className={`flex flex-col overflow-hidden font-sans antialiased ${
                     shouldHide
                       ? "hidden"
-                      : "relative h-full rounded-2xl border border-white/[0.08] bg-[#12141c]/90 shadow-lg shadow-black/40 backdrop-blur-xl transition-[box-shadow,border-color,opacity] duration-200"
+                      : "relative h-full rounded-2xl border border-white/[0.08] bg-[#12141c]/90 shadow-lg shadow-black/40 transition-[box-shadow,border-color,opacity] duration-200"
                   } ${drag?.id === swarm.id ? "opacity-30" : ""} ${
                     over?.kind === "pane" && over.id === swarm.id ? "ring-2 ring-swarm-gold/70" : ""
                   } ${focusedPane === swarm.id && !isThisMax ? "ring-1 ring-swarm-gold/40 border-swarm-gold/40 shadow-xl shadow-amber-500/5" : ""}`}

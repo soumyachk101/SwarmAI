@@ -41,10 +41,10 @@ interface Props {
  isMaximized?: boolean;
  onAddAgent?: () => void;
  /** Crown control, supplied for agent extensions only. Wired by the app so
- * this package never imports the pane store. */
+ this package never imports the pane store. */
  crown?: { isLead: boolean; taken: boolean; onToggle: () => void };
  /** Passed to the server process, so MCP servers the agent extension spawns
- * inherit them — that is how a crowned extension gets Lead's tools. */
+ inherit them — that is how a crowned extension gets Lead's tools. */
  env?: Record<string, string>;
 }
 
@@ -57,28 +57,33 @@ export default function OpenVsxPane({ paneId, workingDir, tabName = "Code Worksp
  const [src, setSrc] = useState<string>("");
 
  const start = useCallback(async () => {
-  setStatus("starting");
-  setError(null);
-  try {
-   await invoke("start_openvsx", { paneId, bin: bin || null, port, workingDir: workingDir || null, extensions: extensionId ? [extensionId] : null, env: env ?? null });
-   // poll readiness — VS Code serve-web may need to download the server
-   // component on first run, which can take 60-120s on slower connections.
-   let ready = false;
-   for (let i = 0; i < 240 && !ready; i++) {
-    ready = await invoke<boolean>("openvsx_ready", { port }).catch(() => false);
-    if (!ready) await new Promise((r) => setTimeout(r, 500));
-   }
-   if (!ready) {
-    throw new Error(
-     `The editor server never answered on port ${port}. It may still be downloading VS Code Server components — click Retry in a moment.`,
-    );
-   }
-   setSrc(`http://127.0.0.1:${port}/`);
-   setStatus("running");
-  } catch (e: any) {
-   setError(String(e?.message || e));
-   setStatus("error");
-  }
+ setStatus("starting");
+ setError(null);
+ try {
+ // Guard: when running in a browser (preview/dev) Tauri's invoke is
+ // unavailable and would throw "Cannot read properties of undefined".
+ if (typeof invoke !== "function") {
+ throw new Error("Tauri API not available — running in browser mode");
+ }
+ await invoke("start_openvsx", { paneId, bin: bin || null, port, workingDir: workingDir || null, extensions: extensionId ? [extensionId] : null, env: env ?? null });
+ // poll readiness — VS Code serve-web may need to download the server
+ // component on first run, which can take 60-120s on slower connections.
+ let ready = false;
+ for (let i = 0; i < 240 && !ready; i++) {
+ ready = await invoke<boolean>("openvsx_ready", { port }).catch(() => false);
+ if (!ready) await new Promise((r) => setTimeout(r, 500));
+ }
+ if (!ready) {
+ throw new Error(
+ `The editor server never answered on port ${port}. It may still be downloading VS Code Server components — click Retry in a moment.`,
+ );
+ }
+ setSrc(`http://127.0.0.1:${port}/`);
+ setStatus("running");
+ } catch (e: any) {
+ setError(String(e?.message || e));
+ setStatus("error");
+ }
  }, [paneId, bin, port, workingDir, extensionId, env]);
 
  // start on mount; stop on unmount

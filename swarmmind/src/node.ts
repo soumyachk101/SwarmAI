@@ -93,7 +93,7 @@ export class NodeWorktreeManager implements WorktreeOps {
  throw new Error(`git worktree add failed: ${lastErr}`);
  }
  }
- throw new Error(lastErr);
+ throw new Error(`NodeManager.create: could not create worktree for task "${taskId}": ${lastErr}`);
  }
 
  remove(worktreePath: string): void {

@@ -3784,9 +3784,41 @@ async fn start_openvsx(
         }
     }
 
-    let child = cmd
+    cmd.stderr(std::process::Stdio::piped());
+    cmd.stdout(std::process::Stdio::piped());
+
+    let mut child = cmd
         .spawn()
         .map_err(|e| format!("Failed to start the editor server ('{exe}'): {e}"))?;
+
+    // Give the process a moment to crash if it's going to
+    std::thread::sleep(std::time::Duration::from_millis(800));
+
+    // Check if it already exited (crashed on startup)
+    match child.try_wait() {
+        Ok(Some(status)) => {
+            // Process already exited — capture stderr for diagnostics
+            let mut stderr_out = String::new();
+            if let Some(mut se) = child.stderr.take() {
+                use std::io::Read;
+                let _ = se.read_to_string(&mut stderr_out);
+            }
+            let mut stdout_out = String::new();
+            if let Some(mut so) = child.stdout.take() {
+                use std::io::Read;
+                let _ = so.read_to_string(&mut stdout_out);
+            }
+            return Err(format!(
+                "Editor server '{}' exited immediately (status: {}). stderr: [{}] stdout: [{}]",
+                exe, status, stderr_out.trim(), stdout_out.trim()
+            ));
+        }
+        Ok(None) => { /* still running, good */ }
+        Err(e) => {
+            return Err(format!("Failed to check editor server status: {e}"));
+        }
+    }
+
     state
         .servers
         .lock()

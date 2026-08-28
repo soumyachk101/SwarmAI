@@ -22,18 +22,16 @@ function extractArchive(archivePath: string, destDir: string): Promise<void> {
  return extractTarGz(archivePath, destDir);
 }
 
-function escapeForPowerShell(s: string): string {
- // Double any embedded double-quotes so PowerShell doesn't break out of the string.
- return s.replace(/"/g, '""');
-}
-
 async function extractZip(archivePath: string, destDir: string): Promise<void> {
  ensureDirectory(destDir);
  return new Promise((resolve, reject) => {
  const child = spawn('powershell', [
  '-NoProfile',
  '-Command',
- `Expand-Archive -LiteralPath "${escapeForPowerShell(archivePath)}" -DestinationPath "${escapeForPowerShell(destDir)}" -Force`,
+ 'Expand-Archive',
+ '-LiteralPath', archivePath,
+ '-DestinationPath', destDir,
+ '-Force',
  ], { stdio: 'pipe' });
  child.on('exit', (code) => {
  if (code === 0) resolve();
@@ -132,10 +130,10 @@ export class WhisperCppEngine implements STTEngine {
 
  try {
  fs.rmSync(extractDir, { recursive: true, force: true });
- } catch { }
+ } catch (err) { console.warn('[whisper-cpp] failed to remove temp extract dir:', err); }
  try {
  fs.unlinkSync(archivePath);
- } catch { }
+ } catch (err) { console.warn('[whisper-cpp] failed to remove archive:', err); }
 
  if (platform() !== 'win32') {
  fs.chmodSync(this.binaryPath, 0o755);
