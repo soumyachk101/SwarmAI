@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { RefreshCw, X, Maximize2, Minimize2, Blocks, KeyRound, Play } from "lucide-react";
+import { RefreshCw, X, Maximize2, Minimize2, Blocks, KeyRound, Play, Trash2, Plus } from "lucide-react";
 import { LeadCrown, PANE_HEADER_CLASS, themeForKind, CLASS_COLORS } from "@swarm/board";
 import OpenVsxLogo from "./OpenVsxLogo";
 
@@ -39,6 +39,7 @@ interface Props {
  onClose: () => void;
  onToggleMaximize?: () => void;
  isMaximized?: boolean;
+ onAddAgent?: () => void;
  /** Crown control, supplied for agent extensions only. Wired by the app so
  * this package never imports the pane store. */
  crown?: { isLead: boolean; taken: boolean; onToggle: () => void };
@@ -47,7 +48,7 @@ interface Props {
  env?: Record<string, string>;
 }
 
-export default function OpenVsxPane({ paneId, workingDir, tabName = "SwarmExtension", extensionId, onClose, onToggleMaximize, isMaximized, crown, env }: Props) {
+export default function OpenVsxPane({ paneId, workingDir, tabName = "Code Workspace", extensionId, onClose, onToggleMaximize, isMaximized, onAddAgent, crown, env }: Props) {
  const port = portForPane(paneId);
  const [status, setStatus] = useState<"idle" | "starting" | "running" | "error">("idle");
  const [error, setError] = useState<string | null>(null);
@@ -113,7 +114,7 @@ export default function OpenVsxPane({ paneId, workingDir, tabName = "SwarmExtens
  <span className="truncate text-xs font-medium text-swarm-text">{tabName}</span>
  <span className="text-micro text-swarm-textMuted">:{port}</span>
  </div>
- <div className="flex items-center gap-1">
+ <div className="flex items-center gap-1.5">
  {crown && (
  <button
  onClick={crown.onToggle}
@@ -139,14 +140,37 @@ export default function OpenVsxPane({ paneId, workingDir, tabName = "SwarmExtens
  <button onClick={() => setConfiguring(true)} className="rounded p-1 text-swarm-textMuted hover:bg-swarm-border/50 hover:text-swarm-text" title="Editor server (optional override)">
  <KeyRound className="size-3.5" />
  </button>
+ <button onClick={start} className="rounded p-1 text-swarm-textMuted hover:bg-swarm-border/50 hover:text-swarm-text" title="Restart Editor Server">
+ <RefreshCw className="size-3.5" />
+ </button>
  {onToggleMaximize && (
  <button onClick={onToggleMaximize} className="rounded p-1 text-swarm-textMuted hover:bg-swarm-border/50 hover:text-swarm-text" title={isMaximized ? "Restore" : "Maximize"}>
  {isMaximized ? <Minimize2 className="size-3.5" /> : <Maximize2 className="size-3.5" />}
  </button>
  )}
- <button onClick={onClose} className="rounded p-1 text-swarm-textMuted hover:bg-swarm-border/50 hover:text-swarm-text" title="Close">
- <X className="size-3.5" />
+ {/* Delete Screen from Board */}
+ <button
+ onClick={onClose}
+ className="rounded p-1 text-swarm-textMuted hover:bg-red-500/20 hover:text-red-400 transition-colors cursor-pointer"
+ title="Delete this screen from Board"
+ aria-label="Delete Screen"
+ >
+ <Trash2 className="size-3.5" />
  </button>
+ {/* Add Agent Button */}
+ {onAddAgent && (
+ <>
+ <span className="h-3.5 w-px bg-white/10 mx-0.5" />
+ <button
+ onClick={onAddAgent}
+ className="flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[11px] font-semibold text-amber-300 hover:bg-amber-500/20 hover:text-amber-200 transition-colors"
+ title="Add new Agent CLI or Terminal"
+ >
+ <Plus size={12} />
+ <span>Add Agent</span>
+ </button>
+ </>
+ )}
  </div>
  </div>
 

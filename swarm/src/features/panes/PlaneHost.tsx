@@ -457,6 +457,7 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
           paneId={swarm.id} workingDir={workingDir}
           tabName={swarm.customName || swarm.cliName} extensionId={swarm.extensionId}
           onClose={close} onToggleMaximize={max} isMaximized={isThisMax}
+          onAddAgent={() => setShowAdd(true)}
           {...extensionAgentProps(swarm, agents)}
         />
       );
