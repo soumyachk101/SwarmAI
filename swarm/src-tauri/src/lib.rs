@@ -3811,9 +3811,16 @@ async fn start_openvsx(
     Ok(port)
 }
 
-/// True once the server answers HTTP on its port.
+/// True once the server answers HTTP or accepts TCP on its port.
 #[tauri::command]
 async fn openvsx_ready(port: u16) -> Result<bool, String> {
+    use std::net::{SocketAddr, TcpStream};
+    use std::time::Duration;
+    if let Ok(addr) = format!("127.0.0.1:{}", port).parse::<SocketAddr>() {
+        if TcpStream::connect_timeout(&addr, Duration::from_millis(600)).is_ok() {
+            return Ok(true);
+        }
+    }
     Ok(http_get_body(port, "/").is_ok())
 }
 
