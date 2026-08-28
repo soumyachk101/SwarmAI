@@ -1165,22 +1165,22 @@ export function DevChatStudio({
     <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#0d0f14] font-sans select-text">
 
 
-      {/* Solid, Opaque Header Bar */}
-      <div className="relative z-30 flex shrink-0 items-center justify-between border-b border-white/[0.08] bg-[#13151b] px-3.5 py-2 shadow-sm">
-        <div className="flex items-center gap-2">
+      {/* Solid, Opaque Header Bar with dynamic responsive flex layout */}
+      <div className="relative z-30 flex shrink-0 items-center justify-between gap-1.5 border-b border-white/[0.08] bg-[#13151b] px-2 sm:px-3.5 py-1.5 sm:py-2 shadow-sm min-w-0">
+        <div className="flex items-center gap-1.5 min-w-0 flex-1 overflow-hidden">
           {/* Multi-Session Dropdown */}
-          <div className="relative">
+          <div className="relative shrink-0">
             <button
               onClick={() => {
                 setShowSessionMenu(!showSessionMenu);
                 setShowModelMenu(false);
                 setShowCliMenu(false);
               }}
-              className="flex items-center gap-1.5 rounded-full border border-white/[0.10] bg-white/[0.04] px-2.5 py-1 text-xs font-medium text-swarm-text hover:border-swarm-gold/50 transition-all shadow-sm"
+              className="flex items-center gap-1 rounded-full border border-white/[0.10] bg-white/[0.04] px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs font-medium text-swarm-text hover:border-swarm-gold/50 transition-all shadow-sm max-w-[85px] sm:max-w-[120px]"
             >
-              <Sparkles size={12} className="text-swarm-gold" />
-              <span className="max-w-[100px] truncate font-medium">{currentSession.title}</span>
-              <ChevronDown size={11} className="text-swarm-textMuted" />
+              <Sparkles size={11} className="text-swarm-gold shrink-0" />
+              <span className="truncate font-medium">{currentSession.title}</span>
+              <ChevronDown size={10} className="text-swarm-textMuted shrink-0" />
             </button>
 
             {showSessionMenu && (
@@ -1233,18 +1233,18 @@ export function DevChatStudio({
           </div>
 
           {/* Model Selector Pill */}
-          <div className="relative">
+          <div className="relative shrink-0">
             <button
               onClick={() => {
                 setShowModelMenu(!showModelMenu);
                 setShowCliMenu(false);
                 setShowSessionMenu(false);
               }}
-              className="flex items-center gap-1.5 rounded-full border border-white/[0.10] bg-white/[0.04] px-2.5 py-1 text-xs font-medium text-swarm-text hover:border-swarm-gold/50 transition-all shadow-sm"
+              className="flex items-center gap-1 rounded-full border border-white/[0.10] bg-white/[0.04] px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs font-medium text-swarm-text hover:border-swarm-gold/50 transition-all shadow-sm max-w-[95px] sm:max-w-[140px]"
             >
-              <ModelIcon size={13} className="text-swarm-gold shrink-0" />
-              <span className="max-w-[120px] truncate font-medium">{activeModel.name}</span>
-              <ChevronDown size={11} className="text-swarm-textMuted shrink-0" />
+              <ModelIcon size={12} className="text-swarm-gold shrink-0" />
+              <span className="truncate font-medium">{activeModel.name}</span>
+              <ChevronDown size={10} className="text-swarm-textMuted shrink-0" />
             </button>
 
             {showModelMenu && (
@@ -1289,10 +1289,10 @@ export function DevChatStudio({
           </div>
 
           {/* Mode Switch Pill */}
-          <div className="flex items-center rounded-full bg-white/[0.04] border border-white/[0.08] p-0.5">
+          <div className="flex items-center rounded-full bg-white/[0.04] border border-white/[0.08] p-0.5 shrink-0">
             <button
               onClick={() => setExecMode("copilot")}
-              className={`rounded-full px-2.5 py-0.5 text-micro font-medium transition-all ${
+              className={`rounded-full px-2 py-0.5 text-micro font-medium transition-all ${
                 execMode === "copilot"
                   ? "bg-swarm-gold text-swarm-canvas font-semibold shadow-sm"
                   : "text-swarm-textMuted hover:text-swarm-text"
@@ -1302,31 +1302,31 @@ export function DevChatStudio({
             </button>
             <button
               onClick={() => setExecMode("cli")}
-              className={`flex items-center gap-1 rounded-full px-2.5 py-0.5 text-micro font-medium transition-all ${
+              className={`flex items-center gap-0.5 rounded-full px-2 py-0.5 text-micro font-medium transition-all ${
                 execMode === "cli"
                   ? "bg-swarm-gold text-swarm-canvas font-semibold shadow-sm"
                   : "text-swarm-textMuted hover:text-swarm-text"
               }`}
             >
-              <Terminal size={10} />
+              <Terminal size={9} />
               <span>CLI</span>
             </button>
           </div>
 
           {/* CLI Selector Pill */}
           {execMode === "cli" && (
-            <div className="relative">
+            <div className="relative shrink-0">
               <button
                 onClick={() => {
                   setShowCliMenu(!showCliMenu);
                   setShowModelMenu(false);
                   setShowSessionMenu(false);
                 }}
-                className="flex items-center gap-1.5 rounded-full border border-swarm-gold/40 bg-swarm-gold/10 px-2 py-0.5 text-micro font-medium text-swarm-goldHi transition-all"
+                className="flex items-center gap-1 rounded-full border border-swarm-gold/40 bg-swarm-gold/10 px-2 py-0.5 text-micro font-medium text-swarm-goldHi transition-all max-w-[80px] sm:max-w-[110px]"
               >
-                <CliIcon size={11} className="text-swarm-gold" />
-                <span className="font-mono font-semibold">{activeCli.command}</span>
-                <ChevronDown size={10} />
+                <CliIcon size={10} className="text-swarm-gold shrink-0" />
+                <span className="font-mono font-semibold truncate">{activeCli.command}</span>
+                <ChevronDown size={9} className="shrink-0" />
               </button>
 
               {showCliMenu && (
@@ -1370,14 +1370,14 @@ export function DevChatStudio({
           )}
         </div>
 
-        {/* Right Tools matching luxury workbench style */}
-        <div className="flex items-center gap-1.5">
+        {/* Right Tools matching luxury workbench style — always visible & shrink-0 */}
+        <div className="flex items-center gap-1 shrink-0 ml-auto">
           {/* AI Crown Indicator */}
           <div
-            className="flex size-7 items-center justify-center rounded-lg bg-swarm-gold/10 text-swarm-gold border border-swarm-gold/20"
+            className="flex size-7 items-center justify-center rounded-lg bg-swarm-gold/10 text-swarm-gold border border-swarm-gold/20 shrink-0"
             title={`Lead AI: ${activeModel.name}`}
           >
-            <Crown size={14} />
+            <Crown size={13} />
           </div>
 
           {/* Refresh / Reset Session */}
@@ -1391,7 +1391,7 @@ export function DevChatStudio({
                 )
               );
             }}
-            className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-white/[0.06] hover:text-white transition-colors"
+            className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-white/[0.06] hover:text-white transition-colors shrink-0"
             title="Reset Chat Session"
           >
             <RotateCw size={13} />
@@ -1400,7 +1400,7 @@ export function DevChatStudio({
           {/* Swap / Switch Execution Mode */}
           <button
             onClick={() => setExecMode((m) => (m === "copilot" ? "cli" : "copilot"))}
-            className={`flex size-7 items-center justify-center rounded-lg transition-colors ${
+            className={`flex size-7 items-center justify-center rounded-lg transition-colors shrink-0 ${
               execMode === "cli"
                 ? "bg-blue-500/20 text-blue-300 border border-blue-500/40"
                 : "text-slate-400 hover:bg-white/[0.06] hover:text-white"
@@ -1410,13 +1410,13 @@ export function DevChatStudio({
             <ArrowLeftRight size={13} />
           </button>
 
-          <span className="h-4 w-px bg-white/10 mx-0.5" />
+          <span className="h-3.5 w-px bg-white/10 mx-0.5 shrink-0" />
 
           {/* Maximize / Expand */}
           {onToggleExpand && (
             <button
               onClick={onToggleExpand}
-              className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-white/[0.06] hover:text-white transition-colors"
+              className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-white/[0.06] hover:text-white transition-colors shrink-0"
               title={isExpanded ? "Restore View" : "Maximize View"}
             >
               {isExpanded ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
@@ -1433,7 +1433,7 @@ export function DevChatStudio({
               setCopiedBlockId("all");
               setTimeout(() => setCopiedBlockId(null), 1500);
             }}
-            className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-white/[0.06] hover:text-white transition-colors"
+            className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-white/[0.06] hover:text-white transition-colors shrink-0"
             title={copiedBlockId === "all" ? "Copied!" : "Copy Full Transcript"}
           >
             {copiedBlockId === "all" ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
@@ -1442,33 +1442,35 @@ export function DevChatStudio({
           {/* Eraser / Clear Chat */}
           <button
             onClick={handleClear}
-            className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-white/[0.06] hover:text-amber-300 transition-colors"
+            className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-white/[0.06] hover:text-amber-300 transition-colors shrink-0"
             title="Clear Chat Messages"
           >
             <Eraser size={13} />
           </button>
 
-          {/* Delete Screen from Board (Trash2) */}
+          {/* Delete Screen from Board (Trash2) — Guaranteed Always Visible */}
           <button
             onClick={onClose ? onClose : (e) => handleDeleteSession(activeSessionId, e)}
-            className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-red-500/20 hover:text-red-400 transition-colors cursor-pointer"
+            className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-red-500/20 hover:text-red-400 transition-colors cursor-pointer shrink-0 z-10"
             title="Delete this screen from Board"
+            aria-label="Delete Screen"
           >
             <Trash2 size={13} />
           </button>
 
-          <span className="h-4 w-px bg-white/10 mx-0.5" />
-
           {/* Add Agent Button */}
           {onAddAgent && (
-            <button
-              onClick={onAddAgent}
-              className="flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 hover:text-amber-200 transition-colors"
-              title="Add new Agent CLI or Terminal"
-            >
-              <Plus size={13} />
-              <span>Add Agent</span>
-            </button>
+            <>
+              <span className="h-3.5 w-px bg-white/10 mx-0.5 shrink-0" />
+              <button
+                onClick={onAddAgent}
+                className="flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2 py-1 sm:px-2.5 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 hover:text-amber-200 transition-colors shrink-0"
+                title="Add new Agent CLI or Terminal"
+              >
+                <Plus size={12} />
+                <span className="hidden sm:inline">Add Agent</span>
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -1795,8 +1797,8 @@ export function DevChatStudio({
                   </>
                 )}
 
-                <span className="text-micro text-swarm-textMuted font-mono">
-                  {activeModel.name} · Shift+Enter for new line
+                <span className="text-micro text-swarm-textMuted font-mono truncate max-w-[130px] sm:max-w-[260px]">
+                  {activeModel.name} · Shift+Enter
                 </span>
               </div>
 
