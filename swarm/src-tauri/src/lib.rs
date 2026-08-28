@@ -3625,18 +3625,9 @@ struct OpenVsxState {
     servers: Mutex<HashMap<String, std::process::Child>>,
 }
 
-/// Which program actually serves the editor pane.
-///
-/// gitpod's openvscode-server publishes Linux builds ONLY — there has never
-/// been a win32 asset — so on Windows and macOS the pane could never start and
-/// fell back to asking for a binary path. Desktop VS Code ships the same thing
-/// as `code serve-web`, on every platform, so that is the default backend when
-/// openvscode-server isn't around.
 #[derive(Clone, Copy, PartialEq)]
 enum EditorBackend {
-    /// gitpod openvscode-server (Linux, or an explicitly configured path).
     OpenVsx,
-    /// `code serve-web` from a desktop VS Code install.
     CodeServeWeb,
 }
 
@@ -3646,13 +3637,13 @@ struct EditorServer {
 }
 
 /// Resolve a usable editor server: an explicit path, then openvscode-server on
-/// PATH, then VS Code's built-in web server.
+/// PATH, then VS Code's built-in web server, or known system install locations.
 fn resolve_editor_server(explicit: Option<String>) -> Result<EditorServer, String> {
- if let Some(p) = explicit {
+	if let Some(p) = explicit {
 		let p = p.trim();
 		if !p.is_empty() {
 			if !std::path::Path::new(p).exists() {
-				return Err(format!("Editor server binary not found at: {}. Expected an executable like openvscode-server or the full path to VS Code code binary. If the path was valid before but now fails, try clearing the saved path and re-detecting.", p));
+				return Err(format!("Editor server binary not found at: {}. Expected an executable like openvscode-server or the full path to VS Code code binary.", p));
 			}
 			let backend = if p.contains("openvscode") { EditorBackend::OpenVsx } else { EditorBackend::CodeServeWeb };
 			return Ok(EditorServer { exe: p.to_string(), backend });
@@ -3664,6 +3655,59 @@ fn resolve_editor_server(explicit: Option<String>) -> Result<EditorServer, Strin
     if which_on_path("code").is_some() {
         return Ok(EditorServer { exe: "code".into(), backend: EditorBackend::CodeServeWeb });
     }
+    if which_on_path("cursor").is_some() {
+        return Ok(EditorServer { exe: "cursor".into(), backend: EditorBackend::CodeServeWeb });
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        let mac_candidates = [
+            "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code",
+            "/Applications/Visual Studio Code - Insiders.app/Contents/Resources/app/bin/code-insiders",
+            "/Applications/Cursor.app/Contents/Resources/app/bin/cursor",
+            "/Applications/VSCodium.app/Contents/Resources/app/bin/codium",
+            "/opt/homebrew/bin/code",
+            "/usr/local/bin/code",
+        ];
+        for candidate in mac_candidates {
+            if std::path::Path::new(candidate).exists() {
+                return Ok(EditorServer { exe: candidate.to_string(), backend: EditorBackend::CodeServeWeb });
+            }
+        }
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        let local_appdata = std::env::var("LOCALAPPDATA").unwrap_or_default();
+        let program_files = std::env::var("ProgramFiles").unwrap_or_default();
+        let win_candidates = [
+            format!("{}\\Programs\\Microsoft VS Code\\bin\\code.cmd", local_appdata),
+            format!("{}\\Microsoft VS Code\\bin\\code.cmd", program_files),
+            format!("{}\\Programs\\Cursor\\bin\\cursor.cmd", local_appdata),
+        ];
+        for candidate in win_candidates {
+            if std::path::Path::new(&candidate).exists() {
+                return Ok(EditorServer { exe: candidate, backend: EditorBackend::CodeServeWeb });
+            }
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        let linux_candidates = [
+            "/usr/bin/code",
+            "/usr/share/code/bin/code",
+            "/snap/bin/code",
+            "/usr/bin/openvscode-server",
+        ];
+        for candidate in linux_candidates {
+            if std::path::Path::new(candidate).exists() {
+                let backend = if candidate.contains("openvscode") { EditorBackend::OpenVsx } else { EditorBackend::CodeServeWeb };
+                return Ok(EditorServer { exe: candidate.to_string(), backend });
+            }
+        }
+    }
+
     Err("No editor server found. Install Visual Studio Code (its `code serve-web` is used automatically), or put `openvscode-server` on PATH.".into())
 }
 

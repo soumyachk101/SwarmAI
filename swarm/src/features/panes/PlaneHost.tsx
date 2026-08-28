@@ -355,7 +355,7 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
   };
   const addOpenVsx = (ext?: { id: string; name: string; icon?: string }) => {
     const swarm: Agent = {
-      id: `openvsx-${Date.now()}`, cli: "openvsx", cliName: ext?.name || "SwarmExtension", kind: "openvsx",
+      id: `openvsx-${Date.now()}`, cli: "openvsx", cliName: ext?.name || "Code Workspace", kind: "openvsx",
       extensionId: ext?.id, iconUrl: ext?.icon,
       // Claude Code, Kilo Code and OpenChamber are agents: they join the swarm
       // like Agents and may be crowned. Tool extensions are just panes.
