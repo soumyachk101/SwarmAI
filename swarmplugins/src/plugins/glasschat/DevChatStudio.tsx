@@ -604,7 +604,7 @@ export function DevChatStudio({
             const tauri = typeof window !== "undefined" ? (window as any).__TAURI_INTERNALS__ || (window as any).__TAURI__ : null;
             if (tauri?.invoke) {
               try {
-                const status: any = await tauri.invoke("swarm_voice_status");
+                const status = await tauri.invoke("swarm_voice_status");
                 if (!status?.has_binary || !status?.installed_models?.length) {
                   await tauri.invoke("swarm_voice_install", { model: "base.en" });
                 }
@@ -780,10 +780,10 @@ export function DevChatStudio({
           content: diff || "No uncommitted changes in git repository.",
         },
       ]);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setAttachedContexts((prev) => [
         ...prev,
-        { id: `git-${Date.now()}`, type: "git", title: "Git Diff", content: String(err?.message || err) },
+        { id: `git-${Date.now()}`, type: "git", title: "Git Diff", content: String(err instanceof Error ? err.message : String(err)) },
       ]);
     }
   };
@@ -844,8 +844,8 @@ export function DevChatStudio({
         } else {
           output = `Process finished: [${cliConfig.command} ${args.join(" ")}]\nin: ${projectPath || "local workspace"}`;
         }
-      } catch (err: any) {
-        output = `Note:\n${String(err?.message || err)}`;
+      } catch (err: unknown) {
+        output = `Note:\n${String(err instanceof Error ? err.message : String(err))}`;
       }
 
       updateCurrentMessages((prev) =>
@@ -860,7 +860,7 @@ export function DevChatStudio({
             : m
         )
       );
-    } catch (e: any) {
+    } catch (e: unknown) {
       updateCurrentMessages((prev) =>
         prev.map((m) =>
           m.id === botMsgId
@@ -868,7 +868,7 @@ export function DevChatStudio({
                 ...m,
                 isCliRunning: false,
                 text: `❌ Execution Error with **${cliConfig.name}**`,
-                cliOutput: String(e?.message || e),
+                cliOutput: String(e instanceof Error ? e.message : String(e)),
               }
             : m
         )

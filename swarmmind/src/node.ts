@@ -80,8 +80,8 @@ export class NodeWorktreeManager implements WorktreeOps {
  this.git(['worktree', 'add', worktreePath, '-b', branch]);
  }
  return { path: worktreePath, branch, taskId: tid };
- } catch (e: any) {
- lastErr = String(e?.stderr || e?.message || e);
+ } catch (e: unknown) {
+ lastErr = (e instanceof Error && typeof (e as any).stderr === "string") ? String((e as any).stderr) : e instanceof Error ? e.message : String(e);
  const lower = lastErr.toLowerCase();
  if (
  lower.includes('already exists') ||

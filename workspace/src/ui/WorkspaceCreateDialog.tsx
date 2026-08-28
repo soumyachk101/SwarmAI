@@ -88,7 +88,7 @@ export default function WorkspaceCreateDialog({ open, onClose }: Props) {
         if (apis.invoke) {
           await apis.invoke("ensure_pheromone_structure", { projectPath });
         }
-      } catch {}
+      } catch (err) { console.warn("[WorkspaceCreateDialog] error:", err); }
     }
     onClose();
   }, [name, projectPath, creating, invalid, workspaces.length, addWorkspace, onClose]);

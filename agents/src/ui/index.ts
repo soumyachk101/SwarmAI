@@ -3,8 +3,12 @@
 // needs (MCP config, agent trust, handoff sync). The app renders these and
 // registers a host (see ./host) — no pane logic lives outside this package.
 export { default as AgentPane } from './AgentPane.js';
-export type { AgentInfo } from './AgentPane.js';
+export type { AgentInfo } from './AgentTerminal.js';
 export { default as TerminalPane } from './TerminalPane.js';
+export { AgentPaneLazy } from './AgentPaneLazy.js';
+export type { AgentPaneLazyProps } from './AgentPaneLazy.js';
+export { TerminalPaneLazy } from './TerminalPaneLazy.js';
+export type { TerminalPaneLazyProps } from './TerminalPaneLazy.js';
 export { default as ResizeHandle } from './ResizeHandle.js';
 export { default as RoleBadge } from './RoleBadge.js';
 export { default as CliUsagePanel } from './CliUsagePanel.js';

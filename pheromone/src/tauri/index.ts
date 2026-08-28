@@ -6,9 +6,9 @@ export interface PheromoneEnsureStructureRequest { project_path: string; }
 export interface PheromoneEnsureStructureResponse { success: boolean; created_files: string[]; }
 
 export interface PheromoneReadMemoryFileRequest { project_path: string; relative_path: string; }
-export interface PheromoneReadMemoryFileResponse { content: string; frontmatter: any; file_type: string; }
+export interface PheromoneReadMemoryFileResponse { content: string; frontmatter: unknown; file_type: string; }
 
-export interface PheromoneWriteMemoryFileRequest { project_path: string; relative_path: string; content: string; frontmatter?: any; }
+export interface PheromoneWriteMemoryFileRequest { project_path: string; relative_path: string; content: string; frontmatter?: unknown; }
 export interface PheromoneWriteMemoryFileResponse { success: boolean; path: string; }
 
 export interface PheromoneListMemoryFilesRequest { project_path: string; }
@@ -63,7 +63,7 @@ export class TauriPheromone {
     return await invoke<PheromoneReadMemoryFileResponse>("pheromone_read_memory_file", { req: { project_path: this.projectPath, relative_path: relativePath } });
   }
 
-  async writeMemoryFile(relativePath: string, content: string, frontmatter?: any): Promise<PheromoneWriteMemoryFileResponse> {
+  async writeMemoryFile(relativePath: string, content: string, frontmatter?: Record<string, unknown>): Promise<PheromoneWriteMemoryFileResponse> {
     const result = await invoke<PheromoneWriteMemoryFileResponse>("pheromone_write_memory_file", { req: { project_path: this.projectPath, relative_path: relativePath, content, frontmatter } });
     try { await this.indexFile(relativePath); } catch (e) { console.warn(`[Pheromone] Failed to index ${relativePath} after write:`, e); }
     return result;
@@ -120,11 +120,11 @@ export class TauriMemoryManager {
 
   async ensureStructure(): Promise<void> { await this.pheromone.ensureStructure(); }
 
-  async readMemoryFile(relativePath: string): Promise<{ content: string; frontmatter?: any; type: string } | null> {
+  async readMemoryFile(relativePath: string): Promise<{ content: string; frontmatter?: unknown; type: string } | null> {
     try { const r = await this.pheromone.readMemoryFile(relativePath); return { content: r.content, frontmatter: r.frontmatter, type: r.file_type }; } catch { return null; }
   }
 
-  async writeMemoryFile(relativePath: string, content: string, frontmatter?: any): Promise<void> {
+  async writeMemoryFile(relativePath: string, content: string, frontmatter?: Record<string, unknown>): Promise<void> {
     await this.pheromone.writeMemoryFile(relativePath, content, frontmatter);
   }
 

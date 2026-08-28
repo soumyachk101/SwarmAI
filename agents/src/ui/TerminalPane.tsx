@@ -117,7 +117,9 @@ export default function TerminalPane({
  // fit() only repaints when cols/rows actually change — force a
  // redraw too so minimize/restore doesn't leave a ghosted canvas.
  terminalInstance.current.refresh(0, terminalInstance.current.rows - 1);
- } catch {}
+ } catch (err) {
+ console.warn("[TerminalPane] fit refresh failed:", err);
+ }
  }
  }, [refitCount]);
 
@@ -317,10 +319,14 @@ export default function TerminalPane({
  if (webglRef.current === webgl) webglRef.current = null;
  try {
  webgl.dispose();
- } catch {}
+ } catch (err) {
+ console.warn("[TerminalPane] WebGL dispose failed:", err);
+ }
  try {
  terminal?.refresh(0, (terminal.rows ?? 1) - 1);
- } catch {}
+ } catch (err) {
+ console.warn("[TerminalPane] terminal refresh failed:", err);
+ }
  });
  } catch (e) {
  console.warn("[TerminalPane] WebGL renderer unavailable, using fallback:", e);
@@ -456,7 +462,8 @@ export default function TerminalPane({
  // dropping the atlas the old theme's text keeps being blitted.
  webglRef.current?.clearTextureAtlas();
  t.refresh(0, t.rows - 1);
- } catch {
+ } catch (err) {
+ console.warn("[TerminalPane] theme switch refresh failed:", err);
  /* ignore */
  }
  };

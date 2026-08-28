@@ -72,11 +72,11 @@ Respond with a JSON array of tasks, each with:
 }`;
 }
 
-export function parseBreakdownResponse(raw: string): { tasks: any[]; warnings: string[] } {
+export function parseBreakdownResponse(raw: string): { tasks: LeadTask[]; warnings: string[] } {
  try {
  const parsed = JSON.parse(raw);
  const tasks = Array.isArray(parsed) ? parsed : parsed.tasks || [];
- return { tasks, warnings: [] };
+ return { tasks: tasks as LeadTask[], warnings: [] };
  } catch {
  return { tasks: [], warnings: ['Could not parse breakdown. LLM returned non-JSON response.'] };
  }

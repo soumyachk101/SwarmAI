@@ -76,7 +76,7 @@ export default function VoiceHotkeys() {
       setPhase({ mode, busy: true, isInstalling: true, isToggle });
       try {
         s = await whisperInstall(MODEL);
-      } catch (err: any) {
+      } catch (err: unknown) {
         setPhase({ mode, busy: false, error: "Voice install error. Check logs.", isToggle });
         setTimeout(() => setPhase(null), 3000);
         return;
@@ -95,8 +95,8 @@ export default function VoiceHotkeys() {
       activeMode.current = mode;
       setTranscriptPreview(null);
       setPhase({ mode, busy: false, isToggle });
-    } catch (err: any) {
-      const msg = String(err?.message ?? err);
+    } catch (err: unknown) {
+      const msg = String(err instanceof Error ? err.message : String(err));
       const userMsg = msg.includes("Permission") || msg.includes("permission")
         ? "Microphone access denied"
         : "Failed to open microphone";
@@ -114,7 +114,7 @@ export default function VoiceHotkeys() {
     if (!deliverResult) {
       try {
         await recRef.current!.stopRecording();
-      } catch {}
+ } catch (err) { console.warn("[VoiceHotkeys] stopRecording failed:", err); }
       setPhase(null);
       return;
     }

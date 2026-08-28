@@ -44,6 +44,9 @@
   ],
   "exclude": [
     "node_modules",
-    "src-tauri"
+    "src-tauri",
+    "tests",
+    "**/*.test.ts",
+    "**/*.test.tsx"
   ]
 }

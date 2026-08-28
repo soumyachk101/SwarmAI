@@ -31,24 +31,27 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@swarm/pheromone": "workspace:*",
-    "@swarm/lead": "workspace:*",
     "@swarm/board": "workspace:*",
+    "@swarm/lead": "workspace:*",
+    "@swarm/pheromone": "workspace:*",
     "lucide-react": "^0.400.0",
-    "zustand": "^5.0.0",
     "xterm": "^5.3.0",
     "xterm-addon-fit": "^0.8.0",
     "xterm-addon-search": "^0.13.0",
-    "xterm-addon-webgl": "^0.16.0"
+    "xterm-addon-webgl": "^0.16.0",
+    "zustand": "^5.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
-    "typescript": "^5.6.0",
-    "vitest": "^2.1.0",
-    "@types/react": "^18.3.0",
-    "react": "^18.3.0",
     "@tauri-apps/api": "^2.1.0",
-    "@tauri-apps/plugin-shell": "^2.0.0"
+    "@tauri-apps/plugin-shell": "^2.0.0",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^22.0.0",
+    "@types/react": "^18.3.0",
+    "jsdom": "^30.0.1",
+    "react": "^18.3.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0"

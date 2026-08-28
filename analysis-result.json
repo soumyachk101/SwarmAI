@@ -1,0 +1,71 @@
+{
+ "agentManagement": {
+ "lifecycleGaps": [
+ "AgentLauncher.launch() only generates a CommandConfig but never spawns the actual CLI process; the real spawn happens elsewhere (presumably in the Tauri Rust backend). If the spawn fails after launch() returns, the session remains in activeSessions forever with no timeout or cleanup.",
+ "No lifecycle states for 'pending' or 'awaiting-review' in the AgentLauncher or agentsStore. The orchestrator emits 'awaiting-review' and 'merged'/'failed', but the store only tracks 'launching' | 'running' | 'idle' | 'error' | 'done'.",
+ "endSession() is never called inside launch() or any automatic lifecycle hook. There is no session timeout, no heartbeat check, no maximum duration.",
+ "The 'done' status in agentsStore is never transitioned to by any code path in the analyzed files.",
+ "No event/callback system for status transitions.",
+ "AgentRegistry in swarmmind/src/registry is an in-memory Map with no persistence. All agent records, locks, and handoff state are lost on app restart."
+ ],
+ "processManagementIssues": [
+ "AgentLauncher never kills or reaps CLI processes. The adapter interface has no kill/cleanup method.",
+ "spawnGuard.ts only tracks paneId to directory mapping in a frontend-side Map with no visibility into actual process PIDs, exit codes, or memory usage.",
+ "No zombie process reaping.",
+ "No per-session resource limits (wall-clock timeout, memory cap, output buffer cap).",
+ "spawned Map in spawnGuard.ts is never cleaned up for panes that close without calling forgetSpawn.",
+ "The Rust-side kill_terminal call swallows all errors, so failed kills silently leave orphaned processes."
+ ],
+ "securityConcerns": [
+ "permissionBypassArgs() ships '--dangerously-skip-permissions' (claude), '--dangerously-bypass-approvals-and-sandbox' (codex), and '--yolo' (cline) by default with no user consent check.",
+ "withPermissionBypass() prepends bypass flags before any user-supplied args with no override mechanism.",
+ "injectionText (Pheromone context chunks) is injected directly into CLI args with no sanitization or escaping.",
+ "No working directory (cwd) validation or sandboxing.",
+ "API keys are passed as environment variables to spawned processes with no mechanism to scrub them after process exit.",
+ "No content security policy on context injection. formatContext() methods do not escape special characters.",
+ "loadClaudeCodeOAuthToken() reads a stored OAuth token and forwards it to the spawned process.",
+ "worktree creation uses git commands constructed from user-provided task IDs as branch names without validation."
+ ]
+ },
+ "adapters": {
+ "inconsistent": [
+ "8 of 10 adapters share nearly identical getCommand() implementations. Only Aider differs, suggesting copy-paste maintenance risk.",
+ "All 10 adapters share identical onSessionEnd() logic duplicated 10 times instead of a base class.",
+ "Aider combines context and task into a single --message arg while all others pass them as separate args.",
+ "No adapter exposes a working directory argument. CommandConfig has no cwd field.",
+ "Adapters do not participate in permissionBypass -- applied separately via withPermissionBypass() in cli-configs."
+ ],
+ "missing": [
+ "No adapter handles --model flag for model selection despite model-catalog.ts existing.",
+ "No adapter handles --api-key or --provider flags.",
+ "No adapter handles resume/attach flags for PTY respawns.",
+ "No adapter exposes MCP server configuration for 8 of 10 CLIs.",
+ "No adapter handles timeout, max-turns, or budget limits.",
+ "KimiCodeAdapter, KiloAdapter, CursorAdapter, KiroAdapter have no permission bypass args defined."
+ ]
+ },
+ "spawnGuard": {
+ "bypassable": true,
+ "issues": [
+ "spawnGuard.ts is purely frontend-side state. A page refresh or React StrictMode double-mount clears all spawn tracking.",
+ "The Rust side's is_process_alive check is the only verification of process liveness; errors are treated as 'dead', causing unnecessary respawns.",
+ "No paneId collision detection.",
+ "The guard does not prevent spawning a second process for the same paneId in a different directory if markSpawned is not called first.",
+ "Transcript storage has no encryption or access control."
+ ]
+ },
+ "recommendations": [
+ "Add a base AgentAdapter class with shared onSessionEnd logic to eliminate 10x duplication.",
+ "Integrate the model catalog into adapters: inject --model flags when the agent is launched with a pinned model.",
+ "Implement process cleanup in the adapter interface -- add a kill() method and track PIDs.",
+ "Persist AgentRegistry state to disk so agent records survive app restarts.",
+ "Add a session timeout/heartbeat mechanism to auto-terminate idle agents.",
+ "Align the two state machines: map agentsStore statuses to orchestrator statuses.",
+ "Validate taskId/branchName before passing to git with a whitelist pattern.",
+ "Add a user-facing consent step before applying permissionBypass flags.",
+ "Encrypt transcripts at rest or clear them on process exit.",
+ "Add MCP config support for all 10 CLIs.",
+ "Implement resume/attach flags in adapters for CLIs that support them.",
+ "Add a working directory (cwd) field to CommandConfig."
+ ]
+}

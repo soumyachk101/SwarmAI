@@ -196,7 +196,7 @@ export class WhisperCppEngine implements STTEngine {
 
  if (fs.existsSync(outputTxtPath)) {
  transcript = fs.readFileSync(outputTxtPath, 'utf-8');
- try { fs.unlinkSync(outputTxtPath); } catch { }
+ try { fs.unlinkSync(outputTxtPath); } catch (err) { console.debug("[whisper-cpp] cleanup .txt failed:", err); }
  } else {
  transcript = stdout;
  }

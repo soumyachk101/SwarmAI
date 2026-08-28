@@ -1,7 +1,7 @@
 import { executeTool, ToolError, ASYNC_TOOLS } from '../tools.js';
 import { MODE_SYSTEM_PROMPTS } from '../modes.js';
 import type { LeadMode } from '../modes.js';
-import { TauriPheromone as Pheromone } from '@swarm/pheromone/tauri';
+import { TauriPheromone as Pheromone, ChunkInfo } from '@swarm/pheromone/tauri';
 import { open as shellOpen } from '@tauri-apps/plugin-shell';
 import { leadHost } from './host.js';
 
@@ -66,7 +66,7 @@ ${host.describeScope(projectPath)}`;
         const res = await pheromone.search(query, { limit: 5 });
         const hits = res?.results ?? [];
         return hits.length
-          ? hits.map((h: any) => `- [${h.score?.toFixed?.(3) ?? '?'}] ${h.chunk?.source_file ?? '?'}: ${String(h.chunk?.content ?? '').slice(0, 200)}`).join('\n')
+          ? hits.map((h: { chunk: ChunkInfo; source_file: string; score: number }) => `- [${h.score?.toFixed?.(3) ?? '?'}] ${h.source_file ?? '?'}: ${String(h.chunk.text ?? '').slice(0, 200)}`).join('\n')
           : 'No memory matches.';
       }
 
@@ -162,8 +162,8 @@ ${host.describeScope(projectPath)}`;
       }
     }
     return executeTool(mode, name, args, ctx);
-  } catch (e) {
+  } catch (e: unknown) {
     if (e instanceof ToolError) return `Error: ${e.message}`;
-    return `Error: ${(e as Error)?.message || 'tool failed'}`;
+    return `Error: ${e instanceof Error ? e.message : "tool failed"}`;
   }
 }

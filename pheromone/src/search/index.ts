@@ -148,13 +148,13 @@ export class SearchEngine {
       .join(' ');
   }
 
-  private rowToChunk(row: any): Chunk {
+  private rowToChunk(row: Record<string, unknown>): Chunk {
     return {
       id: (row.id as string) ?? `${row.source_file}:${row.chunk_index}`,
       source_file: row.source_file as string,
       chunk_index: row.chunk_index as number,
       content: row.content as string,
-      embedding: row.embedding ? Array.from(new Uint8Array(row.embedding)) : undefined,
+      embedding: row.embedding ? Array.from(new Uint8Array(row.embedding as ArrayBuffer)) : undefined,
       created_at: (row.created_at as number) ?? 0,
       updated_at: (row.updated_at as number) ?? 0,
     };

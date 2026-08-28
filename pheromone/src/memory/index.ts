@@ -112,9 +112,9 @@ export class MemoryManager {
           chunks.push({ text: currentText.trim(), heading: currentHeading });
           currentText = '';
         }
-        currentHeading = node.children.map((c: any) => c.value).join('');
+        currentHeading = node.children.map((c: { value: string }) => c.value).join('');
       } else if (node.type === 'paragraph') {
-        const text = node.children.map((c: any) => c.value).join('');
+        const text = node.children.map((c: { value: string }) => c.value).join('');
         currentText += text + '\n\n';
       }
     }

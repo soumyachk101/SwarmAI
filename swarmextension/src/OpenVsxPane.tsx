@@ -80,8 +80,8 @@ export default function OpenVsxPane({ paneId, workingDir, tabName = "Code Worksp
  }
  setSrc(`http://127.0.0.1:${port}/`);
  setStatus("running");
- } catch (e: any) {
- setError(String(e?.message || e));
+ } catch (e: unknown) {
+ setError(String(e instanceof Error ? e.message : String(e)));
  setStatus("error");
  }
  }, [paneId, bin, port, workingDir, extensionId, env]);

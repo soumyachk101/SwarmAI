@@ -46,10 +46,10 @@ export default function ToolboxPane({ paneId, onClose, onToggleMaximize, isMaxim
     try {
       setAvailable(await discoverInstalledSkills());
       setError(null);
-    } catch (e: any) {
+    } catch (e: unknown) {
       // Without this the scan failed as an unhandled rejection and the list just
       // stayed empty — indistinguishable from "you have no skills installed".
-      setError(`Couldn't scan skills: ${String(e?.message ?? e)}`);
+      setError(`Couldn't scan skills: ${String(e instanceof Error ? e.message : String(e))}`);
     } finally {
       setScanning(false);
     }
@@ -73,8 +73,8 @@ export default function ToolboxPane({ paneId, onClose, onToggleMaximize, isMaxim
       await fn();
       const trees = 1 + (swarm.worktrees?.length ?? 0);
       setStatus(`${label} · applied to ${trees} tree${trees === 1 ? "" : "s"}`);
-    } catch (e: any) {
-      setError(String(e?.message ?? e));
+    } catch (e: unknown) {
+      setError(String(e instanceof Error ? e.message : String(e)));
     } finally {
       setBusy(false);
     }
@@ -98,10 +98,10 @@ export default function ToolboxPane({ paneId, onClose, onToggleMaximize, isMaxim
         return;
       }
       run(`Added ${skill.name}`, () => setSkills(swarm!.id, [...toolbox.skills, skill]));
-    } catch (e: any) {
+    } catch (e: unknown) {
       // An unreadable folder threw past the button handler as an unhandled
       // rejection: the picker closed and the pane looked like it did nothing.
-      setError(String(e?.message ?? e));
+      setError(String(e instanceof Error ? e.message : String(e)));
     }
   };
 

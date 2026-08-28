@@ -154,7 +154,7 @@ export async function verifyTaskWorktree(
       passed: true,
       output: status ? `Branch ${status.branch}: ${status.changed} changed files` : "Verified",
     };
-  } catch (e: any) {
+  } catch (e: unknown) {
     return { passed: false, output: String(e) };
   }
 }

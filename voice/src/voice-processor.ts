@@ -12,7 +12,7 @@ import { AudioRecorderStub } from './recorder/index.js';
 import { createCleanupService, NoopCleanupService } from './cleanup/index.js';
 import type { CleanupService } from './cleanup/index.js';
 
-type EventHandler = (...args: any[]) => void;
+type EventHandler = (...args: unknown[]) => void;
 
 export class Voice {
   private engine: STTEngine;

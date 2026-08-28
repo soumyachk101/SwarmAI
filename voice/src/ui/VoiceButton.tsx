@@ -49,8 +49,8 @@ export default function VoiceButton({ onTranscript }: { onTranscript: (text: str
       const s = await whisperInstall(MODEL);
       setState(isVoiceReady(s) ? "idle" : "needs-install");
       if (!isVoiceReady(s)) setError("Install finished but voice still isn't ready.");
-    } catch (e: any) {
-      setError(String(e?.message ?? e));
+    } catch (e: unknown) {
+      setError(String(e instanceof Error ? e.message : String(e)));
       setState("needs-install");
     }
   };
@@ -61,8 +61,9 @@ export default function VoiceButton({ onTranscript }: { onTranscript: (text: str
       voice();
       await recRef.current!.startRecording();
       setState("recording");
-    } catch (e: any) {
-      setError(String(e?.message ?? e).includes("Permission") ? "Microphone permission denied." : String(e?.message ?? e));
+    } catch (e: unknown) {
+      const msg = String(e instanceof Error ? e.message : String(e));
+ setError(msg.includes("Permission") ? "Microphone permission denied." : msg);
     }
   };
 
@@ -73,8 +74,8 @@ export default function VoiceButton({ onTranscript }: { onTranscript: (text: str
       const text = cleanTranscript(await voice().voiceCommandTranscribe(path));
       if (text) onTranscript(text);
       else setError("Didn't catch that — try again.");
-    } catch (e: any) {
-      setError(String(e?.message ?? e));
+    } catch (e: unknown) {
+      setError(String(e instanceof Error ? e.message : String(e)));
     } finally {
       setState("idle");
     }

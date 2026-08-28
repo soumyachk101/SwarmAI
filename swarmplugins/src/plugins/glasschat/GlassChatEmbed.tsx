@@ -178,7 +178,7 @@ export function GlassChatEmbed({
       }
     } catch (e: any) {
       console.error("GlassChat Partner Mode Initialization Error:", e);
-      setError(String(e?.message || e));
+      setError(String(e instanceof Error ? e.message : String(e)));
     } finally {
       setLoading(false);
     }
@@ -223,7 +223,7 @@ export function GlassChatEmbed({
       };
     } catch (e: any) {
       console.error("GlassChat Partner Mount Error:", e);
-      setError(String(e?.message || e));
+      setError(String(e instanceof Error ? e.message : String(e)));
     }
   }, [scriptLoaded, configuredAppId, configuredToken, baseUrl, effectiveLayout, themeName, isConfiguring, loading, viewMode]);
 

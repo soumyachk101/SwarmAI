@@ -206,6 +206,35 @@ select:focus {
   outline: none;
 }
 
+
+/* Accessibility: keyboard focus ring for all interactive elements. */
+*:focus-visible {
+ outline: 2px solid #60a5fa;
+ outline-offset: 2px;
+}
+
+*:focus:not(:focus-visible) {
+ outline: none;
+}
+
+/* Skip-nav link: visually hidden off-screen until it receives focus. */
+.skip-nav-link {
+ position: absolute;
+ top: -40px;
+ left: 0;
+ background: #000;
+ color: #fff;
+ padding: 8px;
+ z-index: 100;
+ font-size: 0.875rem;
+ text-decoration: none;
+ border-radius: 0 0 4px 0;
+}
+
+.skip-nav-link:focus {
+ top: 0;
+}
+
 @layer components {
   /*
    * THE ELEVATION LADDER
