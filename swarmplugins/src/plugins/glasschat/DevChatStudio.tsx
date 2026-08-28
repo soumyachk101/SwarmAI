@@ -27,9 +27,12 @@ import {
   MicOff,
   BrainCircuit,
   Loader2,
-  Volume2,
   X,
   Radio,
+  RotateCw,
+  ArrowLeftRight,
+  Eraser,
+  Crown,
   type LucideIcon,
 } from "lucide-react";
 import type { SwarmPluginProps } from "../../types";
@@ -354,6 +357,8 @@ function generateSmartAssistantResponse(query: string, modelName: string): { rep
 export interface DevChatStudioProps extends SwarmPluginProps {
   isExpanded?: boolean;
   onToggleExpand?: () => void;
+  onClose?: () => void;
+  onAddAgent?: () => void;
   onSwitchToGlassChat?: () => void;
   hasGlassChatScript?: boolean;
 }
@@ -361,6 +366,8 @@ export interface DevChatStudioProps extends SwarmPluginProps {
 export function DevChatStudio({
   isExpanded = false,
   onToggleExpand,
+  onClose,
+  onAddAgent,
   projectPath,
 }: DevChatStudioProps) {
   const [sessions, setSessions] = useState<DevChatSession[]>(() => {
@@ -1363,47 +1370,116 @@ export function DevChatStudio({
           )}
         </div>
 
-        {/* Right Tools */}
-        <div className="flex items-center gap-1">
-          {/* Voice Mode Quick Button */}
-          <button
-            onClick={openVoiceStudio}
-            className="flex items-center gap-1 rounded-full bg-swarm-gold/15 border border-swarm-gold/30 px-2.5 py-1 text-micro font-medium text-swarm-gold hover:bg-swarm-gold/25 transition-all shadow-sm"
-            title="Open Interactive Voice Mode"
+        {/* Right Tools matching luxury workbench style */}
+        <div className="flex items-center gap-1.5">
+          {/* AI Crown Indicator */}
+          <div
+            className="flex size-7 items-center justify-center rounded-lg bg-swarm-gold/10 text-swarm-gold border border-swarm-gold/20"
+            title={`Lead AI: ${activeModel.name}`}
           >
-            <Radio size={12} className="animate-pulse text-swarm-gold" />
-            <span>Voice Mode</span>
+            <Crown size={14} />
+          </div>
+
+          {/* Refresh / Reset Session */}
+          <button
+            onClick={() => {
+              setSessions((prev) =>
+                prev.map((s) =>
+                  s.id === activeSessionId
+                    ? { ...s, messages: INITIAL_MESSAGES }
+                    : s
+                )
+              );
+            }}
+            className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-white/[0.06] hover:text-white transition-colors"
+            title="Reset Chat Session"
+          >
+            <RotateCw size={13} />
           </button>
 
+          {/* Swap / Switch Execution Mode */}
           <button
-            onClick={handleCreateNewSession}
-            className="flex size-7 items-center justify-center rounded-lg text-swarm-textMuted hover:bg-white/[0.06] hover:text-swarm-gold transition-colors"
-            title="New Chat Session"
+            onClick={() => setExecMode((m) => (m === "copilot" ? "cli" : "copilot"))}
+            className={`flex size-7 items-center justify-center rounded-lg transition-colors ${
+              execMode === "cli"
+                ? "bg-blue-500/20 text-blue-300 border border-blue-500/40"
+                : "text-slate-400 hover:bg-white/[0.06] hover:text-white"
+            }`}
+            title={`Mode: ${execMode === "cli" ? "CLI Execution" : "Copilot Reasoning"} (Click to Swap)`}
           >
-            <Plus size={14} />
-          </button>
-          <button
-            onClick={handleClear}
-            className="flex size-7 items-center justify-center rounded-lg text-swarm-textMuted hover:bg-white/[0.06] hover:text-swarm-err transition-colors"
-            title="Clear Current Chat"
-          >
-            <Trash2 size={13} />
+            <ArrowLeftRight size={13} />
           </button>
 
+          <span className="h-4 w-px bg-white/10 mx-0.5" />
+
+          {/* Maximize / Expand */}
           {onToggleExpand && (
             <button
               onClick={onToggleExpand}
-              className="flex size-7 items-center justify-center rounded-lg text-swarm-textMuted hover:bg-white/[0.06] hover:text-swarm-text transition-colors"
+              className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-white/[0.06] hover:text-white transition-colors"
               title={isExpanded ? "Restore View" : "Maximize View"}
             >
               {isExpanded ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
             </button>
           )}
+
+          {/* Copy Full Transcript */}
+          <button
+            onClick={() => {
+              const fullTranscript = messages
+                .map((m) => `${m.sender === "user" ? "User" : "Assistant"}: ${m.text}`)
+                .join("\n\n");
+              navigator.clipboard.writeText(fullTranscript);
+              setCopiedBlockId("all");
+              setTimeout(() => setCopiedBlockId(null), 1500);
+            }}
+            className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-white/[0.06] hover:text-white transition-colors"
+            title={copiedBlockId === "all" ? "Copied!" : "Copy Full Transcript"}
+          >
+            {copiedBlockId === "all" ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
+          </button>
+
+          {/* Eraser / Clear Chat */}
+          <button
+            onClick={handleClear}
+            className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-white/[0.06] hover:text-amber-300 transition-colors"
+            title="Clear Chat Messages"
+          >
+            <Eraser size={13} />
+          </button>
+
+          {/* Delete Screen from Board (Trash2) */}
+          <button
+            onClick={onClose ? onClose : (e) => handleDeleteSession(activeSessionId, e)}
+            className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-red-500/20 hover:text-red-400 transition-colors cursor-pointer"
+            title="Delete this screen from Board"
+          >
+            <Trash2 size={13} />
+          </button>
+
+          <span className="h-4 w-px bg-white/10 mx-0.5" />
+
+          {/* Add Agent Button */}
+          {onAddAgent && (
+            <button
+              onClick={onAddAgent}
+              className="flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 hover:text-amber-200 transition-colors"
+              title="Add new Agent CLI or Terminal"
+            >
+              <Plus size={13} />
+              <span>Add Agent</span>
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Messages Stream */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-5 scrollbar-sleek">
+      {/* Messages Stream with explicit onWheel stopPropagation to prevent parent scroll trapping */}
+      <div
+        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 space-y-5 scrollbar-sleek"
+        onWheel={(e) => {
+          e.stopPropagation();
+        }}
+      >
         {messages.map((msg) => {
           const isUser = msg.sender === "user";
           const isThoughtExpanded = expandedThoughtIds[msg.id] ?? false;

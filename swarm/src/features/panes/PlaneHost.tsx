@@ -132,6 +132,11 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
   const [focusedPane, setFocusedPane] = useState<string | null>(null);
   const [appMode, setAppMode] = useState<"agent" | "code" | "chat">("agent");
 
+  // When switching workspace or folder, always return to the active agent board
+  useEffect(() => {
+    setAppMode("agent");
+  }, [activeWorkspaceId, workingDir]);
+
   // The plane body's shape, for the Auto layout. Bucketed, not measured in
   // pixels: a window drag fires ResizeObserver on every frame and each state
   // write re-renders every pane on the board, so only a change that would
@@ -434,35 +439,14 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
 
     if (swarm.kind === "devchat" || swarm.cli === "devchat")
       return (
-        <div className="flex h-full w-full flex-col overflow-hidden bg-swarm-canvas">
-          <div className="flex h-8 shrink-0 items-center justify-between border-b border-swarm-border/40 bg-swarm-surface px-2.5">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <Sparkles size={13} className="text-swarm-gold shrink-0" />
-              <span className="text-xs font-semibold text-swarm-text truncate">AI Copilot Chat</span>
-              <span className="rounded-full bg-swarm-gold/15 px-1.5 py-0.2 text-[10px] font-medium text-swarm-gold font-mono shrink-0">
-                Claude · Gemini · CLI
-              </span>
-            </div>
-            <div className="flex items-center gap-1 shrink-0">
-              <button
-                onClick={max}
-                className="rounded p-1 text-swarm-textMuted hover:text-swarm-text transition-colors"
-                title={isThisMax ? "Restore" : "Maximize"}
-              >
-                {isThisMax ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
-              </button>
-              <button
-                onClick={close}
-                className="rounded p-1 text-swarm-textMuted hover:text-swarm-err transition-colors"
-                title="Close chat pane"
-              >
-                <X size={12} />
-              </button>
-            </div>
-          </div>
-          <div className="flex-1 min-h-0 overflow-hidden">
-            <DevChatStudio projectPath={activeWorkspace?.boundProjectPath || workingDir} />
-          </div>
+        <div className="flex h-full w-full flex-col overflow-hidden bg-[#0d0f14]">
+          <DevChatStudio
+            projectPath={activeWorkspace?.boundProjectPath || workingDir}
+            onClose={close}
+            onToggleExpand={max}
+            isExpanded={isThisMax}
+            onAddAgent={() => setShowAdd(true)}
+          />
         </div>
       );
     if (swarm.kind === "emulator")
@@ -645,11 +629,9 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
   // Chips for the Board strip — one per open component.
   const stripItems: StripItem[] = items.map((b) => ({
     id: b.id,
-    name: b.customName || b.cliName,
+    name: b.customName || b.cliName || b.cli,
     kind: b.kind ?? "agent",
-    accent: themeForKind(b.kind).accent,
   }));
-
   const handleFlowDispatch = async ({
     prompt,
     mode,
@@ -697,63 +679,6 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
     status: agentStatuses[swarm.id] || "idle",
   }));
 
-  if (appMode === "chat") {
-    return (
-      <div
-        ref={rootRef}
-        className="flex-1 flex flex-col glass-inset relative min-w-0 font-sans antialiased bg-[#0d0f17]"
-      >
-        <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.08] bg-[#12141c]/90 shrink-0">
-          <div className="flex items-center gap-2 text-xs text-slate-300">
-            <Sparkles className="size-4 text-amber-400" />
-            <span className="font-semibold text-white">AI Copilot Chat</span>
-            <span className="text-slate-500 font-mono text-[11px] truncate max-w-xs">{activeWorkspace?.boundProjectPath || workingDir}</span>
-          </div>
-          <div className="flex items-center rounded-xl bg-[#161926] p-0.5 border border-white/[0.08]">
-            <button onClick={() => setAppMode("agent")} className="px-3 py-1 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-colors">Agent</button>
-            <button onClick={() => setAppMode("code")} className="px-3 py-1 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-colors">Code</button>
-            <button onClick={() => setAppMode("chat")} className="px-3 py-1 text-xs font-semibold rounded-lg bg-[#252a3d] text-white border border-white/[0.12] shadow-sm">Chat</button>
-          </div>
-        </div>
-        <div className="flex-1 min-h-0 overflow-hidden">
-          <DevChatStudio projectPath={activeWorkspace?.boundProjectPath || workingDir} />
-        </div>
-      </div>
-    );
-  }
-
-  if (appMode === "code") {
-    return (
-      <div
-        ref={rootRef}
-        className="flex-1 flex flex-col glass-inset relative min-w-0 font-sans antialiased bg-[#0d0f17]"
-      >
-        <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.08] bg-[#12141c]/90 shrink-0">
-          <div className="flex items-center gap-2 text-xs text-slate-300">
-            <Blocks className="size-4 text-blue-400" />
-            <span className="font-semibold text-white">Code & Diffs</span>
-            <span className="text-slate-500 font-mono text-[11px] truncate max-w-xs">{activeWorkspace?.boundProjectPath || workingDir}</span>
-          </div>
-          <div className="flex items-center rounded-xl bg-[#161926] p-0.5 border border-white/[0.08]">
-            <button onClick={() => setAppMode("agent")} className="px-3 py-1 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-colors">Agent</button>
-            <button onClick={() => setAppMode("code")} className="px-3 py-1 text-xs font-semibold rounded-lg bg-[#252a3d] text-white border border-white/[0.12] shadow-sm">Code</button>
-            <button onClick={() => setAppMode("chat")} className="px-3 py-1 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-colors">Chat</button>
-          </div>
-        </div>
-        <div className="flex-1 min-h-0 overflow-hidden p-3">
-          <OpenVsxPane
-            paneId="code-main"
-            workingDir={workingDir}
-            tabName="Code Workspace"
-            onClose={() => setAppMode("agent")}
-            onToggleMaximize={() => {}}
-            isMaximized={false}
-          />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div
       ref={rootRef}
@@ -778,8 +703,6 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
             activeId={focusedPane}
             showLogo={fullscreen}
             onSelect={(id) => {
-              // Only scroll to + highlight the pane — do NOT move the Focus
-              // spotlight. Spotlight changes exclusively via drag-swap.
               setFocusedPane(id);
               rootRef.current?.querySelector(`[data-pane-id="${id}"]`)?.scrollIntoView({ block: "nearest" });
             }}
@@ -930,10 +853,10 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
             agentsMeta={flowAgentsMeta}
             onDispatch={handleFlowDispatch}
             onZoomSettled={refitTerminals}
-            emptyState={<PlaneEmpty plane={plane} onAdd={() => setShowAdd(true)} activeMode={appMode} onModeChange={setAppMode} />}
+            emptyState={<PlaneEmpty plane={plane} onAdd={() => setShowAdd(true)} onAddChat={addChatPane} onAddCode={addOpenVsx} />}
           />
         ) : count === 0 ? (
-          <PlaneEmpty plane={plane} onAdd={() => setShowAdd(true)} activeMode={appMode} onModeChange={setAppMode} />
+          <PlaneEmpty plane={plane} onAdd={() => setShowAdd(true)} onAddChat={addChatPane} onAddCode={addOpenVsx} />
         ) : (
           <div className="grid gap-2" style={gridStyle}>
             {items.map((swarm) => {
@@ -1199,20 +1122,23 @@ function MenuItem({ onClick, title, subtitle, icon: Icon = Plus, iconNode }: { o
 function PlaneEmpty({
   plane,
   onAdd,
-  activeMode,
-  onModeChange,
+  onAddChat,
+  onAddCode,
 }: {
   plane: PlaneDef;
   onAdd: () => void;
-  activeMode?: "agent" | "code" | "chat";
-  onModeChange?: (m: "agent" | "code" | "chat") => void;
+  onAddChat?: () => void;
+  onAddCode?: () => void;
 }) {
   if (plane.kind === "board") {
     return (
       <SessionLauncher
         onLaunched={onAdd}
-        activeMode={activeMode}
-        onModeChange={onModeChange}
+        onModeChange={(m) => {
+          if (m === "chat") onAddChat?.();
+          else if (m === "code") onAddCode?.();
+          else onAdd();
+        }}
       />
     );
   }
