@@ -169,7 +169,15 @@ export function createDynamicModel(flag: string, cliId: string): AvailableModel 
     provider = "moonshot";
   }
 
-  const is1M = /^(gemini-2\.5|gemini-2\.0|claude-3\.5-sonnet|claude-3\.5-haiku|claude-fable|gpt-4o|o1|o3)/i.test(lower)
+  const ONE_M_TOKEN_PREFIXES = [
+ 'claude-3-5-sonnet', 'claude-3-5-haiku', 'claude-3-opus',
+ 'claude-sonnet-4', 'claude-opus-4', 'claude-fable-5',
+ 'gpt-4o', 'gpt-4-turbo', 'gpt-4-1106', 'gpt-4-0125',
+ 'o1', 'o1-mini', 'o3', 'o3-mini',
+ 'gemini-2.5', 'gemini-2.0',
+ 'deepseek-r1',
+ ];
+ const is1M = ONE_M_TOKEN_PREFIXES.some(p => lower.startsWith(p))
  || lower.includes('128k') || lower.includes('200k') || lower.includes('1m');
   const isFree = lower.includes(":free") || lower.includes("free") || lower.includes("zen") || lower.startsWith("opencode/");
 

@@ -1,0 +1,1 @@
+{"agentManagement": {"lifecycleGaps": ["test"], "processManagementIssues": ["test"], "securityConcerns": ["test"]}, "adapters": {"inconsistent": ["test"], "missing": ["test"]}, "spawnGuard": {"bypassable": true, "issues": ["test"]}, "recommendations": ["test"]}

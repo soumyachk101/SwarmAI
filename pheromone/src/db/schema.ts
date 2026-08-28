@@ -55,6 +55,13 @@ export function initializeSchema(db: initSqlJs.Database): void {
  )
  `);
 
+ // Generated column for vector search performance — stores the byte-length
+ // of the embedding blob as an indexable proxy, enabling LIMIT push-down
+ // in vector queries instead of full-table scans in JS.
+ db.run(`
+ ALTER TABLE chunks ADD COLUMN embedding_norm REAL GENERATED ALWAYS AS (length(embedding)) STORED
+ `);
+
  // FTS4 virtual table for keyword search (sql.js compatible — the bundled
  // sql.js build has NO fts5 module, only fts4). SearchEngine also creates a
  // chunks_fts4 mirror for databases that were created by the Rust backend
@@ -89,6 +96,7 @@ export function initializeSchema(db: initSqlJs.Database): void {
  db.run(`
  CREATE INDEX IF NOT EXISTS idx_chunks_source_file ON chunks(source_file);
  CREATE INDEX IF NOT EXISTS idx_chunks_embedding ON chunks(embedding) WHERE embedding IS NOT NULL;
+ CREATE INDEX IF NOT EXISTS idx_chunks_embedding_norm ON chunks(embedding_norm);
  CREATE INDEX IF NOT EXISTS idx_memory_files_type ON memory_files(type);
  `);
 }
