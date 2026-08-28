@@ -3768,7 +3768,11 @@ async fn start_openvsx(
 
 	if let Some(ref wd) = working_dir {
 		cmd.current_dir(wd);
-		cmd.arg("--folder").arg(wd.clone());
+		if server.backend == EditorBackend::CodeServeWeb {
+			cmd.arg("--default-folder").arg(wd.clone());
+		} else {
+			cmd.arg("--folder").arg(wd.clone());
+		}
 	}
 
     // Agent extensions spawn their own MCP servers as children of this process,
