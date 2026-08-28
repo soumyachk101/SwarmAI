@@ -412,10 +412,15 @@ select:focus {
     height: 5px;
   }
 
-  /* Hairline horizontal scrollbar — for the tab strip */
+  /* Hairline horizontal scrollbar / hidden for tab strips */
+  .scrollbar-hair {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
   .scrollbar-hair::-webkit-scrollbar {
-    width: 3px;
-    height: 3px;
+    display: none;
+    width: 0px;
+    height: 0px;
   }
 }
 

@@ -49,6 +49,7 @@ import UserGuideModal from "@/features/help/UserGuideModal";
 import SwarmDashboardModal from "@/features/dashboard/SwarmDashboardModal";
 import DiffPreviewModal from "@/features/diff/DiffPreviewModal";
 import TaskTemplatesModal from "@/features/templates/TaskTemplatesModal";
+import MacWindowControls from "@/shared/MacWindowControls";
 import { BookOpen, Activity, FileDiff, Layers } from "lucide-react";
 
 
@@ -291,14 +292,22 @@ export default function HomePage() {
     }
   };
 
+  const isMac = typeof navigator !== "undefined" && (/Mac|iPod|iPhone|iPad/.test(navigator.userAgent) || navigator.platform?.includes("Mac"));
+
   /**
-   * The window's top-left corner, rendered inside the sidebar. Four small
-   * controls: the mark, the overflow menu, and the two panel toggles. Anything
-   * with a dialog or a panel behind it goes in the menu, so this row stays the
-   * same width no matter how many features the app grows.
+   * The window's top-left corner, rendered inside the sidebar.
    */
   const appRow = (
     <>
+      {isMac && (
+        <MacWindowControls
+          onClose={handleClose}
+          onMinimize={handleMinimize}
+          onMaximize={handleMaximize}
+          isMaximized={isMaximized}
+          className="pl-0 pr-2.5"
+        />
+      )}
       <SwarmLogo size={18} className="shrink-0" />
       <OverflowMenu
         items={[
@@ -471,28 +480,32 @@ export default function HomePage() {
           >
             <PanelRight size={15} />
           </button>
-          <div className="w-px h-4 bg-swarm-border/40 mx-0.5" />
-          <button
-            onClick={handleMinimize}
-            className="p-1.5 rounded-md hover:bg-swarm-border/60 text-swarm-textMuted hover:text-swarm-text transition-colors"
-            title="Minimize"
-          >
-            <Minus size={14} />
-          </button>
-          <button
-            onClick={handleMaximize}
-            className="p-1.5 rounded-md hover:bg-swarm-border/60 text-swarm-textMuted hover:text-swarm-text transition-colors"
-            title={isMaximized ? "Restore" : "Maximize"}
-          >
-            {isMaximized ? <Copy size={14} /> : <Square size={14} />}
-          </button>
-          <button
-            onClick={handleClose}
-            className="p-1.5 rounded-md hover:bg-swarm-err/80 text-swarm-textMuted hover:text-white transition-colors"
-            title="Close"
-          >
-            <X size={14} />
-          </button>
+          {!isMac && (
+            <>
+              <div className="w-px h-4 bg-swarm-border/40 mx-0.5" />
+              <button
+                onClick={handleMinimize}
+                className="p-1.5 rounded-md hover:bg-swarm-border/60 text-swarm-textMuted hover:text-swarm-text transition-colors"
+                title="Minimize"
+              >
+                <Minus size={14} />
+              </button>
+              <button
+                onClick={handleMaximize}
+                className="p-1.5 rounded-md hover:bg-swarm-border/60 text-swarm-textMuted hover:text-swarm-text transition-colors"
+                title={isMaximized ? "Restore" : "Maximize"}
+              >
+                {isMaximized ? <Copy size={14} /> : <Square size={14} />}
+              </button>
+              <button
+                onClick={handleClose}
+                className="p-1.5 rounded-md hover:bg-swarm-err/80 text-swarm-textMuted hover:text-white transition-colors"
+                title="Close"
+              >
+                <X size={14} />
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -530,37 +543,20 @@ export default function HomePage() {
 
         {/* Main grid area — min-w-0 allows flex to shrink below children's intrinsic width when sidebars are docked */}
         <div className="flex-1 flex flex-col overflow-hidden relative min-w-0">
-          {workspaces.length === 0 ? (
-            /* Nothing is open yet. No placeholder swarm, no empty grid — just the
-               one action that starts everything. */
-            <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
-              <SwarmLogo size={44} />
-              <div className="space-y-1">
-                {/* "a agent" was a bad find-and-replace from the rebrand: the
-                    thing a folder opens is a workspace, which is what the
-                    sidebar calls it too. */}
-                <p className="text-sm font-semibold text-swarm-text">No workspace open</p>
-                <p className="max-w-[42ch] text-xs leading-relaxed text-swarm-textMuted">
-                  Open a project folder to start a workspace. It keeps its own agents,
-                  branches, board and memory, and remembers them next time.
-                </p>
-              </div>
-              <button
-                onClick={handleOpenFolder}
-                className="flex items-center gap-1.5 rounded-lg border border-swarm-gold/30 bg-swarm-gold/15 px-3.5 py-1.5 text-xs font-medium text-swarm-goldHi transition-colors hover:bg-swarm-gold/25"
-              >
-                <FolderOpen size={14} />
-                Open Project
-              </button>
-            </div>
-          ) : (
-            <PlaneHost
-              workingDir={projectPath}
-              // The app controls live in the sidebar. The strip only needs a
-              // way back when that sidebar is collapsed; in fullscreen it
-              // shows the mark alone (BoardStrip's showLogo).
-              leading={
-                leftOpen ? undefined : (
+          <PlaneHost
+            workingDir={projectPath || "~/Desktop/bridgemind"}
+            leading={
+              leftOpen ? undefined : (
+                <div className="flex items-center gap-1">
+                  {isMac && (
+                    <MacWindowControls
+                      onClose={handleClose}
+                      onMinimize={handleMinimize}
+                      onMaximize={handleMaximize}
+                      isMaximized={isMaximized}
+                      className="pl-0 pr-1.5"
+                    />
+                  )}
                   <button
                     onClick={() => toggleLeft()}
                     className="shrink-0 rounded-md p-1 text-swarm-textMuted transition-colors hover:bg-swarm-border/50 hover:text-swarm-text"
@@ -568,17 +564,11 @@ export default function HomePage() {
                   >
                     <PanelLeft size={15} />
                   </button>
-                )
-              }
-              // Only the centre column runs under the floating controls; the
-              // dock covers whatever part of that corner it occupies. Measured
-              // rather than "0 when the dock is open": folded to its icon rail
-              // the dock is 44px wide and the strip's `+` went back under the
-              // controls. A fullscreen plane unmounts the dock, which drops its
-              // width to 0 and reserves the full cluster again.
-              reserveRight={Math.max(0, windowControlsWidth - (dockVisible ? dockWidth : 0))}
-            />
-          )}
+                </div>
+              )
+            }
+            reserveRight={leftOpen && leftTakesSpace ? windowControlsWidth : windowControlsWidth + dockWidth}
+          />
           {/* Tasks is docked to the center, outside the plane, so switching
               planes never moves it. A fullscreen plane covers it — the plane's
               floating Tasks widget takes over there. */}

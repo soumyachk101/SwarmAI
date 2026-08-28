@@ -1462,7 +1462,7 @@ export default function AgentPane({
     >
       {/* Neutral chrome — class identity is the leading accent dot only. */}
       <div data-pane-drag data-pane-header="true" className={`${PANE_HEADER_CLASS} justify-between`}>
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
           {isEditing && onEditChange ? (
             <input
               type="text"
@@ -1481,15 +1481,9 @@ export default function AgentPane({
             <span
               onDoubleClick={onRename}
               title={displayName}
-              className={`flex items-center gap-1.5 text-xs font-medium cursor-pointer hover:text-swarm-goldHi transition-colors truncate ${PANE_TITLE_CLASS}`}
+              className={`flex items-center gap-2 text-xs font-medium cursor-pointer hover:text-swarm-goldHi transition-colors min-w-0 flex-1 ${PANE_TITLE_CLASS}`}
             >
-              {/* The dot means CLI agent, always — it is the one place a pane
-                  states its class, so status must never repaint it. Starting
-                  pulses; a failed spawn keeps the class colour and takes a red
-                  halo instead. Shown at every width for the same reason.
-                  `notFound` is a failed spawn too: it used to render as a
-                  perfectly healthy dot, so a grid of panes hid the one whose
-                  CLI isn't installed. */}
+              {/* The dot means CLI agent, always */}
               <span
                 className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
                   spawnState === "connecting" ? "animate-pulse" : ""
@@ -1511,14 +1505,17 @@ export default function AgentPane({
               {agent.role && (
                 <RoleBadge role={agent.role} branchName={agent.branchName} />
               )}
-              <span className="truncate max-w-[130px]" title={displayName}>{displayName}</span>
+              <span className="truncate shrink font-semibold min-w-0" title={displayName}>{displayName}</span>
               {/* What this swarm is running — dynamically displays selected model & effort */}
-              {(currentModel || currentEffort) && paneWidth >= 330 && (
+              {(currentModel || currentEffort) && paneWidth >= 380 && (
                 <span
                   className="shrink-0 rounded-md border border-white/[0.12] bg-white/[0.06] px-1.5 py-0.5 text-[9px] font-mono text-zinc-300 font-medium shadow-xs"
                   title={`Running ${currentModel}${currentEffort ? ` at ${currentEffort} effort` : ""}`}
                 >
-                  {[currentModel.replace(" (1M Context)", " 1M").replace(" (1M)", " 1M"), currentEffort].filter(Boolean).join(" · ")}
+                  {paneWidth >= 460
+                    ? [currentModel.replace(" (1M Context)", " 1M").replace(" (1M)", " 1M"), currentEffort].filter(Boolean).join(" · ")
+                    : currentModel.replace(" (1M Context)", " 1M").replace(" (1M)", " 1M")
+                  }
                 </span>
               )}
             </span>
@@ -1731,7 +1728,7 @@ export default function AgentPane({
  }}
  />
  <div className="p-2.5 pt-3">
- <div className="relative rounded-2xl border border-white/[0.08] bg-[#0c0e14]/[0.97] backdrop-blur-2xl shadow-2xl shadow-black/50 transition-all duration-200 focus-within:border-white/[0.18] focus-within:shadow-black/60 flex items-center gap-2.5">
+ <div className="relative rounded-2xl border border-white/[0.08] bg-[#0c0e14]/[0.97] backdrop-blur-2xl shadow-2xl shadow-black/50 transition-all duration-200 focus-within:border-white/[0.18] focus-within:shadow-black/60 flex items-center gap-2.5 px-3.5 py-2.5">
  {/* Subtle inner sheen */}
  <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
               {/* Left Column: Input + Bottom Controls */}

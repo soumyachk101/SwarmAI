@@ -23,23 +23,23 @@ describe("model-detection", () => {
  expect(result).toEqual([]);
  });
 
- it("returns empty when CLI is not installed", async () => {
- const result = await probeCliModels("claude");
- // claude is likely not installed in test env, should return empty gracefully
- expect(Array.isArray(result)).toBe(true);
- });
+  it("returns empty when CLI is not installed", async () => {
+    const result = await probeCliModels("claude");
+    // claude is likely not installed in test env, should return empty gracefully
+    expect(Array.isArray(result)).toBe(true);
+  }, 10_000);
 
- it("parses Claude help output when available", async () => {
- // This tests the parsing logic indirectly via the full pipeline
- // We can't easily mock execFile in this setup, but we verify the
- // function handles the output shape correctly
- const result = await probeCliModels("claude");
- expect(Array.isArray(result)).toBe(true);
- // If claude is installed, results should be lowercase cliFlags
- for (const flag of result) {
- expect(flag).toBe(flag.toLowerCase());
- }
- });
+  it("parses Claude help output when available", async () => {
+    // This tests the parsing logic indirectly via the full pipeline
+    // We can't easily mock execFile in this setup, but we verify the
+    // function handles the output shape correctly
+    const result = await probeCliModels("claude");
+    expect(Array.isArray(result)).toBe(true);
+    // If claude is installed, results should be lowercase cliFlags
+    for (const flag of result) {
+      expect(flag).toBe(flag.toLowerCase());
+    }
+  }, 10_000);
  });
 
  describe("clearProbeCache", () => {

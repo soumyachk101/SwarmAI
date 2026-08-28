@@ -25,8 +25,8 @@ export async function ensureMCPConfigForCLI(
   try {
     mcpServerPath = await invoke<string>("get_pheromone_mcp_path");
   } catch (e) {
-    console.error(`[Pheromone] get_pheromone_mcp_path failed — cannot register MCP for ${cli}:`, e);
-    throw e;
+    console.warn(`[Pheromone] get_pheromone_mcp_path unavailable — falling back to stdin bridge for ${cli}:`, e);
+    return "stdin-fallback";
   }
   console.log(`[Pheromone] MCP server.js -> ${mcpServerPath} (cli=${cli}, project=${projectPath})`);
   const action = buildCliConfig(cli, { mcpServerPath, projectPath }, {

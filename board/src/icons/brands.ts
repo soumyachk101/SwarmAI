@@ -38,6 +38,18 @@ const vec = (i: { path: string; hex: string; title: string }): Brand => ({
  * the shared UI kit and must not depend on Agents (Agents depends on
  * Board, so the arrow only points one way).
  */
+const GEMINI_PATH =
+  "M12 0C12 6.627 6.627 12 0 12c6.627 0 12 5.627 12 12 0-6.627 5.627-12 12-12-6.627 0-12-5.627-12-12z";
+
+const DEEPSEEK_PATH =
+  "M12 2C6.48 2 2 6.48 2 12c0 2.85 1.2 5.42 3.12 7.24.16.15.39.22.61.18.22-.04.41-.18.49-.39.18-.46.33-1.04.42-1.63.09-.59.13-1.18.13-1.65 0-2.21 1.79-4 4-4h2.5c1.93 0 3.5-1.57 3.5-3.5S14.68 4.5 12.75 4.5c-1.24 0-2.25 1.01-2.25 2.25 0 .41-.34.75-.75.75s-.75-.34-.75-.75C9 4.9 10.68 3.5 12.75 3.5c2.62 0 4.75 2.13 4.75 4.75 0 2.48-1.91 4.5-4.35 4.73C12.77 13.06 12.4 13.5 12 14c-.66.83-1.5 2.05-1.5 3.5 0 .61-.06 1.28-.18 1.95 1.54.36 3.16.55 4.83.55 5.52 0 10-4.48 10-10S17.52 2 12 2z";
+
+const GROK_PATH =
+  "M2.5 3h4.2l5.3 7.8L17.3 3h4.2l-7.4 10.9L22 21h-4.2l-5.7-8.4L6.1 21H1.9l7.7-11.3L2.5 3z";
+
+const DROID_PATH =
+  "M12 2a3 3 0 0 0-3 3v1.1a8.003 8.003 0 0 0-5.9 7.7 8 8 0 0 0 16 0 8.003 8.003 0 0 0-6.1-7.7V5a3 3 0 0 0-3-3zm-5 11a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm10 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm-9 6h8a1 1 0 0 1 0 2H8a1 1 0 0 1 0-2z";
+
 export const CLI_BRANDS: Record<string, Brand> = {
   "claude-code": vec(siClaude),
   "codex-cli": { kind: "vector", path: OPENAI_PATH, hex: "#FFFFFF", title: "OpenAI Codex" },
@@ -45,6 +57,10 @@ export const CLI_BRANDS: Record<string, Brand> = {
   "kimi-code": vec(siKimi),
   cline: vec(siCline),
   cursor: vec(siCursor),
+  "gemini-cli": { kind: "vector", path: GEMINI_PATH, hex: "#4E82EE", title: "Gemini CLI" },
+  droid: { kind: "vector", path: DROID_PATH, hex: "#10B981", title: "Droid" },
+  "deepseek-harness": { kind: "vector", path: DEEPSEEK_PATH, hex: "#4D6BFE", title: "DeepSeek Harness" },
+  "grok-build": { kind: "vector", path: GROK_PATH, hex: "#FFFFFF", title: "Grok Build" },
   "antigravity-cli": { kind: "raster", asset: "antigravity", title: "Antigravity" },
   kiro: { kind: "raster", asset: "kiro", title: "Kiro" },
   kilo: { kind: "raster", asset: "kilo", title: "Kilo" },
@@ -68,3 +84,4 @@ export function cliBrand(id: string | undefined | null): Brand | undefined {
 export function shellBrand(id: string | undefined | null): Brand | undefined {
   return id ? SHELL_BRANDS[id] : undefined;
 }
+

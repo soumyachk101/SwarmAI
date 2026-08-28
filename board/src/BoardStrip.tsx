@@ -79,67 +79,52 @@ export default function BoardStrip({
       {viewToggle && <span className="h-5 w-px shrink-0 bg-swarm-border/60" />}
 
       {items.length > 0 && (
-      <div className="flex min-w-0 shrink items-center gap-1.5 overflow-x-auto scrollbar-hair">
-      {items.map((it) => {
-        const t = themeForKind(it.kind);
-        const active = activeId === it.id;
-        return (
-          <div
-            key={it.id}
-            ref={active ? activeRef : undefined}
-            onClick={() => onSelect(it.id)}
-            // A chip can't be a <button>: it nests the close button, which is
-            // invalid HTML. activatable() restores the tab stop and Enter/Space.
-            {...activatable(() => onSelect(it.id), it.name)}
-            aria-current={active ? "true" : undefined}
-            // 26px chip, the one chip/tab height in the app. `glass` is a pane
-            // FRAME (border, rim light, drop shadow) — on a 26px chip it read as
-            // a floating card inside the toolbar. The active chip is the same
-            // surface its focused pane header lifts to instead, so a chip and
-            // its pane obviously state the same thing.
-            className={`group flex h-6.5 shrink-0 cursor-pointer select-none items-center gap-1.5 rounded-md border px-2 text-mini font-medium transition-colors ${
-              active
-                ? "border-swarm-borderHi bg-swarm-surfaceHi text-swarm-text"
-                : "border-transparent text-swarm-textDim hover:bg-swarm-border/30 hover:text-swarm-text"
-            }`}
-            title={it.name}
-          >
-            {/* Class identity = colored dot only; pane chrome stays neutral.
-                The active chip haloes its dot instead of tinting the chip:
-                glass-on-glass alone is too quiet to spot in a full strip. */}
-            <span
-              className="size-1.5 shrink-0 rounded-full"
-              style={{ background: t.accent, boxShadow: active ? `0 0 0 3px ${t.accentSoft}` : undefined }}
-              aria-hidden
-            />
-            {it.icon && <span className="shrink-0 text-swarm-textMuted">{it.icon}</span>}
-            <span className="max-w-[140px] truncate">{it.name}</span>
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onClose(it.id); }}
-              // opacity-0 alone made this unreachable by keyboard: it stayed
-              // invisible while focused, so Tab landed on a button nobody could
-              // see. focus-visible reveals it the same way hover does.
-              className="shrink-0 rounded p-0.5 opacity-0 transition-opacity hover:bg-swarm-border/60 hover:text-swarm-text group-hover:opacity-100 focus-visible:opacity-100"
-              title={`Close ${it.name}`}
-              aria-label={`Close ${it.name}`}
-            >
-              <X className="size-3" />
-            </button>
-          </div>
-        );
-      })}
-      </div>
+        <div className="flex flex-1 min-w-0 items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-0.5">
+          {items.map((it) => {
+            const t = themeForKind(it.kind);
+            const active = activeId === it.id;
+            return (
+              <div
+                key={it.id}
+                ref={active ? activeRef : undefined}
+                onClick={() => onSelect(it.id)}
+                {...activatable(() => onSelect(it.id), it.name)}
+                aria-current={active ? "true" : undefined}
+                className={`group flex h-7 shrink-0 cursor-pointer select-none items-center gap-2 rounded-lg border px-2.5 text-xs font-medium transition-all ${
+                  active
+                    ? "border-white/[0.16] bg-white/[0.08] text-white shadow-sm ring-1 ring-white/[0.06]"
+                    : "border-transparent text-slate-400 hover:bg-white/[0.04] hover:text-slate-200"
+                }`}
+                title={it.name}
+              >
+                <span
+                  className="size-1.5 shrink-0 rounded-full"
+                  style={{ background: t.accent, boxShadow: active ? `0 0 0 3px ${t.accentSoft}` : undefined }}
+                  aria-hidden
+                />
+                {it.icon && <span className="shrink-0 text-slate-400">{it.icon}</span>}
+                <span className="max-w-[160px] truncate">{it.name}</span>
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); onClose(it.id); }}
+                  className="shrink-0 rounded p-0.5 opacity-0 transition-opacity hover:bg-white/[0.1] hover:text-white group-hover:opacity-100 focus-visible:opacity-100"
+                  title={`Close ${it.name}`}
+                  aria-label={`Close ${it.name}`}
+                >
+                  <X className="size-3" />
+                </button>
+              </div>
+            );
+          })}
+        </div>
       )}
 
-      {/* + and maximize sit OUTSIDE the scroller (scrollbar spans only the tabs)
-          and in normal flow, so + trails the tabs and stops next to maximize —
-          never behind it. */}
+      {/* + and maximize sit OUTSIDE the scroller and in normal flow */}
       <button
         type="button"
         ref={addRef}
         onClick={onAdd}
-        className="flex size-6.5 shrink-0 items-center justify-center rounded-md border border-swarm-gold/30 bg-swarm-gold/10 text-swarm-goldHi transition-colors hover:bg-swarm-gold/20"
+        className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-white/[0.1] bg-white/[0.05] text-slate-300 transition-all hover:bg-white/[0.1] hover:text-white active:scale-95"
         title="Add component"
         aria-label="Add component"
       >

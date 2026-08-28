@@ -35,7 +35,7 @@ async function getExecFileAsync(): Promise<((cmd: string, args: string[], opts: 
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const PROBE_TIMEOUT = 5_000;
+const PROBE_TIMEOUT = 2_500;
 const MAX_BUFFER = 64 * 1024;
 
 // Maps CLI command name → the binary to run
