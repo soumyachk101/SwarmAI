@@ -57,31 +57,28 @@ export default function OpenVsxPane({ paneId, workingDir, tabName = "Code Worksp
  const [src, setSrc] = useState<string>("");
 
  const start = useCallback(async () => {
- setStatus("starting");
- setError(null);
- try {
- await invoke("start_openvsx", { paneId, bin: bin || null, port, workingDir: workingDir || null, extensions: extensionId ? [extensionId] : null, env: env ?? null });
- // poll readiness
- let ready = false;
- for (let i = 0; i < 60 && !ready; i++) {
- ready = await invoke<boolean>("openvsx_ready", { port }).catch(() => false);
- if (!ready) await new Promise((r) => setTimeout(r, 500));
- }
- // The loop used to fall through on timeout and point the iframe at a port
- // nothing was listening on — 30 seconds of spinner followed by a blank
- // white rectangle and no explanation. Failing here lands in the error
- // state below, which at least offers Retry and Set binary.
- if (!ready) {
- throw new Error(
- `The editor server never answered on port ${port}. It may have failed to start, or it is still unpacking extensions — Retry usually works.`,
- );
- }
- setSrc(`http://127.0.0.1:${port}/`);
- setStatus("running");
- } catch (e: any) {
- setError(String(e?.message || e));
- setStatus("error");
- }
+  setStatus("starting");
+  setError(null);
+  try {
+   await invoke("start_openvsx", { paneId, bin: bin || null, port, workingDir: workingDir || null, extensions: extensionId ? [extensionId] : null, env: env ?? null });
+   // poll readiness — VS Code serve-web may need to download the server
+   // component on first run, which can take 60-120s on slower connections.
+   let ready = false;
+   for (let i = 0; i < 240 && !ready; i++) {
+    ready = await invoke<boolean>("openvsx_ready", { port }).catch(() => false);
+    if (!ready) await new Promise((r) => setTimeout(r, 500));
+   }
+   if (!ready) {
+    throw new Error(
+     `The editor server never answered on port ${port}. It may still be downloading VS Code Server components — click Retry in a moment.`,
+    );
+   }
+   setSrc(`http://127.0.0.1:${port}/`);
+   setStatus("running");
+  } catch (e: any) {
+   setError(String(e?.message || e));
+   setStatus("error");
+  }
  }, [paneId, bin, port, workingDir, extensionId, env]);
 
  // start on mount; stop on unmount
@@ -220,10 +217,8 @@ export default function OpenVsxPane({ paneId, workingDir, tabName = "Code Worksp
  <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center text-swarm-textMuted">
  <RefreshCw className="size-5 animate-spin text-swarm-honey" />
  <span className="text-xs">Starting the editor server…</span>
- {/* A silent 30s spinner is indistinguishable from a hang. Naming the
- slow part up front stops it from reading as one. */}
- <span className="max-w-[36ch] text-micro leading-relaxed">
- First run installs extensions, which can take half a minute.
+ <span className="max-w-[40ch] text-micro leading-relaxed">
+ First run downloads VS Code Server components and installs extensions — this can take 1-2 minutes.
  </span>
  </div>
  )}
