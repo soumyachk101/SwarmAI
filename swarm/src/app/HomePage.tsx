@@ -543,7 +543,7 @@ export default function HomePage() {
         {/* Main grid area — min-w-0 allows flex to shrink below children's intrinsic width when sidebars are docked */}
         <div className="flex-1 flex flex-col overflow-hidden relative min-w-0">
           <PlaneHost
-            workingDir={projectPath || "~/Desktop/bridgemind"}
+            workingDir={projectPath || "~/Desktop/SwarmAI"}
             leading={
               leftOpen ? undefined : (
                 <div className="flex items-center gap-1">

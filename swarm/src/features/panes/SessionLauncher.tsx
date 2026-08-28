@@ -97,7 +97,7 @@ export default function SessionLauncher({
   const workspaces = useWorkspaceStore((s) => s.workspaces);
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
   const activeWorkspace = workspaces.find((w) => w.id === activeWorkspaceId);
-  const rawProjectPath = activeWorkspace?.boundProjectPath || "~/Desktop/bridgemind";
+  const rawProjectPath = activeWorkspace?.boundProjectPath || "~/Desktop/SwarmAI";
   const displayPath = rawProjectPath.replace(/^\/(Users|home)\/[^/]+/, "~");
 
   const handleLaunch = () => {
