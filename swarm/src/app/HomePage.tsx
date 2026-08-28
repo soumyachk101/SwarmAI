@@ -82,8 +82,9 @@ function useMeasuredWidth(initial = 0) {
 }
 
 export default function HomePage() {
+  const isMac = typeof navigator !== "undefined" && (/Mac|iPod|iPhone|iPad/.test(navigator.userAgent) || navigator.platform?.includes("Mac"));
   const [isMaximized, setIsMaximized] = useState(false);
-  const [windowControlsRef, windowControlsWidth] = useMeasuredWidth(142);
+  const [windowControlsRef, windowControlsWidth] = useMeasuredWidth(isMac ? 68 : 142);
   const [dockRef, dockWidth] = useMeasuredWidth();
   const [showSettings, setShowSettings] = useState(false);
   const [showUpdates, setShowUpdates] = useState(false);
@@ -291,8 +292,6 @@ export default function HomePage() {
       console.error("Failed to open folder:", e);
     }
   };
-
-  const isMac = typeof navigator !== "undefined" && (/Mac|iPod|iPhone|iPad/.test(navigator.userAgent) || navigator.platform?.includes("Mac"));
 
   /**
    * The window's top-left corner, rendered inside the sidebar.
@@ -567,7 +566,7 @@ export default function HomePage() {
                 </div>
               )
             }
-            reserveRight={leftOpen && leftTakesSpace ? windowControlsWidth : windowControlsWidth + dockWidth}
+            reserveRight={dockVisible ? 0 : windowControlsWidth}
           />
           {/* Tasks is docked to the center, outside the plane, so switching
               planes never moves it. A fullscreen plane covers it — the plane's

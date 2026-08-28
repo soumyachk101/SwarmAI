@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import {
   Globe, Smartphone,
@@ -551,19 +551,46 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
       : isAuto ? fit.rows
       : preset ? preset.rows ?? 1
       : gridLayout === "rows" ? 1
-      // Master packs every row into one screen by design (see gridStyle), so it
-      // never overflows. The other legacy layouts used to claim a screen row per
-      // pane row, and then the MIN_ROW floor pushed the surplus off-screen with
-      // no peek sliver and no "N more" pill — cap them at what actually fits.
       : isMaster ? totalRows
       : fit.rows,
   );
   const overflow = totalRows > rowsPerPage;
   const subtract = (overflow ? PEEK : 0) + GAP * (rowsPerPage - 1);
   const rowVal = `max(${MIN_ROW}px, calc((100cqh - ${subtract}px) / ${rowsPerPage}))`;
-  // How many panes sit below the visible rows — the PEEK sliver alone is easy
-  // to miss with several panes open, so surface the count next to it too.
   const hiddenCount = !overflow ? 0 : focusMode ? count - 3 : Math.max(0, count - cols * rowsPerPage);
+  const [scrollBelow, setScrollBelow] = useState(hiddenCount);
+
+  const updateScrollBelow = useCallback(() => {
+    const el = bodyRef.current;
+    if (!el) {
+      setScrollBelow(0);
+      return;
+    }
+    // Check if scrolled near the bottom
+    const scrollRemaining = el.scrollHeight - el.scrollTop - el.clientHeight;
+    if (scrollRemaining <= 16) {
+      setScrollBelow(0);
+      return;
+    }
+    const elRect = el.getBoundingClientRect();
+    const paneNodes = el.querySelectorAll<HTMLElement>("[data-pane-id]");
+    let below = 0;
+    paneNodes.forEach((node) => {
+      const r = node.getBoundingClientRect();
+      if (r.top >= elRect.bottom - 12) {
+        below++;
+      }
+    });
+    setScrollBelow(below > 0 ? below : (scrollRemaining > 30 ? hiddenCount : 0));
+  }, [hiddenCount]);
+
+  useEffect(() => {
+    const el = bodyRef.current;
+    if (!el) return;
+    updateScrollBelow();
+    el.addEventListener("scroll", updateScrollBelow, { passive: true });
+    return () => el.removeEventListener("scroll", updateScrollBelow);
+  }, [updateScrollBelow, count, gridLayout, items]);
 
   // Explicit placement, for the two layouts whose slots aren't interchangeable.
   //
@@ -974,15 +1001,20 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
           <SwarmTelemetryHUD agents={flowAgentsMeta} />
         )}
 
-        {/* Overflow hint — the PEEK sliver alone (~34px of the next row's
-            titlebar) is easy to miss with several panes open, so also call
-            out how many are below. */}
-        {!canvasView && !maximizedPane && overflow && hiddenCount > 0 && (
-          <div className="pointer-events-none sticky inset-x-0 bottom-1 z-20 flex justify-center">
-            <span className="pointer-events-none flex items-center gap-1 rounded-full border border-swarm-gold/40 glass-hi px-2 py-0.5 text-micro font-medium text-swarm-goldHi shadow-lg">
-              <ChevronDown className="size-3" />
-              {hiddenCount} more below
-            </span>
+        {/* Overflow hint — smoothly shows remaining hidden panes and hides when at bottom */}
+        {!canvasView && !maximizedPane && overflow && scrollBelow > 0 && (
+          <div className="sticky inset-x-0 bottom-1 z-20 flex justify-center">
+            <button
+              onClick={() => {
+                const el = bodyRef.current;
+                if (el) el.scrollBy({ top: 280, behavior: "smooth" });
+              }}
+              className="flex items-center gap-1.5 rounded-full border border-swarm-gold/40 glass-hi px-3 py-0.5 text-micro font-medium text-swarm-goldHi shadow-lg hover:bg-swarm-gold/20 active:scale-95 transition-all cursor-pointer pointer-events-auto"
+              title="Scroll down to see more panes"
+            >
+              <ChevronDown className="size-3 animate-bounce" />
+              {scrollBelow} more below
+            </button>
           </div>
         )}
       </div>
