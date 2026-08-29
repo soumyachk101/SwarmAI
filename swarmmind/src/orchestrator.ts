@@ -6,137 +6,147 @@ import type { WorktreeOps, WorktreeInfo } from './ports.js';
 import type { HandoffManager } from './handoffs/index.js';
 
 export interface TaskSpec {
-  id: string;
-  description: string;
-  owns: string[];
-  reads: string[];
-  dependsOn: string[];
-  role: Role;
-  cli: string;
-  missionId: string;
+ id: string;
+ description: string;
+ owns: string[];
+ reads: string[];
+ dependsOn: string[];
+ role: Role;
+ cli: string;
+ missionId: string;
 }
 
 export interface OrchestrationResult {
-  canStart: TaskSpec[];
-  blocked: Array<{ task: TaskSpec; reason: string }>;
-  conflicts: LockConflict[];
+ canStart: TaskSpec[];
+ blocked: Array<{ task: TaskSpec; reason: string }>;
+ conflicts: LockConflict[];
 }
 
 export class Orchestrator {
-  constructor(
-    private registry: AgentRegistry,
-    private locks: LockRegistry,
-    private worktree: WorktreeOps,
-    private handoffs: HandoffManager,
-    private roles: RoleManager,
-  ) {}
+ constructor(
+ private registry: AgentRegistry,
+ private locks: LockRegistry,
+ private worktree: WorktreeOps,
+ private handoffs: HandoffManager,
+ private roles: RoleManager,
+ ) {}
 
-  plan(tasks: TaskSpec[]): OrchestrationResult {
-    const canStart: TaskSpec[] = [];
-    const blocked: Array<{ task: TaskSpec; reason: string }> = [];
-    const allConflicts: LockConflict[] = [];
+ plan(tasks: TaskSpec[]): OrchestrationResult {
+ const canStart: TaskSpec[] = [];
+ const blocked: Array<{ task: TaskSpec; reason: string }> = [];
+ const allConflicts: LockConflict[] = [];
 
-    const completedTaskIds = new Set(
-      this.registry.findByStatus('merged').map(a => a.taskId)
-    );
+ const completedTaskIds = new Set(
+ this.registry.findByStatus('merged').map(a => a.taskId)
+ );
 
-    for (const task of tasks) {
-      const unresolvedDeps = task.dependsOn.filter(d => !completedTaskIds.has(d));
-      if (unresolvedDeps.length > 0) {
-        blocked.push({ task, reason: `Waiting on: ${unresolvedDeps.join(', ')}` });
-        continue;
-      }
+ for (const task of tasks) {
+ const unresolvedDeps = task.dependsOn.filter(d => !completedTaskIds.has(d));
+ if (unresolvedDeps.length > 0) {
+ blocked.push({ task, reason: `Waiting on: ${unresolvedDeps.join(', ')}` });
+ continue;
+ }
 
-      const roleDef = this.roles.getDefinition(task.role);
-      if (roleDef.needsWorktree && task.owns.length > 0) {
-        const conflicts = this.locks.acquireMany(task.owns, task.id);
-        if (conflicts.length > 0) {
-          blocked.push({
-            task,
-            reason: `File conflict on: ${conflicts.map(c => c.filePath).join(', ')} (owned by task: ${conflicts[0].existingOwner})`,
-          });
-          allConflicts.push(...conflicts);
-          continue;
-        }
-      }
+ const roleDef = this.roles.getDefinition(task.role);
+ if (roleDef.needsWorktree && task.owns.length > 0) {
+ const conflicts = this.locks.acquireMany(task.owns, task.id);
+ if (conflicts.length > 0) {
+ blocked.push({
+ task,
+ reason: `File conflict on: ${conflicts.map(c => c.filePath).join(', ')} (owned by task: ${conflicts[0].existingOwner})`,
+ });
+ allConflicts.push(...conflicts);
+ continue;
+ }
+ }
 
-      canStart.push(task);
-    }
+ canStart.push(task);
+ }
 
-    return { canStart, blocked, conflicts: allConflicts };
-  }
+ return { canStart, blocked, conflicts: allConflicts };
+ }
 
-  async dispatch(task: TaskSpec): Promise<{ agentId: string; worktree?: WorktreeInfo }> {
-    const roleDef = this.roles.getDefinition(task.role);
-    let worktree: WorktreeInfo | undefined;
+ async dispatch(task: TaskSpec): Promise<{ agentId: string; worktree?: WorktreeInfo }> {
+ const roleDef = this.roles.getDefinition(task.role);
+ let worktree: WorktreeInfo | undefined;
 
-    if (roleDef.needsWorktree) {
-      // await: WorktreeOps may be async (the desktop app goes through Tauri IPC).
-      worktree = await this.worktree.create(task.id);
-    }
+ if (roleDef.needsWorktree) {
+ // await: WorktreeOps may be async (the desktop app goes through Tauri IPC).
+ worktree = await this.worktree.create(task.id);
+ }
 
-    const agentId = `agent-${task.id}-${crypto.randomUUID().slice(0, 8)}`;
-    this.registry.register({
-      id: agentId,
-      taskId: task.id,
-      cli: task.cli,
-      role: task.role,
-      worktreePath: worktree?.path || '',
-      branchName: worktree?.branch || '',
-      paneId: '',
-      status: 'running',
-      missionId: task.missionId,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    });
+ const agentId = `agent-${task.id}-${crypto.randomUUID().slice(0, 8)}`;
+ this.registry.register({
+ id: agentId,
+ taskId: task.id,
+ cli: task.cli,
+ role: task.role,
+ worktreePath: worktree?.path || '',
+ branchName: worktree?.branch || '',
+ paneId: '',
+ status: 'running',
+ missionId: task.missionId,
+ createdAt: Date.now(),
+ updatedAt: Date.now(),
+ });
 
-    await this.handoffs.write(task.id, {
-      taskId: task.id,
-      role: task.role,
-      status: 'running',
-      worktreePath: worktree?.path,
-      branchName: worktree?.branch,
-      filesTouched: task.owns,
-      summary: task.description,
-      blocking: [],
-      dependsOn: task.dependsOn,
-    });
+ await this.handoffs.write(task.id, {
+ taskId: task.id,
+ role: task.role,
+ status: 'running',
+ worktreePath: worktree?.path,
+ branchName: worktree?.branch,
+ filesTouched: task.owns,
+ summary: task.description,
+ blocking: [],
+ dependsOn: task.dependsOn,
+ });
 
-    return { agentId, worktree };
-  }
+ return { agentId, worktree };
+ }
 
-  async complete(agentId: string): Promise<void> {
-    const agent = this.registry.get(agentId);
-    if (!agent) return;
+ async complete(agentId: string): Promise<void> {
+ const agent = this.registry.get(agentId);
+ if (!agent) return;
 
-    this.registry.updateStatus(agentId, 'awaiting-review');
-    await this.handoffs.write(agent.taskId, { status: 'awaiting-review' });
-  }
+ this.registry.updateStatus(agentId, 'awaiting-review');
+ await this.handoffs.write(agent.taskId, { status: 'awaiting-review' });
+ }
 
-  async approve(agentId: string): Promise<void> {
-    const agent = this.registry.get(agentId);
-    if (!agent) return;
+ async approve(agentId: string): Promise<void> {
+ const agent = this.registry.get(agentId);
+ if (!agent) return;
 
-    if (agent.worktreePath) {
-      // Merge must land before we mark it merged / release the file locks —
-      // otherwise a failed merge would free files an unmerged branch still owns.
-      await this.worktree.mergeAndRemove(agent.worktreePath, agent.branchName);
-    }
+ let merged = false;
+ if (agent.worktreePath) {
+ try {
+ await this.worktree.mergeAndRemove(agent.worktreePath, agent.branchName);
+ merged = true;
+ } catch (e) {
+ this.registry.updateStatus(agentId, 'awaiting-review');
+ await this.handoffs.write(agent.taskId, {
+ status: 'awaiting-review',
+ reviewerNotes: `Merge failed: ${(e as Error)?.message || String(e)}`,
+ });
+ return;
+ }
+ } else {
+ merged = true;
+ }
 
-    this.registry.updateStatus(agentId, 'merged');
-    this.locks.release(agent.taskId);
+ this.registry.updateStatus(agentId, 'merged');
+ this.locks.release(agent.taskId);
+ await this.handoffs.write(agent.taskId, { status: 'merged' });
+ }
 
-    await this.handoffs.write(agent.taskId, { status: 'merged' });
-  }
+ async reject(agentId: string, reviewerNotes: string): Promise<void> {
+ const agent = this.registry.get(agentId);
+ if (!agent) return;
 
-  async reject(agentId: string, reviewerNotes: string): Promise<void> {
-    const agent = this.registry.get(agentId);
-    if (!agent) return;
-
-    this.registry.updateStatus(agentId, 'failed');
-    await this.handoffs.write(agent.taskId, {
-      status: 'failed',
-      reviewerNotes,
-    });
-  }
+ this.registry.updateStatus(agentId, 'failed');
+ await this.handoffs.write(agent.taskId, {
+ status: 'failed',
+ reviewerNotes,
+ });
+ }
 }

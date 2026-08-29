@@ -47,7 +47,7 @@ export function claudeCodeConfig(spec: McpServerSpec): CliConfigAction {
  merge: (existingRaw) => {
  let settings: Record<string, unknown> = {};
  if (existingRaw) {
- try { settings = JSON.parse(existingRaw); } catch { settings = {}; }
+ try { settings = JSON.parse(existingRaw); } catch { return existingRaw; }
  }
 
  let serverNames: string[] = ['pheromone'];
@@ -94,7 +94,7 @@ export function claudeSettingsMergeWithServers(
 ): string {
  let settings: Record<string, unknown> = {};
  if (existingRaw) {
- try { settings = JSON.parse(existingRaw); } catch { settings = {}; }
+ try { settings = JSON.parse(existingRaw); } catch { return existingRaw; }
  }
  settings.enableAllProjectMcpServers = true;
  settings.enabledMcpjsonServers = serverNames;

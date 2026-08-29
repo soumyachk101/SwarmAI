@@ -131,4 +131,38 @@ function downloadFile(url: string, dest: string): Promise<void> {
   });
 }
 
+export function extractArchive(archivePath: string, destDir: string): Promise<void> {
+  ensureDirectory(destDir);
+  return new Promise((resolve, reject) => {
+    import('node:child_process').then((cp) => {
+      if (archivePath.endsWith('.tar.gz') || archivePath.endsWith('.tgz')) {
+        const child = cp.spawn('tar', ['-xzf', archivePath, '-C', destDir]);
+        child.on('close', (code) => {
+          if (code === 0) resolve();
+          else reject(new Error(`tar extraction failed with code ${code}`));
+        });
+        child.on('error', reject);
+      } else if (archivePath.endsWith('.zip')) {
+        if (os.platform() === 'win32') {
+          const child = cp.spawn('powershell', ['-command', `Expand-Archive -Path '${archivePath}' -DestinationPath '${destDir}' -Force`]);
+          child.on('close', (code) => {
+            if (code === 0) resolve();
+            else reject(new Error(`powershell unzip failed with code ${code}`));
+          });
+          child.on('error', reject);
+        } else {
+          const child = cp.spawn('unzip', ['-o', archivePath, '-d', destDir]);
+          child.on('close', (code) => {
+            if (code === 0) resolve();
+            else reject(new Error(`unzip failed with code ${code}`));
+          });
+          child.on('error', reject);
+        }
+      } else {
+        reject(new Error(`Unsupported archive format: ${archivePath}`));
+      }
+    }).catch(reject);
+  });
+}
+
 export { downloadFile };

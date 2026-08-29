@@ -114,8 +114,8 @@ export function normalizeUrl(input: string, defaultPort = 3000): string {
   const trimmed = input.trim();
   if (!trimmed) return "about:blank";
 
-  // Explicit schemes (http://, https://, about:, etc.)
-  if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(trimmed)) {
+  // Explicit schemes (http://, https://, about:, file://, ws://, etc.)
+  if (/^(https?|about|file|ws|wss|blob|data):/i.test(trimmed) || /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(trimmed)) {
     return trimmed;
   }
 

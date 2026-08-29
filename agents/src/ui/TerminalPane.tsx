@@ -202,11 +202,15 @@ export default function TerminalPane({
  // signal — spawn_terminal resolving just means the pty was created.
  setStatus("running");
  });
+ // Assign before the disposed check so the cleanup effect can always
+ // reach the unlisten function, even if the component unmounts between
+ // the await and this assignment.
+ unlistenOutput = fn;
  if (disposed) {
- fn();
+ unlistenOutput();
+ unlistenOutput = null;
  return;
  }
- unlistenOutput = fn;
  };
  await subscribeOutput();
  if (disposed || !terminal) return;

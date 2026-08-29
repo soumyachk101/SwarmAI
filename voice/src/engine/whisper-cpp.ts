@@ -2,7 +2,9 @@ import type { ModelSize, TranscriptionResult, TranscriptionSegment } from '../ty
 import type { STTEngine } from './index.js';
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawn, execFile } from 'node:child_process';
+import { platform } from 'node:os';
+import { invoke } from '@tauri-apps/api/core';
+
 import {
  getModelInfo,
  getModelPath,
@@ -11,46 +13,20 @@ import {
  resolveCacheDir,
  ensureDirectory,
  downloadFile,
+ extractArchive,
 } from './model-cache.js';
-import { platform } from 'node:os';
 
-function extractArchive(archivePath: string, destDir: string): Promise<void> {
- const ext = path.extname(archivePath);
- if (ext === '.zip') {
- return extractZip(archivePath, destDir);
- }
- return extractTarGz(archivePath, destDir);
+interface WhisperSpawnRequest {
+ binary_path: string;
+ args: string[];
+ working_dir?: string;
+ timeout_secs: number;
 }
 
-async function extractZip(archivePath: string, destDir: string): Promise<void> {
- ensureDirectory(destDir);
- return new Promise((resolve, reject) => {
- const child = spawn('powershell', [
- '-NoProfile',
- '-Command',
- 'Expand-Archive',
- '-LiteralPath', archivePath,
- '-DestinationPath', destDir,
- '-Force',
- ], { stdio: 'pipe' });
- child.on('exit', (code) => {
- if (code === 0) resolve();
- else reject(new Error(`unzip failed with code ${code}`));
- });
- child.on('error', reject);
- });
-}
-
-async function extractTarGz(archivePath: string, destDir: string): Promise<void> {
- ensureDirectory(destDir);
- return new Promise((resolve, reject) => {
- const child = spawn('tar', ['-xzf', archivePath, '-C', destDir], { stdio: 'pipe' });
- child.on('exit', (code) => {
- if (code === 0) resolve();
- else reject(new Error(`tar failed with code ${code}`));
- });
- child.on('error', reject);
- });
+interface WhisperSpawnResponse {
+ pid: number;
+ exit_code: number;
+ stdout: string;
 }
 
 function parseWhisperOutput(text: string): { fullText: string; segments: TranscriptionSegment[] } {
@@ -171,8 +147,6 @@ export class WhisperCppEngine implements STTEngine {
  await this.ensureModel(modelSize);
 
  const modelPath = getModelPath(this.cacheDir, modelSize);
-
- return new Promise((resolve, reject) => {
  const args = [
  '-f', audioPath,
  '-m', modelPath,
@@ -180,39 +154,42 @@ export class WhisperCppEngine implements STTEngine {
  ];
 
  const startTime = Date.now();
- const child = execFile(this.binaryPath, args, {
- timeout: 120_000,
- maxBuffer: 10 * 1024 * 1024,
- }, (error, stdout, stderr) => {
- const durationMs = Date.now() - startTime;
 
- if (error) {
- reject(new Error(`whisper-cli failed: ${error.message}\n${stderr}`));
- return;
- }
+ // Route process spawning through Tauri backend commands instead of
+ // node:child_process (which is blocked in the renderer).
+ try {
+ const response = await invoke<WhisperSpawnResponse>('spawn_whisper_process', {
+ req: {
+ binary_path: this.binaryPath,
+ args,
+ working_dir: this.cacheDir,
+ timeout_secs: 120,
+ } as WhisperSpawnRequest,
+ });
+
+ const durationMs = Date.now() - startTime;
 
  const outputTxtPath = audioPath.replace(/\.[^.]+$/, '') + '.txt';
  let transcript = '';
 
  if (fs.existsSync(outputTxtPath)) {
  transcript = fs.readFileSync(outputTxtPath, 'utf-8');
- try { fs.unlinkSync(outputTxtPath); } catch (err) { console.debug("[whisper-cpp] cleanup .txt failed:", err); }
+ try { fs.unlinkSync(outputTxtPath); } catch { /* ignore cleanup errors */ }
  } else {
- transcript = stdout;
+ transcript = response.stdout;
  }
 
  const { fullText, segments } = parseWhisperOutput(transcript);
 
- resolve({
+ return {
  text: fullText,
  durationMs,
  modelSize,
  segments,
  cleaned: false,
- });
- });
-
- child.on('error', reject);
- });
+ };
+ } catch (error) {
+ throw new Error(`Failed to run whisper-cpp via Tauri: ${error}`);
+ }
  }
 }

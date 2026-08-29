@@ -11,7 +11,7 @@ import { THEMES, DEFAULT_THEME_ID } from "./themes";
 
 describe("theme migration (8 themes -> 3)", () => {
   it("rewrites a theme that no longer exists", () => {
-    for (const dead of ["hive", "claude", "neon", "midnight", "forest", "rose", "slate", "dracula"]) {
+    for (const dead of ["hive", "claude", "neon", "vintage", "forest", "rose", "slate", "dracula"]) {
       expect(migrateThemeState({ themeId: dead }).themeId).toBe(DEFAULT_THEME_ID);
     }
   });

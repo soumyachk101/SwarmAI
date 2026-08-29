@@ -68,14 +68,15 @@ describe("OnboardingModal", () => {
  });
 
  it("completes onboarding and removes modal", () => {
- var { container } = render(<OnboardingModal />);
- expect(screen.getByText("Welcome to Swarm AI")).toBeDefined();
- fireEvent.click(screen.getByText(/Next/));
- fireEvent.click(screen.getByText(/Next/));
- fireEvent.click(screen.getByText("Get Started"));
- expect(container.innerHTML).toBe("");
- expect(localStorage.getItem("swarm-onboarding-seen")).toBe("true");
- });
+    var { container } = render(<OnboardingModal />);
+    expect(screen.getByText("Welcome to Swarm AI")).toBeDefined();
+    for (let i = 0; i < 5; i++) {
+      fireEvent.click(screen.getByText(/Next/));
+    }
+    fireEvent.click(screen.getByText("Get Started"));
+    expect(container.innerHTML).toBe("");
+    expect(localStorage.getItem("swarm-onboarding-seen")).toBe("true");
+  });
 
  it("skips onboarding via Skip button", () => {
  var { container } = render(<OnboardingModal />);

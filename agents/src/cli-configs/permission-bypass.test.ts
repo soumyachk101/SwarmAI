@@ -1,17 +1,47 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { permissionBypassArgs, withPermissionBypass } from './permission-bypass.js';
-import {
- claudeEnabledMcpServersFromMcpJson,
- claudeSettingsMergeWithServers,
-} from './claude-code.js';
+import { setAgentsHost, agentsHost } from '../ui/host.js';
+import { claudeEnabledMcpServersFromMcpJson, claudeSettingsMergeWithServers } from './claude-code.js';
 import { pheromoneCommand, toNodePath } from './types.js';
+
+// Reset the agentsHost before each test so the default (bypass disabled)
+// is always the starting state.
+beforeEach(() => {
+ setAgentsHost({
+ apiKeys: () => ({ anthropic: '', openai: '', google: '', openrouter: '', moonshot: '' }),
+ openFilesFor: () => [],
+ activeWorkspaceId: () => '',
+ revealLeadDock: () => {},
+ publishLeadRole: () => {},
+ permissionBypassEnabled: () => false,
+ });
+});
 
 describe('permissionBypassArgs', () => {
  it('returns Claude skip-permissions flag', () => {
  expect(permissionBypassArgs('claude')).toEqual(['--dangerously-skip-permissions']);
  });
 
- it('merges without duplicating', () => {
+ it('returns Codex bypass flag', () => {
+ expect(permissionBypassArgs('codex')).toEqual(['--dangerously-bypass-approvals-and-sandbox']);
+ });
+
+ it('returns opencode auto flag', () => {
+ expect(permissionBypassArgs('opencode')).toEqual(['--auto']);
+ });
+
+ it('returns empty for CLIs without a stable bypass flag', () => {
+ expect(permissionBypassArgs('kimi')).toEqual([]);
+ expect(permissionBypassArgs('kilo')).toEqual([]);
+ });
+});
+
+describe('withPermissionBypass', () => {
+ it('merges without duplicating when bypass is enabled', () => {
+ setAgentsHost({
+ ...agentsHost(),
+ permissionBypassEnabled: () => true,
+ });
  expect(withPermissionBypass('claude', ['--dangerously-skip-permissions', '-p'])).toEqual([
  '--dangerously-skip-permissions',
  '-p',
@@ -20,6 +50,19 @@ describe('permissionBypassArgs', () => {
  '--dangerously-skip-permissions',
  '-p',
  ]);
+ });
+
+ it('returns args unchanged when bypass is disabled', () => {
+ setAgentsHost({
+ ...agentsHost(),
+ permissionBypassEnabled: () => false,
+ });
+ expect(withPermissionBypass('claude', ['-p'])).toEqual(['-p']);
+ expect(withPermissionBypass('codex', ['--model', 'gpt-4'])).toEqual(['--model', 'gpt-4']);
+ });
+
+ it('returns args unchanged for CLIs without bypass flags', () => {
+ expect(withPermissionBypass('kimi', ['--model', 'kimi'])).toEqual(['--model', 'kimi']);
  });
 });
 

@@ -8,21 +8,24 @@ import { useAgentsStore, type Agent } from "@swarm/agents/ui";
 // inherits it, the agent extension spawns its MCP servers as children, and the
 // pheromone-mcp server advertises Lead's tools exactly as it does for a CLI.
 export function extensionAgentProps(swarm: Agent, swarms: Agent[]) {
-  if (!swarm.agentExt) return {};
-  const lead = swarms.find((b) => b.isLead && b.workspaceId === swarm.workspaceId);
-  const isLead = lead?.id === swarm.id;
-  const env: Record<string, string> = { SWARM_PANE_ID: swarm.id };
-  if (isLead) env.SWARM_LEAD = "1";
-  return {
-    env,
-    crown: {
-      isLead,
-      taken: !!lead && !isLead,
-      onToggle: () => {
-        const s = useAgentsStore.getState();
-        if (isLead) s.demoteLead(swarm.workspaceId ?? "");
-        else s.promoteToLead(swarm.id);
-      },
-    },
-  };
+ if (!swarm.agentExt) return {};
+ const env: Record<string, string> = { SWARM_PANE_ID: swarm.id };
+ const isLead = swarms.some((b) => b.isLead && b.workspaceId === swarm.workspaceId && b.id === swarm.id);
+ const taken = swarms.some((b) => b.isLead && b.workspaceId === swarm.workspaceId && b.id !== swarm.id);
+ if (isLead) env.SWARM_LEAD = "1";
+ return {
+ env,
+ crown: {
+ isLead,
+ taken,
+ onToggle: () => {
+ const s = useAgentsStore.getState();
+ const currentlyLead = swarms.some(
+ (b) => b.isLead && b.workspaceId === swarm.workspaceId && b.id === swarm.id,
+ );
+ if (currentlyLead) s.demoteLead(swarm.workspaceId ?? "");
+ else s.promoteToLead(swarm.id);
+ },
+ },
+ };
 }

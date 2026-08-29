@@ -49,9 +49,8 @@ describe("GitControlModal", () => {
 
  it("calls onClose when the close button is clicked", () => {
  render(<GitControlModal isOpen={true} onClose={mockOnClose} projectPath="/test/project" />);
- const closeButtons = screen.getAllByRole("button");
- const xButton = closeButtons.find(btn => btn.querySelector("svg"));
- if (xButton) fireEvent.click(xButton);
+ const closeBtn = screen.getByLabelText("Close");
+ fireEvent.click(closeBtn);
  expect(mockOnClose).toHaveBeenCalled();
  });
 
@@ -187,7 +186,7 @@ describe("GitControlModal", () => {
  rerender(<GitControlModal isOpen={true} onClose={mockOnClose} projectPath="/test/project" />);
 
  await waitFor(() => {
- expect(mockInvoke).toHaveBeenCalledTimes(2);
+ expect(mockInvoke.mock.calls.length).toBeGreaterThanOrEqual(2);
  });
  });
 

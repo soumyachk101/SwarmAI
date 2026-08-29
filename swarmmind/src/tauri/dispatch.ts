@@ -2,15 +2,15 @@ import { breakdown } from "@swarm/lead";
 import type { LeadTask } from "@swarm/lead";
 import type { NewCardInput } from "@swarm/tasks";
 import {
-  AgentRegistry, LockRegistry, RoleManager, Orchestrator, HandoffManager,
+ AgentRegistry, LockRegistry, RoleManager, Orchestrator, HandoffManager,
 } from "../core.js";
 import type { Role, LockConflict } from "../core.js";
 import { TauriWorktreeOps, tauriHandoffFs } from "./adapters.js";
 
 // The orchestration spine.
 //
-//   goal → Lead.breakdown() → SwarmMind.Orchestrator.plan() (lock conflicts)
-//        → per task: dispatch() → worktree + handoff + registry → launch swarm
+// goal → Lead.breakdown() → SwarmMind.Orchestrator.plan() (lock conflicts)
+// → per task: dispatch() → worktree + handoff + registry → launch swarm
 //
 // SwarmMind owns every orchestration decision (which roles need a worktree, who
 // conflicts with whom, status lifecycle). Swarm supplies Tauri adapters for the
@@ -20,36 +20,36 @@ import { TauriWorktreeOps, tauriHandoffFs } from "./adapters.js";
 // running the Tauri app; the pure planning below is unit-tested.
 
 export interface WorktreeInfo {
-  path: string;
-  branch: string;
-  task_id: string;
+ path: string;
+ branch: string;
+ task_id: string;
 }
 
 export interface DispatchPlanEntry {
-  task: LeadTask;
-  cli: string;
-  needsWorktree: boolean;
+ task: LeadTask;
+ cli: string;
+ needsWorktree: boolean;
 }
 
 export interface DispatchResult {
-  taskId: string;
-  title: string;
-  cli: string;
-  agentId?: string;
-  worktree?: WorktreeInfo;
-  /** Set when SwarmMind's lock registry refused the task (file ownership clash). */
-  blockedBy?: LockConflict[];
-  error?: string;
+ taskId: string;
+ title: string;
+ cli: string;
+ agentId?: string;
+ worktree?: WorktreeInfo;
+ /** Set when SwarmMind's lock registry refused the task (file ownership clash). */
+ blockedBy?: LockConflict[];
+ error?: string;
 }
 
 const roles = new RoleManager();
 
 /** Lead suggests a role name; map it onto SwarmMind's role vocabulary. */
 function toSwarmMindRole(suggested: string): Role {
-  const r = (suggested || "").toLowerCase();
-  return r === "builder" || r === "scout" || r === "reviewer" || r === "coordinator"
-    ? (r as Role)
-    : "builder";
+ const r = (suggested || "").toLowerCase();
+ return r === "builder" || r === "scout" || r === "reviewer" || r === "coordinator"
+ ? (r as Role)
+ : "builder";
 }
 
 /**
@@ -57,27 +57,27 @@ function toSwarmMindRole(suggested: string): Role {
  * Worktree need comes from SwarmMind's RoleManager — the single source of truth.
  */
 export function planDispatch(tasks: LeadTask[], preferredCli?: string): DispatchPlanEntry[] {
-  return tasks.map((task) => ({
-    task,
-    cli: preferredCli && preferredCli !== "auto" ? preferredCli : (task.suggestedCli || "claude"),
-    needsWorktree: roles.getDefinition(toSwarmMindRole(task.suggestedRole)).needsWorktree,
-  }));
+ return tasks.map((task) => ({
+ task,
+ cli: preferredCli && preferredCli !== "auto" ? preferredCli : (task.suggestedCli || "claude"),
+ needsWorktree: roles.getDefinition(toSwarmMindRole(task.suggestedRole)).needsWorktree,
+ }));
 }
 
 export interface DispatchHooks {
-  /** Launch the agent pane and return its id, so the card can point at it. */
-  launchAgent: (cli: string, name: string, cwd?: string, initialPrompt?: string) => string;
-  addCard: (card: NewCardInput) => void;
+ /** Launch the agent pane and return its id, so the card can point at it. */
+ launchAgent: (cli: string, name: string, cwd?: string, initialPrompt?: string) => string;
+ addCard: (card: NewCardInput) => void;
 }
 
 function buildOrchestrator(projectPath: string) {
-  const registry = new AgentRegistry();
-  const locks = new LockRegistry();
-  const handoffs = new HandoffManager(projectPath, tauriHandoffFs);
-  const orchestrator = new Orchestrator(
-    registry, locks, new TauriWorktreeOps(projectPath), handoffs, roles,
-  );
-  return { registry, locks, handoffs, orchestrator };
+ const registry = new AgentRegistry();
+ const locks = new LockRegistry();
+ const handoffs = new HandoffManager(projectPath, tauriHandoffFs);
+ const orchestrator = new Orchestrator(
+ registry, locks, new TauriWorktreeOps(projectPath), handoffs, roles,
+ );
+ return { registry, locks, handoffs, orchestrator };
 }
 
 // One Orchestrator per project, kept for the session.
@@ -86,21 +86,33 @@ function buildOrchestrator(projectPath: string) {
 // every file lock the moment dispatch returned, so two goals dispatched minutes
 // apart could hand the same file to two builders, and approve() would find no
 // agent to merge. Keyed by project so separate projects stay isolated.
+//
+// Keys are normalized (lowercase, forward-slashes) so that case-insensitive
+// filesystems (Windows, macOS) don't create duplicate orchestrator instances
+// for the same project addressed with different casing.
 const orchestrators = new Map<string, ReturnType<typeof buildOrchestrator>>();
 
+function normalizeProjectPath(p: string): string {
+ return p.toLowerCase().replace(/\\/g, '/');
+}
+
 export function getOrchestrator(projectPath: string) {
-  let existing = orchestrators.get(projectPath);
-  if (!existing) {
-    existing = buildOrchestrator(projectPath);
-    orchestrators.set(projectPath, existing);
-  }
-  return existing;
+ const key = normalizeProjectPath(projectPath);
+ let existing = orchestrators.get(key);
+ if (!existing) {
+ existing = buildOrchestrator(projectPath);
+ orchestrators.set(key, existing);
+ }
+ return existing;
 }
 
 /** Test seam: drop cached state (also used when a project closes). */
 export function resetOrchestrator(projectPath?: string) {
-  if (projectPath) orchestrators.delete(projectPath);
-  else orchestrators.clear();
+ if (projectPath) {
+ orchestrators.delete(normalizeProjectPath(projectPath));
+ } else {
+ orchestrators.clear();
+ }
 }
 
 /**
@@ -110,18 +122,18 @@ export function resetOrchestrator(projectPath?: string) {
  * approval still works — just without the bookkeeping.
  */
 export async function approveTask(
-  projectPath: string,
-  taskId: string,
-  fallback: { branch: string; worktreePath: string },
+ projectPath: string,
+ taskId: string,
+ fallback: { branch: string; worktreePath: string },
 ): Promise<{ merged: boolean; viaOrchestrator: boolean }> {
-  const { registry, orchestrator } = getOrchestrator(projectPath);
-  const agent = registry.findByTask(taskId);
-  if (agent) {
-    await orchestrator.approve(agent.id);
-    return { merged: true, viaOrchestrator: true };
-  }
-  await new TauriWorktreeOps(projectPath).mergeAndRemove(fallback.worktreePath, fallback.branch);
-  return { merged: true, viaOrchestrator: false };
+ const { registry, orchestrator } = getOrchestrator(projectPath);
+ const agent = registry.findByTask(taskId);
+ if (agent) {
+ await orchestrator.approve(agent.id);
+ return { merged: true, viaOrchestrator: true };
+ }
+ await new TauriWorktreeOps(projectPath).mergeAndRemove(fallback.worktreePath, fallback.branch);
+ return { merged: true, viaOrchestrator: false };
 }
 
 /**
@@ -130,33 +142,33 @@ export async function approveTask(
  * the worktree and its file locks stay put so the swarm can revise in place.
  */
 export async function rejectTask(
-  projectPath: string,
-  taskId: string,
-  reviewerNotes: string,
+ projectPath: string,
+ taskId: string,
+ reviewerNotes: string,
 ): Promise<{ viaOrchestrator: boolean }> {
-  const { registry, orchestrator } = getOrchestrator(projectPath);
-  const agent = registry.findByTask(taskId);
-  if (!agent) return { viaOrchestrator: false };
-  await orchestrator.reject(agent.id, reviewerNotes);
-  return { viaOrchestrator: true };
+ const { registry, orchestrator } = getOrchestrator(projectPath);
+ const agent = registry.findByTask(taskId);
+ if (!agent) return { viaOrchestrator: false };
+ await orchestrator.reject(agent.id, reviewerNotes);
+ return { viaOrchestrator: true };
 }
 
 /**
  * Run automated verification (Agent CI) in a task's worktree.
  */
 export async function verifyTaskWorktree(
-  worktreePath: string,
+ worktreePath: string,
 ): Promise<{ passed: boolean; output: string }> {
-  try {
-    const { invoke } = await import("@tauri-apps/api/core");
-    const status = await invoke<{ branch: string; changed: number }>("git_status", { projectPath: worktreePath }).catch(() => null);
-    return {
-      passed: true,
-      output: status ? `Branch ${status.branch}: ${status.changed} changed files` : "Verified",
-    };
-  } catch (e: unknown) {
-    return { passed: false, output: String(e) };
-  }
+ try {
+ const { invoke } = await import("@tauri-apps/api/core");
+ const status = await invoke<{ branch: string; changed: number }>("git_status", { projectPath: worktreePath }).catch(() => null);
+ return {
+ passed: true,
+ output: status ? `Branch ${status.branch}: ${status.changed} changed files` : "Verified",
+ };
+ } catch (e: unknown) {
+ return { passed: false, output: String(e) };
+ }
 }
 
 /**
@@ -166,92 +178,92 @@ export async function verifyTaskWorktree(
  * the rest.
  */
 export async function dispatchGoal(
-  goal: string,
-  projectPath: string,
-  hooks: DispatchHooks,
-  pheromoneContext?: string,
-  preferredCli?: string,
+ goal: string,
+ projectPath: string,
+ hooks: DispatchHooks,
+ pheromoneContext?: string,
+ preferredCli?: string,
 ): Promise<DispatchResult[]> {
-  const { tasks } = await breakdown({ goal, pheromoneContext });
-  const plan = planDispatch(tasks, preferredCli);
-  const results: DispatchResult[] = [];
+ const { tasks } = await breakdown({ goal, pheromoneContext });
+ const plan = planDispatch(tasks, preferredCli);
+ const results: DispatchResult[] = [];
 
-  const { orchestrator, handoffs } = getOrchestrator(projectPath);
-  if (projectPath) {
-    try { await handoffs.ensureStructure(); } catch { /* handoffs are best-effort */ }
-  }
+ const { orchestrator, handoffs } = getOrchestrator(projectPath);
+ if (projectPath) {
+ try { await handoffs.ensureStructure(); } catch { /* handoffs are best-effort */ }
+ }
 
-  // One goal = one mission; it groups this goal's tasks in the registry and in
-  // `.pheromone/agents/handoffs/` (HandoffManager.listByMission keys on this).
-  const missionId = `m${Date.now().toString(36)}`;
+ // One goal = one mission; it groups this goal's tasks in the registry and in
+ // `.pheromone/agents/handoffs/` (HandoffManager.listByMission keys on this).
+ const missionId = `m${Date.now().toString(36)}`;
 
-  for (const { task, cli } of plan) {
-    const result: DispatchResult = { taskId: task.id, title: task.description, cli };
-    const spec = {
-      id: task.id,
-      description: task.description,
-      owns: task.owns ?? [],
-      reads: task.reads ?? [],
-      dependsOn: task.dependsOn ?? [],
-      role: toSwarmMindRole(task.suggestedRole),
-      cli,
-      missionId,
-    };
+ for (const { task, cli } of plan) {
+ const result: DispatchResult = { taskId: task.id, title: task.description, cli };
+ const spec = {
+ id: task.id,
+ description: task.description,
+ owns: task.owns ?? [],
+ reads: task.reads ?? [],
+ dependsOn: task.dependsOn ?? [],
+ role: toSwarmMindRole(task.suggestedRole),
+ cli,
+ missionId,
+ };
 
-    try {
-      // Ask SwarmMind first: two builders owning the same file must not both run.
-      const check = orchestrator.plan([spec]);
-      if (!check.canStart.some((t) => t.id === task.id)) {
-        result.blockedBy = check.conflicts;
-        // Still surface it on the board, flagged — a blocked task that appears
-        // nowhere is worse than one shown as blocked.
-        hooks.addCard({
-          id: task.id,
-          title: task.description,
-          description: `owns: ${task.owns?.join(", ") || "—"}`,
-          column: "backlog",
-          owns: task.owns ?? [],
-          reads: task.reads ?? [],
-          dependsOn: task.dependsOn ?? [],
-          assignedRole: spec.role,
-          assignedCli: cli,
-          missionId,
-          blockingReason: check.conflicts
-            .map((c) => `${c.filePath} owned by ${c.existingOwner}`)
-            .join("; "),
-        });
-        results.push(result);
-        continue;
-      }
+ try {
+ // Ask SwarmMind first: two builders owning the same file must not both run.
+ const check = orchestrator.plan([spec]);
+ if (!check.canStart.some((t) => t.id === task.id)) {
+ result.blockedBy = check.conflicts;
+ // Still surface it on the board, flagged — a blocked task that appears
+ // nowhere is worse than one shown as blocked.
+ hooks.addCard({
+ id: task.id,
+ title: task.description,
+ description: `owns: ${task.owns?.join(", ") || "—"}`,
+ column: "backlog",
+ owns: task.owns ?? [],
+ reads: task.reads ?? [],
+ dependsOn: task.dependsOn ?? [],
+ assignedRole: spec.role,
+ assignedCli: cli,
+ missionId,
+ blockingReason: check.conflicts
+ .map((c) => `${c.filePath} owned by ${c.existingOwner}`)
+ .join("; "),
+ });
+ results.push(result);
+ continue;
+ }
 
-      const { agentId, worktree } = await orchestrator.dispatch(spec);
-      result.agentId = agentId;
-      if (worktree) {
-        result.worktree = { path: worktree.path, branch: worktree.branch, task_id: worktree.taskId };
-      }
+ const { agentId, worktree } = await orchestrator.dispatch(spec);
+ result.agentId = agentId;
+ if (worktree) {
+ result.worktree = { path: worktree.path, branch: worktree.branch, task_id: worktree.taskId };
+ }
 
-      const paneAgentId = hooks.launchAgent(cli, task.description.slice(0, 40), worktree?.path, task.description);
+ const paneAgentId = hooks.launchAgent(cli, task.description.slice(0, 40), worktree?.path, task.description);
 
-      // The card must carry the agent link, or the pipeline can never show the
-      // task as running: nodeStatus() reads agent status via paneAgentId.
-      hooks.addCard({
-        id: task.id,
-        title: task.description,
-        description: `owns: ${task.owns?.join(", ") || "—"}`,
-        column: "in-progress",
-        owns: task.owns ?? [],
-        reads: task.reads ?? [],
-        dependsOn: task.dependsOn ?? [],
-        assignedRole: spec.role,
-        assignedCli: cli,
-        missionId,
-        agentId: paneAgentId,
-        worktreeBranch: worktree?.branch,
-      });
-    } catch (e) {
-      result.error = (e as Error)?.message || String(e);
-    }
-    results.push(result);
-  }
-  return results;
+ // The card must carry the agent link, or the pipeline can never show the
+ // task as running: nodeStatus() reads agent status via paneAgentId.
+ hooks.addCard({
+ id: task.id,
+ title: task.description,
+ description: `owns: ${task.owns?.join(", ") || "—"}`,
+ column: "in-progress",
+ owns: task.owns ?? [],
+ reads: task.reads ?? [],
+ dependsOn: task.dependsOn ?? [],
+ assignedRole: spec.role,
+ assignedCli: cli,
+ missionId,
+ agentId: paneAgentId,
+ worktreeBranch: worktree?.branch,
+ });
+ } catch (e) {
+ result.error = (e as Error)?.message || String(e);
+ }
+ results.push(result);
+ }
+ return results;
 }

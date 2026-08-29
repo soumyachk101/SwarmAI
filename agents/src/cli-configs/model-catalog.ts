@@ -114,22 +114,44 @@ export const MODEL_CATALOG: Record<string, AvailableModel[]> = {
   "kiro": [],
 };
 
+// Aliases for long CLI names
+MODEL_CATALOG["claude-code"] = MODEL_CATALOG["claude"];
+MODEL_CATALOG["cursor-agent"] = MODEL_CATALOG["cursor"];
+MODEL_CATALOG["kilo-code"] = MODEL_CATALOG["kilo"];
+MODEL_CATALOG["kimi-code"] = MODEL_CATALOG["kimi"];
+MODEL_CATALOG["kiro-code"] = MODEL_CATALOG["kiro"];
+
 // ─── Lookup helpers ──────────────────────────────────────────────────────────
 
+export function normalizeCliId(cliId: string): string {
+  const c = (cliId || "").toLowerCase().trim();
+  if (c === "claude-code" || c === "claude") return "claude";
+  if (c === "cursor-agent" || c === "cursor") return "cursor";
+  if (c === "kilo-code" || c === "kilo") return "kilo";
+  if (c === "kimi-code" || c === "kimi") return "kimi";
+  if (c === "kiro-code" || c === "kiro") return "kiro";
+  return c;
+}
+
 export function getModelsForCli(cliId: string): AvailableModel[] {
-  return MODEL_CATALOG[cliId] ?? [];
+  const norm = normalizeCliId(cliId);
+  return MODEL_CATALOG[norm] ?? MODEL_CATALOG[cliId] ?? [];
 }
 
 export function getDefaultModelForCli(cliId: string): AvailableModel | undefined {
-  return MODEL_CATALOG[cliId]?.[0];
+  const norm = normalizeCliId(cliId);
+  return (MODEL_CATALOG[norm] ?? MODEL_CATALOG[cliId])?.[0];
 }
 
 export function getModelById(cliId: string, modelId: string): AvailableModel | undefined {
-  return MODEL_CATALOG[cliId]?.find(m => m.id === modelId);
+  const norm = normalizeCliId(cliId);
+  const list = MODEL_CATALOG[norm] ?? MODEL_CATALOG[cliId] ?? [];
+  return list.find((m) => m.id === modelId || m.cliFlag === modelId || m.label === modelId);
 }
 
 export function cliSupportsModels(cliId: string): boolean {
-  return (MODEL_CATALOG[cliId]?.length ?? 0) > 0;
+  const norm = normalizeCliId(cliId);
+  return ((MODEL_CATALOG[norm] ?? MODEL_CATALOG[cliId])?.length ?? 0) > 0;
 }
 
 export function getClisWithModels(): string[] {

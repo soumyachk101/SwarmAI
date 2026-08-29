@@ -188,7 +188,11 @@ export class SearchEngine {
  stmt.bind([fetchLimit]);
  while (stmt.step()) {
  const row = stmt.getAsObject() as any;
- const embeddingArray = new Float32Array(new Uint8Array(row.embedding).buffer);
+ const embeddingBlob = new Uint8Array(row.embedding as ArrayBuffer);
+ const dims = queryEmbedding.length;
+ const embeddingByteLen = dims * 4;
+ if (embeddingBlob.byteLength < embeddingByteLen) continue;
+ const embeddingArray = new Float32Array(embeddingBlob.buffer, embeddingBlob.byteOffset, dims);
  // Cosine similarity: dot product of two L2-normalised vectors.
  // Dividing by queryNorm only once (it's constant across all candidates).
  const dot = queryEmbedding.reduce((s, v, i) => s + v * embeddingArray[i], 0);

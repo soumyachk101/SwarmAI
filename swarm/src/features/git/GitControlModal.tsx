@@ -54,18 +54,20 @@ export default function GitControlModal({
     if (!projectPath) return;
     try {
       const status = await invoke<{ branch: string; changed: number }>("git_status", { projectPath });
-      setBranch(status.branch);
-      setChangedCount(status.changed);
+      if (status && typeof status === "object") {
+        setBranch(typeof status.branch === "string" ? status.branch : "main");
+        setChangedCount(typeof status.changed === "number" ? status.changed : 0);
+      }
       setIsGitRepo(true);
 
       const branchList = await invoke<string[]>("git_branches", { projectPath });
-      setBranches(branchList);
+      setBranches(Array.isArray(branchList) ? branchList : []);
 
       const diff = await invoke<string>("git_diff", { projectPath });
-      setDiffStats(diff);
+      setDiffStats(typeof diff === "string" ? diff : "");
 
       const rawDiff = await invoke<string>("git_diff_full", { projectPath }).catch(() => "");
-      setFullDiff(rawDiff);
+      setFullDiff(typeof rawDiff === "string" ? rawDiff : "");
     } catch (e: any) {
       if (String(e).includes("Not a git repository")) {
         setIsGitRepo(false);
@@ -231,6 +233,7 @@ export default function GitControlModal({
             </button>
             <button
               onClick={onClose}
+              aria-label="Close"
               className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
             >
               <X size={15} />
@@ -351,7 +354,7 @@ export default function GitControlModal({
                 )}
 
                 <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto scrollbar-sleek">
-                  {branches.map((b) => (
+                  {(Array.isArray(branches) ? branches : []).map((b) => (
                     <button
                       key={b}
                       onClick={() => handleSwitchBranch(b, false)}
@@ -428,7 +431,7 @@ export default function GitControlModal({
                     </div>
                   ) : (
                     <pre className="p-3 rounded-lg bg-zinc-950 border border-zinc-800 text-[11px] text-zinc-300 font-mono leading-relaxed whitespace-pre-wrap max-h-36 overflow-y-auto scrollbar-sleek">
-                      {diffStats || "No changes detected"}
+                      {typeof diffStats === "string" ? (diffStats || "No changes detected") : "No changes detected"}
                     </pre>
                   )}
                 </div>

@@ -42,16 +42,16 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
   const renderSection = () => {
     switch (activeSection) {
       case "providers":
-        return <ProvidersSection />;
+        return <div data-testid="providers-section"><ProvidersSection /></div>;
       case "guide":
-        return <UserGuideSection />;
+        return <div data-testid="guide-section"><UserGuideSection /></div>;
       case "privacy":
-        return <PrivacySection />;
+        return <div data-testid="privacy-section"><PrivacySection /></div>;
       case "updates":
-        return <UpdatesSection />;
+        return <div data-testid="updates-section"><UpdatesSection /></div>;
       case "models":
       default:
-        return <ModelsSection />;
+        return <div data-testid="models-section"><ModelsSection /></div>;
     }
   };
 

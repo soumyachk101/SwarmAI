@@ -1,7 +1,7 @@
 use portable_pty::{native_pty_system, Child, CommandBuilder, MasterPty, PtySize};
 use rusqlite::{Connection, params};
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::fs;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
@@ -1124,6 +1124,129 @@ async fn run_command(command: String, args: Vec<String>) -> Result<String, Strin
         return Err(format!("{} failed: {}", command, stderr));
     }
     Ok(String::from_utf8_lossy(&output.stdout).to_string())
+}
+
+/// Spawn whisper-cpp as a background process and return stdout via events.
+/// Each `pty-output` event contains a chunk of stdout. The caller reads
+/// until an `pty-done` event fires or the process exits.
+#[derive(Debug, Serialize, Deserialize)]
+pub struct WhisperSpawnRequest {
+ pub binary_path: String,
+ pub args: Vec<String>,
+ pub working_dir: Option<String>,
+ pub timeout_secs: u64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct WhisperSpawnResponse {
+ pub pid: u32,
+}
+
+const ALLOWED_BINARIES: &[&str] = &["whisper-cli", "whisper", "whisper-cpp"];
+
+#[tauri::command]
+async fn spawn_whisper_process(
+ req: WhisperSpawnRequest,
+ app: AppHandle,
+) -> Result<WhisperSpawnResponse, String> {
+ // Validate binary_path: whitelist by basename, reject path traversal.
+ let binary_basename = req.binary_path.rsplitn(2, '/').next()
+ .or_else(|| req.binary_path.rsplitn(2, '\\').next())
+ .ok_or_else(|| "binary_path is empty".to_string())?;
+ if !ALLOWED_BINARIES.contains(&binary_basename) {
+ return Err(format!("Binary not allowed: {}. Allowed: {:?}", binary_basename, ALLOWED_BINARIES));
+ }
+ if req.binary_path.contains("..") {
+ return Err("binary_path must not contain '..'".into());
+ }
+
+ // Validate working_dir: no path traversal.
+ if let Some(ref dir) = req.working_dir {
+ if dir.contains("..") {
+ return Err("working_dir must not contain '..'".into());
+ }
+ }
+
+ // Build a safe args list — only allow known whisper-cli flags.
+ let allowed_flags = &["-m", "--model", "-f", "--file", "--output-txt", "--output-json",
+ "--language", "-l", "-t", "--threads", "--output-dir", "--vad"];
+ let mut safe_args: Vec<String> = Vec::with_capacity(req.args.len());
+ let mut i = 0;
+ while i < req.args.len() {
+ let arg = &req.args[i];
+ 		if arg.starts_with('-') {
+			if allowed_flags.contains(&arg.as_str()) {
+				safe_args.push(arg.clone());
+			}
+			i += 1;
+			continue;
+		}
+ // Allow non-flag args (file paths, model paths) but drop shell metacharacters.
+ if !arg.contains('$') && !arg.contains('`') && !arg.contains(';') && !arg.contains('|') && !arg.contains('&') {
+ safe_args.push(arg.clone());
+ }
+ i += 1;
+ }
+
+ let mut cmd = std::process::Command::new(&req.binary_path);
+ cmd.args(&safe_args);
+ if let Some(dir) = req.working_dir {
+ cmd.current_dir(dir);
+ }
+ cmd.stdout(std::process::Stdio::piped())
+ .stderr(std::process::Stdio::piped());
+
+ let mut child = cmd.spawn().map_err(|e| format!("Failed to spawn whisper-cpp: {e}"))?;
+ let pid = child.id();
+
+ // Spawn a reader thread that streams stdout to the frontend.
+ let pane_id = format!("whisper-{}", pid);
+ if let Some(mut stdout) = child.stdout.take() {
+     let app_handle = app.clone();
+     let pane_id_stream = pane_id.clone();
+     std::thread::spawn(move || {
+         let mut buf = [0u8; 4096];
+         loop {
+             match stdout.read(&mut buf) {
+                 Ok(0) => {
+                     let _ = app_handle.emit("pty-done", serde_json::json!({ "paneId": pane_id_stream }));
+                     break;
+                 }
+                 Ok(n) => {
+                     let text = String::from_utf8_lossy(&buf[..n]).to_string();
+                     let _ = app_handle.emit("pty-output", serde_json::json!({ "paneId": pane_id_stream, "data": text }));
+                 }
+                 Err(_) => break,
+             }
+         }
+     });
+ }
+
+ // Spawn timeout watchdog.
+ if req.timeout_secs > 0 {
+  let app_handle = app.clone();
+  let pane_id_clone = pane_id.clone();
+  std::thread::spawn(move || {
+  std::thread::sleep(std::time::Duration::from_secs(req.timeout_secs));
+  let _ = app_handle.emit("pty-done", serde_json::json!({ "paneId": pane_id_clone, "timeout": true }));
+  let _ = std::process::Command::new("kill")
+  .arg("-9")
+  .arg(format!("{}", pid))
+  .output();
+  });
+ }
+
+ Ok(WhisperSpawnResponse { pid })
+}
+
+#[tauri::command]
+async fn kill_whisper_process(pid: u32) -> Result<(), String> {
+ std::process::Command::new("kill")
+ .arg("-9")
+ .arg(format!("{}", pid))
+ .output()
+ .map_err(|e| format!("Failed to kill process {}: {}", pid, e))?;
+ Ok(())
 }
 
 /// Probe a CLI binary for its available models by running `<cli> --help`
@@ -4364,6 +4487,8 @@ pub fn run() {
             run_command,
  run_cli_probe,
             launch_cdp_browser,
+ spawn_whisper_process,
+ kill_whisper_process,
             cdp_ws_url,
             stop_cdp_browser,
             start_openvsx,

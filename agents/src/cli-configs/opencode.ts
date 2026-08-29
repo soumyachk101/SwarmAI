@@ -10,7 +10,7 @@ export function opencodeConfig(spec: McpServerSpec): CliConfigAction {
  merge: (existingRaw) => {
  let config: Record<string, unknown> = {};
  if (existingRaw) {
- try { config = JSON.parse(existingRaw); } catch { config = {}; }
+ try { config = JSON.parse(existingRaw); } catch { return existingRaw; }
  }
  const mcp = (config.mcp as Record<string, Record<string, unknown>> | null) || {};
  mcp.pheromone = { type: 'local', command, enabled: true };

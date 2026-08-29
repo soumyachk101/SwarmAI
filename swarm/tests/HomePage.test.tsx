@@ -2,76 +2,103 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import HomePage from "@/app/HomePage";
 
+// Mock ResizeObserver for jsdom
+global.ResizeObserver = class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+} as any;
+
 // Mock all the heavy child components and stores
 vi.mock("@/features/panes/PlaneHost", () => ({
- default: () => <div data-testid="plane-host">PlaneHost</div>,
+  default: ({ leading }: any) => <div data-testid="plane-host">{leading}PlaneHost</div>,
 }));
 
 vi.mock("@swarm/tasks", () => ({
- TasksPanel: () => <div data-testid="tasks-panel">TasksPanel</div>,
+  TasksPanel: () => <div data-testid="tasks-panel">TasksPanel</div>,
 }));
 
 vi.mock("@swarm/voice/ui", () => ({
- VoiceHotkeys: () => <div data-testid="voice-hotkeys">VoiceHotkeys</div>,
+  VoiceHotkeys: () => <div data-testid="voice-hotkeys">VoiceHotkeys</div>,
 }));
 
-vi.mock("@swarm/workspace", () => ({
- useWorkspaceStore: () => ({
- workspaces: [{ id: "ws-1", boundProjectPath: "/Users/test/project", name: "Test", taskCards: [] }],
- activeWorkspaceId: "ws-1",
- boardOpen: false,
- setBoardOpen: vi.fn(),
- openFolder: vi.fn(),
- }),
-}));
+vi.mock("@swarm/workspace", () => {
+  const state = {
+    workspaces: [{ id: "ws-1", boundProjectPath: "/Users/test/project", name: "Test", taskCards: [] }],
+    activeWorkspaceId: "ws-1",
+    boardOpen: false,
+    setBoardOpen: vi.fn(),
+    openFolder: vi.fn(),
+  };
+  const store = (selector?: (s: any) => any) => (selector ? selector(state) : state);
+  store.getState = () => state;
+  return { useWorkspaceStore: store };
+});
 
 vi.mock("@swarm/board", () => ({
- BrandGlyph: () => <span data-testid="brand-glyph">BrandGlyph</span>,
- cliBrand: () => "claude",
- shellBrand: () => "shell",
+  BrandGlyph: () => <span data-testid="brand-glyph">BrandGlyph</span>,
+  cliBrand: () => "claude",
+  shellBrand: () => "shell",
+  LeadCrown: () => <span data-testid="lead-crown">LeadCrown</span>,
 }));
 
 vi.mock("@swarm/workspace/ui", () => ({
- WorkspacesSidebar: () => <div data-testid="workspace-sidebar">Sidebar</div>,
+  WorkspacesSidebar: ({ topBar, themePickerSlot }: any) => (
+    <div data-testid="workspace-sidebar">
+      {topBar}
+      {themePickerSlot}
+      Sidebar
+    </div>
+  ),
 }));
 
 vi.mock("@swarm/extension", () => ({
- ExtensionsMarketplace: () => <div>Extensions</div>,
+  ExtensionsMarketplace: () => <div>Extensions</div>,
 }));
 
 vi.mock("@swarm/pheromone/ui", () => ({
- SessionHistory: () => <div>SessionHistory</div>,
+  SessionHistory: () => <div>SessionHistory</div>,
 }));
 
-vi.mock("@swarm/agents/ui", () => ({
- CliUsagePanel: () => <div>Usage</div>,
- useAgentsStore: () => ({
- agentStatuses: {},
- agents: [],
- refitTerminals: vi.fn(),
- }),
- ensurePheromoneMcpForProject: vi.fn(),
-}));
+vi.mock("@swarm/agents/ui", () => {
+  const state = {
+    agentStatuses: {},
+    agents: [],
+    refitTerminals: vi.fn(),
+  };
+  const store = (selector?: (s: any) => any) => (selector ? selector(state) : state);
+  store.getState = () => state;
+  return {
+    CliUsagePanel: () => <div>Usage</div>,
+    useAgentsStore: store,
+    ensurePheromoneMcpForProject: vi.fn(),
+    setupStorageSync: vi.fn(),
+  };
+});
 
 vi.mock("@swarm/lead/ui", () => ({
- useLeadBridge: () => {},
+  useLeadBridge: () => {},
+  LeadPanel: () => <div data-testid="lead-panel">LeadPanel</div>,
 }));
 
 vi.mock("@/shared/tauri", () => ({
- getTauriAPIs: () => ({}),
- loadTauriAPIs: () => Promise.resolve(null),
+  getTauriAPIs: () => ({}),
+  loadTauriAPIs: () => Promise.resolve(null),
 }));
 
-vi.mock("@/shared/uiStore", () => ({
- useUiStore: () => ({
- leftOpen: true,
- rightOpen: false,
- setLeftOpen: vi.fn(),
- setRightOpen: vi.fn(),
- toggleLeft: vi.fn(),
- toggleRight: vi.fn(),
- }),
-}));
+vi.mock("@/shared/uiStore", () => {
+  const state = {
+    leftOpen: true,
+    rightOpen: false,
+    setLeftOpen: vi.fn(),
+    setRightOpen: vi.fn(),
+    toggleLeft: vi.fn(),
+    toggleRight: vi.fn(),
+  };
+  const store = (selector?: (s: any) => any) => (selector ? selector(state) : state);
+  store.getState = () => state;
+  return { useUiStore: store };
+});
 
 vi.mock("@/shared/SwarmLogo", () => ({
  default: () => <span data-testid="swarm-logo">Logo</span>,

@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 
-import { MODEL_CATALOG } from "../cli-configs/model-catalog.js";
+import { MODEL_CATALOG, normalizeCliId } from "../cli-configs/model-catalog.js";
 import type { AvailableModel } from "../cli-configs/model-catalog.js";
 
 export interface DetectedModel {
@@ -55,7 +55,8 @@ export function useAutoModelDetection(
 	// Convert catalog models to DetectedModel format
 	const catalogModels = useCallback(
 		(cliId: string): DetectedModel[] => {
-			const catalog = MODEL_CATALOG[cliId] ?? [];
+			const norm = normalizeCliId(cliId);
+			const catalog = MODEL_CATALOG[norm] ?? MODEL_CATALOG[cliId] ?? [];
 			return catalog.map(
 				(m: AvailableModel): DetectedModel => ({
 					id: m.id,

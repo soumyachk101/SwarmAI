@@ -203,13 +203,18 @@ function AgentPane({
  const compactHeader = paneWidth > 0 && paneWidth < 240;
  const displayName = agent.customName || agent.cliName;
 
- // Auto-select default model when CLI changes
- useEffect(() => {
- const defaultLabel = getDefaultModelForCli(agent.cli)?.label;
- if (defaultLabel && (!agent.model || agent.model !== defaultLabel)) {
- setCurrentModel(defaultLabel);
- }
- }, [agent.cli, agent.model]);
+  // Sync currentModel with agent.model or default
+  useEffect(() => {
+    if (agent.model) {
+      const entry = getModelById(agent.cli, agent.model) || detectedModels.find((m) => m.id === agent.model || m.label === agent.model);
+      setCurrentModel(entry ? entry.label : agent.model);
+    } else {
+      const defaultModel = getDefaultModelForCli(agent.cli);
+      if (defaultModel) {
+        setCurrentModel(defaultModel.label);
+      }
+    }
+  }, [agent.cli, agent.model]);
 
  // Auto-detect models
  const autoModelDetection = useAutoModelDetection(agent.cli, paneId);
@@ -244,34 +249,28 @@ function AgentPane({
  return () => clearTimeout(timer);
  }, [spawnState]);
 
- // Close dropdowns on outside click / Escape
- useEffect(() => {
- const open = modelMenuOpen || effortMenuOpen || settingsMenuOpen || commandSuggestionsOpen || handoffMenuOpen;
- if (!open) return;
- const onDown = (e: globalThis.MouseEvent) => {
- const target = e.target as Node;
- if (modelMenuOpen && !modelMenuRef.current?.contains(target)) setModelMenuOpen(false);
- if (effortMenuOpen && !effortMenuRef.current?.contains(target)) setEffortMenuOpen(false);
- if (settingsMenuOpen && !settingsMenuRef.current?.contains(target)) setSettingsMenuOpen(false);
- if (handoffMenuOpen && !handoffMenuRef.current?.contains(target)) setHandoffMenuOpen(false);
- if (commandSuggestionsOpen && !promptTextareaRef.current?.contains(target)) setCommandSuggestionsOpen(false);
- };
- const onKey = (e: globalThis.KeyboardEvent) => {
- if (e.key === "Escape") {
- setModelMenuOpen(false);
- setEffortMenuOpen(false);
- setSettingsMenuOpen(false);
- setHandoffMenuOpen(false);
- setCommandSuggestionsOpen(false);
- }
- };
- window.addEventListener("mousedown", onDown);
- window.addEventListener("keydown", onKey);
- return () => {
- window.removeEventListener("mousedown", onDown);
- window.removeEventListener("keydown", onKey);
- };
- }, [modelMenuOpen, effortMenuOpen, settingsMenuOpen, commandSuggestionsOpen, handoffMenuOpen, promptTextareaRef]);
+  // Close pane-level dropdowns on outside click / Escape
+  useEffect(() => {
+    const open = handoffMenuOpen || commandSuggestionsOpen;
+    if (!open) return;
+    const onDown = (e: globalThis.MouseEvent) => {
+      const target = e.target as Node;
+      if (handoffMenuOpen && !handoffMenuRef.current?.contains(target)) setHandoffMenuOpen(false);
+      if (commandSuggestionsOpen && !promptTextareaRef.current?.contains(target)) setCommandSuggestionsOpen(false);
+    };
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setHandoffMenuOpen(false);
+        setCommandSuggestionsOpen(false);
+      }
+    };
+    window.addEventListener("mousedown", onDown);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("mousedown", onDown);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [handoffMenuOpen, commandSuggestionsOpen, promptTextareaRef]);
 
  // ---- Handlers ----
 

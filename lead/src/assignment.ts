@@ -7,7 +7,7 @@ export interface AssignmentStrategy {
 
 export class DefaultAssignmentStrategy implements AssignmentStrategy {
  name = 'default';
- private availableClis = ['claude', 'codex', 'opencode', 'kilo', 'cline', 'agy'];
+ private availableClis = ['claude', 'codex', 'opencode', 'kilo', 'cline', 'agy', 'cursor', 'gemini', 'droid', 'aider'];
 
  assign(tasks: LeadTask[]): Assignment[] {
  const assignments: Assignment[] = [];

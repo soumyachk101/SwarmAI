@@ -569,11 +569,18 @@ Four different state strategies for related concepts:
 
 **Key changes since ULTRA-REVIEW (Aug 28):**
 - ✅ Lock rollback in `acquireMany()` has been implemented
-- ✅ Permission bypass in claude-code.ts has been mitigated with allowlist
-- ✅ `extractZip` now uses `spawn()` with array args (not string interpolation)
-- ⚠️ React version conflict and missing board dependency still present
-- ⚠️ `approve()` ordering bug still present
-- ⚠️ Session ID collision still present
+- ✅ React version conflict — aligned `tasks/package.json` to React 18, added missing `@swarm/board` dependency
+- ✅ `approve()` ordering bug — mergeAndRemove now wrapped in try/catch, status only updated after successful merge
+- ✅ Session ID collision — replaced `Date.now()` with `crypto.randomUUID()`
+- ✅ Orchestrator Map keys normalized (lowercase + forward slashes) to prevent case-sensitive filesystem duplicates
+- ✅ `--dangerously-skip-permissions` now gated behind `agentsHost().permissionBypassEnabled()` — defaults to `false`
+- ✅ Config file destructive merge — JSON parse failure now returns raw content instead of `{}`
+- ✅ TerminalPane listener leak — unlistenOutput assigned before disposed check
+- ✅ Unreachable throw in `node.ts` removed
+- ✅ `nodeStatus()` stale blockingReason bug fixed — only considers blockingReason if task is in backlog/todo column
+- ✅ Stale closure in `extensionAgentProps` — reads lead status at click time, not render time
+- ✅ Embedding length validation in vector search — skips rows shorter than expected
+- ✅ `permissionBypassArgs`/`withPermissionBypass` now respects `permissionBypassEnabled()` from host
 
 ---
 

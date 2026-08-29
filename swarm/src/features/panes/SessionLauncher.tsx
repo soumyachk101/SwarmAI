@@ -119,13 +119,13 @@ export default function SessionLauncher({
   };
 
   return (
-    <div className="flex h-full w-full flex-col overflow-y-auto bg-[#0b0d14] text-[#e2e8f0] scrollbar-sleek select-none">
+    <div className="@container flex h-full w-full flex-col overflow-y-auto bg-[#0b0d14] text-[#e2e8f0] scrollbar-sleek select-none">
       {/* Top Segmented Mode Selector Bar */}
-      <div className="flex items-center justify-center pt-6 pb-4">
+      <div className="flex items-center justify-center pt-3 pb-2 sm:pt-5 sm:pb-3 shrink-0">
         <div className="flex items-center rounded-xl bg-[#141824] p-1 border border-white/[0.08] shadow-lg shadow-black/20">
           <button
             onClick={() => onModeChange?.("agent")}
-            className={`px-5 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+            className={`px-4 sm:px-5 py-1 sm:py-1.5 text-xs font-semibold rounded-lg transition-all ${
               activeMode === "agent"
                 ? "bg-[#252c42] text-white shadow-md border border-white/[0.12]"
                 : "text-slate-400 hover:text-slate-200"
@@ -135,7 +135,7 @@ export default function SessionLauncher({
           </button>
           <button
             onClick={() => onModeChange?.("code")}
-            className={`px-5 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+            className={`px-4 sm:px-5 py-1 sm:py-1.5 text-xs font-semibold rounded-lg transition-all ${
               activeMode === "code"
                 ? "bg-[#252c42] text-white shadow-md border border-white/[0.12]"
                 : "text-slate-400 hover:text-slate-200"
@@ -145,7 +145,7 @@ export default function SessionLauncher({
           </button>
           <button
             onClick={() => onModeChange?.("chat")}
-            className={`px-5 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+            className={`px-4 sm:px-5 py-1 sm:py-1.5 text-xs font-semibold rounded-lg transition-all ${
               activeMode === "chat"
                 ? "bg-[#252c42] text-white shadow-md border border-white/[0.12]"
                 : "text-slate-400 hover:text-slate-200"
@@ -157,19 +157,19 @@ export default function SessionLauncher({
       </div>
 
       {/* Main Container */}
-      <div className="mx-auto w-full max-w-5xl px-6 sm:px-10 pb-10 flex flex-col gap-7">
+      <div className="mx-auto w-full max-w-4xl px-4 sm:px-8 pb-4 flex flex-col gap-4 sm:gap-5 flex-1">
         {/* Title Header */}
-        <div className="flex items-center gap-2.5 text-sm">
+        <div className="flex items-center gap-2 text-xs sm:text-sm shrink-0">
           <span className="font-semibold text-slate-200 tracking-normal font-sans">New session</span>
-          <span className="truncate text-slate-500 font-mono text-xs">{displayPath}</span>
+          <span className="truncate text-slate-500 font-mono text-[11px] sm:text-xs">{displayPath}</span>
         </div>
 
         {/* ── PRESET Section ────────────────────────────────────────────── */}
-        <div className="flex flex-col gap-2.5">
-          <label className="text-[11px] font-bold tracking-wider text-slate-400 uppercase font-sans">
+        <div className="flex flex-col gap-2 shrink-0">
+          <label className="text-[10.5px] font-bold tracking-wider text-slate-400 uppercase font-sans">
             PRESET
           </label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div className="grid grid-cols-2 @[560px]:grid-cols-4 gap-2.5 sm:gap-3">
             {PRESETS.map((p) => {
               const active = selectedPreset === p.id;
               const Icon = p.Icon;
@@ -177,25 +177,25 @@ export default function SessionLauncher({
                 <button
                   key={p.id}
                   onClick={() => setSelectedPreset(p.id)}
-                  className={`group relative flex flex-col justify-between p-4 rounded-2xl border text-left transition-all duration-150 min-h-[110px] ${
+                  className={`group relative flex flex-col justify-between p-3 sm:p-3.5 rounded-xl border text-left transition-all duration-150 min-h-[85px] sm:min-h-[105px] ${
                     active
                       ? "bg-[#161e36] border-blue-500/80 shadow-lg shadow-blue-500/10 ring-1 ring-blue-500/50"
                       : "bg-[#111420]/90 border-white/[0.08] hover:border-white/[0.18] hover:bg-[#151928]"
                   }`}
                 >
-                  <div className="flex items-center justify-between gap-2 w-full mb-2.5">
-                    <div className="flex items-center gap-2 min-w-0">
+                  <div className="flex items-center justify-between gap-1.5 w-full mb-1.5">
+                    <div className="flex items-center gap-1.5 min-w-0">
                       <Icon
-                        className={`size-4 shrink-0 ${
+                        className={`size-3.5 sm:size-4 shrink-0 ${
                           active ? "text-blue-400" : "text-slate-400 group-hover:text-slate-200"
                         }`}
                       />
-                      <span className={`text-sm font-semibold truncate ${active ? "text-white" : "text-slate-200"}`}>
+                      <span className={`text-xs sm:text-sm font-semibold truncate ${active ? "text-white" : "text-slate-200"}`}>
                         {p.title}
                       </span>
                     </div>
                     <span
-                      className={`text-xs font-mono px-2 py-0.5 rounded-md shrink-0 ${
+                      className={`text-[10px] sm:text-xs font-mono px-1.5 py-0.5 rounded-md shrink-0 ${
                         active
                           ? "bg-blue-500/20 text-blue-300 font-bold"
                           : "bg-white/[0.06] text-slate-400"
@@ -204,7 +204,7 @@ export default function SessionLauncher({
                       {p.count}
                     </span>
                   </div>
-                  <p className="text-[11.5px] text-slate-400 leading-relaxed">
+                  <p className="text-[10.5px] sm:text-[11.5px] text-slate-400 leading-snug line-clamp-2">
                     {p.description}
                   </p>
                 </button>
@@ -214,11 +214,11 @@ export default function SessionLauncher({
         </div>
 
         {/* ── AGENT Section ────────────────────────────────────────────── */}
-        <div className="flex flex-col gap-2.5">
-          <label className="text-[11px] font-bold tracking-wider text-slate-400 uppercase">
+        <div className="flex flex-col gap-2 shrink-0">
+          <label className="text-[10.5px] font-bold tracking-wider text-slate-400 uppercase">
             AGENT
           </label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-2 @[520px]:grid-cols-3 @[720px]:grid-cols-4 gap-2">
             {AGENT_OPTIONS.map((opt) => {
               const active = selectedAgentId === opt.id;
               const brand = opt.cliId ? cliBrand(opt.cliId) : undefined;
@@ -227,24 +227,24 @@ export default function SessionLauncher({
                 <button
                   key={opt.id}
                   onClick={() => setSelectedAgentId(opt.id)}
-                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl border text-left transition-all duration-150 ${
+                  className={`flex items-center justify-between px-2.5 py-2 sm:px-3 sm:py-2.5 rounded-xl border text-left transition-all duration-150 ${
                     active
                       ? "bg-[#192038]/90 border-blue-500/80 shadow-md shadow-blue-500/10 ring-1 ring-blue-500/50"
                       : "bg-[#131622]/80 border-white/[0.08] hover:border-white/[0.18] hover:bg-[#161a2b]"
                   }`}
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-white/[0.05]">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="flex size-5 sm:size-6 shrink-0 items-center justify-center rounded-lg bg-white/[0.05]">
                       {opt.isTerminal ? (
-                        <SquareTerminal className="size-4 text-emerald-400" />
+                        <SquareTerminal className="size-3.5 sm:size-4 text-emerald-400" />
                       ) : brand ? (
-                        <BrandGlyph brand={brand} size={15} />
+                        <BrandGlyph brand={brand} size={14} />
                       ) : (
-                        <Bot className="size-4 text-slate-300" />
+                        <Bot className="size-3.5 sm:size-4 text-slate-300" />
                       )}
                     </div>
                     <span
-                      className={`truncate text-xs font-semibold ${
+                      className={`truncate text-[11px] sm:text-xs font-semibold ${
                         active ? "text-white" : "text-slate-200"
                       }`}
                     >
@@ -253,8 +253,8 @@ export default function SessionLauncher({
                   </div>
 
                   {active && (
-                    <div className="flex size-4 shrink-0 items-center justify-center rounded-full bg-blue-500 text-white shadow-sm">
-                      <Check className="size-2.5 stroke-[3]" />
+                    <div className="flex size-3.5 sm:size-4 shrink-0 items-center justify-center rounded-full bg-blue-500 text-white shadow-sm ml-1">
+                      <Check className="size-2 sm:size-2.5 stroke-[3]" />
                     </div>
                   )}
                 </button>
@@ -264,18 +264,18 @@ export default function SessionLauncher({
         </div>
 
         {/* ── HOW MANY Section ────────────────────────────────────────── */}
-        <div className="flex flex-col gap-2.5">
-          <label className="text-[11px] font-bold tracking-wider text-slate-400 uppercase">
+        <div className="flex flex-col gap-2 shrink-0">
+          <label className="text-[10.5px] font-bold tracking-wider text-slate-400 uppercase">
             HOW MANY
           </label>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {[1, 2, 3, 4, 5, 6].map((num) => {
               const active = sessionCount === num;
               return (
                 <button
                   key={num}
                   onClick={() => setSessionCount(num)}
-                  className={`flex size-8 items-center justify-center rounded-lg text-xs font-bold transition-all ${
+                  className={`flex size-7 sm:size-8 items-center justify-center rounded-lg text-xs font-bold transition-all ${
                     active
                       ? "bg-[#192038] border border-blue-500/80 text-blue-400 ring-1 ring-blue-500/40 shadow-sm"
                       : "bg-[#131622] border border-white/[0.08] text-slate-400 hover:text-slate-200 hover:bg-[#181d2e]"
@@ -292,38 +292,36 @@ export default function SessionLauncher({
         </div>
 
         {/* ── TASK - OPTIONAL Section ─────────────────────────────────── */}
-        <div className="flex flex-col gap-2.5">
-          <label className="text-[11px] font-bold tracking-wider text-slate-400 uppercase">
+        <div className="flex flex-col gap-2 shrink-0">
+          <label className="text-[10.5px] font-bold tracking-wider text-slate-400 uppercase">
             TASK — OPTIONAL
           </label>
-          <div className="relative rounded-xl border border-white/[0.08] bg-[#131622]/90 focus-within:border-blue-500/60 focus-within:ring-1 focus-within:ring-blue-500/40 transition-all p-3">
-            <textarea
-              value={taskPrompt}
-              onChange={(e) => setTaskPrompt(e.target.value)}
-              placeholder="What should it work on?"
-              rows={3}
-              className="w-full resize-none bg-transparent text-xs text-slate-200 placeholder:text-slate-500 outline-none leading-relaxed"
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-                  e.preventDefault();
-                  handleLaunch();
-                }
-              }}
-            />
-          </div>
+          <textarea
+            value={taskPrompt}
+            onChange={(e) => setTaskPrompt(e.target.value)}
+            placeholder="What should it work on?"
+            rows={2}
+            className="w-full resize-none rounded-xl border border-white/[0.08] bg-[#131622]/90 px-3.5 py-3 text-xs text-slate-200 placeholder:text-slate-500 focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/40 outline-none leading-relaxed transition-all shadow-inner"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                e.preventDefault();
+                handleLaunch();
+              }
+            }}
+          />
         </div>
 
-        {/* ── Launch Action Footer ────────────────────────────────────── */}
-        <div className="flex items-center justify-between pt-2 pb-6 border-t border-white/[0.06]">
-          <div className="flex items-center gap-2 text-xs text-slate-500">
-            <Sparkles className="size-3.5 text-blue-400" />
+        {/* ── Launch Action Footer (Sticky) ────────────────────────────── */}
+        <div className="sticky bottom-0 -mx-4 sm:-mx-8 px-4 sm:px-8 py-3 bg-[#0b0d14]/95 backdrop-blur-md border-t border-white/[0.08] mt-auto shadow-2xl z-20 flex items-center justify-between">
+          <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-slate-400">
+            <Sparkles className="size-3.5 text-blue-400 shrink-0" />
             <span>Press <kbd className="rounded bg-white/[0.08] px-1.5 py-0.5 text-[10px] text-slate-300 font-mono">⌘+Enter</kbd> to launch</span>
           </div>
 
           <button
             onClick={handleLaunch}
             disabled={isLaunching}
-            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-2.5 text-xs font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:brightness-110 hover:shadow-blue-500/30 active:scale-[0.98] disabled:opacity-50 cursor-pointer"
+            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 sm:px-6 py-2 sm:py-2.5 text-xs font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:brightness-110 hover:shadow-blue-500/30 active:scale-[0.98] disabled:opacity-50 cursor-pointer shrink-0"
           >
             <Play className="size-3.5 fill-current" />
             <span>Start Session</span>

@@ -990,9 +990,9 @@ function PlaneAddMenu({
 
   // Board menu: unified gold theme, a search box, top agents per category.
   if (plane.kind === "board") {
-    const agents = CLI_METADATA.filter((c) => has(c.name) || has(c.command)).slice(0, 8);
-    const terms = shells.filter((s) => has(s.label)).slice(0, 4);
-    const exts = extensions.filter((e) => has(e.name) || has(e.publisher)).slice(0, 4);
+    const agents = CLI_METADATA.filter((c) => has(c.name) || has(c.command));
+    const terms = shells.filter((s) => has(s.label)).slice(0, 6);
+    const exts = extensions.filter((e) => has(e.name) || has(e.publisher)).slice(0, 6);
     const aiTools = [
       { key: "devchat", title: "AI Copilot Chat", subtitle: "Claude 5, Gemini 3.7 & CLI Executor", icon: Sparkles, onClick: onChat },
     ].filter((t) => has(t.title) || has(t.subtitle));
