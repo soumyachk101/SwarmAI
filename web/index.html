@@ -91,6 +91,23 @@ header.scrolled{background:rgba(5,6,8,.92);border-bottom-color:var(--border-m);b
 .copy-btn{display:inline-flex;align-items:center;justify-content:center;background:0 0;border:1px solid var(--border-s);color:var(--text-3);cursor:pointer;padding:5px;border-radius:var(--rsm);transition:all .2s ease}
 .copy-btn:hover{color:var(--text-1);border-color:var(--border-b);background:rgba(255,255,255,.05)}
 .copy-btn.ok{color:var(--emerald);border-color:rgba(16,185,129,.3)}
+/* ── Hero Agent Showcase ── */
+.hero-agents{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;max-width:920px;margin:24px auto 0;animation:fadeUp .8s var(--ease) .35s both}
+.agent-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:var(--rfull);background:rgba(255,255,255,.03);border:1px solid var(--border-s);font-family:var(--fm);font-size:11.5px;color:var(--text-2);font-weight:500;transition:all .25s ease;backdrop-filter:blur(6px);text-decoration:none}
+.agent-chip:hover{background:rgba(255,255,255,.08);border-color:var(--border-b);color:var(--text-1);transform:translateY(-2px);box-shadow:var(--sh-s)}
+.agent-chip .chip-dot{width:6px;height:6px;border-radius:50%}
+.chip-dot.claude{background:#d97706}
+.chip-dot.codex{background:#10b981}
+.chip-dot.grok{background:#38bdf8}
+.chip-dot.antigravity{background:#8b5cf6}
+.chip-dot.opencode{background:#ec4899}
+.chip-dot.aider{background:#06b6d4}
+.chip-dot.cursor{background:#6366f1}
+.chip-dot.cline{background:#f97316}
+.chip-dot.kiro{background:#14b8a6}
+.chip-dot.kilo{background:#84cc16}
+.chip-dot.kimi{background:#eab308}
+
 .trust{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:22px;padding-top:20px;animation:fadeUp .8s var(--ease) .5s both}
 .trust-i{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-4);font-weight:500}
 .trust-ic{width:16px;height:16px;color:var(--emerald);opacity:.7}
@@ -349,7 +366,20 @@ footer{background:#030406;border-top:1px solid var(--border-s);padding:64px 24px
 <section class="hero">
 <div class="hero-pill"><span class="live-dot"></span><span>Autonomous AI-Native Desktop Workspace</span><span style="color:rgba(255,255,255,.12)">|</span><span style="color:var(--platinum);font-weight:600">Multi-Agent Concurrency</span></div>
 <h1 class="hero-h1">Where Multiple AI Agents Build<br/><span class="hero-grad">Simultaneously Without Conflicts.</span></h1>
-<p class="hero-sub">Swarm AI coordinates Claude Code, OpenAI Codex, OpenCode, Aider, and Antigravity concurrently. Equipped with shared Pheromone memory, isolated Git worktrees, and an infinite Flow canvas — all running locally on your machine.</p>
+<p class="hero-sub">Swarm AI coordinates Claude Code, OpenAI Codex, xAI Grok Code, Google Antigravity, OpenCode, Aider, Cursor, Cline, Kiro, Kilo, and Kimi Code concurrently. Equipped with shared Pheromone memory, isolated Git worktrees, and an infinite Flow canvas — all running locally on your workstation.</p>
+<div class="hero-agents">
+<div class="agent-chip"><span class="chip-dot claude"></span>Anthropic Claude Code</div>
+<div class="agent-chip"><span class="chip-dot codex"></span>OpenAI Codex</div>
+<div class="agent-chip"><span class="chip-dot grok"></span>xAI Grok Code</div>
+<div class="agent-chip"><span class="chip-dot antigravity"></span>Google Antigravity CLI</div>
+<div class="agent-chip"><span class="chip-dot opencode"></span>OpenCode (DeepSeek R1)</div>
+<div class="agent-chip"><span class="chip-dot aider"></span>Aider Chat</div>
+<div class="agent-chip"><span class="chip-dot cursor"></span>Cursor CLI</div>
+<div class="agent-chip"><span class="chip-dot cline"></span>Cline</div>
+<div class="agent-chip"><span class="chip-dot kiro"></span>Kiro CLI</div>
+<div class="agent-chip"><span class="chip-dot kilo"></span>Kilo Code</div>
+<div class="agent-chip"><span class="chip-dot kimi"></span>Kimi Code</div>
+</div>
 <div class="hero-actions">
 <div class="hero-btns">
 <a href="releases/macOS/SwarmAI_0.1.0_aarch64.dmg" class="btn-hero btn-p" id="autoDlBtn">
@@ -518,17 +548,19 @@ codex --model codex-5.6-sol --reasoning-effort high</div>
 <div class="d-code">export OLLAMA_HOST="http://localhost:11434"
 opencode --model deepseek-r1:32b --api-base http://localhost:11434/v1</div>
 <h2 class="d-h2">4. Full CLI Catalog</h2>
-<div class="d-code">Agent Command Install Method
------------------------------------------------------------------
-Claude Code claude npm install -g @anthropic-ai/claude-code
-Codex CLI codex npm install -g @openai/codex
-Aider aider pip install aider-chat
-Antigravity agy npm install -g @google/antigravity-cli
-OpenCode opencode npm install -g opencode-ai
-Cline cline npm install -g cline
-Cursor CLI cursor Cursor IDE bundled
-Kiro CLI kiro npm install -g kiro-cli
-Kilo kilo npm install -g kilo-ai</div>
+<div class="d-code">Agent                Command     Model Ecosystem & Default Target
+---------------------------------------------------------------------------------
+Anthropic Claude     claude      Claude 3.7 Sonnet, Claude Opus 5, Haiku 3.5
+OpenAI Codex         codex       Codex 5.6 Sol, GPT-4o, o3-mini
+xAI Grok Code        grok        Grok Beta, Grok 2, Grok 3 (Reasoning)
+Google Antigravity   agy         Gemini 2.0 Flash, Gemini 1.5 Pro, PaLM
+OpenCode             opencode    DeepSeek R1, LLaMA 3.3, Mistral, Ollama/vLLM
+Aider Multi-Model    aider       Multi-provider pairing, architect mode
+Cursor CLI           cursor      Cursor Agent Headless, Composer
+Cline                cline       Open-source autonomous coding agent
+Kiro CLI             kiro        Local & remote agent coordinator
+Kilo Code            kilo        Fast token-budgeted CLI assistant
+Moonshot Kimi Code   kimi        Kimi Moonshot long-context reasoning</div>
 </article>
 
 <!-- MCP Integration -->
@@ -714,7 +746,7 @@ Cmd/Ctrl+K Clear Terminal Buffer</div>
 <div class="faq"><div class="faq-q" onclick="toggleFaq(this)">What is Swarm AI and how is it different?<svg class="faq-chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-a"><div class="faq-ain">Swarm AI is a <strong>local-first desktop workspace</strong> that runs multiple AI coding agents in parallel, each in its own isolated Git worktree. Unlike single-thread chatbots, it coordinates Claude Code, Codex CLI, Aider, and others simultaneously with shared project memory (Pheromone). Your code never leaves your machine.</div></div></div>
 <div class="faq"><div class="faq-q" onclick="toggleFaq(this)">Is Swarm AI free to use?<svg class="faq-chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-a"><div class="faq-ain">Yes! Open source under a <strong>personal, non-commercial license</strong>. Free for personal projects. Commercial use requires a separate license — contact <a href="mailto:soumya.chk101@gmail.com">soumya.chk101@gmail.com</a>.</div></div></div>
 <div class="faq"><div class="faq-q" onclick="toggleFaq(this)">Do I need API keys?<svg class="faq-chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-a"><div class="faq-ain">Swarm AI itself needs no API key — it's a local orchestration layer. The coding agents it runs (Claude Code, Codex, etc.) need their provider keys. These are entered in Settings and stored securely in your OS keychain.</div></div></div>
-<div class="faq"><div class="faq-q" onclick="toggleFaq(this)">Which AI coding agents are supported?<svg class="faq-chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-a"><div class="faq-ain"><strong>10+ CLI agents</strong> out of the box: Claude Code, OpenAI Codex CLI, Aider, Antigravity CLI, OpenCode, Cline, Cursor CLI, Kiro CLI, and Kilo. Each gets automatic MCP registration with Pheromone, permission bypass flags, and security-hardened environment variables.</div></div></div>
+<div class="faq"><div class="faq-q" onclick="toggleFaq(this)">Which AI coding agents are supported?<svg class="faq-chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-a"><div class="faq-ain"><strong>11+ CLI agents out of the box</strong>: Anthropic Claude Code, OpenAI Codex CLI, xAI Grok Code, Google Antigravity CLI, OpenCode (DeepSeek/Ollama), Aider, Cursor CLI, Cline, Kiro CLI, Kilo Code, and Kimi Code. Each gets automatic MCP registration with Pheromone, permission bypass flags, and security-hardened environment variables.</div></div></div>
 <div class="faq"><div class="faq-q" onclick="toggleFaq(this)">How does Pheromone prevent conflicts?<svg class="faq-chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-a"><div class="faq-ain">Two mechanisms: (1) <strong>Shared vector memory</strong> — every architectural decision is indexed and available to all agents via semantic search. (2) <strong>File-ownership locks</strong> — Lead assigns exclusive write paths to each worker, preventing simultaneous edits.</div></div></div>
 <div class="faq"><div class="faq-q" onclick="toggleFaq(this)">Can I run on an air-gapped machine?<svg class="faq-chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-a"><div class="faq-ain">Yes. Zero cloud dependency. Use local LLMs via Ollama or vLLM with OpenCode. All memory stays on your machine. The only network calls are direct connections to your chosen model provider.</div></div></div>
 <div class="faq"><div class="faq-q" onclick="toggleFaq(this)">What are the system requirements?<svg class="faq-chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-a"><div class="faq-ain"><strong>All:</strong> Node.js ≥ 20, Git ≥ 2.38, one coding CLI.<br/><strong>macOS:</strong> Xcode CLI Tools. Apple Silicon or Intel.<br/><strong>Windows:</strong> WebView2 runtime, VS C++ build tools.<br/><strong>Linux:</strong> webkit2gtk, libssl-dev, build-essential, libayatana-appindicator3-dev, librsvg2-dev.</div></div></div>
