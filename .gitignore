@@ -1,83 +1,139 @@
-# Dependencies
-node_modules
-/node_modules
-.pnpm-store
+# ==============================================================================
+# Dependencies & Package Managers
+# ==============================================================================
+node_modules/
+/node_modules/
+.pnpm-store/
 .pnpm-debug.log*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+bun.lockb
 
-# AI Agent IDE configs & local states
+# ==============================================================================
+# AI Agent IDE & Assistant Local State (Claude, Cursor, Aider, Antigravity, etc.)
+# ==============================================================================
 .claude/
 .agents/
 .cursor/
 .playwright-mcp/
 .thekedar/
+.aider*
+*.aider*
+chat_history/
+*.chat.history.md
 
-# Build outputs & Bundles
-dist
-.next
-out
-target
-/target
+# ==============================================================================
+# Build Outputs, Caches & Bundles
+# ==============================================================================
+dist/
+**/dist/
+build/
+**/build/
+.next/
+out/
+target/
+**/target/
 swarm/src-tauri/target/
+.turbo/
+/.turbo/
+*.tsbuildinfo
+coverage/
+.nyc_output/
+.playwright/
 
-# Release binary installers (compiled artifacts should be distributed via GitHub Releases, not git tree)
+# ==============================================================================
+# Release Installers & Compiled Binaries
+# (Compiled binaries should be published via GitHub Releases / CI, not git tree)
+# ==============================================================================
 releases/**/*.dmg
 releases/**/*.exe
 releases/**/*.msi
 releases/**/*.deb
 releases/**/*.app
 releases/**/*.zip
+releases/**/*.tar.gz
+releases/**/*.rpm
 *.dmg
 *.exe
 *.msi
 *.deb
 *.app
+!releases/**/.gitkeep
+!download-site/releases/**/.gitkeep
 
-# Turbo cache (local, machine-specific, regenerated on every build)
-.turbo
-/.turbo
-
-# TypeScript incremental build cache
-*.tsbuildinfo
-
-# Pheromone local database & state
+# ==============================================================================
+# Databases & Local Runtime Storage
+# ==============================================================================
 .pheromone/
 pheromone.db
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
 
-# Environment & Secrets
+# ==============================================================================
+# Secrets, Environment & Credentials
+# ==============================================================================
 .env
 .env.local
 .env.*.local
 *.pem
 *.key
+*.cert
+*.p12
+*.pfx
 
-# IDE & Editor
-.vscode
-.idea
-*.swp
-*.swo
-
-# OS & accidental local directories
+# ==============================================================================
+# Operating System & File System Artifacts
+# ==============================================================================
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 /Users/
 
+# ==============================================================================
+# IDEs & Text Editors
+# ==============================================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# ==============================================================================
 # Logs
+# ==============================================================================
 *.log
-npm-debug.log*
-pnpm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+*.log.*
 
-# Testing & Coverage
-coverage/
-.nyc_output/
-.playwright/
-
-# Temporary / Scratch scripts
+# ==============================================================================
+# Temporary / Scratch Files & Scripts
+# ==============================================================================
+*.bak
+*.backup
+*.old
+*.orig
+*.tmp
+*.temp
+patch_*.py
+fix_*.py
 fix*.js
 fix*.rb
 do_fix.js
 fixed_func.rs
 insert_launchctl.rb
 new_block.txt
-*.tmp
+analysis-result*.json
+test-simple*.json
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
