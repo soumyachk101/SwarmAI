@@ -16,8 +16,8 @@
 
 <!-- Badges Row -->
 <p>
- <a href="https://github.com/soumyachk101/swarm">
- <img src="https://img.shields.io/badge/GitHub-soumyachk101%2Fswarm-black?style=flat-square&logo=github" alt="GitHub" />
+ <a href="https://github.com/soumyachk101/SwarmAI">
+ <img src="https://img.shields.io/badge/GitHub-soumyachk101%2FSwarmAI-black?style=flat-square&logo=github" alt="GitHub" />
  </a>
  <a href="https://tauri.app">
  <img src="https://img.shields.io/badge/Tauri-v2-FFC131?style=flat-square&logo=tauri&logoColor=white" alt="Tauri" />
@@ -582,7 +582,7 @@ Every bug fix gets a regression test. Code comments reference specific issues:
 | **CLI Agent** | Any | At least one coding agent on PATH |
 | **Android SDK** | Optional | Emulator plane (`emulator` + `platform-tools`) |
 
-> **API Keys**: Provider keys are entered in the in-app Settings panel and stored locally. No `.env` files are required for the core application — `swarm/.env.example` contains GlassChat legacy variables that are only needed if you enable the GlassChat integration plugin.
+> **API Keys**: Provider keys are entered in the in-app Settings panel and stored locally. No `.env` files are required for the core application — `desktop/.env.example` contains GlassChat legacy variables that are only needed if you enable the GlassChat integration plugin.
 
 ### Platform Prerequisites
 
@@ -853,7 +853,7 @@ For a commercial license, contact [soumya.chk101@gmail.com](mailto:soumya.chk101
 
 | Resource | Link |
 |----------|------|
-| **GitHub Repository** | [github.com/soumyachk101/swarm](https://github.com/soumyachk101/swarm) |
+| **GitHub Repository** | [github.com/soumyachk101/SwarmAI](https://github.com/soumyachk101/SwarmAI) |
 | **Author** | [@soumyachk101](https://github.com/soumyachk101) |
 | **Email** | soumya.chk101@gmail.com |
 
