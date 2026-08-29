@@ -3,8 +3,8 @@
 import {
   Play, Calendar, GitBranch, Code2, Layers,
   ShieldCheck, BadgeCheck, Square,
+  type LucideIcon,
 } from "lucide-react";
-import type { ComponentType } from "react";
 import type { TaskCard } from "../board.js";
 import { buildPipeline, type PipelineStage } from "../pipeline.js";
 import { STATUS_COLORS } from "../theme.js";
@@ -25,7 +25,7 @@ const PORT_R = 3.5;
 
 const CONNECTOR_COLOR = "rgb(var(--swarm-gold))";
 
-interface Palette { icon: ComponentType<{ size?: number; className?: string }>; accent: string }
+interface Palette { icon: LucideIcon; accent: string }
 
 const PAL: Record<string, Palette> = {
   start:       { icon: Play,       accent: STATUS_COLORS.done },
