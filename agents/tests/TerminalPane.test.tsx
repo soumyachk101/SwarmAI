@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
-import TerminalPane from "./TerminalPane";
+import "@testing-library/jest-dom";
+import TerminalPane from "../src/ui/TerminalPane";
 
 // Mock xterm and addons
 const mockXTermInstance = {
@@ -49,21 +50,30 @@ vi.mock("@tauri-apps/api/core", () => ({
 
 vi.mock("@tauri-apps/api/event", () => ({
  listen: vi.fn(() => ({ dispose: vi.fn() })),
- type UnlistenFn = () => {};
 }));
 
 // Mock the spawnGuard
-vi.mock("./spawnGuard", () => ({
+vi.mock("../src/ui/spawnGuard", () => ({
  isAlreadySpawned: vi.fn().mockResolvedValue(false),
  markSpawned: vi.fn(),
 }));
 
-// Mock useAgentsStore
-vi.mock("./agentsStore", () => ({
- useAgentsStore: () => ({
- refitCount: 0,
- setActivePaneId: vi.fn(),
- }),
+const { mockTerminalStoreState, mockUseTerminalAgentsStore } = vi.hoisted(() => {
+  const state = {
+    refitCount: 0,
+    setActivePaneId: vi.fn(),
+    agents: [] as any[],
+    agentStatuses: {},
+  };
+  const fn: any = vi.fn((selector?: any) =>
+    typeof selector === "function" ? selector(state) : state
+  );
+  fn.getState = () => state;
+  return { mockTerminalStoreState: state, mockUseTerminalAgentsStore: fn };
+});
+
+vi.mock("../src/ui/agentsStore", () => ({
+  useAgentsStore: mockUseTerminalAgentsStore,
 }));
 
 // Mock board components
@@ -73,13 +83,13 @@ vi.mock("@swarm/board", () => ({
  themeForKind: () => ({ accent: "#f59e0b" }),
 }));
 
-vi.mock("./themeColors", () => ({
+vi.mock("../src/ui/themeColors", () => ({
  THEME_CHANGE_EVENT: "theme:change",
  buildXtermThemeFromDom: () => ({}),
  swarmHex: () => "#0b0d14",
 }));
 
-vi.mock("./paneResize", () => ({
+vi.mock("../src/ui/paneResize", () => ({
  onWindowResize: (callback: () => void) => {
  const id = setInterval(callback, 100);
  return () => clearInterval(id);
@@ -88,7 +98,12 @@ vi.mock("./paneResize", () => ({
 
 describe("TerminalPane", () => {
  beforeEach(() => {
- vi.clearAllMocks();
+  vi.clearAllMocks();
+  Object.assign(navigator, {
+    clipboard: {
+      writeText: vi.fn().mockResolvedValue(undefined),
+    },
+  });
  });
 
  afterEach(() => {
@@ -169,11 +184,12 @@ describe("TerminalPane", () => {
  expect(screen.getByText(/Starting bash/)).toBeDefined();
  });
 
- it("calls setActivePaneId on mouse down", () => {
+ it("calls setActivePaneId on mouse down", async () => {
  const setActivePaneId = vi.fn();
- vi.mocked(require("./agentsStore").useAgentsStore).mockReturnValue({
- refitCount: 0,
- setActivePaneId,
+ const { useAgentsStore } = await import("../src/ui/agentsStore");
+ vi.mocked(useAgentsStore).mockReturnValue({
+  refitCount: 0,
+  setActivePaneId,
  } as any);
 
  render(<TerminalPane paneId="terminal-1" />);

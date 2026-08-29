@@ -15,6 +15,11 @@ const ROLE_CONFIG: Record<string, { label: string; color: string; dot: string }>
   reviewer: { label: 'Reviewer', color: 'bg-swarm-ok/15 text-swarm-ok border-swarm-ok/25', dot: 'bg-swarm-ok' },
   scout: { label: 'Scout', color: 'bg-swarm-honey/15 text-swarm-honey border-swarm-honey/25', dot: 'bg-swarm-honey' },
   coordinator: { label: 'Coordinator', color: 'bg-swarm-amber/15 text-swarm-amber border-swarm-amber/25', dot: 'bg-swarm-amber' },
+  architect: { label: 'Architect', color: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/25', dot: 'bg-indigo-400 shadow-glow' },
+  frontend: { label: 'Frontend', color: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/25', dot: 'bg-cyan-400' },
+  backend: { label: 'Backend', color: 'bg-purple-500/15 text-purple-400 border-purple-500/25', dot: 'bg-purple-400' },
+  tester: { label: 'Tester', color: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/25', dot: 'bg-emerald-400' },
+  security: { label: 'Security', color: 'bg-rose-500/15 text-rose-400 border-rose-500/25', dot: 'bg-rose-400' },
 };
 
 const FALLBACK = {

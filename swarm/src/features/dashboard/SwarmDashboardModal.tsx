@@ -42,6 +42,11 @@ const ROLE_COLORS: Record<string, string> = {
  reviewer: "border-cyan-500/40 text-cyan-400 bg-cyan-500/10",
  scout: "border-amber-500/40 text-amber-400 bg-amber-500/10",
  coordinator: "border-purple-500/40 text-purple-400 bg-purple-500/10",
+ architect: "border-indigo-500/40 text-indigo-400 bg-indigo-500/10",
+ frontend: "border-cyan-500/40 text-cyan-400 bg-cyan-500/10",
+ backend: "border-purple-500/40 text-purple-400 bg-purple-500/10",
+ tester: "border-emerald-500/40 text-emerald-400 bg-emerald-500/10",
+ security: "border-rose-500/40 text-rose-400 bg-rose-500/10",
 };
 
 const LEVEL_COLORS: Record<string, string> = {

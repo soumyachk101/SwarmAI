@@ -405,9 +405,26 @@ export function DevChatStudio({
   const [liveThinkingStep, setLiveThinkingStep] = useState<string | null>(null);
   const [thinkingElapsed, setThinkingElapsed] = useState<number>(0);
 
-  // Context attachments
+  // Context attachments & @ mentions
   const [attachedContexts, setAttachedContexts] = useState<AttachedContext[]>([]);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
+  const [showMentionMenu, setShowMentionMenu] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState("");
+  const [mentionIndex, setMentionIndex] = useState(0);
+
+  // Close dropdown menus on outside click
+  useEffect(() => {
+    if (!showModelMenu && !showSessionMenu && !showCliMenu && !showAttachMenu && !showMentionMenu) return;
+    const onOutside = () => {
+      setShowModelMenu(false);
+      setShowSessionMenu(false);
+      setShowCliMenu(false);
+      setShowAttachMenu(false);
+      setShowMentionMenu(false);
+    };
+    window.addEventListener("click", onOutside);
+    return () => window.removeEventListener("click", onOutside);
+  }, [showModelMenu, showSessionMenu, showCliMenu, showAttachMenu, showMentionMenu]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -813,6 +830,43 @@ export function DevChatStudio({
     } catch (_) {}
   };
 
+  // Attach File from disk
+  const handleAttachFile = async () => {
+    setShowAttachMenu(false);
+    setShowMentionMenu(false);
+    try {
+      const tauri = typeof window !== "undefined" ? (window as any).__TAURI_INTERNALS__ || (window as any).__TAURI__ : null;
+      let selected: string | string[] | null = null;
+      if (tauri?.open) {
+        selected = await tauri.open({ multiple: false, directory: false, title: "Select file to attach" });
+      } else if (tauri?.invoke) {
+        try {
+          selected = (await tauri.invoke("plugin:dialog|open", {
+            options: { multiple: false, directory: false, title: "Select file to attach" },
+          })) as any;
+        } catch (_) {}
+      }
+      if (!selected || typeof selected !== "string") return;
+      const filePath = selected;
+      let content = "";
+      if (tauri?.invoke) {
+        content = (await tauri.invoke("read_file", { path: filePath })) as string;
+      }
+      const fileName = filePath.split(/[\\/]/).pop() || filePath;
+      setAttachedContexts((prev) => [
+        ...prev.filter((p) => p.title !== fileName),
+        {
+          id: `file-${Date.now()}`,
+          type: "file",
+          title: fileName,
+          content: content || `[Empty file: ${filePath}]`,
+        },
+      ]);
+    } catch (err) {
+      console.error("Failed to attach file:", err);
+    }
+  };
+
   // Real CLI task execution via Tauri IPC
   const runLiveCliTask = async (promptText: string, cliId: string, modelId: string) => {
     const cliConfig = INSTALLED_CLIS.find((c) => c.id === cliId) || INSTALLED_CLIS[0];
@@ -1051,7 +1105,86 @@ export function DevChatStudio({
     [selectedModel, selectedCli, execMode, projectPath, attachedContexts]
   );
 
+  const MENTION_OPTIONS = [
+    {
+      id: "git",
+      name: "@git",
+      label: "Git Diff",
+      desc: "Uncommitted changes & active diff",
+      icon: GitBranch,
+      action: () => handleAttachGitDiff(),
+    },
+    {
+      id: "tree",
+      name: "@tree",
+      label: "Project Tree",
+      desc: "Directory structure & file paths",
+      icon: FolderTree,
+      action: () => handleAttachProjectTree(),
+    },
+    {
+      id: "file",
+      name: "@file",
+      label: "Attach File",
+      desc: "Pick source file from workspace",
+      icon: FileCode,
+      action: () => handleAttachFile(),
+    },
+  ];
+
+  const applyMentionOption = (opt: (typeof MENTION_OPTIONS)[0]) => {
+    const cleanedInput = input.replace(/@([a-zA-Z0-9_\-\.]*)$/, "").trim();
+    setInput(cleanedInput);
+    setShowMentionMenu(false);
+    opt.action();
+  };
+
+  const handleInputChange = (val: string) => {
+    setInput(val);
+    const match = val.match(/@([a-zA-Z0-9_\-\.]*)$/);
+    if (match) {
+      setMentionQuery(match[1].toLowerCase());
+      setShowMentionMenu(true);
+      setMentionIndex(0);
+    } else {
+      setShowMentionMenu(false);
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (showMentionMenu) {
+      const filtered = MENTION_OPTIONS.filter(
+        (o) => o.name.toLowerCase().includes(mentionQuery) || o.label.toLowerCase().includes(mentionQuery)
+      );
+      if (filtered.length > 0) {
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          e.stopPropagation();
+          setMentionIndex((prev) => (prev + 1) % filtered.length);
+          return;
+        }
+        if (e.key === "ArrowUp") {
+          e.preventDefault();
+          e.stopPropagation();
+          setMentionIndex((prev) => (prev - 1 + filtered.length) % filtered.length);
+          return;
+        }
+        if (e.key === "Enter" || e.key === "Tab") {
+          e.preventDefault();
+          e.stopPropagation();
+          const selected = filtered[mentionIndex] || filtered[0];
+          applyMentionOption(selected);
+          return;
+        }
+        if (e.key === "Escape") {
+          e.preventDefault();
+          e.stopPropagation();
+          setShowMentionMenu(false);
+          return;
+        }
+      }
+    }
+
     e.stopPropagation();
     e.nativeEvent.stopImmediatePropagation();
     if (e.key === "Enter" && !e.shiftKey) {
@@ -1167,12 +1300,13 @@ export function DevChatStudio({
 
       {/* Solid, Opaque Header Bar with dynamic responsive flex layout */}
       <div className="relative z-30 flex shrink-0 items-center justify-between gap-1.5 border-b border-white/[0.08] bg-[#13151b] px-2 sm:px-3.5 py-1.5 sm:py-2 shadow-sm min-w-0">
-        <div className="flex items-center gap-1.5 min-w-0 flex-1 overflow-hidden">
+        <div className="flex items-center gap-1.5 min-w-0 flex-1">
           {/* Multi-Session Dropdown */}
           <div className="relative shrink-0">
             <button
-              onClick={() => {
-                setShowSessionMenu(!showSessionMenu);
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowSessionMenu((v) => !v);
                 setShowModelMenu(false);
                 setShowCliMenu(false);
               }}
@@ -1184,59 +1318,58 @@ export function DevChatStudio({
             </button>
 
             {showSessionMenu && (
-              <>
-                <div className="fixed inset-0 z-[90]" onClick={() => setShowSessionMenu(false)} />
-                <div
-                  className="absolute left-0 top-full mt-1.5 z-[100] w-64 rounded-xl border border-white/[0.12] p-1.5 shadow-2xl animate-scale-in"
-                  style={{ backgroundColor: "#151821", opacity: 1, zIndex: 100 }}
-                >
-                  <div className="flex items-center justify-between px-2.5 py-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
-                    <span>Chat Sessions</span>
-                    <button
-                      onClick={handleCreateNewSession}
-                      className="flex items-center gap-1 text-swarm-gold hover:text-swarm-goldHi"
-                    >
-                      <Plus size={12} />
-                      <span>New</span>
-                    </button>
-                  </div>
-                  <div className="max-h-60 overflow-y-auto scrollbar-sleek space-y-0.5">
-                    {sessions.map((s) => (
-                      <div
-                        key={s.id}
-                        onClick={() => {
-                          setActiveSessionId(s.id);
-                          setShowSessionMenu(false);
-                        }}
-                        className={`flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs cursor-pointer transition-colors ${
-                          s.id === activeSessionId
-                            ? "bg-swarm-gold/20 text-swarm-goldHi font-medium"
-                            : "text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text"
-                        }`}
-                      >
-                        <span className="truncate">{s.title}</span>
-                        {sessions.length > 1 && (
-                          <button
-                            onClick={(e) => handleDeleteSession(s.id, e)}
-                            className="text-swarm-textMuted hover:text-swarm-err p-0.5"
-                            title="Delete session"
-                          >
-                            <Trash2 size={11} />
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="absolute left-0 top-full mt-1.5 z-[100] w-64 rounded-xl border border-white/[0.12] p-1.5 shadow-2xl animate-scale-in"
+                style={{ backgroundColor: "#151821", opacity: 1, zIndex: 100 }}
+              >
+                <div className="flex items-center justify-between px-2.5 py-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
+                  <span>Chat Sessions</span>
+                  <button
+                    onClick={handleCreateNewSession}
+                    className="flex items-center gap-1 text-swarm-gold hover:text-swarm-goldHi"
+                  >
+                    <Plus size={12} />
+                    <span>New</span>
+                  </button>
                 </div>
-              </>
+                <div className="max-h-60 overflow-y-auto scrollbar-sleek space-y-0.5">
+                  {sessions.map((s) => (
+                    <div
+                      key={s.id}
+                      onClick={() => {
+                        setActiveSessionId(s.id);
+                        setShowSessionMenu(false);
+                      }}
+                      className={`flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs cursor-pointer transition-colors ${
+                        s.id === activeSessionId
+                          ? "bg-swarm-gold/20 text-swarm-goldHi font-medium"
+                          : "text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text"
+                      }`}
+                    >
+                      <span className="truncate">{s.title}</span>
+                      {sessions.length > 1 && (
+                        <button
+                          onClick={(e) => handleDeleteSession(s.id, e)}
+                          className="text-swarm-textMuted hover:text-swarm-err p-0.5"
+                          title="Delete session"
+                        >
+                          <Trash2 size={11} />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
 
           {/* Model Selector Pill */}
           <div className="relative shrink-0">
             <button
-              onClick={() => {
-                setShowModelMenu(!showModelMenu);
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowModelMenu((v) => !v);
                 setShowCliMenu(false);
                 setShowSessionMenu(false);
               }}
@@ -1248,43 +1381,41 @@ export function DevChatStudio({
             </button>
 
             {showModelMenu && (
-              <>
-                <div className="fixed inset-0 z-[90]" onClick={() => setShowModelMenu(false)} />
-                <div
-                  className="absolute left-0 top-full mt-1.5 z-[100] w-64 rounded-xl border border-white/[0.12] p-1.5 shadow-2xl animate-scale-in"
-                  style={{ backgroundColor: "#151821", opacity: 1, zIndex: 100 }}
-                >
-                  <div className="px-2.5 py-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
-                    Select AI Model
-                  </div>
-                  <div className="max-h-72 overflow-y-auto scrollbar-sleek space-y-0.5">
-                    {DEV_MODELS.map((model) => {
-                      const Icon = model.icon;
-                      const active = model.id === selectedModel;
-                      return (
-                        <button
-                          key={model.id}
-                          onClick={() => {
-                            setSelectedModel(model.id);
-                            setShowModelMenu(false);
-                          }}
-                          className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs transition-colors ${
-                            active
-                              ? "bg-swarm-gold/20 text-swarm-goldHi font-medium"
-                              : "text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text"
-                          }`}
-                        >
-                          <div className="flex items-center gap-2 truncate">
-                            <Icon size={13} className={active ? "text-swarm-gold shrink-0" : "text-swarm-textMuted shrink-0"} />
-                            <span className="truncate">{model.name}</span>
-                          </div>
-                          <span className="text-micro text-swarm-textMuted font-mono shrink-0 ml-1">{model.badge}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="absolute left-0 top-full mt-1.5 z-[100] w-64 rounded-xl border border-white/[0.12] p-1.5 shadow-2xl animate-scale-in"
+                style={{ backgroundColor: "#151821", opacity: 1, zIndex: 100 }}
+              >
+                <div className="px-2.5 py-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
+                  Select AI Model
                 </div>
-              </>
+                <div className="max-h-72 overflow-y-auto scrollbar-sleek space-y-0.5">
+                  {DEV_MODELS.map((model) => {
+                    const Icon = model.icon;
+                    const active = model.id === selectedModel;
+                    return (
+                      <button
+                        key={model.id}
+                        onClick={() => {
+                          setSelectedModel(model.id);
+                          setShowModelMenu(false);
+                        }}
+                        className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs transition-colors ${
+                          active
+                            ? "bg-swarm-gold/20 text-swarm-goldHi font-medium"
+                            : "text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 truncate">
+                          <Icon size={13} className={active ? "text-swarm-gold shrink-0" : "text-swarm-textMuted shrink-0"} />
+                          <span className="truncate">{model.name}</span>
+                        </div>
+                        <span className="text-micro text-swarm-textMuted font-mono shrink-0 ml-1">{model.badge}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             )}
           </div>
 
@@ -1317,8 +1448,9 @@ export function DevChatStudio({
           {execMode === "cli" && (
             <div className="relative shrink-0">
               <button
-                onClick={() => {
-                  setShowCliMenu(!showCliMenu);
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowCliMenu((v) => !v);
                   setShowModelMenu(false);
                   setShowSessionMenu(false);
                 }}
@@ -1330,41 +1462,39 @@ export function DevChatStudio({
               </button>
 
               {showCliMenu && (
-                <>
-                  <div className="fixed inset-0 z-[90]" onClick={() => setShowCliMenu(false)} />
-                  <div
-                    className="absolute left-0 top-full mt-1.5 z-[100] w-56 rounded-xl border border-white/[0.12] p-1.5 shadow-2xl animate-scale-in"
-                    style={{ backgroundColor: "#151821", opacity: 1, zIndex: 100 }}
-                  >
-                    <div className="px-2.5 py-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
-                      Installed CLI Runners
-                    </div>
-                    {INSTALLED_CLIS.map((cli) => {
-                      const Icon = cli.icon;
-                      const active = cli.id === selectedCli;
-                      return (
-                        <button
-                          key={cli.id}
-                          onClick={() => {
-                            setSelectedCli(cli.id);
-                            setShowCliMenu(false);
-                          }}
-                          className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs transition-colors ${
-                            active
-                              ? "bg-swarm-gold/20 text-swarm-goldHi font-medium"
-                              : "text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text"
-                          }`}
-                        >
-                          <div className="flex items-center gap-2 truncate">
-                            <Icon size={13} className={active ? "text-swarm-gold shrink-0" : "text-swarm-textMuted shrink-0"} />
-                            <span className="truncate">{cli.name}</span>
-                          </div>
-                          <span className="text-micro text-swarm-textMuted font-mono shrink-0 ml-1">{cli.command}</span>
-                        </button>
-                      );
-                    })}
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute left-0 top-full mt-1.5 z-[100] w-56 rounded-xl border border-white/[0.12] p-1.5 shadow-2xl animate-scale-in"
+                  style={{ backgroundColor: "#151821", opacity: 1, zIndex: 100 }}
+                >
+                  <div className="px-2.5 py-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
+                    Installed CLI Runners
                   </div>
-                </>
+                  {INSTALLED_CLIS.map((cli) => {
+                    const Icon = cli.icon;
+                    const active = cli.id === selectedCli;
+                    return (
+                      <button
+                        key={cli.id}
+                        onClick={() => {
+                          setSelectedCli(cli.id);
+                          setShowCliMenu(false);
+                        }}
+                        className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs transition-colors ${
+                          active
+                            ? "bg-swarm-gold/20 text-swarm-goldHi font-medium"
+                            : "text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 truncate">
+                          <Icon size={13} className={active ? "text-swarm-gold shrink-0" : "text-swarm-textMuted shrink-0"} />
+                          <span className="truncate">{cli.name}</span>
+                        </div>
+                        <span className="text-micro text-swarm-textMuted font-mono shrink-0 ml-1">{cli.command}</span>
+                      </button>
+                    );
+                  })}
+                </div>
               )}
             </div>
           )}
@@ -1735,10 +1865,59 @@ export function DevChatStudio({
         ) : (
           /* Standard Input Box */
           <div className="relative flex flex-col rounded-2xl border border-white/[0.10] bg-[#14161d] focus-within:border-swarm-gold/60 focus-within:ring-1 focus-within:ring-swarm-gold/30 transition-all shadow-xl">
+            {/* Interactive @ Mention Context Autocomplete Popup */}
+            {showMentionMenu && (() => {
+              const filtered = MENTION_OPTIONS.filter(
+                (o) => o.name.toLowerCase().includes(mentionQuery) || o.label.toLowerCase().includes(mentionQuery)
+              );
+              if (filtered.length === 0) return null;
+              return (
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute left-2.5 bottom-full mb-2 z-[120] w-72 rounded-2xl border border-white/[0.14] bg-[#12141c]/98 backdrop-blur-2xl p-1.5 shadow-2xl animate-scale-in"
+                >
+                  <div className="flex items-center justify-between px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-swarm-gold border-b border-white/[0.06] mb-1">
+                    <span>Context Attachment (@)</span>
+                    <span className="text-zinc-500 font-sans font-normal text-[10px]">Tab or ↵ to attach</span>
+                  </div>
+                  <div className="space-y-0.5">
+                    {filtered.map((opt, idx) => {
+                      const Icon = opt.icon;
+                      const active = idx === mentionIndex;
+                      return (
+                        <button
+                          key={opt.id}
+                          onClick={() => applyMentionOption(opt)}
+                          className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-left transition-all cursor-pointer ${
+                            active
+                              ? "bg-swarm-gold/20 text-swarm-goldHi border border-swarm-gold/30 shadow-sm"
+                              : "text-zinc-300 hover:bg-white/[0.06] hover:text-white border border-transparent"
+                          }`}
+                        >
+                          <div className={`size-6 rounded-lg flex items-center justify-center shrink-0 ${
+                            active ? "bg-swarm-gold/30 text-swarm-gold" : "bg-white/[0.06] text-zinc-400"
+                          }`}>
+                            <Icon size={13} />
+                          </div>
+                          <div className="flex flex-col min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-xs font-semibold font-mono text-swarm-gold">{opt.name}</span>
+                              <span className="text-xs text-zinc-200 font-medium">{opt.label}</span>
+                            </div>
+                            <span className="text-[10px] text-zinc-400 truncate">{opt.desc}</span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
+
             <textarea
               ref={textareaRef}
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => handleInputChange(e.target.value)}
               onKeyDown={handleKeyDown}
               onKeyUp={(e) => {
                 e.stopPropagation();
@@ -1750,8 +1929,8 @@ export function DevChatStudio({
               }}
               placeholder={
                 execMode === "cli"
-                  ? `Execute task with ${activeCli.name} (${activeCli.command})…`
-                  : `Ask ${activeModel.name} anything…`
+                  ? `Execute task with ${activeCli.name} (${activeCli.command})… or type @ to attach context`
+                  : `Ask ${activeModel.name} anything… or type @ to attach context`
               }
               rows={2}
               className="w-full resize-none bg-transparent px-3.5 pt-3 pb-1 text-xs text-swarm-text outline-none placeholder:text-swarm-textMuted/40 font-sans"
@@ -1761,40 +1940,48 @@ export function DevChatStudio({
               {/* Quick Context Attachment Menu */}
               <div className="flex items-center gap-1.5 relative">
                 <button
-                  onClick={() => setShowAttachMenu(!showAttachMenu)}
-                  className="flex items-center gap-1 rounded-lg bg-white/[0.04] border border-white/[0.08] px-2 py-1 text-micro text-swarm-textMuted hover:text-swarm-gold hover:border-swarm-gold/40 transition-colors"
-                  title="Attach Context to Prompt"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowAttachMenu((v) => !v);
+                    setShowMentionMenu(false);
+                  }}
+                  className="flex items-center gap-1 rounded-lg bg-white/[0.04] border border-white/[0.08] px-2 py-1 text-micro text-swarm-textMuted hover:text-swarm-gold hover:border-swarm-gold/40 transition-colors cursor-pointer"
+                  title="Attach Context to Prompt (or type @)"
                 >
                   <Paperclip size={11} />
                   <span>Attach</span>
                 </button>
 
                 {showAttachMenu && (
-                  <>
-                    <div className="fixed inset-0 z-[90]" onClick={() => setShowAttachMenu(false)} />
-                    <div
-                      className="absolute left-0 bottom-full mb-1.5 z-[100] w-52 rounded-xl border border-white/[0.12] p-1.5 shadow-2xl animate-scale-in"
-                      style={{ backgroundColor: "#151821", opacity: 1, zIndex: 100 }}
-                    >
-                      <div className="px-2 py-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
-                        Add Context to Prompt
-                      </div>
-                      <button
-                        onClick={handleAttachGitDiff}
-                        className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text transition-colors"
-                      >
-                        <GitBranch size={13} className="text-swarm-gold" />
-                        <span>Attach Git Diff</span>
-                      </button>
-                      <button
-                        onClick={handleAttachProjectTree}
-                        className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text transition-colors"
-                      >
-                        <FolderTree size={13} className="text-swarm-gold" />
-                        <span>Attach Project Tree</span>
-                      </button>
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    className="absolute left-0 bottom-full mb-1.5 z-[120] w-56 rounded-xl border border-white/[0.12] p-1.5 shadow-2xl animate-scale-in bg-[#151821]"
+                  >
+                    <div className="px-2.5 py-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
+                      Add Context to Prompt
                     </div>
-                  </>
+                    <button
+                      onClick={handleAttachGitDiff}
+                      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text transition-colors cursor-pointer"
+                    >
+                      <GitBranch size={13} className="text-swarm-gold" />
+                      <span>Attach Git Diff</span>
+                    </button>
+                    <button
+                      onClick={handleAttachProjectTree}
+                      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text transition-colors cursor-pointer"
+                    >
+                      <FolderTree size={13} className="text-swarm-gold" />
+                      <span>Attach Project Tree</span>
+                    </button>
+                    <button
+                      onClick={handleAttachFile}
+                      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text transition-colors cursor-pointer"
+                    >
+                      <FileCode size={13} className="text-swarm-gold" />
+                      <span>Attach File (Browse…)</span>
+                    </button>
+                  </div>
                 )}
 
                 <span className="text-micro text-swarm-textMuted font-mono truncate max-w-[130px] sm:max-w-[260px]">

@@ -12,7 +12,7 @@ import UpdateCheckerModal from "@/features/updates/UpdateCheckerModal";
 import { ExtensionsMarketplace } from "@swarm/extension";
 import { Blocks, Gauge } from "lucide-react";
 import { useAgentsStore, CliUsagePanel, setupStorageSync } from "@swarm/agents/ui";
-import { getTauriAPIs, loadTauriAPIs } from "@/shared/tauri";
+import { getTauriAPIs, loadTauriAPIs, isTauri } from "@/shared/tauri";
 import { WorkspacesSidebar as ADEWorktreeSidebar } from "@swarm/workspace/ui";
 import ADERightDock from "@/features/dock/RightDock";
 import { useWorkspaceStore } from "@swarm/workspace";
@@ -299,13 +299,17 @@ export default function HomePage() {
   const appRow = (
     <>
       {isMac && (
-        <MacWindowControls
-          onClose={handleClose}
-          onMinimize={handleMinimize}
-          onMaximize={handleMaximize}
-          isMaximized={isMaximized}
-          className="pl-0 pr-2.5"
-        />
+        isTauri() ? (
+          <div className="w-[70px] shrink-0 h-full select-none" data-tauri-drag-region />
+        ) : (
+          <MacWindowControls
+            onClose={handleClose}
+            onMinimize={handleMinimize}
+            onMaximize={handleMaximize}
+            isMaximized={isMaximized}
+            className="pl-0 pr-2.5"
+          />
+        )
       )}
       <SwarmLogo size={18} className="shrink-0" />
       <OverflowMenu
@@ -548,13 +552,17 @@ export default function HomePage() {
               leftOpen ? undefined : (
                 <div className="flex items-center gap-1">
                   {isMac && (
-                    <MacWindowControls
-                      onClose={handleClose}
-                      onMinimize={handleMinimize}
-                      onMaximize={handleMaximize}
-                      isMaximized={isMaximized}
-                      className="pl-0 pr-1.5"
-                    />
+                    isTauri() ? (
+                      <div className="w-[70px] shrink-0 h-full select-none" data-tauri-drag-region />
+                    ) : (
+                      <MacWindowControls
+                        onClose={handleClose}
+                        onMinimize={handleMinimize}
+                        onMaximize={handleMaximize}
+                        isMaximized={isMaximized}
+                        className="pl-0 pr-1.5"
+                      />
+                    )
                   )}
                   <button
                     onClick={() => toggleLeft()}

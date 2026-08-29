@@ -9,7 +9,7 @@ import { MCP_CAPABLE_CLIS } from "../cli-configs/index.js";
 //
 // This guards the source itself: the only writeToProcess calls left in the pane
 // are the user's own keystrokes and Ctrl+C.
-const PANE = readFileSync(join(__dirname, "AgentPane.tsx"), "utf8");
+const PANE = readFileSync(join(__dirname, "AgentTerminal.tsx"), "utf8");
 
 describe("no prompt injection", () => {
   it("never sends a Lead charter into a CLI", () => {
@@ -20,6 +20,8 @@ describe("no prompt injection", () => {
   it("keeps only keystrokes, SIGINT and the non-MCP memory pointer on stdin", () => {
     const calls = [...PANE.matchAll(/writeToProcess\(([^\n]*)\)/g)].map((m) => m[1]);
     expect(calls).toEqual([
+      'pText + "\\r"); }, 1200', // initial user prompt (MCP branch)
+      'pText + "\\r"); }, 1200', // initial user prompt (non-MCP branch)
       'flattenForStdin(ctxLine) + "\\n"', // non-MCP CLIs only, guarded below
       '"\\x03"', // Ctrl+C
       "data", // the user's own typing

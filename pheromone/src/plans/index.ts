@@ -1,6 +1,6 @@
 import matter from 'gray-matter';
 import { randomUUID } from 'crypto';
-import { FileSystemPort } from '../ports.js';
+import { type FileSystemPort, NodeFileSystem } from '../ports.js';
 
 export type PlanStatus = 'draft' | 'active' | 'done';
 export type StepStatus = 'pending' | 'in_progress' | 'done';
@@ -38,7 +38,7 @@ export class PlanManager {
  constructor(projectPath: string, fs?: FileSystemPort) {
  // Forward slashes — accepted by Windows APIs and work everywhere.
  this.dir = `${projectPath}/.pheromone/plans`;
- this.fs = fs ?? (() => { throw new Error('FileSystemPort required'); })();
+ this.fs = fs ?? new NodeFileSystem();
  }
 
  async ensureStructure(): Promise<void> {

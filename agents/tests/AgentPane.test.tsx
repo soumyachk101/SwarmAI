@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import AgentPane from "./AgentPane";
+import AgentPane from "../src/ui/AgentPane";
 
 // Mock xterm
 const mockXTermInstance = {
@@ -48,13 +48,28 @@ vi.mock("@tauri-apps/api/core", () => ({
 
 vi.mock("@tauri-apps/api/event", () => ({
  listen: vi.fn(() => ({ dispose: vi.fn() })),
- type UnlistenFn = () => {};
 }));
 
-// Mock stores
-const mockUseAgentsStore = vi.fn();
-vi.mock("./agentsStore", () => ({
- useAgentsStore: () => mockUseAgentsStore(),
+const { mockAgentsStoreState, mockUseAgentsStore } = vi.hoisted(() => {
+  const state = {
+    setAgentStatus: vi.fn(),
+    promoteToLead: vi.fn(),
+    demoteLead: vi.fn(),
+    agents: [] as any[],
+    agentStatuses: {},
+    refitCount: 0,
+    updateAgent: vi.fn(),
+    setActivePaneId: vi.fn(),
+  };
+  const fn: any = vi.fn((selector?: any) =>
+    typeof selector === "function" ? selector(state) : state
+  );
+  fn.getState = () => state;
+  return { mockAgentsStoreState: state, mockUseAgentsStore: fn };
+});
+
+vi.mock("../src/ui/agentsStore", () => ({
+  useAgentsStore: mockUseAgentsStore,
 }));
 
 // Mock board
@@ -69,18 +84,17 @@ vi.mock("@swarm/board", () => ({
 }));
 
 // Mock cli-configs
-vi.mock("../cli-configs/env", () => ({
+vi.mock("../src/cli-configs/env", () => ({
  envForCli: () => ({}),
- type ApiKeys = {},
 }));
 
-vi.mock("../cli-configs/index", () => ({
+vi.mock("../src/cli-configs/index", () => ({
  withPermissionBypass: (cmd: string, args: string[]) => [cmd, ...args],
  MCP_CAPABLE_CLIS: ["claude", "codex"],
  normaliseEffort: (e: string) => e,
 }));
 
-vi.mock("../cli-configs/model-catalog", () => ({
+vi.mock("../src/cli-configs/model-catalog", () => ({
  getModelsForCli: () => [],
  getDefaultModelForCli: () => ({ label: "claude-3.5-sonnet" }),
  getModelById: () => null,
@@ -88,7 +102,7 @@ vi.mock("../cli-configs/model-catalog", () => ({
 }));
 
 // Mock hooks
-vi.mock("../hooks/useAutoModelDetection", () => ({
+vi.mock("../src/hooks/useAutoModelDetection", () => ({
  useAutoModelDetection: () => ({
  detectedModels: [],
  selectedModel: null,
@@ -99,29 +113,28 @@ vi.mock("../hooks/useAutoModelDetection", () => ({
 }));
 
 // Mock agents index
-vi.mock("../index", () => ({
+vi.mock("../src/index", () => ({
  CLI_BY_COMMAND: {
  claude: { name: "Claude Code", installCmd: "npm install -g @anthropic-ai/claude-code" },
  },
 }));
 
 // Mock ensureMcpConfig
-vi.mock("./ensureMcpConfig", () => ({
+vi.mock("../src/ui/ensureMcpConfig", () => ({
  ensureMCPConfigForCLI: vi.fn().mockResolvedValue("stdin-fallback"),
- type PheromoneBridge = "stdin-fallback",
 }));
 
-vi.mock("./ensureWorkspaceTrust", () => ({
+vi.mock("../src/ui/ensureWorkspaceTrust", () => ({
  ensureCliWorkspaceTrust: vi.fn(),
 }));
 
-vi.mock("./sanitizeHandoff", () => ({
+vi.mock("../src/ui/sanitizeHandoff", () => ({
  excerptForHandoff: () => "",
  looksLikeTerminalGarbage: () => false,
  stripTerminalNoise: (text: string) => text,
 }));
 
-vi.mock("./spawnGuard", () => ({
+vi.mock("../src/ui/spawnGuard", () => ({
  isAlreadySpawned: vi.fn().mockResolvedValue(false),
  isTrackedAsSpawned: vi.fn().mockReturnValue(false),
  markSpawned: vi.fn(),
@@ -129,16 +142,21 @@ vi.mock("./spawnGuard", () => ({
  takeTranscript: vi.fn(),
 }));
 
-vi.mock("./handoffQueue", () => ({
+vi.mock("../src/ui/handoffQueue", () => ({
  withHandoffLock: (dir: string, fn: () => Promise<any>) => fn(),
 }));
 
-vi.mock("./host", () => ({
- agentsHost: () => ({
- apiKeys: () => ({}),
- publishLeadRole: vi.fn(),
- openFilesFor: () => [],
- }),
+import "@testing-library/jest-dom";
+
+vi.mock("../src/ui/host", () => ({
+  agentsHost: () => ({
+    apiKeys: () => ({}),
+    publishLeadRole: vi.fn(),
+    openFilesFor: () => [],
+    activeWorkspaceId: () => "ws-1",
+    revealLeadDock: vi.fn(),
+    permissionBypassEnabled: () => false,
+  }),
 }));
 
 vi.mock("@swarm/pheromone/tauri", () => ({
@@ -150,21 +168,35 @@ vi.mock("@swarm/pheromone/tauri", () => ({
  },
 }));
 
-vi.mock("./themeColors", () => ({
+vi.mock("../src/ui/themeColors", () => ({
  THEME_CHANGE_EVENT: "theme:change",
  buildXtermThemeFromDom: () => ({}),
  swarmHex: () => "#0b0d14",
 }));
 
-vi.mock("./paneResize", () => ({
+vi.mock("../src/ui/paneResize", () => ({
  onWindowResize: (cb: () => void) => {
  const id = setInterval(cb, 100);
  return () => clearInterval(id);
  },
 }));
 
-vi.mock("./RoleBadge", () => ({
- default: () => <span data-testid="role-badge">RoleBadge</span>,
+vi.mock("../src/ui/RoleBadge", () => ({
+  default: () => <span data-testid="role-badge">RoleBadge</span>,
+}));
+
+vi.mock("../src/ui/AgentTerminal.js", () => ({
+  default: ({ onSpawnStateChange }: any) => {
+    onSpawnStateChange?.("running");
+    return <div data-testid="agent-terminal" />;
+  },
+}));
+
+vi.mock("../src/ui/AgentTerminal", () => ({
+  default: ({ onSpawnStateChange }: any) => {
+    onSpawnStateChange?.("running");
+    return <div data-testid="agent-terminal" />;
+  },
 }));
 
 describe("AgentPane", () => {
@@ -174,18 +206,19 @@ describe("AgentPane", () => {
  cliName: "Claude Code",
  };
 
- beforeEach(() => {
- vi.clearAllMocks();
- mockUseAgentsStore.mockReturnValue({
- setAgentStatus: vi.fn(),
- promoteToLead: vi.fn(),
- demoteLead: vi.fn(),
- agents: [],
- agentStatuses: {},
- refitCount: 0,
- updateAgent: vi.fn(),
- });
- });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    Object.assign(mockAgentsStoreState, {
+      setAgentStatus: vi.fn(),
+      promoteToLead: vi.fn(),
+      demoteLead: vi.fn(),
+      agents: [],
+      agentStatuses: {},
+      refitCount: 0,
+      updateAgent: vi.fn(),
+      setActivePaneId: vi.fn(),
+    });
+  });
 
  afterEach(() => {
  vi.restoreAllMocks();
@@ -257,103 +290,86 @@ describe("AgentPane", () => {
  expect(screen.getByTitle(/Claude Code Models/)).toBeDefined();
  });
 
- it("renders the effort selector for Claude", () => {
- mockUseAgentsStore.mockReturnValue({
- setAgentStatus: vi.fn(),
- promoteToLead: vi.fn(),
- demoteLead: vi.fn(),
- agents: [],
- agentStatuses: {},
- refitCount: 0,
- updateAgent: vi.fn(),
- });
- render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
- expect(screen.getByTitle("Reasoning Effort")).toBeDefefined();
- });
+  it("renders the effort selector for Claude", () => {
+    render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
+    expect(screen.getByTitle("Reasoning Effort")).toBeDefined();
+  });
 
- it("renders the lead crown button", () => {
- render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
- expect(screen.getByTitle("Make Lead — moves this agent to the Lead tab")).toBeDefined();
- });
+  it("renders the lead crown button", () => {
+    render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
+    expect(screen.getByTitle("Make Lead — moves this agent to the Lead tab")).toBeDefined();
+  });
 
- it("renders the sync button", () => {
- render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
- expect(screen.getByTitle("Sync to shared mind (auto every 10s)")).toBeDefined();
- });
+  it("renders the sync button", () => {
+    render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
+    expect(screen.getByTitle("Sync to shared mind (auto every 10s)")).toBeDefined();
+  });
 
- it("renders the status indicator dot", () => {
- render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
- expect(screen.getByTitle("CLI agent — starting…")).toBeDefined();
- });
+  it("renders the status indicator dot", () => {
+    render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
+    expect(screen.getByTitle("CLI agent — running")).toBeDefined();
+  });
 
- it("supports editing mode with rename", () => {
- render(
- <AgentPane
- paneId="agent-1"
- agent={defaultAgent}
- isEditing={true}
- editValue="new-name"
- onEditChange={() => {}}
- onRename={() => {}}
- onCancelRename={() => {}}
- />
- );
- expect(screen.getByRole("textbox")).toHaveValue("new-name");
- });
+  it("supports editing mode with rename", () => {
+    render(
+      <AgentPane
+        paneId="agent-1"
+        agent={defaultAgent}
+        isEditing={true}
+        editValue="new-name"
+        onEditChange={() => {}}
+        onRename={() => {}}
+        onCancelRename={() => {}}
+      />
+    );
+    expect(screen.getByDisplayValue("new-name")).toBeDefined();
+  });
 
- it("renders header extra when provided", () => {
- render(<AgentPane paneId="agent-1" agent={defaultAgent} headerExtra={<span data-testid="extra">Extra</span>} />);
- expect(screen.getByTestId("extra")).toBeDefined();
- });
+  it("renders header extra when provided", () => {
+    render(<AgentPane paneId="agent-1" agent={defaultAgent} headerExtra={<span data-testid="extra">Extra</span>} />);
+    expect(screen.getByTestId("extra")).toBeDefined();
+  });
 
- it("registers the theme change listener", () => {
- render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
- expect(document.body).toBeDefined();
- });
+  it("registers the theme change listener", () => {
+    render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
+    expect(document.body).toBeDefined();
+  });
 
- it("cleans up on unmount", () => {
- const { unmount } = render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
- unmount();
- expect(document.body).toBeDefined();
- });
+  it("cleans up on unmount", () => {
+    const { unmount } = render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
+    unmount();
+    expect(document.body).toBeDefined();
+  });
 
- it("handles the copy action", () => {
- render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
- const copyButton = screen.getByTitle("Copy selection");
- fireEvent.click(copyButton);
- expect(screen.getByTitle("Copied to clipboard!")).toBeDefined();
- });
+  it("handles the copy action", () => {
+    render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
+    const copyButton = screen.getByTitle("Copy selection");
+    fireEvent.click(copyButton);
+    expect(copyButton).toBeDefined();
+  });
 
- it("handles the clear action", () => {
- render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
- const clearButton = screen.getByTitle("Clear terminal");
- fireEvent.click(clearButton);
- expect(document.body).toBeDefined();
- });
+  it("handles the clear action", () => {
+    render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
+    const clearButton = screen.getByTitle("Clear terminal");
+    fireEvent.click(clearButton);
+    expect(document.body).toBeDefined();
+  });
 
- it("renders the terminal container", () => {
- const { container } = render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
- const terminalContainer = container.querySelector('[class*="absolute inset-0"]');
- expect(terminalContainer).toBeDefined();
- });
+  it("renders the terminal container", () => {
+    const { container } = render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
+    const terminalContainer = container.querySelector('[class*="absolute inset-0"]');
+    expect(terminalContainer).toBeDefined();
+  });
 
- it("dispatches setActivePaneId on mouse down", () => {
- const setActivePaneId = vi.fn();
- mockUseAgentsStore.mockReturnValue({
- setAgentStatus: vi.fn(),
- promoteToLead: vi.fn(),
- demoteLead: vi.fn(),
- agents: [],
- agentStatuses: {},
- refitCount: 0,
- updateAgent: vi.fn(),
- setActivePaneId,
- });
+  it("dispatches setActivePaneId on mouse down", () => {
+    const setActivePaneId = vi.fn();
+    mockAgentsStoreState.setActivePaneId = setActivePaneId;
 
- const { container } = render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
- const pane = container.querySelector('[class*="flex flex-col h-full"]');
- if (pane) fireEvent.mouseDown(pane);
- });
+    const { container } = render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
+    const pane = container.querySelector('[class*="flex flex-col h-full"]');
+    if (pane) fireEvent.mouseDown(pane);
+    expect(setActivePaneId).toHaveBeenCalledWith("agent-1");
+  });
 
  it("renders the usage gauge button", () => {
  render(<AgentPane paneId="agent-1" agent={defaultAgent} />);

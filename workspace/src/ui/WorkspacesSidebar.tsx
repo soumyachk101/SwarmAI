@@ -1487,99 +1487,102 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
   return (
     <div
       ref={sidebarRef}
-      className="relative h-full flex bg-[#090b10] border-r border-white/[0.08] shrink-0 font-sans antialiased select-none"
+      className="relative h-full flex flex-col bg-[#090b10] border-r border-white/[0.08] shrink-0 font-sans antialiased select-none"
       style={{ width: sidebarWidth, minWidth: MIN_WIDTH, maxWidth: "50vw" }}
     >
-      {/* ── Vertical Pro Activity Bar Rail (Far Left, 50px) ──────────────── */}
-      <div className="w-[50px] shrink-0 flex flex-col items-center justify-between border-r border-white/[0.06] bg-[#07080d] py-2.5 z-20">
-        {/* Top Section: App/Brand Logo & Activity Tabs */}
-        <div className="flex flex-col items-center gap-1.5 w-full">
-          {/* Activity Bar Tabs */}
-          {TABS.map((tab) => {
-            const Icon = tab.icon;
-            const active = activeTab === tab.id;
-            return (
-              <div key={tab.id} className="relative w-full flex justify-center py-0.5 group">
-                {/* Active Left Indicator Bar */}
-                {active && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r bg-white shadow-[0_0_8px_rgba(255,255,255,0.7)]" />
-                )}
-                <button
-                  onClick={() => { setActiveTab(tab.id); setViewer(null); }}
-                  title={tab.label}
-                  aria-label={tab.label}
-                  className={`size-9 rounded-xl flex items-center justify-center transition-all duration-150 ${
-                    active
-                      ? "text-white bg-white/[0.14] border border-white/[0.24] shadow-md"
-                      : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06]"
-                  }`}
-                >
-                  <Icon className="size-4.5" />
-                </button>
-              </div>
-            );
-          })}
+      {/* ── App Top Row (Window Controls on the absolute far-left edge) ─────── */}
+      {topBar && (
+        <div
+          className="flex h-11 shrink-0 items-center gap-1.5 border-b border-white/[0.06] bg-[#07080d] px-3 z-30"
+          data-tauri-drag-region
+        >
+          {topBar}
         </div>
+      )}
 
-        {/* Bottom Section: Theme Picker, Gear Settings, Pin & Close Actions */}
-        <div className="flex flex-col items-center gap-1.5 w-full pt-2 border-t border-white/[0.06]">
-          {/* Theme Picker Slot */}
-          {themePickerSlot}
-
-          {/* Settings & Tools Gear Button */}
-          <button
-            ref={gearBtnRef}
-            onClick={() => {
-              setGearRect(gearBtnRef.current?.getBoundingClientRect() ?? null);
-              setSettingsMenuOpen((v) => !v);
-            }}
-            aria-haspopup="menu"
-            aria-expanded={settingsMenuOpen}
-            className={`size-9 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer ${
-              settingsMenuOpen
-                ? "text-white bg-white/[0.16] border border-white/[0.3] shadow-md"
-                : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06]"
-            }`}
-            title="Settings & Tools (Open project, Git, Extensions, Usage)"
-            aria-label="Settings and Tools"
-          >
-            <Settings size={18} className={settingsMenuOpen ? "rotate-45 transition-transform duration-200" : "transition-transform duration-200"} />
-          </button>
-
-          <button
-            onClick={onTogglePin}
-            className={`size-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
-              pinned ? "text-white bg-white/[0.12] border border-white/[0.2]" : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.06]"
-            }`}
-            title={pinned ? "Unpin sidebar" : "Pin sidebar"}
-            aria-label={pinned ? "Unpin sidebar" : "Pin sidebar"}
-          >
-            {pinned ? <PinOff size={13} /> : <Pin size={13} />}
-          </button>
-          {onClose && (
-            <button
-              onClick={onClose}
-              className="size-8 flex items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.06] transition-colors cursor-pointer"
-              title="Close sidebar"
-              aria-label="Close sidebar"
-            >
-              <X size={13} />
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* ── Main Sidebar Panel Content Area ──────────────────────────────── */}
-      <div className="flex-1 flex flex-col min-w-0 bg-gradient-to-b from-[#0c0e16]/98 to-[#090b11]/98 backdrop-blur-2xl">
-        {/* App row — top-left corner */}
-        {topBar && (
-          <div
-            className="flex h-11 shrink-0 items-center gap-0.5 border-b border-white/[0.06] bg-white/[0.01] px-3"
-            data-tauri-drag-region
-          >
-            {topBar}
+      {/* ── Sidebar Body: Left Activity Rail + Main Panel ─────────────────── */}
+      <div className="flex-1 flex min-h-0 overflow-hidden">
+        {/* ── Vertical Pro Activity Bar Rail (Far Left, 50px) ──────────────── */}
+        <div className="w-[50px] shrink-0 flex flex-col items-center justify-between border-r border-white/[0.06] bg-[#07080d] py-3 z-20">
+          {/* Top Section: App/Brand Logo & Activity Tabs (spaced down cleanly) */}
+          <div className="flex flex-col items-center gap-2 w-full pt-1.5">
+            {/* Activity Bar Tabs */}
+            {TABS.map((tab) => {
+              const Icon = tab.icon;
+              const active = activeTab === tab.id;
+              return (
+                <div key={tab.id} className="relative w-full flex justify-center py-0.5 group">
+                  {/* Active Left Indicator Bar */}
+                  {active && (
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r bg-white shadow-[0_0_8px_rgba(255,255,255,0.7)]" />
+                  )}
+                  <button
+                    onClick={() => { setActiveTab(tab.id); setViewer(null); }}
+                    title={tab.label}
+                    aria-label={tab.label}
+                    className={`size-9 rounded-xl flex items-center justify-center transition-all duration-150 ${
+                      active
+                        ? "text-white bg-white/[0.14] border border-white/[0.24] shadow-md"
+                        : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06]"
+                    }`}
+                  >
+                    <Icon className="size-4.5" />
+                  </button>
+                </div>
+              );
+            })}
           </div>
-        )}
+
+          {/* Bottom Section: Theme Picker, Gear Settings, Pin & Close Actions */}
+          <div className="flex flex-col items-center gap-1.5 w-full pt-2 border-t border-white/[0.06]">
+            {/* Theme Picker Slot */}
+            {themePickerSlot}
+
+            {/* Settings & Tools Gear Button */}
+            <button
+              ref={gearBtnRef}
+              onClick={() => {
+                setGearRect(gearBtnRef.current?.getBoundingClientRect() ?? null);
+                setSettingsMenuOpen((v) => !v);
+              }}
+              aria-haspopup="menu"
+              aria-expanded={settingsMenuOpen}
+              className={`size-9 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer ${
+                settingsMenuOpen
+                  ? "text-white bg-white/[0.16] border border-white/[0.3] shadow-md"
+                  : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06]"
+              }`}
+              title="Settings & Tools (Open project, Git, Extensions, Usage)"
+              aria-label="Settings and Tools"
+            >
+              <Settings size={18} className={settingsMenuOpen ? "rotate-45 transition-transform duration-200" : "transition-transform duration-200"} />
+            </button>
+
+            <button
+              onClick={onTogglePin}
+              className={`size-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
+                pinned ? "text-white bg-white/[0.12] border border-white/[0.2]" : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.06]"
+              }`}
+              title={pinned ? "Unpin sidebar" : "Pin sidebar"}
+              aria-label={pinned ? "Unpin sidebar" : "Pin sidebar"}
+            >
+              {pinned ? <PinOff size={13} /> : <Pin size={13} />}
+            </button>
+            {onClose && (
+              <button
+                onClick={onClose}
+                className="size-8 flex items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.06] transition-colors cursor-pointer"
+                title="Close sidebar"
+                aria-label="Close sidebar"
+              >
+                <X size={13} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* ── Main Sidebar Panel Content Area ──────────────────────────────── */}
+        <div className="flex-1 flex flex-col min-w-0 bg-gradient-to-b from-[#0c0e16]/98 to-[#090b11]/98 backdrop-blur-2xl">
 
         {/* Main Tab Content */}
         <div className="flex-1 overflow-hidden flex flex-col min-h-0">
@@ -1754,6 +1757,7 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
           )}
         </div>
       </div>
+    </div>
 
       {contextMenu && createPortal(
         <>

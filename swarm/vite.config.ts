@@ -33,19 +33,42 @@ export default defineConfig({
  environment: 'jsdom',
  globals: true,
  },
- server: {
- port: 5173,
- strictPort: true,
- watch: {
- ignored: [
- '**/dist/**',
- '**/.pheromone/**',
- '**/.git/**',
- '**/node_modules/**',
- '**/*.tsbuildinfo',
- '**/.agents/**',
- '**/sessions/**',
- ],
- },
- },
+  build: {
+    chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('zustand')) {
+              return 'vendor-react';
+            }
+            if (id.includes('@tauri-apps')) {
+              return 'vendor-tauri';
+            }
+            if (id.includes('xterm')) {
+              return 'vendor-xterm';
+            }
+            if (id.includes('lucide-react') || id.includes('simple-icons')) {
+              return 'vendor-icons';
+            }
+          }
+        },
+      },
+    },
+  },
+  server: {
+    port: 5173,
+    strictPort: true,
+    watch: {
+      ignored: [
+        '**/dist/**',
+        '**/.pheromone/**',
+        '**/.git/**',
+        '**/node_modules/**',
+        '**/*.tsbuildinfo',
+        '**/.agents/**',
+        '**/sessions/**',
+      ],
+    },
+  },
 });
