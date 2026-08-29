@@ -44,7 +44,7 @@
 <br />
 
 <p align="center">
-  <img src="assets/swarmai-preview.png" alt="SwarmAI Desktop Environment Preview" width="95%" style="border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);" />
+  <img src="assets/hero-illustration.svg" alt="Swarm AI Desktop Environment Preview" width="100%" />
 </p>
 
 </div>
@@ -138,40 +138,52 @@ Swarm follows a **ports-and-adapters** architecture with a strict **purity bound
 | **Borrow, Never Re-implement** | Each package is standalone. Swarm composes them, never duplicates. |
 | **Self-Enforcing Boundaries** | Tests scan source files for architectural violations. |
 
+<p align="center">
+  <img src="assets/architecture-diagram.svg" alt="Swarm AI Architecture Diagram" width="100%" />
+</p>
+
 ### Monorepo Topology
 
-The project is organized as **13 packages** in a pnpm workspace, orchestrated by Turborepo:
+The project is organized into **15 modular workspace packages** with Turborepo and pnpm:
 
 ```mermaid
 graph TD
- subgraph "Swarm AI Monorepo"
- swarm["swarm/<br/>🖥️ Desktop App<br/>(Tauri + React)"]
- pheromone["pheromone/<br/>🧠 Memory Engine<br/>(SQLite + FTS5 + RRF)"]
- swarmmind["swarmmind/<br/>⚡ Orchestrator<br/>(Pure Core + Tauri)"]
- lead["lead/<br/>🎯 AI Planner<br/>(3 Modes)"]
- tasks["tasks/<br/>📋 Task Board"]
- agents["agents/<br/>🤖 Agent Launcher<br/>(10+ CLI Adapters)"]
- voice["voice/<br/>🎙️ Whisper.cpp STT"]
- board["board/<br/>📊 Board Primitives"]
- flow["flow/<br/>🎨 Infinite Canvas"]
- workspace["workspace/<br/>🗂️ Multi-Workspace"]
- plugins["swarmplugins/<br/>🔌 Plugin Registry"]
- extension["swarmextension/<br/>🧩 VS Code Extension"]
- design["design-system/<br/>🎨 Design Tokens"]
- end
+  subgraph Apps
+    desktop["desktop/<br/>🖥️ Desktop App<br/>(Tauri + React)"]
+    web["web/<br/>🌐 Landing Site<br/>(GitHub Pages)"]
+  end
 
- swarm --> pheromone
- swarm --> swarmmind
- swarm --> lead
- swarm --> tasks
- swarm --> agents
- swarm --> voice
- swarm --> board
- swarm --> flow
- swarm --> workspace
- swarm --> plugins
- swarm --> extension
- swarm --> design
+  subgraph Packages
+    pheromone["packages/pheromone/<br/>🧠 Memory Engine<br/>(SQLite + FTS5 + Vector)"]
+    mcp["packages/pheromone-mcp/<br/>🔌 MCP Bridge"]
+    mind["packages/mind/<br/>⚡ Orchestrator<br/>(Pure Core + Tauri)"]
+    lead["packages/lead/<br/>🎯 AI Planner<br/>(3 Modes)"]
+    tasks["packages/tasks/<br/>📋 Task Board"]
+    agents["packages/agents/<br/>🤖 Agent Launcher<br/>(11+ CLI Adapters)"]
+    voice["packages/voice/<br/>🎙️ Whisper.cpp STT"]
+    board["packages/board/<br/>📊 Board Primitives"]
+    flow["packages/flow/<br/>🎨 Infinite Canvas"]
+    workspace["packages/workspace/<br/>🗂️ Multi-Workspace"]
+    plugins["packages/plugins/<br/>🔌 Plugin Registry"]
+    extension["packages/extension/<br/>🧩 Extension Marketplace"]
+    reports["packages/reports/<br/>📈 Health & Analytics"]
+    design["packages/design-system/<br/>🎨 Design Tokens"]
+  end
+
+  desktop --> pheromone
+  desktop --> mcp
+  desktop --> mind
+  desktop --> lead
+  desktop --> tasks
+  desktop --> agents
+  desktop --> voice
+  desktop --> board
+  desktop --> flow
+  desktop --> workspace
+  desktop --> plugins
+  desktop --> extension
+  desktop --> reports
+  desktop --> design
 ```
 
 ---
@@ -367,6 +379,10 @@ An **infinite canvas editor** for visual planning:
 
 ## Technology Stack
 
+<p align="center">
+  <img src="assets/tech-stack-icons.svg" alt="Swarm AI Core Technology Stack" width="100%" />
+</p>
+
 ### Desktop Shell
 
 | Technology | Version | Purpose |
@@ -533,15 +549,15 @@ Swarm maintains a rigorous testing philosophy with **34 test files** across **9 
 ### Test Coverage by Package
 
 ```
-agents/ 8 test files — CLI integration, security, UI state, spawn lifecycle
-board/ 2 test files — Accessibility, brand consistency
-flow/ 2 test files — Canvas geometry, camera math
-lead/ 2 test files — Task decomposition, mode-based permissions
-pheromone/ 2 test files — Search algorithms, plan persistence
-swarm/ 4 test files — CDP browser, AVD config, migrations, WCAG contrast
-swarmmind/ 5 test files — Orchestration, handoffs, purity guards, messages, dispatch
-tasks/ 3 test files — Board ops, card immutability, pipeline construction
-voice/ 5 test files — STT engine, voice processor, purity, cleanup, types
+desktop/               10 test files — Vitest UI, settings, launcher, themes, CDP
+packages/agents/        8 test files — CLI integration, security, UI state, spawn lifecycle
+packages/board/         2 test files — Accessibility, brand consistency
+packages/flow/          2 test files — Canvas geometry, camera math
+packages/lead/          2 test files — Task decomposition, mode-based permissions
+packages/mind/          5 test files — Orchestration, handoffs, purity guards, messages, dispatch
+packages/pheromone/     2 test files — Search algorithms, plan persistence
+packages/tasks/         3 test files — Board ops, card immutability, pipeline construction
+packages/voice/         5 test files — STT engine, voice processor, purity, cleanup, types
 ```
 
 ### Regression Protection
@@ -581,20 +597,21 @@ Tauri v2 requires native dependencies on each platform:
 ### Install & Run
 
 ```bash
-# Install dependencies
+# 1. Install dependencies
 pnpm install
 
-# Build all workspace packages first (required before tauri:build)
+# 2. Build all workspace packages
 pnpm turbo build
 
-# Run the desktop app in development mode
-cd swarm && pnpm tauri:dev
+# 3. Run desktop application with hot-reload
+pnpm tauri:dev
+# (Or run browser UI only: pnpm dev)
 
-# Run all tests
+# 4. Run all 302 Vitest suites
 pnpm turbo test
 ```
 
-> **Build order matters**: `tauri:build` expects prebuilt `dist/` artifacts from the workspace packages. Always run `pnpm turbo build` at the root first. The `swarm/package.json` `build` script chains `build:deps` (builds all `@swarm/*` packages) → `tsc` → `vite build`.
+> **Build order matters**: `tauri:build` expects prebuilt `dist/` artifacts from the workspace packages. Always run `pnpm turbo build` at the root first. The `desktop/package.json` `build` script chains `build:deps` (builds all `@swarm/*` packages) → `tsc` → `vite build`.
 
 ### MCP Server Registration
 
@@ -615,193 +632,106 @@ The MCP server exposes a single tool: `pheromone_query`, which agents call to re
 pnpm install && pnpm turbo build
 
 # Development (hot reload)
-cd swarm && pnpm tauri:dev
+pnpm tauri:dev
 
-# Production build (creates installers)
-cd swarm && pnpm tauri:build
+# Production build (creates native desktop installers)
+pnpm --filter @swarm/app tauri:build
 ```
 
 ### Installer Outputs
 
 | Platform | Format | Path |
 |----------|--------|------|
-| **Windows** | NSIS Setup | `swarm/src-tauri/target/release/bundle/nsis/` |
-| **Windows** | MSI | `swarm/src-tauri/target/release/bundle/msi/` |
-| **macOS** | DMG / App | `swarm/src-tauri/target/release/bundle/dmg/` / `bundle/macos/` |
-| **Linux** | AppImage / Deb | `swarm/src-tauri/target/release/bundle/` |
+| **Windows** | NSIS Setup | `desktop/src-tauri/target/release/bundle/nsis/` |
+| **Windows** | MSI | `desktop/src-tauri/target/release/bundle/msi/` |
+| **macOS** | DMG / App | `desktop/src-tauri/target/release/bundle/dmg/` / `bundle/macos/` |
+| **Linux** | AppImage / Deb | `desktop/src-tauri/target/release/bundle/` |
 
 ---
 
 ## Project Structure
 
+<p align="center">
+  <img src="assets/folder-structure.svg" alt="Swarm AI Project Folder Structure" width="100%" />
+</p>
+
 ```text
 swarm-ai/
 │
-├── swarm/ # 🖥️ Tauri desktop application
-│ ├── src/
-│ │ ├── app/ # HomePage shell (title bar, planes, docks)
-│ │ ├── features/ # One folder per feature domain
-│ │ │ ├── panes/ # Plane host + switcher (multi-pane CSS grid)
-│ │ │ ├── browser/ # CDP browser pane (launch, screenshot, navigate)
-│ │ │ ├── emulator/ # Android AVD build + boot panes
-│ │ │ │ └── android/ # AVD spec validation, config.ini generation
-│ │ │ ├── settings/ # Models, providers, settings UI
-│ │ │ └── dock/ # Right dock (Lead chat, task board)
-│ │ └── shared/ # Cross-feature: Tauri bindings, Zustand stores, logo, themes
-│ └── src-tauri/
-│ └── src/
-│ └── lib.rs # PTY, FS, Git/Worktree, Pheromone, CDP, Browser, Emulator
+├── desktop/                    # 🖥️ Tauri desktop application
+│   ├── src/                    # UI shell (HomePage, terminal planes, docks)
+│   └── src-tauri/              # Native Rust engine (PTY, FS, Git/Worktree, SQLite, CDP)
 │
-├── pheromone/ # 🧠 Project memory engine
-│ ├── src/
-│ │ ├── db/ # SQLite schema, migrations, connection management
-│ │ ├── memory/ # MemoryManager — markdown parsing, file tracking
-│ │ ├── search/ # Hybrid search engine (FTS5 + vector + RRF)
-│ │ ├── injection/ # InjectionPipeline — token-budgeted context injection
-│ │ └── plans/ # Plan persistence for Lead missions
-│ └── pheromone-mcp/ # MCP stdio server exposing pheromone_query
+├── web/                        # 🌐 Official download site & documentation landing page
+│   ├── releases/               # macOS, Windows, Linux installer packages
+│   └── index.html              # Static site with live previews
 │
-├── swarmmind/ # ⚡ Orchestration engine (pure core)
-│ ├── src/
-│ │ ├── orchestrator.ts # Plan → Dispatch → Complete → Approve/Reject
-│ │ ├── core.ts # Public API — re-exports all modules
-│ │ ├── ports.ts # Side-effect interfaces (WorktreeOps, HandoffFs)
-│ │ ├── registry/ # AgentRegistry — tracks status, worktree, CLI
-│ │ ├── locks/ # LockRegistry — file-ownership lock management
-│ │ ├── roles/ # RoleManager — coordinator, builder, scout, reviewer
-│ │ ├── worktree/ # Git worktree create/merge/remove operations
-│ │ ├── handoffs/ # HandoffManager — markdown handoff format + I/O
-│ │ ├── messages/ # MessageBus — point-to-point + broadcast messaging
-│ │ └── tauri/ # Desktop adapters (IPC → core)
-│ └── tests/ # Orchestrator, handoffs, purity, dispatch tests
+├── packages/                   # 📦 Modular domain libraries
+│   ├── agents/                 # 11+ CLI agent adapters (Claude, Codex, Grok, Kimi, etc.)
+│   ├── mind/                   # SwarmMind orchestrator, task handoffs, event bus
+│   ├── pheromone/              # SQLite vector memory & semantic search engine
+│   ├── pheromone-mcp/          # Model Context Protocol stdio bridge server
+│   ├── lead/                   # AI planner & goal decomposition
+│   ├── tasks/                  # Task board, pipeline stages & worktree lanes
+│   ├── voice/                  # Whisper.cpp offline STT & audio HUD
+│   ├── board/                  # Kanban primitives & agent badges
+│   ├── workspace/              # Multi-workspace & worktree file management
+│   ├── flow/                   # Infinite visual node canvas
+│   ├── plugins/                # GlassChat Studio plugin system
+│   ├── extension/              # OpenVSX marketplace extension pane
+│   ├── reports/                # System health monitors & analytics
+│   └── design-system/          # Central CSS design tokens & themes
 │
-├── lead/ # 🎯 AI planner
-│ ├── src/
-│ │ ├── breakdown.ts # Goal → task decomposition
-│ │ ├── assignment.ts # CLI + role assignment strategy
-│ │ ├── review-routing.ts # Approve/Reassign/Retry routing
-│ │ ├── modes.ts # Steward / Forager / Stinger
-│ │ ├── tools.ts # Tool definitions with mode-based permissions
-│ │ └── types.ts # LeadTask, BreakdownResult, Assignment types
-│ └── tests/ # Breakdown, tools (mode security) tests
-│
-├── tasks/ # 📋 Task board & pipeline
-│ ├── src/
-│ │ ├── board.ts # TaskCard type + Board class (stateful)
-│ │ ├── cards.ts # Pure card operations (immutable array-in/out)
-│ │ ├── pipeline.ts # Pipeline stages (Planner→Coordinator→Build→Merge→Review→Verify)
-│ │ ├── dispatch.ts # Dispatch command builder
-│ │ └── theme.ts # Task board theming
-│ └── tests/ # Board, cards (immutability), pipeline tests
-│
-├── agents/ # 🤖 Agent launcher & CLI adapters
-│ ├── src/
-│ │ ├── launcher.ts # AgentLauncher — spawn, track, clean up sessions
-│ │ ├── types.ts # Session, AgentStatus, AgentRecord types
-│ │ ├── cli-info.ts # CLI_METADATA — 10 CLI agents catalog
-│ │ ├── cli-configs/ # Per-CLI config builders (MCP, flags, permission bypass)
-│ │ └── ui/ # Agent pane UI logic (spawn guard, sanitize, migration)
-│ └── tests/ # Launcher, CLI config, security tests
-│
-├── voice/ # 🎙️ Local voice layer
-│ ├── src/
-│ │ ├── voice-processor.ts # Voice orchestrator (dictation + voice command)
-│ │ ├── core.ts # Pure core exports
-│ │ ├── types.ts # ModelSize, TranscriptionResult, VoiceConfig
-│ │ ├── engine/ # WhisperCppEngine — model download + STT
-│ │ ├── hotkeys/ # HotkeyService interface + stub
-│ │ ├── injection/ # InjectionService interface + stub
-│ │ ├── cleanup/ # Optional LLM cleanup service
-│ │ └── recorder/ # AudioRecorder interface + stub
-│ └── tests/ # 5 test files — engine, processor, purity, cleanup, types
-│
-├── board/ # 📊 Board primitives & pipeline state
-│ ├── src/
-│ │ ├── BoardStrip.tsx # Board strip component
-│ │ ├── BoardLogo.tsx # Logo component
-│ │ ├── LeadCrown.tsx # Lead indicator component
-│ │ ├── activatable.ts # Keyboard accessibility (Enter/Space)
-│ │ └── themes.ts # Board theme definitions
-│ └── tests/ # Activatable (a11y), brand icons
-│
-├── workspace/ # 🗂️ Workspace coordination
-│ ├── src/
-│ │ ├── store.ts # Workspace state (folder ↔ swarm binding)
-│ │ ├── toolbox.ts # MCP server configuration management
-│ │ ├── openFiles.ts # Open file tracking for Pheromone hints
-│ │ ├── toolboxIO.ts # File I/O for MCP config
-│ │ └── ui/ # Sidebar, toolbox pane, worktree select, dialogs
-│ └── tests/ # Store (multi-workspace), toolbox (MCP merge)
-│
-├── flow/ # 🎨 Visual flow canvas
-│ ├── src/
-│ │ ├── FlowCanvas.tsx # Infinite canvas component
-│ │ ├── CanvasNode.tsx # Node rendering
-│ │ ├── CanvasControls.tsx # Zoom, pan, snap controls
-│ │ ├── FlowMark.tsx # Canvas watermark
-│ │ ├── camera.ts # Camera math (screen↔world, zoom, fit-to)
-│ │ └── canvasStore.ts # Zustand store for canvas state
-│ └── tests/ # Canvas layout, camera round-trips
-│
-├── swarmplugins/ # 🔌 Internal plugin registry
-│ └── src/
-│ ├── registry.ts # Plugin registration & discovery
-│ ├── types.ts # Plugin interface definitions
-│ └── index.ts # Public exports
-│
-├── swarmextension/ # 🧩 VS Code extension (private)
-│ └── src/
-│ ├── ExtensionsMarketplace.tsx # Extension marketplace UI
-│ ├── OpenVsxPane.tsx # Open VSX integration pane
-│ ├── catalog.ts # Extension catalog
-│ └── extensionStore.ts # Extension state management
-│
-├── design-system/ # 🎨 Design tokens & components
-├── pnpm-workspace.yaml # Workspace configuration (13 actual packages)
-├── turbo.json # Build pipeline configuration
-├── package.json # Root monorepo config
-└── LICENSE # Personal, non-commercial license
+├── docs/                       # 📚 Audits, architectural blueprints & user guides
+├── assets/                     # Vector illustrations & logos
+├── pnpm-workspace.yaml         # Workspace configuration (desktop, web, packages/*)
+├── turbo.json                  # Turborepo build pipeline
+└── package.json                # Root monorepo scripts
 ```
 
 ---
 
 ## Package Reference
 
-All packages are consumed via `workspace:*` protocol. Several use a **dual-entry-point pattern** — a pure subpath and a platform subpath — so consumers import only what they need:
+All packages are consumed via `workspace:*` protocol:
 
 | Package | Path | Key Exports | Pure Core? | Private? |
 |---------|------|-------------|------------|----------|
-| `@swarm/pheromone` | `pheromone/` | `.` (core + Tauri adapter), `./tauri`, `./ui` (React SessionHistory) | Yes | No |
-| `@swarm/pheromone-mcp` | `pheromone/pheromone-mcp/` | `.` (MCP stdio server), `./tools/pheromone-query`, `./cli-configs` | No (Node.js CLI) | No |
-| `@swarm/mind` | `swarmmind/` | `.` (main), `./core` (pure orchestration), `./tauri` | Yes (`/core`) | No |
-| `@swarm/lead` | `lead/` | `.` (main), `./ui` (React components) | No (LLM-dependent) | No |
-| `@swarm/tasks` | `tasks/` | `Board`, `addCard`, `moveCard`, `removeCard`, `updateCard`, `buildPipeline` | Yes | No |
-| `@swarm/agents` | `agents/` | `.`, `./cli-configs`, `./ui` (xterm), `./storage` (zustand) | No (process spawn) | No |
-| `@swarm/voice` | `voice/` | `.`, `./core` (pure STT), `./ui` (React overlay) | Yes (`/core`) | No |
-| `@swarm/board` | `board/` | Board primitives, pipeline state, theme definitions | Yes | No |
-| `@swarm/workspace` | `workspace/` | `.`, `./ui` (sidebar, toolbox) | No (FS I/O) | No |
-| `@swarm/flow` | `flow/` | `FlowCanvas`, `CanvasNode`, `CanvasControls`, camera utilities | Yes | No |
-| `@swarm/extension` | `swarmextension/` | VS Code extension with Open VSX marketplace | No | **Yes** |
-| `@swarm/plugins` | `swarmplugins/` | Internal plugin registry | No | **Yes** |
-| `@swarm/app` | `swarm/` | Tauri desktop application (consumes everything) | No | No |
+| `@swarm/app` | `desktop/` | Tauri desktop application shell | No | No |
+| `@swarm/pheromone` | `packages/pheromone/` | `.` (core + Tauri adapter), `./tauri`, `./ui` | Yes | No |
+| `@swarm/pheromone-mcp` | `packages/pheromone-mcp/` | `.` (MCP stdio server), `./tools/pheromone-query` | No (Node.js CLI) | No |
+| `@swarm/mind` | `packages/mind/` | `.` (main), `./core` (pure orchestration), `./tauri` | Yes (`/core`) | No |
+| `@swarm/lead` | `packages/lead/` | `.` (main), `./ui` (React components) | No (LLM-dependent) | No |
+| `@swarm/tasks` | `packages/tasks/` | `Board`, `addCard`, `moveCard`, `removeCard`, `buildPipeline` | Yes | No |
+| `@swarm/agents` | `packages/agents/` | `.`, `./cli-configs`, `./ui` (xterm), `./storage` | No (process spawn) | No |
+| `@swarm/voice` | `packages/voice/` | `.`, `./core` (pure STT), `./ui` (React overlay) | Yes (`/core`) | No |
+| `@swarm/board` | `packages/board/` | Board primitives, pipeline state, theme definitions | Yes | No |
+| `@swarm/workspace` | `packages/workspace/` | `.`, `./ui` (sidebar, toolbox) | No (FS I/O) | No |
+| `@swarm/flow` | `packages/flow/` | `FlowCanvas`, `CanvasNode`, `CanvasControls` | Yes | No |
+| `@swarm/plugins` | `packages/plugins/` | Internal plugin registry | No | **Yes** |
+| `@swarm/extension` | `packages/extension/` | VS Code extension with Open VSX marketplace | No | **Yes** |
+| `@swarm/reports` | `packages/reports/` | Test result visualizers & system monitors | Yes | No |
+| `@swarm/design-system` | `packages/design-system/` | Theme tokens & CSS styles | Yes | No |
 
 ---
 
 ## Supported CLI Agents
 
-Swarm integrates with **10+ CLI coding agents** out of the box:
+Swarm integrates with **11+ CLI coding agents** out of the box:
 
 | Agent | Command | Install | Docs |
 |-------|---------|---------|------|
 | **Claude Code** | `claude` | `npm install -g @anthropic-ai/claude-code` | [docs.anthropic.com](https://docs.anthropic.com/en/docs/claude-code) |
 | **Codex CLI** | `codex` | `npm install -g @openai/codex` | [github.com/openai/codex](https://github.com/openai/codex) |
-| **Aider** | `aider` | `pip install aider-chat` | [aider.chat](https://aider.chat/docs/install.html) |
+| **Grok Code** | `grok` | `npm install -g @xai/grok-cli` / `opencode` | [x.ai](https://x.ai) |
 | **Antigravity CLI** | `agy` | `npm install -g @google/antigravity-cli` | [antigravity.google](https://antigravity.google) |
 | **OpenCode** | `opencode` | `npm install -g opencode-ai` | [opencode.ai](https://opencode.ai) |
+| **Aider** | `aider` | `pip install aider-chat` | [aider.chat](https://aider.chat/docs/install.html) |
+| **Cursor CLI** | `cursor` | Cursor IDE (CLI ships with app) | [cursor.com](https://cursor.com/downloads) |
 | **Cline** | `cline` | `npm install -g cline` | [github.com/cline/cline](https://github.com/cline/cline) |
-| **Cursor CLI** | `cursor` | Cursor IDE (CLI ships with the app) | [cursor.com](https://cursor.com/downloads) |
 | **Kiro CLI** | `kiro` | `npm install -g kiro-cli` | [kiro.dev](https://kiro.dev) |
 | **Kilo** | `kilo` | `npm install -g kilo-ai` | [kilo.ai](https://kilo.ai) |
+| **Kimi Code** | `kimi` | `npm install -g kimi-cli` | [moonshot.cn](https://moonshot.cn) |
 
 Each agent gets:
 - MCP auto-registration with Pheromone query tool
