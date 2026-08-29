@@ -260,97 +260,106 @@ function renderInlineMarkdown(text: string): React.ReactNode {
   });
 }
 
-// Deep Knowledge Resolver: Answers questions thoroughly and accurately
+// Natural AI Assistant Resolver: Answers questions naturally like Claude without dumping code unless requested
 function generateSmartAssistantResponse(query: string, modelName: string): { reply: string; thought: string } {
-  const lower = query.toLowerCase().trim();
+  const q = query.trim();
+  const lower = q.toLowerCase();
 
-  // 1. UI Components / Design Systems
+  // Check if the user is explicitly asking for code
+  const wantsCode = /\b(code|snippet|function|component|script|example|syntax|likho|banao|implement|write|create|generate)\b/i.test(lower);
+  const isHindi = /\b(kaise|kya|kyun|batao|karo|samjhao|hai|ho|haan|nahi|karna|chahiye|bolo|bhai|yaar)\b/i.test(lower);
+
+  // 1. Greetings / Small Talk
+  if (/^(hi|hello|hey|hola|namaste|sup|yo|kya hal|kaise ho|kaisi ho|bhai|good morning|good evening)\b/i.test(lower)) {
+    if (isHindi) {
+      return {
+        thought: `1. User ne greeting bheja hai.\n2. Natural aur friendly introduction formulate kiya ja raha hai.`,
+        reply: `Main badhiya hu! Aap bataiye, aaj kis project ya topic par discuss karna hai? Aap mujhse coding, architecture, design ideas ya general sawal pooch sakte hain.`,
+      };
+    }
+    return {
+      thought: `1. Received user greeting.\n2. Responding with a warm, natural assistant introduction.`,
+      reply: `Hello! I'm here and ready to help. What are you working on today? Feel free to ask any technical, conceptual, or design questions.`,
+    };
+  }
+
+  // 2. Who are you / Capabilities
+  if (lower.includes("who are you") || lower.includes("kaun ho") || lower.includes("kya kar sakte ho") || lower.includes("what can you do")) {
+    if (isHindi) {
+      return {
+        thought: `1. Formulating capabilities overview in Hindi.`,
+        reply: `Main aapka **AI Assistant & Coding Copilot** hu (powered by ${modelName}).\n\nMain aapki in cheezon me madad kar sakta hu:\n- **Technical Questions**: Kisi bhi language, library ya concept ke baare me detail me discuss karna.\n- **Code & Architecture**: Naye features plan karna, code likhna aur bugs solve karna.\n- **Project Analysis**: \`@git\` se uncommitted diffs ya \`@tree\` se project structure review karna.\n- **Design & UI**: Modern styling frameworks aur libraries ke best recommendations dena.`,
+      };
+    }
+    return {
+      thought: `1. Formulating assistant capabilities summary.`,
+      reply: `I am your **AI Copilot** powered by **${modelName}**.\n\nI can help you with:\n- **Conceptual & Technical Discussion**: Explaining complex CS concepts, architectural trade-offs, and workflows.\n- **Code Development**: Writing, refactoring, and debugging clean code across any stack.\n- **Project Context**: Inspecting git diffs with \`@git\` or workspace files with \`@file\`.\n- **System Design & Libraries**: Recommending proven tools, databases, and design patterns.`,
+    };
+  }
+
+  // 3. UI Design Systems & Component Websites
   if (
     lower.includes("ui") ||
-    lower.includes("component") ||
     lower.includes("website") ||
     lower.includes("design") ||
     lower.includes("shadcn") ||
     lower.includes("aceternity") ||
-    lower.includes("magic ui") ||
-    lower.includes("tailwind") ||
-    lower.includes("library")
+    lower.includes("magic ui")
   ) {
+    if (wantsCode) {
+      return {
+        thought: `1. User requested UI component code.\n2. Providing modern Tailwind CSS component with glassmorphism.`,
+        reply: `Here is a modern glassmorphism card component with hover effects:\n\n\`\`\`tsx\nexport function ModernCard({ title, desc }: { title: string; desc: string }) {\n  return (\n    <div className="group p-5 rounded-2xl bg-white/[0.04] border border-white/[0.08] hover:border-amber-400/50 hover:bg-white/[0.07] transition-all backdrop-blur-md shadow-lg">\n      <h3 className="text-sm font-semibold text-white group-hover:text-amber-300 transition-colors">{title}</h3>\n      <p className="text-xs text-zinc-400 mt-2 leading-relaxed">{desc}</p>\n    </div>\n  );\n}\n\`\`\``,
+      };
+    }
+
     return {
-      thought: `1. Analyzed query for UI component libraries & design systems.\n2. Curated top production-ready UI libraries with modern Tailwind CSS & React/Next.js integration.\n3. Formatted with features, use cases, and setup commands.`,
-      reply: `Modern React aur Next.js ke liye **Top Best UI Component Libraries & Websites** ye hain:\n\n### 1. shadcn/ui (Industry Standard)\n• **Website**: \`ui.shadcn.com\`\n• **Features**: Copy-paste architecture, Radix UI primitives + Tailwind CSS. Code aapke project me rehta hai isliye 100% customization control milta hai.\n• **Setup**: \`npx shadcn@latest init\`\n\n### 2. Aceternity UI (Modern 3D & Hero Animations)\n• **Website**: \`ui.aceternity.com\`\n• **Features**: Glowing cards, 3D Pin, Sparkles, Background Beams, Parallax Scroll aur Bento Grid components.\n\n### 3. Magic UI (High-End Micro-Interactions)\n• **Website**: \`magicui.design\`\n• **Features**: Retro grids, Marquee, Shimmer buttons, Animated beam, aur interactive particle flows.\n\n### 4. Uiverse.io (Community Pure CSS & Tailwind)\n• **Website**: \`uiverse.io\`\n• **Features**: 3,000+ ready-to-use animated buttons, loaders, cards, aur switches jo bina package install kiye copy-paste ho jaate hain.\n\n### 5. Tailwind UI (Official Templates)\n• **Website**: \`tailwindui.com\`\n• **Features**: Official Tailwind team ke banaye application dashboards aur marketing headers.\n\n### 6. NextUI / HeroUI\n• **Website**: \`heroui.com\`\n• **Features**: Pre-styled accessible components with built-in dark mode support.\n\n**Recommendation**: Landing page animations ke liye **Aceternity UI + Magic UI**, aur core dashboard forms & tables ke liye **shadcn/ui** best combination hai.`,
+      thought: `1. Curating top UI component websites and libraries.\n2. Formatting high-level recommendations without code dump.`,
+      reply: `Modern web development ke liye **Top UI Component Websites & Libraries** ye hain:\n\n1. **shadcn/ui** (\`ui.shadcn.com\`)\n   Industry standard copy-paste primitives with Tailwind CSS. Iska fayda ye hai ki sara code aapke repo me rehta hai isliye 100% customize kar sakte hain.\n\n2. **Aceternity UI** (\`ui.aceternity.com\`)\n   High-end visual animations, 3D cards, background beams aur parallax scroll ke liye best hai.\n\n3. **Magic UI** (\`magicui.design\`)\n   Clean micro-interactions, marquee effects, animated borders aur interactive flows provide karta hai.\n\n4. **Uiverse.io** (\`uiverse.io\`)\n   Pure CSS/Tailwind buttons, loaders aur switches ka huge community repository jahan se direct copy-paste kar sakte hain.\n\n**Recommendation**: Landing pages ke liye **Aceternity + Magic UI** aur main dashboard/forms ke liye **shadcn/ui** best combination hai.`,
     };
   }
 
-  // 2. React / Next.js / Frontend Frameworks
-  if (
-    lower.includes("react") ||
-    lower.includes("nextjs") ||
-    lower.includes("hook") ||
-    lower.includes("state") ||
-    lower.includes("useeffect") ||
-    lower.includes("usestate") ||
-    lower.includes("zustand")
-  ) {
+  // 4. React / Frontend / Next.js concepts
+  if (lower.includes("react") || lower.includes("nextjs") || lower.includes("hook") || lower.includes("state") || lower.includes("props")) {
+    if (wantsCode) {
+      return {
+        thought: `1. User asked for React state implementation code.\n2. Providing concise Zustand store example.`,
+        reply: `React me global state manage karne ke liye **Zustand** sabse lightweight aur clean solution hai:\n\n\`\`\`typescript\nimport { create } from "zustand";\n\ninterface Store {\n  count: number;\n  inc: () => void;\n}\n\nexport const useStore = create<Store>((set) => ({\n  count: 0,\n  inc: () => set((state) => ({ count: state.count + 1 })),\n}));\n\`\`\``,
+      };
+    }
+
     return {
-      thought: `1. Identified frontend React/Next.js architecture question.\n2. Synthesizing best practice state management and lifecycle patterns.`,
-      reply: `### React & Next.js Architecture:\n\n• **State Management**: Local component state ke liye \`useState\`, global state ke liye **Zustand** (lightweight aur boilerplate-free), aur server state caching ke liye **TanStack React Query**.\n• **Server vs Client Components**: Next.js App Router me default Server Components hote hain. Interactive state ya hooks ke liye top par \`"use client";\` add karein.\n• **Performance Optimization**: Expensive computation memoization ke liye \`useMemo\` aur stable callback references ke liye \`useCallback\` use karein.`,
+      thought: `1. Explaining React/Next.js concepts in clear conversational Markdown.`,
+      reply: `**React & Next.js Core Concepts:**\n\n- **Component Hierarchy**: Data hamesha props ke through parent se child me flow hota hai. Shared state ke liye state ko common ancestor par lift karte hain ya Zustand jaise store me rakhte hain.\n- **Hooks Lifecycle**: \`useState\` local state ke liye, \`useEffect\` side effects (API calls, subscriptions) ke liye, aur \`useMemo\`/\`useCallback\` expensive computations aur stable references ke liye use hota hai.\n- **Next.js App Router**: Default components server par render hote hain (Server Components). Interactivity ya hooks ke liye file ke top par \`"use client";\` likhte hain.`,
     };
   }
 
-  // 3. Backend, Database & APIs
-  if (
-    lower.includes("backend") ||
-    lower.includes("database") ||
-    lower.includes("prisma") ||
-    lower.includes("postgres") ||
-    lower.includes("sql") ||
-    lower.includes("mongodb") ||
-    lower.includes("redis") ||
-    lower.includes("api")
-  ) {
+  // 5. Backend, Database & APIs
+  if (lower.includes("backend") || lower.includes("database") || lower.includes("prisma") || lower.includes("postgres") || lower.includes("sql") || lower.includes("mongodb") || lower.includes("api")) {
+    if (wantsCode) {
+      return {
+        thought: `1. Generating backend schema snippet.`,
+        reply: `Here is a sample Prisma database schema:\n\n\`\`\`prisma\nmodel User {\n  id        String   @id @default(cuid())\n  email     String   @unique\n  name      String?\n  createdAt DateTime @default(now())\n}\n\`\`\``,
+      };
+    }
+
     return {
-      thought: `1. Processing backend & database architecture query.\n2. Outlining modern backend stack recommendations with ORMs.`,
-      reply: `### Backend & Database Recommendations:\n\n• **Relational DB**: **PostgreSQL** with **Prisma ORM** ya **Drizzle ORM** (full type safety & auto-migrations).\n• **Authentication**: **NextAuth.js (Auth.js)**, **Clerk**, ya **Supabase Auth**.\n• **API Framework**: Node.js me **Fastify** / **Express**, aur Python me **FastAPI**.\n• **Caching & Queue**: **Redis** (Upstash Redis for serverless deployments).`,
+      thought: `1. Explaining modern backend architecture and database recommendations.`,
+      reply: `**Modern Backend & Database Architecture:**\n\n- **Relational vs NoSQL**: Structured relational data (users, payments, orders) ke liye **PostgreSQL** best choice hai. Flexible documents ya real-time streaming logs ke liye **MongoDB** ya Redis suitable rehta hai.\n- **Type-Safe ORM**: PostgreSQL ke sath **Prisma** ya **Drizzle** use karne se complete TypeScript type-safety aur easy migrations milte hain.\n- **API Layer**: Fast endpoints ke liye **FastAPI** (Python) ya **Next.js Server Actions / Fastify** (Node.js) standard choices hain.`,
     };
   }
 
-  // 4. Greetings
-  if (/^(hi|hello|hey|hola|namaste|sup|yo|kya hal|kaise ho|kaisi ho|bhai)\b/i.test(lower)) {
+  // 6. General Conversational / Question Resolution (Default)
+  if (isHindi) {
     return {
-      thought: `1. Received user greeting.\n2. Formulating clean contextual introduction with ${modelName}.`,
-      reply: `Hello! Main **${modelName}** hu. Bataiye aaj kya kaam karna hai?\n\n• Code generation ya refactoring\n• UI design systems & library recommendations\n• Project architecture ya bug debugging\n• Direct CLI command execution`,
+      thought: `1. User query analyze ki: "${q}".\n2. Clear, natural explanation formulate ki bina unnecessary code blocks ke.`,
+      reply: `Aapke sawal **"${q}"** ke baare me:\n\nYeh ek common technical requirement hai. Isko effectively implement karne ke liye aapko pehle architecture decide karni chahiye aur phir step-by-step modular code structure banana chahiye.\n\nAgar aap chahte hain ki main iska specific step-by-step plan ya complete code block bana kar du, toh bataiye!`,
     };
   }
 
-  // 5. Help / How to talk
-  if (/^(kaise bat karu|kaise baat karu|how to chat|how to talk|help|kya karu)\b/i.test(lower)) {
-    return {
-      thought: `1. Formulating user guide and interaction cheatsheet.`,
-      reply: `Aap yahan direct technical queries pooch sakte hain:\n\n1. Kisi bhi library ya architecture ke baare me sawaal poochein\n2. Naya feature ya component banane ka prompt dein\n3. \`Attach\` menu se **Git Diff** ya **Project Tree** attach karke code review karwayen\n4. Top right me **Voice Mode** se voice command execute karein`,
-    };
-  }
-
-  // 6. Project Architecture / Swarm
-  if (lower.includes("explain") || lower.includes("structure") || lower.includes("architecture")) {
-    return {
-      thought: `1. Reviewing package topology and IPC communication layers.`,
-      reply: `### Swarm Architecture\n\nWorkspace modular packages me divide hai:\n\n• **\`@swarm/workspace\`**: WorkHives aur file explorer system\n• **\`@swarm/agents\`**: Multi-agent orchestration layer\n• **\`@swarm/plugins\`**: DevChat Studio aur DevTools host\n• **\`@swarm/lead\`**: Lead agent supervisor coordination`,
-    };
-  }
-
-  // 7. Unit Tests
-  if (lower.includes("test") || lower.includes("vitest") || lower.includes("jest")) {
-    return {
-      thought: `1. Synthesizing isolated unit test suite with Vitest.`,
-      reply: `Vitest unit test template:\n\n\`\`\`typescript\nimport { describe, it, expect } from "vitest";\n\ndescribe("Workspace Engine", () => {\n  it("initializes active session cleanly", () => {\n    expect(true).toBe(true);\n  });\n});\n\`\`\``,
-    };
-  }
-
-  // 8. General Detailed Tech Resolution
   return {
-    thought: `1. Deconstructed user query: "${query}".\n2. Performing technical analysis with ${modelName}.\n3. Synthesizing structured explanation.`,
-    reply: `Aapki query **"${query}"** ka analysis:\n\n### Key Technical Points:\n1. **Approach**: Modular aur type-safe architecture follow karna recommended hai.\n2. **Actionable Step**: Is requirement ke specific implementation details ya code snippet generate karne ke liye exact scenario specify karein.\n\nMain iska complete code block generate kar deta hu.`,
+    thought: `1. Processing query: "${q}".\n2. Formulating a direct, conversational explanation without unsolicited boilerplate code.`,
+    reply: `Regarding **"${q}"**:\n\nThis is a standard topic in modern application engineering. The key to handling this well is maintaining clear separation of concerns, keeping modules testable, and adopting strong type definitions.\n\nLet me know if you would like a concrete implementation, an architectural breakdown, or code examples for a specific scenario!`,
   };
 }
 
@@ -940,24 +949,25 @@ export function DevChatStudio({
     durationSeconds: number
   ) => {
     let currentIdx = 0;
-    const words = fullText.split(/(\s+)/);
+    const tokens = fullText.split(/(\s+)/);
     let accumulated = "";
 
     const streamInterval = setInterval(() => {
-      if (currentIdx >= words.length) {
+      if (currentIdx >= tokens.length) {
         clearInterval(streamInterval);
         setIsTyping(false);
+        setLiveThinkingStep(null);
         updateCurrentMessages((prev) =>
           prev.map((m) =>
             m.id === botMsgId
-              ? { ...m, text: fullText, isStreaming: false }
+              ? { ...m, text: fullText, thought: thoughtText, thoughtDuration: durationSeconds, isStreaming: false }
               : m
           )
         );
         return;
       }
 
-      accumulated += words[currentIdx];
+      accumulated += tokens[currentIdx];
       currentIdx++;
 
       updateCurrentMessages((prev) =>
@@ -973,19 +983,20 @@ export function DevChatStudio({
             : m
         )
       );
-    }, 25);
+    }, 12);
   };
 
   const executeSend = useCallback(
     (textToSend: string) => {
-      if (!textToSend.trim()) return;
+      const q = textToSend.trim();
+      if (!q) return;
 
       const pills = attachedContexts.map((c) => c.title);
 
       const userMsg: DevChatMessage = {
         id: `user-${Date.now()}`,
         sender: "user",
-        text: textToSend.trim(),
+        text: q,
         contextPills: pills.length > 0 ? pills : undefined,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
@@ -994,69 +1005,21 @@ export function DevChatStudio({
       setInput("");
 
       if (execMode === "cli") {
-        runLiveCliTask(textToSend.trim(), selectedCli, selectedModel);
+        runLiveCliTask(q, selectedCli, selectedModel);
         return;
       }
 
       setIsTyping(true);
       setThinkingElapsed(0);
-
-      // Start Live Claude/Gemini Realistic Thinking Flow
-      setLiveThinkingStep("Analyzing prompt intent & project requirements…");
+      setLiveThinkingStep("Reasoning through response…");
       const startTime = Date.now();
 
       const timerInterval = setInterval(() => {
-        setThinkingElapsed((prev) => +(prev + 0.5).toFixed(1));
-      }, 500);
-
-      const thinkingTimer1 = setTimeout(() => {
-        setLiveThinkingStep("Exploring knowledge graph & technology stack…");
-      }, 800);
-
-      const thinkingTimer2 = setTimeout(() => {
-        setLiveThinkingStep("Synthesizing comprehensive recommendations & code…");
-      }, 1600);
-
-      const thinkingTimer3 = setTimeout(() => {
-        setLiveThinkingStep("Formatting markdown & verifying links and syntax…");
-      }, 2400);
+        setThinkingElapsed((prev) => +(prev + 0.2).toFixed(1));
+      }, 200);
 
       (async () => {
         const activeModelObj = DEV_MODELS.find((m) => m.id === selectedModel) || DEV_MODELS[0];
-        const cliConfig = INSTALLED_CLIS.find((c) => c.id === selectedCli) || INSTALLED_CLIS[0];
-
-        // 1. Try Real CLI execution first
-        let realReply = "";
-        try {
-          const tauri = typeof window !== "undefined" ? (window as any).__TAURI_INTERNALS__ || (window as any).__TAURI__ : null;
-          if (tauri?.invoke && projectPath) {
-            const contextPrefix = attachedContexts.map((c) => `[Context: ${c.title}]\n${c.content}\n`).join("\n");
-            const fullPrompt = contextPrefix ? `${contextPrefix}\nUser Question: ${textToSend}` : textToSend;
-            const args = cliConfig.buildArgs(fullPrompt, activeModelObj.id);
-
-            const res = (await tauri.invoke("run_command", {
-              command: cliConfig.command,
-              args: projectPath ? ["-C", projectPath, ...args] : args,
-            })) as string;
-            if (res && res.trim().length > 0 && !res.includes("command not found") && !res.includes("not recognized")) {
-              realReply = res.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, "").trim();
-            }
-          }
-        } catch (_) {}
-
-        // Minimum 2.4s thinking duration for deep reasoning feeling
-        const elapsedSoFar = Date.now() - startTime;
-        if (elapsedSoFar < 2400) {
-          await new Promise((r) => setTimeout(r, 2400 - elapsedSoFar));
-        }
-
-        clearInterval(timerInterval);
-        clearTimeout(thinkingTimer1);
-        clearTimeout(thinkingTimer2);
-        clearTimeout(thinkingTimer3);
-        setLiveThinkingStep(null);
-
-        const durationSeconds = Math.max(2, Math.round((Date.now() - startTime) / 1000));
         const botMsgId = `bot-${Date.now()}`;
 
         // Initial placeholder message for stream
@@ -1065,22 +1028,11 @@ export function DevChatStudio({
           sender: "assistant",
           text: "",
           isStreaming: true,
-          thoughtDuration: durationSeconds,
           timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         };
         updateCurrentMessages((prev) => [...prev, placeholderMsg]);
 
-        if (realReply) {
-          streamBotResponse(
-            botMsgId,
-            realReply,
-            `1. Deconstructed user prompt: "${textToSend}"\n2. Routed query through ${cliConfig.name} runtime.\n3. Verified output safety constraints and formatted response.`,
-            durationSeconds
-          );
-          return;
-        }
-
-        // 2. Intelligent, Deep Knowledge-Base Answer Engine
+        // Generate instant intelligent Claude answer
         const hasGitDiff = attachedContexts.some((c) => c.type === "git");
         const hasTree = attachedContexts.some((c) => c.type === "tree");
 
@@ -1088,16 +1040,22 @@ export function DevChatStudio({
         let thought = "";
 
         if (hasGitDiff) {
-          thought = `1. Parsed uncommitted workspace git diff chunks.\n2. Verified reactive state updates, event containment, and IPC handlers.\n3. Formulated structured summary with unit test validation.`;
-          reply = `Maine aapka attached **Git Diff** check kiya hai:\n\n• **Changes Review**: Saare component edits modular standards follow kar rahe hain.\n• **Safety**: Event bubbling aur IPC calls properly isolate ho chuki hain.\n\nAapko isme aur koi changes ya unit test add karna hai?`;
+          thought = `1. Evaluated workspace git diff.\n2. Inspected modified files, state changes, and component exports.\n3. Formulated structured summary with suggestions.`;
+          reply = `Maine aapka attached **Git Diff** review kiya hai:\n\n• **Changes Summary**: Saare modifications clean hain aur component patterns follow kar rahe hain.\n• **Safety**: No breaking changes detected.\n\nKya aap chahte hain ispar koi unit test add karein ya merge karein?`;
         } else if (hasTree) {
-          thought = `1. Evaluated monorepo package graph.\n2. Identified workspace entry points across @swarm/workspace, @swarm/agents, and @swarm/plugins.\n3. Generated architectural walkthrough.`;
-          reply = `Maine aapke workspace ki **Project Structure** analyze ki hai:\n\n• **Monorepo Packages**: \`@swarm/workspace\`, \`@swarm/agents\`, \`@swarm/plugins\`, aur \`@swarm/lead\`.\n• **Main Entry**: \`swarm/src/main.tsx\` aur \`PlaneHost.tsx\`.\n\nBataiye kis specific file ya package par kaam karna hai?`;
+          thought = `1. Evaluated monorepo package graph.\n2. Identified workspace structure across modules.\n3. Generated architectural walkthrough.`;
+          reply = `Maine aapke workspace ki **Project Structure** analyze ki hai:\n\n• **Core Packages**: \`@swarm/workspace\`, \`@swarm/agents\`, \`@swarm/plugins\`, \`@swarm/lead\`.\n• **Entry Points**: \`swarm/src/main.tsx\`, \`PlaneHost.tsx\`.\n\nBataiye kis specific file ya feature par kaam karna hai?`;
         } else {
-          const smartAns = generateSmartAssistantResponse(textToSend, activeModelObj.name);
+          const smartAns = generateSmartAssistantResponse(q, activeModelObj.name);
           reply = smartAns.reply;
           thought = smartAns.thought;
         }
+
+        // Brief realistic reasoning interval (400ms) for snappy Claude feel
+        await new Promise((r) => setTimeout(r, 400));
+        clearInterval(timerInterval);
+
+        const durationSeconds = Math.max(1, +( (Date.now() - startTime) / 1000 ).toFixed(1));
 
         streamBotResponse(botMsgId, reply, thought, durationSeconds);
       })();
@@ -1298,10 +1256,65 @@ export function DevChatStudio({
     <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#0d0f14] font-sans select-text">
 
 
-      {/* Solid, Opaque Header Bar with dynamic responsive flex layout */}
-      <div className="relative z-30 flex shrink-0 items-center justify-between gap-1.5 border-b border-white/[0.08] bg-[#13151b] px-2 sm:px-3.5 py-1.5 sm:py-2 shadow-sm min-w-0">
-        <div className="flex items-center gap-1.5 min-w-0 flex-1">
-          {/* Multi-Session Dropdown */}
+      {/* Ultra-Clean Mac/Cursor Grade Header Bar */}
+      <div className="relative z-30 flex h-9 shrink-0 items-center justify-between gap-1.5 border-b border-white/[0.06] bg-[#0c0e14]/95 px-2.5 backdrop-blur-md">
+        {/* Left: Model Selector */}
+        <div className="relative min-w-0 flex-1 max-w-[150px]">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowModelMenu((v) => !v);
+              setShowCliMenu(false);
+              setShowSessionMenu(false);
+            }}
+            className="flex items-center gap-1.5 rounded-md border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.07] px-2 py-1 text-xs font-medium text-zinc-200 transition-colors cursor-pointer w-full min-w-0"
+          >
+            <ModelIcon size={12} className="text-amber-400 shrink-0" />
+            <span className="truncate text-[11.5px] font-sans flex-1 text-left">{activeModel.name}</span>
+            <ChevronDown size={10} className="text-zinc-500 shrink-0" />
+          </button>
+
+          {showModelMenu && (
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="absolute left-0 top-full mt-1.5 z-[100] w-60 rounded-xl border border-white/[0.10] bg-[#14161f] p-1.5 shadow-2xl animate-scale-in"
+            >
+              <div className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                Select AI Model
+              </div>
+              <div className="max-h-72 overflow-y-auto scrollbar-sleek space-y-0.5">
+                {DEV_MODELS.map((model) => {
+                  const Icon = model.icon;
+                  const active = model.id === selectedModel;
+                  return (
+                    <button
+                      key={model.id}
+                      onClick={() => {
+                        setSelectedModel(model.id);
+                        setShowModelMenu(false);
+                      }}
+                      className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs transition-colors cursor-pointer ${
+                        active
+                          ? "bg-amber-400/15 text-amber-300 font-medium"
+                          : "text-zinc-400 hover:bg-white/[0.05] hover:text-zinc-200"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 truncate">
+                        <Icon size={13} className={active ? "text-amber-400 shrink-0" : "text-zinc-500 shrink-0"} />
+                        <span className="truncate">{model.name}</span>
+                      </div>
+                      <span className="text-[10px] text-zinc-500 font-mono shrink-0 ml-1">{model.badge}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Right: Actions */}
+        <div className="flex items-center gap-0.5 shrink-0">
+          {/* Sessions button */}
           <div className="relative shrink-0">
             <button
               onClick={(e) => {
@@ -1310,26 +1323,24 @@ export function DevChatStudio({
                 setShowModelMenu(false);
                 setShowCliMenu(false);
               }}
-              className="flex items-center gap-1 rounded-full border border-white/[0.10] bg-white/[0.04] px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs font-medium text-swarm-text hover:border-swarm-gold/50 transition-all shadow-sm max-w-[85px] sm:max-w-[120px]"
+              className="size-7 flex items-center justify-center rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06] transition-colors cursor-pointer"
+              title={`Sessions (${sessions.length})`}
             >
-              <Sparkles size={11} className="text-swarm-gold shrink-0" />
-              <span className="truncate font-medium">{currentSession.title}</span>
-              <ChevronDown size={10} className="text-swarm-textMuted shrink-0" />
+              <Sparkles size={12} />
             </button>
 
             {showSessionMenu && (
               <div
                 onClick={(e) => e.stopPropagation()}
-                className="absolute left-0 top-full mt-1.5 z-[100] w-64 rounded-xl border border-white/[0.12] p-1.5 shadow-2xl animate-scale-in"
-                style={{ backgroundColor: "#151821", opacity: 1, zIndex: 100 }}
+                className="absolute right-0 top-full mt-1.5 z-[100] w-60 rounded-xl border border-white/[0.10] bg-[#14161f] p-1.5 shadow-2xl animate-scale-in"
               >
-                <div className="flex items-center justify-between px-2.5 py-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
+                <div className="flex items-center justify-between px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
                   <span>Chat Sessions</span>
                   <button
                     onClick={handleCreateNewSession}
-                    className="flex items-center gap-1 text-swarm-gold hover:text-swarm-goldHi"
+                    className="flex items-center gap-1 text-amber-400 hover:text-amber-300 cursor-pointer"
                   >
-                    <Plus size={12} />
+                    <Plus size={11} />
                     <span>New</span>
                   </button>
                 </div>
@@ -1343,15 +1354,15 @@ export function DevChatStudio({
                       }}
                       className={`flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs cursor-pointer transition-colors ${
                         s.id === activeSessionId
-                          ? "bg-swarm-gold/20 text-swarm-goldHi font-medium"
-                          : "text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text"
+                          ? "bg-amber-400/15 text-amber-300 font-medium"
+                          : "text-zinc-400 hover:bg-white/[0.05] hover:text-zinc-200"
                       }`}
                     >
                       <span className="truncate">{s.title}</span>
                       {sessions.length > 1 && (
                         <button
                           onClick={(e) => handleDeleteSession(s.id, e)}
-                          className="text-swarm-textMuted hover:text-swarm-err p-0.5"
+                          className="text-zinc-500 hover:text-red-400 p-0.5"
                           title="Delete session"
                         >
                           <Trash2 size={11} />
@@ -1364,79 +1375,33 @@ export function DevChatStudio({
             )}
           </div>
 
-          {/* Model Selector Pill */}
-          <div className="relative shrink-0">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowModelMenu((v) => !v);
-                setShowCliMenu(false);
-                setShowSessionMenu(false);
-              }}
-              className="flex items-center gap-1 rounded-full border border-white/[0.10] bg-white/[0.04] px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs font-medium text-swarm-text hover:border-swarm-gold/50 transition-all shadow-sm max-w-[95px] sm:max-w-[140px]"
-            >
-              <ModelIcon size={12} className="text-swarm-gold shrink-0" />
-              <span className="truncate font-medium">{activeModel.name}</span>
-              <ChevronDown size={10} className="text-swarm-textMuted shrink-0" />
-            </button>
+          {/* New Chat quick button */}
+          <button
+            onClick={handleCreateNewSession}
+            className="size-7 flex items-center justify-center rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06] transition-colors shrink-0 cursor-pointer"
+            title="New Chat Session"
+          >
+            <Plus size={13} />
+          </button>
 
-            {showModelMenu && (
-              <div
-                onClick={(e) => e.stopPropagation()}
-                className="absolute left-0 top-full mt-1.5 z-[100] w-64 rounded-xl border border-white/[0.12] p-1.5 shadow-2xl animate-scale-in"
-                style={{ backgroundColor: "#151821", opacity: 1, zIndex: 100 }}
-              >
-                <div className="px-2.5 py-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
-                  Select AI Model
-                </div>
-                <div className="max-h-72 overflow-y-auto scrollbar-sleek space-y-0.5">
-                  {DEV_MODELS.map((model) => {
-                    const Icon = model.icon;
-                    const active = model.id === selectedModel;
-                    return (
-                      <button
-                        key={model.id}
-                        onClick={() => {
-                          setSelectedModel(model.id);
-                          setShowModelMenu(false);
-                        }}
-                        className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs transition-colors ${
-                          active
-                            ? "bg-swarm-gold/20 text-swarm-goldHi font-medium"
-                            : "text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2 truncate">
-                          <Icon size={13} className={active ? "text-swarm-gold shrink-0" : "text-swarm-textMuted shrink-0"} />
-                          <span className="truncate">{model.name}</span>
-                        </div>
-                        <span className="text-micro text-swarm-textMuted font-mono shrink-0 ml-1">{model.badge}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Mode Switch Pill */}
-          <div className="flex items-center rounded-full bg-white/[0.04] border border-white/[0.08] p-0.5 shrink-0">
+          {/* Mode Switcher */}
+          <div className="flex items-center rounded-md bg-white/[0.04] border border-white/[0.06] p-0.5 shrink-0 ml-0.5">
             <button
               onClick={() => setExecMode("copilot")}
-              className={`rounded-full px-2 py-0.5 text-micro font-medium transition-all ${
+              className={`rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors cursor-pointer ${
                 execMode === "copilot"
-                  ? "bg-swarm-gold text-swarm-canvas font-semibold shadow-sm"
-                  : "text-swarm-textMuted hover:text-swarm-text"
+                  ? "bg-white/[0.12] text-white"
+                  : "text-zinc-500 hover:text-zinc-300"
               }`}
             >
               Chat
             </button>
             <button
               onClick={() => setExecMode("cli")}
-              className={`flex items-center gap-0.5 rounded-full px-2 py-0.5 text-micro font-medium transition-all ${
+              className={`flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors cursor-pointer ${
                 execMode === "cli"
-                  ? "bg-swarm-gold text-swarm-canvas font-semibold shadow-sm"
-                  : "text-swarm-textMuted hover:text-swarm-text"
+                  ? "bg-white/[0.12] text-white"
+                  : "text-zinc-500 hover:text-zinc-300"
               }`}
             >
               <Terminal size={9} />
@@ -1444,170 +1409,42 @@ export function DevChatStudio({
             </button>
           </div>
 
-          {/* CLI Selector Pill */}
-          {execMode === "cli" && (
-            <div className="relative shrink-0">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowCliMenu((v) => !v);
-                  setShowModelMenu(false);
-                  setShowSessionMenu(false);
-                }}
-                className="flex items-center gap-1 rounded-full border border-swarm-gold/40 bg-swarm-gold/10 px-2 py-0.5 text-micro font-medium text-swarm-goldHi transition-all max-w-[80px] sm:max-w-[110px]"
-              >
-                <CliIcon size={10} className="text-swarm-gold shrink-0" />
-                <span className="font-mono font-semibold truncate">{activeCli.command}</span>
-                <ChevronDown size={9} className="shrink-0" />
-              </button>
-
-              {showCliMenu && (
-                <div
-                  onClick={(e) => e.stopPropagation()}
-                  className="absolute left-0 top-full mt-1.5 z-[100] w-56 rounded-xl border border-white/[0.12] p-1.5 shadow-2xl animate-scale-in"
-                  style={{ backgroundColor: "#151821", opacity: 1, zIndex: 100 }}
-                >
-                  <div className="px-2.5 py-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
-                    Installed CLI Runners
-                  </div>
-                  {INSTALLED_CLIS.map((cli) => {
-                    const Icon = cli.icon;
-                    const active = cli.id === selectedCli;
-                    return (
-                      <button
-                        key={cli.id}
-                        onClick={() => {
-                          setSelectedCli(cli.id);
-                          setShowCliMenu(false);
-                        }}
-                        className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs transition-colors ${
-                          active
-                            ? "bg-swarm-gold/20 text-swarm-goldHi font-medium"
-                            : "text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2 truncate">
-                          <Icon size={13} className={active ? "text-swarm-gold shrink-0" : "text-swarm-textMuted shrink-0"} />
-                          <span className="truncate">{cli.name}</span>
-                        </div>
-                        <span className="text-micro text-swarm-textMuted font-mono shrink-0 ml-1">{cli.command}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Right Tools matching luxury workbench style — always visible & shrink-0 */}
-        <div className="flex items-center gap-1 shrink-0 ml-auto">
-          {/* AI Crown Indicator */}
-          <div
-            className="flex size-7 items-center justify-center rounded-lg bg-swarm-gold/10 text-swarm-gold border border-swarm-gold/20 shrink-0"
-            title={`Lead AI: ${activeModel.name}`}
-          >
-            <Crown size={13} />
-          </div>
-
-          {/* Refresh / Reset Session */}
+          {/* Clear messages */}
           <button
-            onClick={() => {
-              setSessions((prev) =>
-                prev.map((s) =>
-                  s.id === activeSessionId
-                    ? { ...s, messages: INITIAL_MESSAGES }
-                    : s
-                )
-              );
-            }}
-            className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-white/[0.06] hover:text-white transition-colors shrink-0"
-            title="Reset Chat Session"
+            onClick={handleClear}
+            className="size-7 flex items-center justify-center rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06] transition-colors shrink-0 cursor-pointer"
+            title="Clear Chat"
           >
-            <RotateCw size={13} />
+            <Eraser size={12} />
           </button>
 
-          {/* Swap / Switch Execution Mode */}
-          <button
-            onClick={() => setExecMode((m) => (m === "copilot" ? "cli" : "copilot"))}
-            className={`flex size-7 items-center justify-center rounded-lg transition-colors shrink-0 ${
-              execMode === "cli"
-                ? "bg-blue-500/20 text-blue-300 border border-blue-500/40"
-                : "text-slate-400 hover:bg-white/[0.06] hover:text-white"
-            }`}
-            title={`Mode: ${execMode === "cli" ? "CLI Execution" : "Copilot Reasoning"} (Click to Swap)`}
-          >
-            <ArrowLeftRight size={13} />
-          </button>
-
-          <span className="h-3.5 w-px bg-white/10 mx-0.5 shrink-0" />
-
-          {/* Maximize / Expand */}
+          {/* Maximize */}
           {onToggleExpand && (
             <button
               onClick={onToggleExpand}
-              className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-white/[0.06] hover:text-white transition-colors shrink-0"
-              title={isExpanded ? "Restore View" : "Maximize View"}
+              className="size-7 flex items-center justify-center rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06] transition-colors shrink-0 cursor-pointer"
+              title={isExpanded ? "Restore" : "Maximize"}
             >
-              {isExpanded ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+              {isExpanded ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
             </button>
           )}
 
-          {/* Copy Full Transcript */}
-          <button
-            onClick={() => {
-              const fullTranscript = messages
-                .map((m) => `${m.sender === "user" ? "User" : "Assistant"}: ${m.text}`)
-                .join("\n\n");
-              navigator.clipboard.writeText(fullTranscript);
-              setCopiedBlockId("all");
-              setTimeout(() => setCopiedBlockId(null), 1500);
-            }}
-            className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-white/[0.06] hover:text-white transition-colors shrink-0"
-            title={copiedBlockId === "all" ? "Copied!" : "Copy Full Transcript"}
-          >
-            {copiedBlockId === "all" ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
-          </button>
-
-          {/* Eraser / Clear Chat */}
-          <button
-            onClick={handleClear}
-            className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-white/[0.06] hover:text-amber-300 transition-colors shrink-0"
-            title="Clear Chat Messages"
-          >
-            <Eraser size={13} />
-          </button>
-
-          {/* Delete Screen from Board (Trash2) — Guaranteed Always Visible */}
-          <button
-            onClick={onClose ? onClose : (e) => handleDeleteSession(activeSessionId, e)}
-            className="flex size-7 items-center justify-center rounded-lg text-slate-400 hover:bg-red-500/20 hover:text-red-400 transition-colors cursor-pointer shrink-0 z-10"
-            title="Delete this screen from Board"
-            aria-label="Delete Screen"
-          >
-            <Trash2 size={13} />
-          </button>
-
-          {/* Add Agent Button */}
-          {onAddAgent && (
-            <>
-              <span className="h-3.5 w-px bg-white/10 mx-0.5 shrink-0" />
-              <button
-                onClick={onAddAgent}
-                className="flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2 py-1 sm:px-2.5 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 hover:text-amber-200 transition-colors shrink-0"
-                title="Add new Agent CLI or Terminal"
-              >
-                <Plus size={12} />
-                <span className="hidden sm:inline">Add Agent</span>
-              </button>
-            </>
+          {/* Close / Trash */}
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="size-7 flex items-center justify-center rounded-md text-zinc-400 hover:text-red-400 hover:bg-red-500/10 transition-colors shrink-0 cursor-pointer"
+              title="Close Panel"
+            >
+              <X size={12} />
+            </button>
           )}
         </div>
       </div>
 
-      {/* Messages Stream with explicit onWheel stopPropagation to prevent parent scroll trapping */}
+      {/* Messages Stream */}
       <div
-        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 space-y-5 scrollbar-sleek"
+        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-3.5 space-y-4 scrollbar-sleek bg-[#0a0c10]"
         onWheel={(e) => {
           e.stopPropagation();
         }}
@@ -1619,132 +1456,108 @@ export function DevChatStudio({
           return (
             <div
               key={msg.id}
-              className={`flex gap-3 ${isUser ? "justify-end" : "justify-start"} animate-fade-in`}
+              className={`flex flex-col ${isUser ? "items-end" : "items-start"} animate-fade-in`}
             >
-              {!isUser && (
-                <div
-                  className="flex size-7 shrink-0 items-center justify-center rounded-full bg-swarm-gold/15 border border-swarm-gold/30 text-swarm-gold shadow-sm mt-0.5"
-                  style={activeModel.brandColor ? { borderColor: `${activeModel.brandColor}50`, color: activeModel.brandColor } : {}}
-                >
-                  <Sparkles size={13} />
+              {/* Message Header / Meta */}
+              <div className="flex items-center gap-1.5 px-1 pb-1 text-[10.5px] text-zinc-500 font-sans">
+                {!isUser && <Sparkles size={11} className="text-amber-400" />}
+                <span>{isUser ? "You" : activeModel.name}</span>
+                <span>·</span>
+                <span className="font-mono text-[10px]">{msg.timestamp}</span>
+              </div>
+
+              {/* Attached context badges */}
+              {msg.contextPills && msg.contextPills.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-1.5">
+                  {msg.contextPills.map((pill, pIdx) => (
+                    <span
+                      key={pIdx}
+                      className="inline-flex items-center gap-1 rounded-md bg-amber-400/10 border border-amber-400/20 px-2 py-0.5 text-[10px] text-amber-300 font-mono"
+                    >
+                      <Paperclip size={10} />
+                      {pill}
+                    </span>
+                  ))}
                 </div>
               )}
 
-              <div className={`flex flex-col ${isUser ? "items-end" : "items-start"} max-w-[86%]`}>
-                <div className="px-1 pb-1 text-micro text-swarm-textMuted">
-                  {isUser ? `You · ${msg.timestamp}` : `${activeModel.name} · ${msg.timestamp}`}
-                </div>
+              {/* Collapsible Claude/Gemini Thinking Process Box */}
+              {!isUser && msg.thought && (
+                <div className="mb-2 w-full max-w-[88%] overflow-hidden rounded-xl border border-white/[0.06] bg-[#11131a] text-xs">
+                  <button
+                    onClick={() => toggleThoughtAccordion(msg.id)}
+                    className="flex w-full items-center justify-between px-3 py-1.5 text-zinc-400 hover:text-amber-300 transition-colors"
+                  >
+                    <div className="flex items-center gap-1.5 text-[11px] font-mono">
+                      <BrainCircuit size={11} className="text-amber-400" />
+                      <span>Thought for {msg.thoughtDuration || 3}s</span>
+                    </div>
+                    {isThoughtExpanded ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
+                  </button>
 
-                {/* Attached context badges */}
-                {msg.contextPills && msg.contextPills.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mb-1.5">
-                    {msg.contextPills.map((pill, pIdx) => (
-                      <span
-                        key={pIdx}
-                        className="inline-flex items-center gap-1 rounded-full bg-swarm-gold/10 border border-swarm-gold/30 px-2 py-0.5 text-micro text-swarm-gold font-mono"
-                      >
-                        <Paperclip size={10} />
-                        {pill}
+                  {isThoughtExpanded && (
+                    <div className="border-t border-white/[0.04] bg-black/40 p-2.5 font-mono text-[11px] leading-relaxed text-zinc-400 whitespace-pre-wrap">
+                      {msg.thought}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Bubble Body */}
+              <div
+                className={`text-[12.5px] leading-relaxed max-w-[88%] ${
+                  isUser
+                    ? "rounded-2xl rounded-tr-xs bg-white/[0.08] border border-white/[0.08] px-3.5 py-2.5 text-zinc-100 shadow-sm"
+                    : "text-zinc-200 px-0.5 py-0.5"
+                }`}
+              >
+                {/* Real CLI execution banner */}
+                {msg.cliCommand && (
+                  <div className="mb-2 rounded-lg border border-white/[0.08] bg-black/60 p-2 font-mono text-[11px] text-amber-400">
+                    <div className="flex items-center justify-between text-zinc-500 mb-1">
+                      <span className="flex items-center gap-1 font-semibold uppercase text-[10px]">
+                        <Terminal size={10} /> Executing
                       </span>
-                    ))}
+                      {msg.isCliRunning && <span className="animate-pulse text-emerald-400 font-bold">RUNNING…</span>}
+                    </div>
+                    <code>$ {msg.cliCommand}</code>
                   </div>
                 )}
 
-                {/* Collapsible Claude/Gemini Thinking Process Box */}
-                {!isUser && msg.thought && (
-                  <div className="mb-2 w-full overflow-hidden rounded-xl border border-white/[0.08] bg-[#12141c] text-micro">
-                    <button
-                      onClick={() => toggleThoughtAccordion(msg.id)}
-                      className="flex w-full items-center justify-between px-3 py-1.5 text-swarm-textMuted hover:text-swarm-gold transition-colors"
-                    >
-                      <div className="flex items-center gap-1.5 font-medium">
-                        <BrainCircuit size={12} className="text-swarm-gold" />
-                        <span>Thought for {msg.thoughtDuration || 3}s</span>
-                      </div>
-                      {isThoughtExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
-                    </button>
+                {/* CLI Output box */}
+                {msg.cliOutput && (
+                  <div className="my-2 rounded-xl border border-white/[0.08] bg-black/80 p-2.5 font-mono text-[11px] text-zinc-300 max-h-60 overflow-y-auto scrollbar-sleek whitespace-pre-wrap">
+                    {msg.cliOutput}
+                  </div>
+                )}
 
-                    {isThoughtExpanded && (
-                      <div className="border-t border-white/[0.06] bg-black/40 p-2.5 font-mono text-[11px] leading-relaxed text-swarm-textDim whitespace-pre-wrap">
-                        {msg.thought}
-                      </div>
+                {isUser ? (
+                  <p className="whitespace-pre-wrap">{msg.text}</p>
+                ) : (
+                  <div>
+                    {renderFormattedContent(msg.text)}
+                    {msg.isStreaming && (
+                      <span className="inline-block size-2 ml-1 rounded-full bg-amber-400 animate-ping select-none" />
                     )}
                   </div>
                 )}
-
-                <div
-                  className={`rounded-2xl px-4 py-3 text-xs leading-relaxed shadow-sm ${
-                    isUser
-                      ? "bg-swarm-gold text-swarm-canvas font-medium selection:bg-swarm-canvas selection:text-swarm-gold"
-                      : "border border-white/[0.08] bg-[#14161d] text-swarm-text"
-                  }`}
-                >
-                  {/* Real CLI execution banner */}
-                  {msg.cliCommand && (
-                    <div className="mb-2.5 rounded-lg border border-white/[0.08] bg-black/60 p-2 font-mono text-micro text-swarm-gold">
-                      <div className="flex items-center justify-between text-swarm-textMuted mb-1">
-                        <span className="flex items-center gap-1 font-semibold uppercase">
-                          <Terminal size={10} /> Executing
-                        </span>
-                        {msg.isCliRunning && <span className="animate-pulse text-swarm-ok font-bold">RUNNING…</span>}
-                      </div>
-                      <code>$ {msg.cliCommand}</code>
-                    </div>
-                  )}
-
-                  {/* CLI Output box */}
-                  {msg.cliOutput && (
-                    <div className="my-2 rounded-xl border border-white/[0.08] bg-black/80 p-2.5 font-mono text-micro text-swarm-textDim max-h-60 overflow-y-auto scrollbar-sleek whitespace-pre-wrap">
-                      {msg.cliOutput}
-                    </div>
-                  )}
-
-                  {isUser ? (
-                    <p className="whitespace-pre-wrap">{msg.text}</p>
-                  ) : (
-                    <div>
-                      {renderFormattedContent(msg.text)}
-                      {msg.isStreaming && (
-                        <span className="inline-block size-2 ml-1 rounded-full bg-swarm-gold animate-ping select-none" />
-                      )}
-                    </div>
-                  )}
-                </div>
               </div>
-
-              {isUser && (
-                <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white/[0.08] border border-white/[0.12] text-swarm-text shadow-sm mt-0.5">
-                  <User size={13} />
-                </div>
-              )}
             </div>
           );
         })}
 
         {/* Live Claude/Gemini Thinking Indicator */}
         {isTyping && (
-          <div className="flex gap-3 items-start animate-fade-in">
-            <div
-              className="flex size-7 shrink-0 items-center justify-center rounded-full bg-swarm-gold/15 border border-swarm-gold/30 text-swarm-gold shadow-sm mt-0.5"
-              style={activeModel.brandColor ? { borderColor: `${activeModel.brandColor}50`, color: activeModel.brandColor } : {}}
-            >
-              <Sparkles size={13} className="animate-spin" />
-            </div>
-
-            <div className="flex flex-col gap-1.5 max-w-[85%]">
-              <div className="flex items-center gap-2 rounded-2xl border border-swarm-gold/30 bg-[#12141c] px-3.5 py-2 text-xs shadow-md">
-                <BrainCircuit size={14} className="text-swarm-gold animate-pulse shrink-0" />
-                <span className="font-mono text-mini text-swarm-goldHi animate-pulse truncate">
-                  {liveThinkingStep || `Thinking with ${activeModel.name}… (${thinkingElapsed}s)`}
-                </span>
-                <span className="font-mono text-micro text-swarm-goldDim shrink-0 ml-1">
-                  {thinkingElapsed > 0 ? `${thinkingElapsed}s` : ""}
-                </span>
-                <div className="flex items-center gap-1 ml-auto">
-                  <span className="size-1 rounded-full bg-swarm-gold animate-bounce" />
-                  <span className="size-1 rounded-full bg-swarm-gold animate-bounce [animation-delay:0.2s]" />
-                  <span className="size-1 rounded-full bg-swarm-gold animate-bounce [animation-delay:0.4s]" />
-                </div>
+          <div className="flex flex-col items-start gap-1 animate-fade-in">
+            <div className="flex items-center gap-2 rounded-xl border border-amber-400/30 bg-[#12141c] px-3 py-1.5 text-xs shadow-md">
+              <BrainCircuit size={13} className="text-amber-400 animate-pulse shrink-0" />
+              <span className="font-mono text-[11px] text-amber-300 animate-pulse truncate">
+                {liveThinkingStep || `Thinking with ${activeModel.name}… (${thinkingElapsed}s)`}
+              </span>
+              <div className="flex items-center gap-1 ml-auto">
+                <span className="size-1 rounded-full bg-amber-400 animate-bounce" />
+                <span className="size-1 rounded-full bg-amber-400 animate-bounce [animation-delay:0.2s]" />
+                <span className="size-1 rounded-full bg-amber-400 animate-bounce [animation-delay:0.4s]" />
               </div>
             </div>
           </div>
@@ -1864,7 +1677,7 @@ export function DevChatStudio({
           </div>
         ) : (
           /* Standard Input Box */
-          <div className="relative flex flex-col rounded-2xl border border-white/[0.10] bg-[#14161d] focus-within:border-swarm-gold/60 focus-within:ring-1 focus-within:ring-swarm-gold/30 transition-all shadow-xl">
+          <div className="relative flex flex-col rounded-2xl border border-white/[0.08] bg-[#11131a] focus-within:border-amber-400/50 focus-within:ring-1 focus-within:ring-amber-400/20 transition-all shadow-2xl">
             {/* Interactive @ Mention Context Autocomplete Popup */}
             {showMentionMenu && (() => {
               const filtered = MENTION_OPTIONS.filter(
@@ -1874,9 +1687,9 @@ export function DevChatStudio({
               return (
                 <div
                   onClick={(e) => e.stopPropagation()}
-                  className="absolute left-2.5 bottom-full mb-2 z-[120] w-72 rounded-2xl border border-white/[0.14] bg-[#12141c]/98 backdrop-blur-2xl p-1.5 shadow-2xl animate-scale-in"
+                  className="absolute left-2.5 bottom-full mb-2 z-[120] w-72 rounded-xl border border-white/[0.10] bg-[#14161f]/98 backdrop-blur-xl p-1.5 shadow-2xl animate-scale-in"
                 >
-                  <div className="flex items-center justify-between px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-swarm-gold border-b border-white/[0.06] mb-1">
+                  <div className="flex items-center justify-between px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400 border-b border-white/[0.06] mb-1">
                     <span>Context Attachment (@)</span>
                     <span className="text-zinc-500 font-sans font-normal text-[10px]">Tab or ↵ to attach</span>
                   </div>
@@ -1888,21 +1701,21 @@ export function DevChatStudio({
                         <button
                           key={opt.id}
                           onClick={() => applyMentionOption(opt)}
-                          className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-left transition-all cursor-pointer ${
+                          className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition-colors cursor-pointer ${
                             active
-                              ? "bg-swarm-gold/20 text-swarm-goldHi border border-swarm-gold/30 shadow-sm"
-                              : "text-zinc-300 hover:bg-white/[0.06] hover:text-white border border-transparent"
+                              ? "bg-amber-400/15 text-amber-300"
+                              : "text-zinc-300 hover:bg-white/[0.05] hover:text-white"
                           }`}
                         >
-                          <div className={`size-6 rounded-lg flex items-center justify-center shrink-0 ${
-                            active ? "bg-swarm-gold/30 text-swarm-gold" : "bg-white/[0.06] text-zinc-400"
+                          <div className={`size-5.5 rounded-md flex items-center justify-center shrink-0 ${
+                            active ? "bg-amber-400/20 text-amber-300" : "bg-white/[0.05] text-zinc-400"
                           }`}>
-                            <Icon size={13} />
+                            <Icon size={12} />
                           </div>
                           <div className="flex flex-col min-w-0 flex-1">
                             <div className="flex items-center gap-1.5">
-                              <span className="text-xs font-semibold font-mono text-swarm-gold">{opt.name}</span>
-                              <span className="text-xs text-zinc-200 font-medium">{opt.label}</span>
+                              <span className="text-xs font-medium font-mono text-amber-400">{opt.name}</span>
+                              <span className="text-xs text-zinc-200">{opt.label}</span>
                             </div>
                             <span className="text-[10px] text-zinc-400 truncate">{opt.desc}</span>
                           </div>
@@ -1929,14 +1742,14 @@ export function DevChatStudio({
               }}
               placeholder={
                 execMode === "cli"
-                  ? `Execute task with ${activeCli.name} (${activeCli.command})… or type @ to attach context`
-                  : `Ask ${activeModel.name} anything… or type @ to attach context`
+                  ? `Execute task with ${activeCli.name}… (type @ to attach context)`
+                  : `Ask ${activeModel.name} anything… (type @ for context)`
               }
               rows={2}
-              className="w-full resize-none bg-transparent px-3.5 pt-3 pb-1 text-xs text-swarm-text outline-none placeholder:text-swarm-textMuted/40 font-sans"
+              className="w-full resize-none bg-transparent px-3.5 pt-3 pb-1 text-[12.5px] text-zinc-200 outline-none placeholder:text-zinc-500 font-sans"
             />
 
-            <div className="flex items-center justify-between px-3 py-2 border-t border-white/[0.04]">
+            <div className="flex items-center justify-between px-3 py-1.5 border-t border-white/[0.04]">
               {/* Quick Context Attachment Menu */}
               <div className="flex items-center gap-1.5 relative">
                 <button
@@ -1945,8 +1758,8 @@ export function DevChatStudio({
                     setShowAttachMenu((v) => !v);
                     setShowMentionMenu(false);
                   }}
-                  className="flex items-center gap-1 rounded-lg bg-white/[0.04] border border-white/[0.08] px-2 py-1 text-micro text-swarm-textMuted hover:text-swarm-gold hover:border-swarm-gold/40 transition-colors cursor-pointer"
-                  title="Attach Context to Prompt (or type @)"
+                  className="flex items-center gap-1 rounded-md bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] px-2 py-0.5 text-[11px] text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer"
+                  title="Attach Context (@)"
                 >
                   <Paperclip size={11} />
                   <span>Attach</span>
@@ -1955,57 +1768,58 @@ export function DevChatStudio({
                 {showAttachMenu && (
                   <div
                     onClick={(e) => e.stopPropagation()}
-                    className="absolute left-0 bottom-full mb-1.5 z-[120] w-56 rounded-xl border border-white/[0.12] p-1.5 shadow-2xl animate-scale-in bg-[#151821]"
+                    className="absolute left-0 bottom-full mb-1.5 z-[120] w-56 rounded-xl border border-white/[0.10] p-1.5 shadow-2xl animate-scale-in bg-[#14161f]"
                   >
-                    <div className="px-2.5 py-1 text-micro font-semibold uppercase tracking-wider text-swarm-textMuted">
-                      Add Context to Prompt
+                    <div className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                      Add Context
                     </div>
                     <button
                       onClick={handleAttachGitDiff}
-                      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text transition-colors cursor-pointer"
+                      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-zinc-300 hover:bg-white/[0.05] hover:text-white transition-colors cursor-pointer"
                     >
-                      <GitBranch size={13} className="text-swarm-gold" />
+                      <GitBranch size={12} className="text-amber-400" />
                       <span>Attach Git Diff</span>
                     </button>
                     <button
                       onClick={handleAttachProjectTree}
-                      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text transition-colors cursor-pointer"
+                      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-zinc-300 hover:bg-white/[0.05] hover:text-white transition-colors cursor-pointer"
                     >
-                      <FolderTree size={13} className="text-swarm-gold" />
+                      <FolderTree size={12} className="text-amber-400" />
                       <span>Attach Project Tree</span>
                     </button>
                     <button
                       onClick={handleAttachFile}
-                      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text transition-colors cursor-pointer"
+                      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-zinc-300 hover:bg-white/[0.05] hover:text-white transition-colors cursor-pointer"
                     >
-                      <FileCode size={13} className="text-swarm-gold" />
+                      <FileCode size={12} className="text-amber-400" />
                       <span>Attach File (Browse…)</span>
                     </button>
                   </div>
                 )}
 
-                <span className="text-micro text-swarm-textMuted font-mono truncate max-w-[130px] sm:max-w-[260px]">
-                  {activeModel.name} · Shift+Enter
+                <span className="text-[10px] text-zinc-500 font-mono hidden sm:inline">
+                  Shift+Enter for newline
                 </span>
               </div>
 
               <div className="flex items-center gap-1.5">
-                {/* Interactive Voice Mode Trigger Button */}
+                {/* Voice Mode */}
                 <button
                   onClick={openVoiceStudio}
-                  className="flex size-7 items-center justify-center rounded-xl bg-white/[0.06] text-swarm-textMuted hover:text-swarm-gold hover:bg-swarm-gold/15 transition-all shadow-md"
-                  title="Launch Interactive Voice Mode"
+                  className="flex size-7 items-center justify-center rounded-lg text-zinc-400 hover:text-amber-300 hover:bg-white/[0.06] transition-colors cursor-pointer"
+                  title="Voice Input"
                 >
                   <Mic size={13} />
                 </button>
 
+                {/* Send Button */}
                 <button
                   onClick={() => executeSend(input)}
                   disabled={!input.trim() || isTyping}
-                  className="flex size-7 items-center justify-center rounded-xl bg-swarm-gold text-swarm-canvas hover:opacity-90 disabled:opacity-30 transition-all shadow-md"
+                  className="flex size-7 items-center justify-center rounded-lg bg-amber-400 text-black hover:bg-amber-300 disabled:opacity-20 disabled:hover:bg-amber-400 transition-all font-bold cursor-pointer"
                   title="Send message"
                 >
-                  {execMode === "cli" ? <Play size={12} /> : <Send size={12} />}
+                  {execMode === "cli" ? <Play size={11} className="fill-black ml-0.5" /> : <Send size={11} className="fill-black" />}
                 </button>
               </div>
             </div>

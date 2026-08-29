@@ -651,10 +651,10 @@ export default function ADERightDock({ projectPath, onClose }: Props) {
  }
  >
         <div
-          className={`shrink-0 flex overflow-x-auto scrollbar-none ${
+          className={`shrink-0 flex overflow-x-auto scrollbar-none bg-[#0c0d13]/90 backdrop-blur-md ${
             collapsed
-              ? "flex-col items-stretch gap-0.5 py-1"
-              : "items-center border-b border-swarm-border/40"
+              ? "flex-col items-stretch gap-0.5 py-1 px-1"
+              : "items-center px-1.5 h-10 border-b border-white/[0.06] gap-1"
           }`}
         >
           {TABS.map((tab) => {
@@ -673,15 +673,15 @@ export default function ADERightDock({ projectPath, onClose }: Props) {
                 title={collapsed ? `${tab.label} — expand panel` : tab.label}
                 aria-label={tab.label}
                 aria-expanded={!collapsed && active}
-                className={`flex items-center justify-center gap-1.5 min-w-0 h-9 text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
-                  collapsed ? "border-l-2" : "flex-1 px-2 border-b-2"
+                className={`flex items-center justify-center gap-1.5 min-w-0 h-7.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap cursor-pointer ${
+                  collapsed ? "w-8 mx-auto" : "flex-1 px-2"
                 } ${
                   active
-                    ? "text-white bg-white/[0.08] border-white shadow-xs"
-                    : "border-transparent text-zinc-400 hover:text-white hover:bg-white/[0.04]"
+                    ? "text-white bg-white/[0.08] shadow-xs"
+                    : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]"
                 }`}
               >
-                <Icon className="size-3.5 shrink-0" />
+                <Icon className={`size-3.5 shrink-0 ${active ? "text-amber-400" : "text-zinc-500"}`} />
                 {!compact && !collapsed && <span className="truncate">{tab.label}</span>}
               </button>
             );
@@ -689,8 +689,8 @@ export default function ADERightDock({ projectPath, onClose }: Props) {
 
           <button
             onClick={onClose}
-            className={`h-8 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors shrink-0 cursor-pointer ${
-              collapsed ? "w-full" : "w-8"
+            className={`size-7 flex items-center justify-center rounded-md text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors shrink-0 cursor-pointer ${
+              collapsed ? "w-full mt-1" : "ml-0.5"
             }`}
             title="Close panel"
             aria-label="Close panel"

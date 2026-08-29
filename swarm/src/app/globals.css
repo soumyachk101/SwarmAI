@@ -134,21 +134,21 @@ body {
    none }` from reaching the scroller Firefox actually sizes. */
 html {
   scrollbar-width: thin;
-  scrollbar-color: rgb(var(--swarm-gold) / 0.3) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
 }
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgb(var(--swarm-gold) / 0.28);
+  background: rgba(255, 255, 255, 0.18);
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgb(var(--swarm-gold) / 0.55);
+  background: rgba(255, 255, 255, 0.35);
 }
 ::-webkit-scrollbar-corner {
   background: transparent;

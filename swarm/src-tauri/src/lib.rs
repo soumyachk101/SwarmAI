@@ -1115,8 +1115,10 @@ async fn remove_dir(path: String) -> Result<(), String> {
 /// Run a one-off command and return stdout (used for CLI MCP registration).
 #[tauri::command]
 async fn run_command(command: String, args: Vec<String>) -> Result<String, String> {
-    let output = std::process::Command::new(&command)
-        .args(&args)
+    let mut cmd = std::process::Command::new(&command);
+    cmd.args(&args);
+    cmd.env("PATH", augmented_path_env());
+    let output = cmd
         .output()
         .map_err(|e| format!("Failed to run {}: {}", command, e))?;
     if !output.status.success() {

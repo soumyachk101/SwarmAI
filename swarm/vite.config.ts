@@ -8,6 +8,9 @@ export default defineConfig({
  resolve: {
  alias: {
  '@': path.resolve(__dirname, './src'),
+ '@swarm/plugins': path.resolve(__dirname, '../swarmplugins/src'),
+ '@swarm/reports/ui': path.resolve(__dirname, '../reports/src/ui'),
+ '@swarm/reports': path.resolve(__dirname, '../reports/src'),
  '@swarm/voice': path.resolve(__dirname, '../voice/src'),
  '@swarm/extension': path.resolve(__dirname, '../swarmextension/src'),
  '@swarm/mind/core': path.resolve(__dirname, '../swarmmind/src/core.ts'),

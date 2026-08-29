@@ -1502,10 +1502,10 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
 
       {/* ── Sidebar Body: Left Activity Rail + Main Panel ─────────────────── */}
       <div className="flex-1 flex min-h-0 overflow-hidden">
-        {/* ── Vertical Pro Activity Bar Rail (Far Left, 50px) ──────────────── */}
-        <div className="w-[50px] shrink-0 flex flex-col items-center justify-between border-r border-white/[0.06] bg-[#07080d] py-3 z-20">
-          {/* Top Section: App/Brand Logo & Activity Tabs (spaced down cleanly) */}
-          <div className="flex flex-col items-center gap-2 w-full pt-1.5">
+        {/* ── Vertical Pro Activity Bar Rail (Far Left, 48px) ──────────────── */}
+        <div className="w-[48px] shrink-0 flex flex-col items-center justify-between border-r border-white/[0.06] bg-[#07080c] py-2.5 z-20">
+          {/* Top Section: App/Brand Logo & Activity Tabs */}
+          <div className="flex flex-col items-center gap-1.5 w-full pt-1">
             {/* Activity Bar Tabs */}
             {TABS.map((tab) => {
               const Icon = tab.icon;
@@ -1514,19 +1514,19 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
                 <div key={tab.id} className="relative w-full flex justify-center py-0.5 group">
                   {/* Active Left Indicator Bar */}
                   {active && (
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r bg-white shadow-[0_0_8px_rgba(255,255,255,0.7)]" />
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4.5 rounded-r bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.7)]" />
                   )}
                   <button
                     onClick={() => { setActiveTab(tab.id); setViewer(null); }}
                     title={tab.label}
                     aria-label={tab.label}
-                    className={`size-9 rounded-xl flex items-center justify-center transition-all duration-150 ${
+                    className={`size-8.5 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer ${
                       active
-                        ? "text-white bg-white/[0.14] border border-white/[0.24] shadow-md"
-                        : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06]"
+                        ? "text-amber-300 bg-amber-400/[0.12] border border-amber-400/25 shadow-sm"
+                        : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.05]"
                     }`}
                   >
-                    <Icon className="size-4.5" />
+                    <Icon className="size-4" />
                   </button>
                 </div>
               );
@@ -1534,7 +1534,7 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
           </div>
 
           {/* Bottom Section: Theme Picker, Gear Settings, Pin & Close Actions */}
-          <div className="flex flex-col items-center gap-1.5 w-full pt-2 border-t border-white/[0.06]">
+          <div className="flex flex-col items-center gap-1.5 w-full pt-2 border-t border-white/[0.05]">
             {/* Theme Picker Slot */}
             {themePickerSlot}
 
@@ -1547,31 +1547,31 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
               }}
               aria-haspopup="menu"
               aria-expanded={settingsMenuOpen}
-              className={`size-9 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer ${
+              className={`size-8.5 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer ${
                 settingsMenuOpen
-                  ? "text-white bg-white/[0.16] border border-white/[0.3] shadow-md"
-                  : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06]"
+                  ? "text-amber-300 bg-amber-400/[0.15] border border-amber-400/30 shadow-sm"
+                  : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.05]"
               }`}
               title="Settings & Tools (Open project, Git, Extensions, Usage)"
               aria-label="Settings and Tools"
             >
-              <Settings size={18} className={settingsMenuOpen ? "rotate-45 transition-transform duration-200" : "transition-transform duration-200"} />
+              <Settings size={16} className={settingsMenuOpen ? "rotate-45 transition-transform duration-200" : "transition-transform duration-200"} />
             </button>
 
             <button
               onClick={onTogglePin}
-              className={`size-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
-                pinned ? "text-white bg-white/[0.12] border border-white/[0.2]" : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.06]"
+              className={`size-7.5 flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
+                pinned ? "text-amber-300 bg-amber-400/10 border border-amber-400/20" : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.05]"
               }`}
               title={pinned ? "Unpin sidebar" : "Pin sidebar"}
               aria-label={pinned ? "Unpin sidebar" : "Pin sidebar"}
             >
-              {pinned ? <PinOff size={13} /> : <Pin size={13} />}
+              {pinned ? <PinOff size={12} /> : <Pin size={12} />}
             </button>
             {onClose && (
               <button
                 onClick={onClose}
-                className="size-8 flex items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.06] transition-colors cursor-pointer"
+                className="size-7.5 flex items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.05] transition-colors cursor-pointer"
                 title="Close sidebar"
                 aria-label="Close sidebar"
               >
@@ -1601,13 +1601,16 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
           ) : (
             /* Workspaces Tab Content */
             <>
-              {/* WorkHive Top Action Header */}
-              <div className="flex h-10 shrink-0 items-center justify-between px-3 border-b border-white/[0.06] bg-black/20">
+              {/* Ultra-Clean Mac/Linear Workspace Header */}
+              <div className="flex h-10 shrink-0 items-center justify-between px-3 border-b border-white/[0.06] bg-[#0c0d12]/90 backdrop-blur-md">
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-xs font-semibold text-white tracking-tight truncate">
-                    Projects & Hives
+                  <div className="size-4.5 rounded-[5px] bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-zinc-300 shrink-0">
+                    <FolderGit2 size={11} className="text-zinc-400" />
+                  </div>
+                  <span className="text-[12px] font-medium text-zinc-200 tracking-tight">
+                    Workspaces
                   </span>
-                  <span className="px-1.5 py-0.2 rounded-full bg-white/[0.08] border border-white/[0.12] text-[10px] font-mono font-medium text-zinc-300 shrink-0">
+                  <span className="text-[11px] font-mono text-zinc-500">
                     {visibleWorkspaces.length}
                   </span>
                 </div>
@@ -1615,38 +1618,37 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
                 <div className="flex items-center gap-1 shrink-0">
                   <button
                     onClick={() => setHideSleeping(!hideSleeping)}
-                    className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                    className={`size-6.5 flex items-center justify-center rounded-md transition-colors cursor-pointer ${
                       hideSleeping
-                        ? "text-white bg-white/[0.12]"
-                        : "text-zinc-400 hover:text-white hover:bg-white/[0.06]"
+                        ? "text-amber-400 bg-amber-400/15"
+                        : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06]"
                     }`}
-                    title={hideSleeping ? "Show all workHives" : "Hide sleeping workHives"}
-                    aria-label="Toggle sleeping hives"
+                    title={hideSleeping ? "Show all workspaces" : "Hide sleeping workspaces"}
+                    aria-label="Toggle sleeping workspaces"
                   >
-                    {hideSleeping ? <EyeOff size={13} /> : <Eye size={13} />}
+                    {hideSleeping ? <EyeOff size={12} /> : <Eye size={12} />}
                   </button>
 
                   <button
                     onClick={handleAdd}
-                    className="inline-flex items-center gap-1 rounded-lg bg-white hover:bg-zinc-200 text-black font-semibold px-2.5 py-1 text-xs shadow-xs active:scale-95 transition-all cursor-pointer shrink-0"
-                    title="Create New Project Workspace"
+                    className="size-6.5 flex items-center justify-center rounded-md border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                    title="Add Workspace Folder"
                   >
-                    <Plus size={13} strokeWidth={2.5} />
-                    <span>New Hive</span>
+                    <Plus size={12} strokeWidth={2} />
                   </button>
                 </div>
               </div>
 
-              {/* Filter workHives input */}
-              <div className="px-3 py-2">
-                <div className="flex h-8 items-center gap-2 rounded-xl border border-white/[0.08] bg-black/40 px-2.5 focus-within:border-white/40 focus-within:ring-1 focus-within:ring-white/20 transition-all shadow-inner">
-                  <Search size={13} className="text-zinc-500 shrink-0" />
+              {/* Minimal Search input */}
+              <div className="px-2.5 py-1.5 border-b border-white/[0.04]">
+                <div className="flex h-7 items-center gap-1.5 rounded-md bg-white/[0.03] border border-white/[0.06] px-2 focus-within:border-amber-400/40 focus-within:bg-white/[0.05] transition-colors">
+                  <Search size={11} className="text-zinc-500 shrink-0" />
                   <input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search projects & folders..."
-                    aria-label="Filter workHives"
-                    className="min-w-0 flex-1 bg-transparent text-xs text-zinc-200 outline-none placeholder:text-zinc-500 font-sans"
+                    placeholder="Search workspaces..."
+                    aria-label="Filter workspaces"
+                    className="min-w-0 flex-1 bg-transparent text-[11.5px] text-zinc-200 outline-none placeholder:text-zinc-500 font-sans"
                     spellCheck={false}
                   />
                   {searchQuery && (
@@ -1655,15 +1657,15 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
                       title="Clear filter"
                       className="text-zinc-500 hover:text-zinc-300"
                     >
-                      <X size={12} />
+                      <X size={10} />
                     </button>
                   )}
                 </div>
               </div>
 
-              {/* WorkHive Cards List */}
-              <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-                <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-sleek px-2 pb-2 space-y-2">
+              {/* Workspaces List */}
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#0a0b10]">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-sleek px-1.5 py-1.5 space-y-0.5">
                   {visibleWorkspaces.length === 0 ? (
                     searchQuery ? (
                       <EmptyNote
@@ -1731,20 +1733,22 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
                 </div>
 
                 {/* Bottom Quick Navigation Links */}
-                <div className="px-2 pt-2 pb-2 border-t border-white/[0.06] flex flex-col gap-1 shrink-0 bg-black/20">
+                <div className="px-2 pt-1.5 pb-1 border-t border-white/[0.05] shrink-0 bg-[#0a0b10]">
                   <button
                     onClick={() => setBoardOpen(!boardOpen)}
-                    className={`flex h-8 items-center gap-2.5 rounded-xl px-2.5 text-xs font-semibold tracking-wider transition-all ${
+                    className={`flex w-full h-7 items-center justify-between px-2 rounded-md text-[11px] font-medium transition-colors cursor-pointer ${
                       boardOpen
-                        ? "bg-amber-500/15 text-amber-300 border border-amber-500/40 shadow-sm"
-                        : "border border-white/[0.04] bg-white/[0.02] text-zinc-400 hover:bg-white/[0.07] hover:border-amber-500/30 hover:text-amber-200"
+                        ? "bg-white/[0.08] text-white"
+                        : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]"
                     }`}
                     title="Toggle TaskComb Pipeline Board"
                   >
-                    <Network size={14} className={boardOpen ? "text-amber-400" : "text-cyan-400"} />
-                    <span className="tracking-widest font-mono text-[11px]">TASK PIPELINE</span>
+                    <div className="flex items-center gap-1.5">
+                      <Network size={12} className={boardOpen ? "text-amber-400" : "text-zinc-500"} />
+                      <span>Task Pipeline</span>
+                    </div>
                     {activeWorkspace?.taskCards && activeWorkspace.taskCards.length > 0 && (
-                      <span className="ml-auto rounded-full bg-amber-500/20 text-amber-300 px-2 py-0.5 text-[10px] font-mono border border-amber-500/30">
+                      <span className="rounded-full bg-white/[0.06] text-zinc-400 px-1.5 py-0.2 text-[10px] font-mono">
                         {activeWorkspace.taskCards.length}
                       </span>
                     )}
@@ -1905,10 +1909,19 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
   );
 }
 
-/* ── WorkHive Card Item (Matches Screenshot 1) ───────────────────── */
+/* ── Linear / Cursor Style Workspace Tree Item ───────────────────── */
 function ProjectGroup({
-  ws, isActive, hasActive, onActivate, onMenu,
-  isRenaming, editValue, onEditChange, onCommitRename, onCancelRename, onStartRename,
+  ws,
+  isActive,
+  hasActive,
+  onActivate,
+  onMenu,
+  isRenaming,
+  editValue,
+  onEditChange,
+  onCommitRename,
+  onCancelRename,
+  onStartRename,
 }: {
   ws: Workspace;
   isActive: boolean;
@@ -1938,6 +1951,17 @@ function ProjectGroup({
   const trees = ws.worktrees ?? [];
   const noRepo = !ws.boundProjectPath;
   const repoName = ws.boundProjectPath ? ws.boundProjectPath.split(/[\\/]/).filter(Boolean).pop() : null;
+  const initials = (ws.name || "W").slice(0, 2).toUpperCase();
+
+  // Subtle monogram badge color based on name
+  const colorSchemes = [
+    { bg: "bg-amber-500/15", border: "border-amber-500/30", text: "text-amber-300" },
+    { bg: "bg-indigo-500/15", border: "border-indigo-500/30", text: "text-indigo-300" },
+    { bg: "bg-emerald-500/15", border: "border-emerald-500/30", text: "text-emerald-300" },
+    { bg: "bg-sky-500/15", border: "border-sky-500/30", text: "text-sky-300" },
+    { bg: "bg-purple-500/15", border: "border-purple-500/30", text: "text-purple-300" },
+  ];
+  const colorScheme = colorSchemes[Math.abs(ws.name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0)) % colorSchemes.length];
 
   useEffect(() => {
     if (!isActive || !ws.boundProjectPath) { setMissing(false); return; }
@@ -1969,6 +1993,7 @@ function ProjectGroup({
     catch (e: any) { setError(String(e?.message ?? e)); }
     finally { setBusy(false); }
   };
+
   const remove = async (id: string) => {
     const tree = trees.find((t) => t.id === id);
     if (!confirm(`Remove tree "${tree?.name ?? id}"? Uncommitted changes in it will be lost.`)) return;
@@ -1977,6 +2002,7 @@ function ProjectGroup({
     catch (e: any) { setError(String(e?.message ?? e)); }
     finally { setPendingId(null); }
   };
+
   const merge = async (id: string) => {
     setPendingId(id); setError(null);
     try { await mergeWorktree(ws.id, id); }
@@ -1985,182 +2011,155 @@ function ProjectGroup({
   };
 
   return (
-    <div className="px-1 py-0.5">
-      {/* Outer WorkHive Luxury Obsidian Card with Smooth Hover Lift */}
+    <div className="group/item relative py-0.5">
+      {/* Linear-style single interactive row */}
       <div
-        className={`rounded-2xl border p-3 shadow-lg transition-all duration-200 ease-out cursor-pointer hover:-translate-y-0.5 hover:shadow-2xl active:translate-y-0 ${
-          isActive
-            ? "border-white/[0.30] bg-gradient-to-b from-[#181c28] to-[#10121a] ring-1 ring-white/[0.20] shadow-black/80 hover:border-white/[0.45]"
-            : "border-white/[0.08] bg-gradient-to-b from-[#131520]/90 to-[#0c0e14]/90 hover:border-white/[0.18] hover:bg-[#181b26]"
-        }`}
         onClick={() => { if (!isRenaming) onActivate(); }}
+        className={`relative flex items-center h-8 px-2 rounded-lg cursor-pointer transition-colors duration-100 ${
+          isActive
+            ? "bg-white/[0.08] text-white"
+            : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]"
+        }`}
       >
-        {/* Card Header: Chevron + Title + Status Pill + Menu */}
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-1.5 min-w-0">
-            <button
-              onClick={(e) => { e.stopPropagation(); setCollapsed(!collapsed); }}
-              className="text-zinc-400 hover:text-zinc-200 transition-colors p-0.5 -ml-0.5 rounded hover:bg-white/[0.06]"
+        {/* Active Amber Indicator Pin */}
+        {isActive && (
+          <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r bg-amber-400" />
+        )}
+
+        {/* Chevron */}
+        <button
+          onClick={(e) => { e.stopPropagation(); setCollapsed(!collapsed); }}
+          className="text-zinc-500 hover:text-zinc-300 p-0.5 -ml-1 rounded transition-transform"
+        >
+          <ChevronRight
+            size={11}
+            className={`transition-transform duration-150 ${collapsed ? "" : "rotate-90"}`}
+          />
+        </button>
+
+        {/* Icon */}
+        <div className="size-4 flex items-center justify-center shrink-0 ml-0.5 mr-1.5">
+          <Folder
+            size={13}
+            className={isActive ? "text-amber-400" : "text-zinc-400 group-hover/item:text-zinc-300"}
+          />
+        </div>
+
+        {/* Title */}
+        <div className="flex-1 min-w-0 flex items-center gap-1.5">
+          {isRenaming ? (
+            <input
+              autoFocus
+              value={editValue}
+              onChange={(e) => onEditChange(e.target.value)}
+              onBlur={onCommitRename}
+              onKeyDown={(e) => { if (e.key === "Enter") onCommitRename(); if (e.key === "Escape") onCancelRename(); }}
+              className="bg-transparent border-b border-amber-400 text-xs text-white outline-none font-sans w-full"
+            />
+          ) : (
+            <span
+              className={`text-[12px] truncate tracking-tight ${isActive ? "font-medium text-white" : "font-normal text-zinc-300 group-hover/item:text-zinc-100"}`}
+              title={ws.name}
+              onDoubleClick={onStartRename}
             >
-              <ChevronDown
-                size={14}
-                className={`transition-transform duration-150 ${collapsed ? "-rotate-90" : ""}`}
-              />
+              {ws.name}
+            </span>
+          )}
+
+          <span className="text-[10px] font-mono text-zinc-500 truncate shrink-0">
+            {noRepo ? "unbound" : "main"}
+          </span>
+        </div>
+
+        {/* Right Status & Actions */}
+        <div className="flex items-center gap-1 shrink-0">
+          {hasActive && (
+            <span
+              className="size-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]"
+              title="Active Agent Running"
+            />
+          )}
+
+          <div className="flex items-center gap-0.5 opacity-0 group-hover/item:opacity-100 transition-opacity">
+            <button
+              onClick={(e) => { e.stopPropagation(); if (noRepo) { bindRepo(); return; } setAdding(!adding); setError(null); }}
+              className="size-5 flex items-center justify-center rounded text-zinc-400 hover:text-white hover:bg-white/[0.08]"
+              title={noRepo ? "Bind folder" : "New worktree branch"}
+            >
+              {noRepo ? <FolderPlus size={11} /> : <Plus size={11} />}
             </button>
-            {isRenaming ? (
-              <input
-                autoFocus
-                value={editValue}
-                onChange={(e) => onEditChange(e.target.value)}
-                onBlur={onCommitRename}
-                onKeyDown={(e) => { if (e.key === "Enter") onCommitRename(); if (e.key === "Escape") onCancelRename(); }}
-                className="bg-transparent border-b border-white text-xs font-bold text-zinc-100 outline-none font-sans w-full"
-              />
-            ) : (
-              <span
-                className="text-xs font-bold text-zinc-100 truncate tracking-tight font-sans block"
-                title={ws.name}
-                onDoubleClick={onStartRename}
-              >
-                {ws.name}
-              </span>
+            <button
+              onClick={(e) => { e.stopPropagation(); onMenu(e); }}
+              className="size-5 flex items-center justify-center rounded text-zinc-400 hover:text-white hover:bg-white/[0.08]"
+              title="Workspace actions"
+            >
+              <MoreHorizontal size={11} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* New Tree Inline Input */}
+      {adding && (
+        <div className="my-1 ml-5 pl-2 flex items-center gap-1">
+          <input
+            autoFocus
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") submit(); if (e.key === "Escape") { setAdding(false); setName(""); } }}
+            placeholder="branch-name"
+            className="h-6 min-w-0 flex-1 rounded border border-white/[0.1] bg-black/60 px-2 text-[11px] text-zinc-100 outline-none focus:border-amber-400/50 font-mono"
+          />
+          <button onClick={submit} disabled={busy || !name.trim()} className="flex size-5.5 shrink-0 items-center justify-center rounded text-amber-300 hover:bg-white/[0.08] disabled:opacity-40">
+            {busy ? <LoaderCircle className="size-3 animate-spin" /> : <Check className="size-3" />}
+          </button>
+          <button onClick={() => { setAdding(false); setName(""); }} className="flex size-5.5 shrink-0 items-center justify-center rounded text-zinc-400 hover:text-zinc-200">
+            <X className="size-3" />
+          </button>
+        </div>
+      )}
+
+      {error && <div className="my-1 ml-5 pl-2 text-[10px] text-red-400 break-words font-mono">{error}</div>}
+
+      {/* Sub-tree branches */}
+      {!collapsed && (
+        <div className="ml-4 pl-3.5 border-l border-white/[0.06] my-0.5 space-y-0.5">
+          {/* Primary branch */}
+          <div
+            onClick={noRepo ? bindRepo : onActivate}
+            className="flex items-center justify-between h-6 px-1.5 rounded hover:bg-white/[0.04] cursor-pointer text-zinc-400 hover:text-zinc-200 transition-colors"
+          >
+            <div className="flex items-center gap-1.5 min-w-0">
+              <GitBranch size={10} className="text-zinc-500 shrink-0" />
+              <span className="text-[11px] font-mono truncate text-zinc-400">primary (main)</span>
+            </div>
+            {hasActive && (
+              <span className="text-[9px] font-mono text-emerald-400 px-1 py-0.2 rounded bg-emerald-500/10">live</span>
             )}
           </div>
 
-          <div className="flex items-center gap-1.5 shrink-0">
-            {/* Live Status Pill */}
-            <span
-              className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-mono border ${
-                hasActive
-                  ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                  : "bg-white/[0.04] border-white/[0.08] text-zinc-400"
-              }`}
+          {/* Worktree branches */}
+          {trees.map((t) => (
+            <div
+              key={t.id}
+              className="group/tree flex items-center justify-between h-6 px-1.5 rounded hover:bg-white/[0.04] cursor-pointer text-zinc-400 hover:text-zinc-200 transition-colors"
             >
-              <span
-                className={`size-1.5 rounded-full ${
-                  hasActive
-                    ? "bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(52,211,153,0.8)]"
-                    : "bg-zinc-500"
-                }`}
-              />
-              <span>{hasActive ? "Active" : "Idle"}</span>
-            </span>
-
-            <button
-              onClick={(e) => { e.stopPropagation(); onMenu(e); }}
-              className="size-5 flex items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.08] transition-colors"
-              title="Workspace menu"
-            >
-              <MoreHorizontal size={13} />
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); if (noRepo) { bindRepo(); return; } setAdding(!adding); setError(null); }}
-              className="size-5 flex items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.08] transition-colors"
-              title={noRepo ? "Bind folder" : "New tree"}
-            >
-              {noRepo ? <FolderPlus size={13} /> : <Plus size={13} />}
-            </button>
-          </div>
-        </div>
-
-        {/* Git Branch & Folder Metadata Pills */}
-        <div className="flex items-center gap-1.5 mb-2 overflow-hidden">
-          <div
-            onClick={(e) => { e.stopPropagation(); if (noRepo) bindRepo(); }}
-            className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-black/40 border border-white/[0.06] text-[10px] text-zinc-400 hover:text-zinc-200 transition-colors truncate max-w-[130px]"
-            title={ws.boundProjectPath || "No folder bound"}
-          >
-            <Folder size={11} className="text-slate-300 shrink-0" />
-            <span className="truncate font-mono">{repoName || "Unbound"}</span>
-          </div>
-
-          <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/[0.08] border border-white/[0.16] text-[10px] text-slate-200 truncate font-mono">
-            <GitBranch size={11} className="shrink-0" />
-            <span className="truncate">{noRepo ? "no repo" : "main"}</span>
-          </div>
-        </div>
-
-        {/* Missing folder notice */}
-        {missing && (
-          <div className="mb-2 flex h-6 items-center gap-1.5 rounded-lg bg-red-500/10 border border-red-500/30 px-2 text-[10px] text-red-400 font-mono">
-            <span className="min-w-0 flex-1 truncate" title={ws.boundProjectPath}>Folder missing from disk</span>
-            <button
-              onClick={(e) => { e.stopPropagation(); bindRepo(); }}
-              className="shrink-0 font-medium underline hover:opacity-80"
-            >
-              Relocate
-            </button>
-          </div>
-        )}
-
-        {/* New tree input */}
-        {adding && (
-          <div className="mb-2 flex items-center gap-1">
-            <input
-              autoFocus
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") submit(); if (e.key === "Escape") { setAdding(false); setName(""); } }}
-              placeholder="branch-name"
-              className="h-6 min-w-0 flex-1 rounded-lg border border-amber-400/40 bg-black/60 px-2 text-mini text-zinc-100 outline-none focus:ring-1 focus:ring-amber-400/30"
-            />
-            <button onClick={submit} disabled={busy || !name.trim()} className="flex size-6 shrink-0 items-center justify-center rounded text-amber-300 hover:bg-amber-400/15 disabled:opacity-40">
-              {busy ? <LoaderCircle className="size-3 animate-spin" /> : <Check className="size-3" />}
-            </button>
-            <button onClick={() => { setAdding(false); setName(""); }} className="flex size-6 shrink-0 items-center justify-center rounded text-zinc-400 hover:text-zinc-200">
-              <X className="size-3" />
-            </button>
-          </div>
-        )}
-
-        {error && <div className="mb-2 text-[10px] text-red-400 break-words font-mono">{error}</div>}
-
-        {/* TREES Section */}
-        {!collapsed && (
-          <div>
-            <div className="text-[9px] font-bold tracking-widest text-zinc-500 uppercase mb-1 pl-0.5 font-mono">
-              WORKTREES ({trees.length + 1})
-            </div>
-
-            {/* Tree Inner Box */}
-            <div className="rounded-xl bg-black/50 border border-white/[0.06] p-2 flex flex-col gap-1.5 shadow-inner">
-              {/* Primary tree */}
-              <div
-                onClick={noRepo ? bindRepo : onActivate}
-                className="flex items-center justify-between p-1 rounded-lg hover:bg-white/[0.04] cursor-pointer group/primary transition-colors"
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className={`size-1.5 rounded-full shrink-0 ${hasActive ? "bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(52,211,153,0.8)]" : "bg-zinc-600"}`} />
-                  <span className="text-xs font-semibold text-zinc-200 group-hover/primary:text-amber-300 transition-colors truncate">
-                    primary
-                  </span>
-                </div>
-                <span className="text-[10px] text-zinc-400 font-mono">
-                  main
-                </span>
+              <div className="flex items-center gap-1.5 min-w-0">
+                <GitBranch size={10} className="text-amber-400/60 shrink-0" />
+                <span className="text-[11px] font-mono truncate text-zinc-400">{t.name}</span>
               </div>
-
-              {/* Worktrees list */}
-              {trees.map((t) => (
-                <div key={t.id} className="pt-1.5 border-t border-white/[0.04] flex items-center justify-between p-1 rounded-lg hover:bg-white/[0.04] transition-colors">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <GitBranch size={11} className="text-amber-400/70 shrink-0" />
-                    <span className="text-xs font-medium text-zinc-300 truncate">{t.name}</span>
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button onClick={() => merge(t.id)} className="text-zinc-400 hover:text-amber-300 p-1 rounded hover:bg-white/[0.06]" title="Merge into main">
-                      <GitMerge size={11} />
-                    </button>
-                    <button onClick={() => remove(t.id)} className="text-zinc-400 hover:text-red-400 p-1 rounded hover:bg-white/[0.06]" title="Remove tree">
-                      <Trash2 size={11} />
-                    </button>
-                  </div>
-                </div>
-              ))}
+              <div className="flex items-center gap-0.5 opacity-0 group-hover/tree:opacity-100 transition-opacity">
+                <button onClick={() => merge(t.id)} className="p-0.5 text-zinc-400 hover:text-amber-300 rounded" title="Merge into main">
+                  <GitMerge size={10} />
+                </button>
+                <button onClick={() => remove(t.id)} className="p-0.5 text-zinc-400 hover:text-red-400 rounded" title="Remove branch">
+                  <Trash2 size={10} />
+                </button>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -2314,7 +2313,7 @@ function CollapsibleSection({
 const NO_FILES: string[] = [];
 
 /**
- * Clean Zed / Cursor style Active Workspace Detail (Agents & Recent Files)
+ * Clean Linear / Cursor style Active Workspace Detail (Agents & Recent Files)
  */
 function ActiveWorkspaceDetail({
   ws, onOpenFile,
@@ -2331,8 +2330,8 @@ function ActiveWorkspaceDetail({
 
   if (!ws) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col justify-center border-t border-swarm-border/30">
-        <EmptyNote text="No workspace selected" hint="Pick one above to see its agents." />
+      <div className="flex min-h-0 flex-1 flex-col justify-center border-t border-white/[0.05] bg-[#0a0b10]">
+        <EmptyNote text="No workspace selected" hint="Select a workspace above." />
       </div>
     );
   }
@@ -2342,8 +2341,8 @@ function ActiveWorkspaceDetail({
   const recent = (ws.boundProjectPath ? openFiles[ws.boundProjectPath] : undefined) ?? NO_FILES;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col border-t border-swarm-border/30 pt-1">
-      {/* Agents Header */}
+    <div className="flex min-h-0 flex-1 flex-col border-t border-white/[0.05] pt-1 bg-[#0a0b10]">
+      {/* Agents Section */}
       <CollapsibleSection
         label="Agents"
         count={mine.length}
@@ -2353,10 +2352,10 @@ function ActiveWorkspaceDetail({
       />
 
       {!agentsCollapsed && (
-        <div className="min-h-0 shrink overflow-y-auto overflow-x-hidden scrollbar-sleek px-1 pb-2 flex flex-col gap-1 max-h-[48%]">
+        <div className="min-h-0 shrink overflow-y-auto overflow-x-hidden scrollbar-sleek px-1.5 pb-1.5 flex flex-col gap-0.5 max-h-[48%]">
           {mine.length === 0 ? (
-            <p className="px-2 py-1 text-[11px] text-swarm-textMuted/50 italic font-mono">
-              No agents running
+            <p className="px-2 py-1 text-[11px] text-zinc-500 font-sans italic">
+              No agents active
             </p>
           ) : (
             mine.map((a) => {
@@ -2367,33 +2366,33 @@ function ActiveWorkspaceDetail({
               return (
                 <div
                   key={a.id}
-                  className="group flex h-8 items-center gap-2 rounded-xl border border-white/[0.04] bg-white/[0.02] px-2.5 text-xs text-swarm-textDim transition-all hover:bg-white/[0.06] hover:border-white/[0.1] hover:text-swarm-text"
+                  className="group flex h-7 items-center gap-2 rounded-md px-2 text-xs text-zinc-300 transition-colors hover:bg-white/[0.04] hover:text-white"
                   title={`${label}\n${a.cliName}${a.model ? ` · ${a.model}` : ""}\n${status}`}
                 >
-                  <span className={`size-2 shrink-0 rounded-full transition-all ${
-                    isRunning ? "bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]" : "bg-slate-500/50"
+                  <span className={`size-1.5 shrink-0 rounded-full ${
+                    isRunning ? "bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]" : "bg-zinc-600"
                   }`} />
                   {brand ? (
                     <BrandGlyph brand={brand} size={13} className="shrink-0 opacity-80 group-hover:opacity-100" />
                   ) : (
-                    <AgentMark size={13} className="shrink-0 text-swarm-textMuted/70" />
+                    <AgentMark size={13} className="shrink-0 text-zinc-500" />
                   )}
-                  <span className="min-w-0 shrink truncate font-medium text-swarm-text text-xs">{label}</span>
+                  <span className="min-w-0 truncate font-normal text-zinc-200 text-[11.5px]">{label}</span>
                   {a.isLead && (
-                    <span className="inline-flex items-center gap-0.5 rounded bg-swarm-gold/20 px-1 py-0.5 text-[9px] font-bold text-swarm-goldHi uppercase">
+                    <span className="inline-flex items-center gap-0.5 rounded px-1 py-0.2 text-[9px] font-medium text-amber-400 bg-amber-400/15 uppercase">
                       <LeadCrown size={8} />
                       lead
                     </span>
                   )}
                   {a.model && (
-                    <span className="shrink-0 text-[10px] text-swarm-textMuted/50 font-mono">
+                    <span className="shrink-0 text-[10px] text-zinc-500 font-mono truncate max-w-[70px]">
                       {a.model}
                     </span>
                   )}
-                  <span className={`ml-auto shrink-0 text-[10px] font-mono px-2 py-0.5 rounded-md ${
+                  <span className={`ml-auto shrink-0 text-[9px] font-mono px-1.5 py-0.2 rounded ${
                     isRunning
-                      ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-medium"
-                      : "text-swarm-textMuted/60 bg-white/[0.02]"
+                      ? "text-emerald-400 bg-emerald-500/10"
+                      : "text-zinc-500"
                   }`}>
                     {status}
                   </span>
@@ -2407,7 +2406,7 @@ function ActiveWorkspaceDetail({
       {/* Recent Files */}
       {recent.length > 0 && (
         <>
-          <div className="border-t border-swarm-border/20 mt-1 pt-1">
+          <div className="border-t border-white/[0.04] mt-0.5 pt-0.5">
             <CollapsibleSection
               label="Recent files"
               count={recent.length}
@@ -2416,7 +2415,7 @@ function ActiveWorkspaceDetail({
             />
           </div>
           {!filesCollapsed && (
-            <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden scrollbar-sleek px-1 pb-2 flex flex-col gap-0.5">
+            <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden scrollbar-sleek px-1.5 pb-1.5 flex flex-col gap-0.5">
               {recent.slice(0, 16).map((path) => {
                 const fileName = path.split(/[\\/]/).pop() || path;
                 const { Icon, className } = getFileIcon(fileName);
@@ -2427,10 +2426,10 @@ function ActiveWorkspaceDetail({
                     onClick={open}
                     {...activatable(open, `Open ${fileName}`)}
                     title={path}
-                    className="flex h-6.5 cursor-pointer items-center gap-1.5 rounded-[5px] px-2 text-xs text-swarm-textDim transition-colors hover:bg-white/[0.04] hover:text-swarm-text"
+                    className="flex h-6.5 cursor-pointer items-center gap-1.5 rounded px-2 text-xs text-zinc-400 transition-colors hover:bg-white/[0.04] hover:text-zinc-200"
                   >
-                    <Icon className={`size-3.5 shrink-0 ${className}`} />
-                    <span className="min-w-0 truncate text-[11px]">{fileName}</span>
+                    <Icon className={`size-3 shrink-0 ${className}`} />
+                    <span className="min-w-0 truncate text-[11px] font-mono">{fileName}</span>
                   </div>
                 );
               })}
