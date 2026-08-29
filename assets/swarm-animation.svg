@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 480" width="100%" height="100%" aria-label="Swarm AI Multi-Agent Concurrent Orchestration Animation">
+  <defs>
+    <!-- Dark Space Gradient -->
+    <radialGradient id="animBg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#141926"/>
+      <stop offset="50%" stop-color="#080a0f"/>
+      <stop offset="100%" stop-color="#030406"/>
+    </radialGradient>
+
+    <!-- Core Amber/Gold Radial Glow -->
+    <radialGradient id="coreAuraGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FF6B00" stop-opacity="0.35"/>
+      <stop offset="70%" stop-color="#FF6B00" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#FF6B00" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Filter Glows -->
+    <filter id="nodeBloom" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="900" height="480" rx="20" fill="url(#animBg)"/>
+  <rect width="898" height="478" x="1" y="1" rx="19" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+  <!-- Top Header Title -->
+  <g transform="translate(450, 32)">
+    <text text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="12" fill="#FFA24C" letter-spacing="0.12em">SWARM AI CONCURRENT ORCHESTRATION ENGINE</text>
+    <text y="18" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#9CA3AF">Autonomous Parallel Execution · Shared Pheromone Context · Zero Merge Conflicts</text>
+  </g>
+
+  <!-- Central Swarm Intelligence Core (450, 240) -->
+  <g transform="translate(450, 240)">
+    <!-- Radiant Halo Pulse -->
+    <circle r="90" fill="url(#coreAuraGrad)">
+      <animate attributeName="r" values="80;105;80" dur="4s" repeatCount="indefinite"/>
+    </circle>
+    <circle r="56" fill="none" stroke="rgba(255,107,0,0.2)" stroke-width="1.5" stroke-dasharray="6 4">
+      <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="40s" repeatCount="indefinite"/>
+    </circle>
+    <circle r="42" fill="none" stroke="rgba(56,189,248,0.25)" stroke-width="1.5" stroke-dasharray="3 3">
+      <animateTransform attributeName="transform" type="rotate" from="360" to="0" dur="30s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Central Core Hexagon -->
+    <polygon points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13" fill="#121724" stroke="#FF6B00" stroke-width="2"/>
+    <text y="4" font-family="system-ui, sans-serif" font-weight="800" font-size="11" fill="#FFFFFF" text-anchor="middle" letter-spacing="0.06em">HUB</text>
+  </g>
+
+  <!-- Background Orbit Guide Tracks (Static Clean Geometry) -->
+  <g fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1">
+    <ellipse cx="450" cy="240" rx="140" ry="85"/>
+    <ellipse cx="450" cy="240" rx="220" ry="120" transform="rotate(-12 450 240)"/>
+    <ellipse cx="450" cy="240" rx="310" ry="145" transform="rotate(8 450 240)"/>
+  </g>
+
+  <!-- Active Dynamic Synapse Connections (Curved Splines from Core to Orbiters) -->
+  <g fill="none" stroke="rgba(255,107,0,0.15)" stroke-width="1.2">
+    <path d="M 450 240 Q 320 180 200 130"><animate attributeName="opacity" values="0.1;0.4;0.1" dur="3s" repeatCount="indefinite"/></path>
+    <path d="M 450 240 Q 580 180 700 130"><animate attributeName="opacity" values="0.1;0.4;0.1" dur="3.2s" repeatCount="indefinite" begin="0.5s"/></path>
+    <path d="M 450 240 Q 280 290 140 330"><animate attributeName="opacity" values="0.1;0.4;0.1" dur="2.8s" repeatCount="indefinite" begin="1s"/></path>
+    <path d="M 450 240 Q 620 290 760 330"><animate attributeName="opacity" values="0.1;0.4;0.1" dur="3.5s" repeatCount="indefinite" begin="1.5s"/></path>
+    <path d="M 450 240 Q 450 140 450 90"><animate attributeName="opacity" values="0.1;0.4;0.1" dur="2.6s" repeatCount="indefinite" begin="0.8s"/></path>
+  </g>
+
+  <!-- Pulsing Data Flow Packets Traveling on Connections -->
+  <g filter="url(#nodeBloom)">
+    <circle r="3" fill="#F59E0B">
+      <animateMotion dur="3s" repeatCount="indefinite" path="M 450 240 Q 320 180 200 130"/>
+    </circle>
+    <circle r="3" fill="#FF6B00">
+      <animateMotion dur="3.2s" repeatCount="indefinite" path="M 450 240 Q 580 180 700 130" begin="0.5s"/>
+    </circle>
+    <circle r="3" fill="#10B981">
+      <animateMotion dur="2.8s" repeatCount="indefinite" path="M 450 240 Q 280 290 140 330" begin="1s"/>
+    </circle>
+    <circle r="3" fill="#38BDF8">
+      <animateMotion dur="3.5s" repeatCount="indefinite" path="M 450 240 Q 620 290 760 330" begin="1.5s"/>
+    </circle>
+    <circle r="3" fill="#A855F7">
+      <animateMotion dur="2.6s" repeatCount="indefinite" path="M 450 240 Q 450 140 450 90" begin="0.8s"/>
+    </circle>
+  </g>
+
+  <!-- WORKER 1: Lead Planner (Top Center Pod) -->
+  <g transform="translate(370, 70)" filter="url(#cardShadow)">
+    <rect width="160" height="42" rx="8" fill="#151b2a" stroke="rgba(245,158,11,0.5)" stroke-width="1.2"/>
+    <circle cx="16" cy="21" r="4.5" fill="#F59E0B" filter="url(#nodeBloom)"/>
+    <text x="28" y="18" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#FFFFFF">Lead Planner</text>
+    <text x="28" y="32" font-family="ui-monospace, monospace" font-size="9" fill="#FBBF24">Goal Decomposition</text>
+  </g>
+
+  <!-- WORKER 2: Anthropic Claude Code (Top Left Pod) -->
+  <g transform="translate(100, 110)" filter="url(#cardShadow)">
+    <rect width="175" height="42" rx="8" fill="#151b2a" stroke="rgba(255,107,0,0.5)" stroke-width="1.2"/>
+    <circle cx="16" cy="21" r="4.5" fill="#FF6B00" filter="url(#nodeBloom)"/>
+    <text x="28" y="18" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#FFFFFF">Claude Code</text>
+    <text x="28" y="32" font-family="ui-monospace, monospace" font-size="9" fill="#FFA24C">Worktree: wt-auth (Opus 5)</text>
+  </g>
+
+  <!-- WORKER 3: OpenAI Codex (Top Right Pod) -->
+  <g transform="translate(625, 110)" filter="url(#cardShadow)">
+    <rect width="175" height="42" rx="8" fill="#151b2a" stroke="rgba(16,185,129,0.5)" stroke-width="1.2"/>
+    <circle cx="16" cy="21" r="4.5" fill="#10B981" filter="url(#nodeBloom)"/>
+    <text x="28" y="18" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#FFFFFF">OpenAI Codex</text>
+    <text x="28" y="32" font-family="ui-monospace, monospace" font-size="9" fill="#34D399">Worktree: wt-api (Codex 5.6)</text>
+  </g>
+
+  <!-- WORKER 4: xAI Grok Code (Bottom Left Pod) -->
+  <g transform="translate(65, 310)" filter="url(#cardShadow)">
+    <rect width="175" height="42" rx="8" fill="#151b2a" stroke="rgba(56,189,248,0.5)" stroke-width="1.2"/>
+    <circle cx="16" cy="21" r="4.5" fill="#38BDF8" filter="url(#nodeBloom)"/>
+    <text x="28" y="18" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#FFFFFF">xAI Grok Code</text>
+    <text x="28" y="32" font-family="ui-monospace, monospace" font-size="9" fill="#38BDF8">Worktree: wt-tests (Grok 3)</text>
+  </g>
+
+  <!-- WORKER 5: Google Antigravity (Bottom Right Pod) -->
+  <g transform="translate(660, 310)" filter="url(#cardShadow)">
+    <rect width="175" height="42" rx="8" fill="#151b2a" stroke="rgba(168,85,247,0.5)" stroke-width="1.2"/>
+    <circle cx="16" cy="21" r="4.5" fill="#A855F7" filter="url(#nodeBloom)"/>
+    <text x="28" y="18" font-family="system-ui, sans-serif" font-weight="700" font-size="11" fill="#FFFFFF">Antigravity CLI</text>
+    <text x="28" y="32" font-family="ui-monospace, monospace" font-size="9" fill="#C084FC">Worktree: wt-ui (Gemini 2.0)</text>
+  </g>
+
+  <!-- Bottom Real-Time Event Status Ticker -->
+  <g transform="translate(180, 420)">
+    <rect width="540" height="28" rx="7" fill="rgba(18,24,38,0.9)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    <circle cx="18" cy="14" r="3.5" fill="#10B981">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <text x="32" y="18" font-family="system-ui, sans-serif" font-size="10.5" fill="#CBD5E1">Active Session: <tspan fill="#38BDF8" font-family="ui-monospace, monospace">5 agents in parallel</tspan> · Shared memory synced · <tspan fill="#10B981">Zero conflicts</tspan></text>
+  </g>
+</svg>

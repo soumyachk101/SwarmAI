@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 140" width="100%" height="100%" aria-label="Swarm AI Core Technology Stack">
+  <defs>
+    <linearGradient id="tsCardBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#141824" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#0a0c12" stop-opacity="0.95"/>
+    </linearGradient>
+    <filter id="pillShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Row 1: Core Frameworks (6 Items) -->
+  <!-- 1. Tauri v2 -->
+  <g transform="translate(20, 15)" filter="url(#pillShadow)">
+    <rect width="145" height="50" rx="10" fill="url(#tsCardBg)" stroke="rgba(255,193,49,0.3)" stroke-width="1"/>
+    <g transform="translate(14, 13)">
+      <circle cx="12" cy="12" r="11" fill="none" stroke="#FFC131" stroke-width="2"/>
+      <path d="M 12 4 A 8 8 0 0 1 20 12 A 8 8 0 0 1 12 20" fill="none" stroke="#24C8DB" stroke-width="2"/>
+    </g>
+    <text x="50" y="27" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="12" fill="#FFFFFF">Tauri v2</text>
+    <text x="50" y="40" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" fill="#FFC131" opacity="0.9">Native Core</text>
+  </g>
+
+  <!-- 2. Rust 2021 -->
+  <g transform="translate(175, 15)" filter="url(#pillShadow)">
+    <rect width="145" height="50" rx="10" fill="url(#tsCardBg)" stroke="rgba(222,165,132,0.3)" stroke-width="1"/>
+    <g transform="translate(14, 13)">
+      <circle cx="12" cy="12" r="10" fill="none" stroke="#DEA584" stroke-width="2"/>
+      <circle cx="12" cy="12" r="4" fill="#DEA584"/>
+      <path d="M 12 2 L 12 6 M 12 18 L 12 22 M 2 12 L 6 12 M 18 12 L 22 12" stroke="#DEA584" stroke-width="2" stroke-linecap="round"/>
+    </g>
+    <text x="50" y="27" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="12" fill="#FFFFFF">Rust 2021</text>
+    <text x="50" y="40" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" fill="#DEA584" opacity="0.9">PTY &amp; Memory</text>
+  </g>
+
+  <!-- 3. React 18 -->
+  <g transform="translate(330, 15)" filter="url(#pillShadow)">
+    <rect width="145" height="50" rx="10" fill="url(#tsCardBg)" stroke="rgba(97,218,251,0.3)" stroke-width="1"/>
+    <g transform="translate(14, 13)">
+      <ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#61DAFB" stroke-width="1.2"/>
+      <ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#61DAFB" stroke-width="1.2" transform="rotate(60 12 12)"/>
+      <ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#61DAFB" stroke-width="1.2" transform="rotate(120 12 12)"/>
+      <circle cx="12" cy="12" r="2" fill="#61DAFB"/>
+    </g>
+    <text x="50" y="27" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="12" fill="#FFFFFF">React 18</text>
+    <text x="50" y="40" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" fill="#61DAFB" opacity="0.9">Workspace UI</text>
+  </g>
+
+  <!-- 4. TypeScript -->
+  <g transform="translate(485, 15)" filter="url(#pillShadow)">
+    <rect width="145" height="50" rx="10" fill="url(#tsCardBg)" stroke="rgba(49,120,198,0.3)" stroke-width="1"/>
+    <g transform="translate(14, 13)">
+      <rect width="24" height="24" rx="4" fill="#3178C6"/>
+      <text x="12" y="17" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="800" font-size="11" fill="#FFFFFF">TS</text>
+    </g>
+    <text x="50" y="27" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="12" fill="#FFFFFF">TypeScript</text>
+    <text x="50" y="40" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" fill="#38BDF8" opacity="0.9">Strict Typing</text>
+  </g>
+
+  <!-- 5. SQLite + FTS5 -->
+  <g transform="translate(640, 15)" filter="url(#pillShadow)">
+    <rect width="145" height="50" rx="10" fill="url(#tsCardBg)" stroke="rgba(56,189,248,0.3)" stroke-width="1"/>
+    <g transform="translate(14, 13)">
+      <ellipse cx="12" cy="6" rx="9" ry="3" fill="none" stroke="#38BDF8" stroke-width="1.4"/>
+      <path d="M 3 6 L 3 18 A 9 3 0 0 0 21 18 L 21 6" fill="none" stroke="#38BDF8" stroke-width="1.4"/>
+      <path d="M 3 12 A 9 3 0 0 0 21 12" fill="none" stroke="#38BDF8" stroke-width="1.4"/>
+    </g>
+    <text x="50" y="27" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="12" fill="#FFFFFF">SQLite + FTS5</text>
+    <text x="50" y="40" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" fill="#38BDF8" opacity="0.9">Vector Memory</text>
+  </g>
+
+  <!-- 6. Whisper.cpp -->
+  <g transform="translate(795, 15)" filter="url(#pillShadow)">
+    <rect width="145" height="50" rx="10" fill="url(#tsCardBg)" stroke="rgba(16,185,129,0.3)" stroke-width="1"/>
+    <g transform="translate(14, 13)">
+      <path d="M 3 12 L 6 8 L 9 16 L 12 4 L 15 20 L 18 8 L 21 12" fill="none" stroke="#10B981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <text x="50" y="27" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="12" fill="#FFFFFF">Whisper.cpp</text>
+    <text x="50" y="40" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" fill="#10B981" opacity="0.9">Offline Audio</text>
+  </g>
+
+  <!-- Row 2: Tooling & Ecosystem (6 Items) -->
+  <!-- 7. Turborepo -->
+  <g transform="translate(20, 75)" filter="url(#pillShadow)">
+    <rect width="145" height="50" rx="10" fill="url(#tsCardBg)" stroke="rgba(239,68,68,0.3)" stroke-width="1"/>
+    <g transform="translate(14, 13)">
+      <circle cx="12" cy="12" r="10" fill="none" stroke="#EF4444" stroke-width="1.5"/>
+      <path d="M 13 4 L 7 13 L 12 13 L 11 20 L 17 11 L 12 11 Z" fill="#EF4444"/>
+    </g>
+    <text x="50" y="27" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="12" fill="#FFFFFF">Turborepo</text>
+    <text x="50" y="40" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" fill="#F87171" opacity="0.9">Build Pipeline</text>
+  </g>
+
+  <!-- 8. pnpm Workspace -->
+  <g transform="translate(175, 75)" filter="url(#pillShadow)">
+    <rect width="145" height="50" rx="10" fill="url(#tsCardBg)" stroke="rgba(246,146,32,0.3)" stroke-width="1"/>
+    <g transform="translate(14, 13)">
+      <rect x="2" y="2" width="8" height="8" fill="#F69220" rx="1.5"/>
+      <rect x="14" y="2" width="8" height="8" fill="#F69220" rx="1.5"/>
+      <rect x="2" y="14" width="8" height="8" fill="#F69220" rx="1.5"/>
+      <rect x="14" y="14" width="8" height="8" fill="#4B5563" rx="1.5"/>
+    </g>
+    <text x="50" y="27" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="12" fill="#FFFFFF">pnpm</text>
+    <text x="50" y="40" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" fill="#FB923C" opacity="0.9">15 Workspaces</text>
+  </g>
+
+  <!-- 9. MCP Protocol -->
+  <g transform="translate(330, 75)" filter="url(#pillShadow)">
+    <rect width="145" height="50" rx="10" fill="url(#tsCardBg)" stroke="rgba(168,85,247,0.3)" stroke-width="1"/>
+    <g transform="translate(14, 13)">
+      <circle cx="6" cy="12" r="3.5" fill="#A855F7"/>
+      <circle cx="18" cy="6" r="3.5" fill="#A855F7"/>
+      <circle cx="18" cy="18" r="3.5" fill="#A855F7"/>
+      <line x1="6" y1="12" x2="18" y2="6" stroke="#A855F7" stroke-width="1.5"/>
+      <line x1="6" y1="12" x2="18" y2="18" stroke="#A855F7" stroke-width="1.5"/>
+    </g>
+    <text x="50" y="27" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="12" fill="#FFFFFF">MCP Protocol</text>
+    <text x="50" y="40" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" fill="#C084FC" opacity="0.9">Server Bridge</text>
+  </g>
+
+  <!-- 10. TailwindCSS -->
+  <g transform="translate(485, 75)" filter="url(#pillShadow)">
+    <rect width="145" height="50" rx="10" fill="url(#tsCardBg)" stroke="rgba(6,182,212,0.3)" stroke-width="1"/>
+    <g transform="translate(14, 13)">
+      <path d="M 6 13 C 7 9 10 7 13 8 C 11 12 13 13 15 13 C 18 13 20 10 22 7 C 21 11 18 13 15 13 C 13 17 11 17 9 17 C 6 17 4 15 2 13 Z" fill="#06B6D4"/>
+    </g>
+    <text x="50" y="27" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="12" fill="#FFFFFF">TailwindCSS</text>
+    <text x="50" y="40" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" fill="#22D3EE" opacity="0.9">Design Tokens</text>
+  </g>
+
+  <!-- 11. Vitest -->
+  <g transform="translate(640, 75)" filter="url(#pillShadow)">
+    <rect width="145" height="50" rx="10" fill="url(#tsCardBg)" stroke="rgba(109,174,31,0.3)" stroke-width="1"/>
+    <g transform="translate(14, 13)">
+      <circle cx="12" cy="12" r="10" fill="none" stroke="#6DAE1F" stroke-width="1.5"/>
+      <path d="M 7 12 L 10 15 L 17 8" fill="none" stroke="#6DAE1F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <text x="50" y="27" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="12" fill="#FFFFFF">Vitest</text>
+    <text x="50" y="40" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" fill="#84CC16" opacity="0.9">302/302 Passed</text>
+  </g>
+
+  <!-- 12. Portable PTY -->
+  <g transform="translate(795, 75)" filter="url(#pillShadow)">
+    <rect width="145" height="50" rx="10" fill="url(#tsCardBg)" stroke="rgba(255,107,0,0.3)" stroke-width="1"/>
+    <g transform="translate(14, 13)">
+      <rect width="24" height="18" y="3" rx="3" fill="none" stroke="#FF6B00" stroke-width="1.5"/>
+      <path d="M 5 8 L 9 12 L 5 16 M 11 16 L 17 16" fill="none" stroke="#FF6B00" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <text x="50" y="27" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="12" fill="#FFFFFF">Portable PTY</text>
+    <text x="50" y="40" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" fill="#FF6B00" opacity="0.9">Agent Shells</text>
+  </g>
+</svg>

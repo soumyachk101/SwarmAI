@@ -1,15 +1,26 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="100%" height="100%" aria-label="Swarm AI Logo">
   <defs>
+    <!-- Background Gradient -->
     <radialGradient id="logoBg" cx="50%" cy="50%" r="65%">
       <stop offset="0%" stop-color="#121622"/>
       <stop offset="60%" stop-color="#090b10"/>
       <stop offset="100%" stop-color="#040507"/>
     </radialGradient>
+
+    <!-- Core Amber-Orange Gradient -->
     <linearGradient id="swarmGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#FFA24C"/>
       <stop offset="45%" stop-color="#FF6B00"/>
       <stop offset="100%" stop-color="#E05300"/>
     </linearGradient>
+
+    <!-- Accent Cyan/Purple Gradient -->
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#818CF8"/>
+    </linearGradient>
+
+    <!-- Glowing Filters -->
     <filter id="coreGlow" x="-20%" y="-20%" width="140%" height="140%">
       <feGaussianBlur stdDeviation="4" result="blur"/>
       <feMerge>
@@ -17,16 +28,21 @@
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
+
     <filter id="ambientGlow" x="-30%" y="-30%" width="160%" height="160%">
       <feGaussianBlur stdDeviation="12" result="blur"/>
       <feColorMatrix type="matrix" values="1 0 0 0 1   0 0.42 0 0 0.42   0 0 0 0 0  0 0 0 0.35 0"/>
     </filter>
   </defs>
 
+  <!-- Container Surface -->
   <rect width="240" height="240" rx="48" fill="url(#logoBg)"/>
   <rect width="238" height="238" x="1" y="1" rx="47" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+
+  <!-- Ambient Glow Behind Core -->
   <circle cx="120" cy="120" r="45" fill="#FF6B00" filter="url(#ambientGlow)"/>
 
+  <!-- Outer Orbiting Swarm Ring (Static Geometry + Smooth Breathing Pulse) -->
   <g>
     <circle cx="120" cy="120" r="76" fill="none" stroke="rgba(255,107,0,0.15)" stroke-width="1" stroke-dasharray="4 6"/>
     <circle cx="120" cy="120" r="76" fill="none" stroke="#FF6B00" stroke-width="1.5" stroke-dasharray="24 160" opacity="0.6">
@@ -34,10 +50,12 @@
     </circle>
   </g>
 
+  <!-- Hexagonal Honeycomb Node Frame -->
   <g fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5">
     <polygon points="120,54 177,87 177,153 120,186 63,153 63,87"/>
   </g>
 
+  <!-- Interconnected Worker Synapse Lines -->
   <g stroke="url(#swarmGrad)" stroke-width="1.5" stroke-linecap="round" opacity="0.85">
     <line x1="120" y1="54" x2="120" y2="92"/>
     <line x1="177" y1="87" x2="145" y2="105"/>
@@ -47,6 +65,7 @@
     <line x1="63" y1="87" x2="95" y2="105"/>
   </g>
 
+  <!-- Outer Swarm Node Beads -->
   <g filter="url(#coreGlow)">
     <circle cx="120" cy="54" r="5" fill="#FF6B00"/>
     <circle cx="177" cy="87" r="4.5" fill="#FFA24C"/>
@@ -56,9 +75,24 @@
     <circle cx="63" cy="87" r="4.5" fill="#FFA24C"/>
   </g>
 
+  <!-- Central Autonomous Swarm Core -->
   <g filter="url(#coreGlow)">
+    <!-- Inner Hexagon Shield -->
     <polygon points="120,92 145,105 145,135 120,148 95,135 95,105" fill="#121622" stroke="url(#swarmGrad)" stroke-width="2"/>
+    
+    <!-- Stylized "S" Swarm Vector Mark -->
     <path d="M 128 108 C 128 104 125 102 120 102 C 113 102 110 106 110 111 C 110 118 116 120 124 122 C 132 124 135 127 135 133 C 135 140 128 144 120 144 C 113 144 108 141 107 136" 
           fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
   </g>
+
+  <!-- Floating Active Micro-Particles -->
+  <circle cx="145" cy="74" r="1.5" fill="#FFA24C">
+    <animate attributeName="opacity" values="0.2;1;0.2" dur="2.4s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="95" cy="166" r="1.5" fill="#38BDF8">
+    <animate attributeName="opacity" values="0.2;1;0.2" dur="3s" repeatCount="indefinite" begin="0.8s"/>
+  </circle>
+  <circle cx="152" cy="120" r="1.5" fill="#10B981">
+    <animate attributeName="opacity" values="0.2;1;0.2" dur="2.8s" repeatCount="indefinite" begin="1.4s"/>
+  </circle>
 </svg>

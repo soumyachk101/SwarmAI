@@ -1,0 +1,216 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 620" width="100%" height="100%" aria-label="Swarm AI Clean Monorepo Architecture Map">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="fsBg" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#121622"/>
+      <stop offset="60%" stop-color="#080a0f"/>
+      <stop offset="100%" stop-color="#030406"/>
+    </radialGradient>
+
+    <!-- Card Backgrounds -->
+    <linearGradient id="cardRoot" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#241b12"/>
+      <stop offset="100%" stop-color="#140e0a"/>
+    </linearGradient>
+
+    <linearGradient id="cardApp" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#141e33"/>
+      <stop offset="100%" stop-color="#0b101c"/>
+    </linearGradient>
+
+    <linearGradient id="cardPkg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#181c28"/>
+      <stop offset="100%" stop-color="#0d0f17"/>
+    </linearGradient>
+
+    <filter id="cardShadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Canvas Surface -->
+  <rect width="1020" height="620" rx="20" fill="url(#fsBg)"/>
+  <rect width="1018" height="618" x="1" y="1" rx="19" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+  <!-- Title Header -->
+  <g transform="translate(40, 24)">
+    <circle cx="8" cy="12" r="4" fill="#FF6B00"/>
+    <text x="22" y="16" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="14" fill="#FFFFFF" letter-spacing="0.04em">SWARM AI MONOREPO ARCHITECTURE</text>
+    <text x="360" y="16" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#9CA3AF">· Turborepo + pnpm Workspace · 15 Modular Packages</text>
+  </g>
+
+  <!-- Root Directory Header -->
+  <g transform="translate(40, 56)" filter="url(#cardShadow)">
+    <rect width="940" height="42" rx="8" fill="url(#cardRoot)" stroke="rgba(255,107,0,0.4)" stroke-width="1"/>
+    <text x="18" y="26" font-family="ui-monospace, monospace" font-weight="700" font-size="13" fill="#FFA24C">swarm-ai/</text>
+    <text x="135" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#D1D5DB">Root Monorepo Engine &amp; Shared Tooling</text>
+    <text x="800" y="26" font-family="ui-monospace, monospace" font-size="10.5" fill="#FF6B00" text-anchor="end">pnpm 9 · Turbo 2 · Rust 2021</text>
+  </g>
+
+  <!-- SECTION 1: Top-Level Applications & Docs -->
+  <g transform="translate(40, 114)">
+    <!-- desktop/ -->
+    <g transform="translate(0, 0)" filter="url(#cardShadow)">
+      <rect width="300" height="64" rx="8" fill="url(#cardApp)" stroke="rgba(56,189,248,0.3)" stroke-width="1"/>
+      <circle cx="16" cy="22" r="3" fill="#38BDF8"/>
+      <text x="28" y="26" font-family="ui-monospace, monospace" font-weight="700" font-size="12" fill="#38BDF8">desktop/</text>
+      <text x="28" y="44" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#9CA3AF">Tauri v2 Desktop Shell + Native Rust PTY</text>
+      <text x="284" y="26" font-family="ui-monospace, monospace" font-size="9" fill="#38BDF8" text-anchor="end">@swarm/app</text>
+    </g>
+
+    <!-- web/ -->
+    <g transform="translate(320, 0)" filter="url(#cardShadow)">
+      <rect width="300" height="64" rx="8" fill="url(#cardApp)" stroke="rgba(16,185,129,0.3)" stroke-width="1"/>
+      <circle cx="16" cy="22" r="3" fill="#10B981"/>
+      <text x="28" y="26" font-family="ui-monospace, monospace" font-weight="700" font-size="12" fill="#10B981">web/</text>
+      <text x="28" y="44" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#9CA3AF">Distribution Landing Page &amp; Releases Hub</text>
+      <text x="284" y="26" font-family="ui-monospace, monospace" font-size="9" fill="#10B981" text-anchor="end">GitHub Pages</text>
+    </g>
+
+    <!-- docs/ -->
+    <g transform="translate(640, 0)" filter="url(#cardShadow)">
+      <rect width="300" height="64" rx="8" fill="url(#cardApp)" stroke="rgba(168,85,247,0.3)" stroke-width="1"/>
+      <circle cx="16" cy="22" r="3" fill="#A855F7"/>
+      <text x="28" y="26" font-family="ui-monospace, monospace" font-weight="700" font-size="12" fill="#A855F7">docs/</text>
+      <text x="28" y="44" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#9CA3AF">Audits, Architecture Specs &amp; User Guides</text>
+      <text x="284" y="26" font-family="ui-monospace, monospace" font-size="9" fill="#A855F7" text-anchor="end">Knowledge</text>
+    </g>
+  </g>
+
+  <!-- SECTION 2: Modular Packages Header -->
+  <g transform="translate(40, 202)">
+    <text x="0" y="0" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="11.5" fill="#FF8C00" letter-spacing="0.08em">PACKAGES/ — DOMAIN LIBRARIES &amp; SYSTEM MODULES</text>
+    <line x1="390" y1="-4" x2="940" y2="-4" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  </g>
+
+  <!-- Grid of 14 Packages (4 Columns x 4 Rows) -->
+  <!-- Row 1 -->
+  <g transform="translate(40, 220)">
+    <!-- packages/agents -->
+    <g transform="translate(0, 0)" filter="url(#cardShadow)">
+      <rect width="225" height="74" rx="8" fill="url(#cardPkg)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="24" font-family="ui-monospace, monospace" font-weight="700" font-size="11.5" fill="#FFA24C">packages/agents</text>
+      <text x="14" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#9CA3AF">11+ CLI agent adapters</text>
+      <text x="14" y="58" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#6B7280">Claude, Codex, Grok, Kimi</text>
+    </g>
+
+    <!-- packages/mind -->
+    <g transform="translate(238, 0)" filter="url(#cardShadow)">
+      <rect width="225" height="74" rx="8" fill="url(#cardPkg)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="24" font-family="ui-monospace, monospace" font-weight="700" font-size="11.5" fill="#38BDF8">packages/mind</text>
+      <text x="14" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#9CA3AF">SwarmMind orchestrator</text>
+      <text x="14" y="58" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#6B7280">Handoff bus &amp; state routing</text>
+    </g>
+
+    <!-- packages/pheromone -->
+    <g transform="translate(476, 0)" filter="url(#cardShadow)">
+      <rect width="225" height="74" rx="8" fill="url(#cardPkg)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="24" font-family="ui-monospace, monospace" font-weight="700" font-size="11.5" fill="#818CF8">packages/pheromone</text>
+      <text x="14" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#9CA3AF">Shared vector memory</text>
+      <text x="14" y="58" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#6B7280">SQLite + FTS5 semantic search</text>
+    </g>
+
+    <!-- packages/pheromone-mcp -->
+    <g transform="translate(714, 0)" filter="url(#cardShadow)">
+      <rect width="225" height="74" rx="8" fill="url(#cardPkg)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="24" font-family="ui-monospace, monospace" font-weight="700" font-size="11.5" fill="#A855F7">packages/pheromone-mcp</text>
+      <text x="14" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#9CA3AF">Model Context Protocol bridge</text>
+      <text x="14" y="58" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#6B7280">Universal tool integration</text>
+    </g>
+  </g>
+
+  <!-- Row 2 -->
+  <g transform="translate(40, 306)">
+    <!-- packages/lead -->
+    <g transform="translate(0, 0)" filter="url(#cardShadow)">
+      <rect width="225" height="74" rx="8" fill="url(#cardPkg)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="24" font-family="ui-monospace, monospace" font-weight="700" font-size="11.5" fill="#10B981">packages/lead</text>
+      <text x="14" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#9CA3AF">Lead planner &amp; architect</text>
+      <text x="14" y="58" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#6B7280">Goal breakdown &amp; delegation</text>
+    </g>
+
+    <!-- packages/flow -->
+    <g transform="translate(238, 0)" filter="url(#cardShadow)">
+      <rect width="225" height="74" rx="8" fill="url(#cardPkg)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="24" font-family="ui-monospace, monospace" font-weight="700" font-size="11.5" fill="#F59E0B">packages/flow</text>
+      <text x="14" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#9CA3AF">Infinite flow canvas</text>
+      <text x="14" y="58" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#6B7280">Visual pipeline &amp; node graph</text>
+    </g>
+
+    <!-- packages/board -->
+    <g transform="translate(476, 0)" filter="url(#cardShadow)">
+      <rect width="225" height="74" rx="8" fill="url(#cardPkg)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="24" font-family="ui-monospace, monospace" font-weight="700" font-size="11.5" fill="#EC4899">packages/board</text>
+      <text x="14" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#9CA3AF">Kanban &amp; agent status strip</text>
+      <text x="14" y="58" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#6B7280">Real-time status indicators</text>
+    </g>
+
+    <!-- packages/tasks -->
+    <g transform="translate(714, 0)" filter="url(#cardShadow)">
+      <rect width="225" height="74" rx="8" fill="url(#cardPkg)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="24" font-family="ui-monospace, monospace" font-weight="700" font-size="11.5" fill="#06B6D4">packages/tasks</text>
+      <text x="14" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#9CA3AF">Worktree task lanes</text>
+      <text x="14" y="58" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#6B7280">Isolated branch tasks</text>
+    </g>
+  </g>
+
+  <!-- Row 3 -->
+  <g transform="translate(40, 392)">
+    <!-- packages/workspace -->
+    <g transform="translate(0, 0)" filter="url(#cardShadow)">
+      <rect width="225" height="74" rx="8" fill="url(#cardPkg)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="24" font-family="ui-monospace, monospace" font-weight="700" font-size="11.5" fill="#3B82F6">packages/workspace</text>
+      <text x="14" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#9CA3AF">Multi-repo management</text>
+      <text x="14" y="58" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#6B7280">Worktree isolation engine</text>
+    </g>
+
+    <!-- packages/voice -->
+    <g transform="translate(238, 0)" filter="url(#cardShadow)">
+      <rect width="225" height="74" rx="8" fill="url(#cardPkg)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="24" font-family="ui-monospace, monospace" font-weight="700" font-size="11.5" fill="#10B981">packages/voice</text>
+      <text x="14" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#9CA3AF">Whisper.cpp audio HUD</text>
+      <text x="14" y="58" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#6B7280">Offline speech-to-text</text>
+    </g>
+
+    <!-- packages/plugins -->
+    <g transform="translate(476, 0)" filter="url(#cardShadow)">
+      <rect width="225" height="74" rx="8" fill="url(#cardPkg)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="24" font-family="ui-monospace, monospace" font-weight="700" font-size="11.5" fill="#EAB308">packages/plugins</text>
+      <text x="14" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#9CA3AF">GlassChat Studio plugins</text>
+      <text x="14" y="58" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#6B7280">Dynamic runtime extensibility</text>
+    </g>
+
+    <!-- packages/extension -->
+    <g transform="translate(714, 0)" filter="url(#cardShadow)">
+      <rect width="225" height="74" rx="8" fill="url(#cardPkg)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="24" font-family="ui-monospace, monospace" font-weight="700" font-size="11.5" fill="#8B5CF6">packages/extension</text>
+      <text x="14" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#9CA3AF">OpenVSX marketplace pane</text>
+      <text x="14" y="58" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#6B7280">Extension ecosystem</text>
+    </g>
+  </g>
+
+  <!-- Row 4 (Supporting Packages) -->
+  <g transform="translate(40, 478)">
+    <!-- packages/reports -->
+    <g transform="translate(0, 0)" filter="url(#cardShadow)">
+      <rect width="463" height="66" rx="8" fill="url(#cardPkg)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="24" font-family="ui-monospace, monospace" font-weight="700" font-size="11.5" fill="#34D399">packages/reports</text>
+      <text x="14" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#9CA3AF">System health monitors, test result visualizers &amp; benchmarks</text>
+      <text x="450" y="24" font-family="ui-monospace, monospace" font-size="9" fill="#34D399" text-anchor="end">Analytics</text>
+    </g>
+
+    <!-- packages/design-system -->
+    <g transform="translate(476, 0)" filter="url(#cardShadow)">
+      <rect width="463" height="66" rx="8" fill="url(#cardPkg)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="24" font-family="ui-monospace, monospace" font-weight="700" font-size="11.5" fill="#F472B6">packages/design-system</text>
+      <text x="14" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#9CA3AF">Central theme tokens, CSS utility presets &amp; dark glassmorphism</text>
+      <text x="450" y="24" font-family="ui-monospace, monospace" font-size="9" fill="#F472B6" text-anchor="end">Tokens</text>
+    </g>
+  </g>
+
+  <!-- Bottom Footer Status -->
+  <g transform="translate(40, 580)">
+    <text x="0" y="0" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#6B7280">100% Local Execution · Zero Cloud Dependency · Conflict-Free Git Worktrees</text>
+    <text x="940" y="0" font-family="ui-monospace, monospace" font-size="10" fill="#FF6B00" text-anchor="end">302/302 Vitest Suites Passing</text>
+  </g>
+</svg>

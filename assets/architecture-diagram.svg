@@ -1,0 +1,213 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 680" width="100%" height="100%" aria-label="Swarm AI System Architecture Diagram">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="archBg" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#121520"/>
+      <stop offset="60%" stop-color="#080a0f"/>
+      <stop offset="100%" stop-color="#030406"/>
+    </radialGradient>
+
+    <!-- Layer Gradients -->
+    <linearGradient id="layerGradUI" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1e293b" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.9"/>
+    </linearGradient>
+
+    <linearGradient id="layerGradOrch" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2a1b3d" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#150e24" stop-opacity="0.9"/>
+    </linearGradient>
+
+    <linearGradient id="layerGradMem" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#132338" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#091424" stop-opacity="0.9"/>
+    </linearGradient>
+
+    <linearGradient id="layerGradRust" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#122822" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#081713" stop-opacity="0.9"/>
+    </linearGradient>
+
+    <linearGradient id="layerGradWorktree" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2d1c10" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#170c06" stop-opacity="0.9"/>
+    </linearGradient>
+
+    <!-- Drop Shadows -->
+    <filter id="archShadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+
+    <!-- Arrowhead Markers -->
+    <marker id="arrowOrange" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#FF6B00"/>
+    </marker>
+    <marker id="arrowPurple" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#A855F7"/>
+    </marker>
+    <marker id="arrowCyan" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#38BDF8"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#10B981"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1060" height="680" rx="20" fill="url(#archBg)"/>
+  <rect width="1058" height="678" x="1" y="1" rx="19" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+  <!-- Diagram Title -->
+  <g transform="translate(40, 26)">
+    <circle cx="8" cy="12" r="4" fill="#FF6B00"/>
+    <text x="22" y="16" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="14" fill="#FFFFFF" letter-spacing="0.04em">SWARM AI ARCHITECTURAL BLUEPRINT</text>
+    <text x="375" y="16" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#9CA3AF">· End-to-End Local-First Agentic Flow</text>
+  </g>
+
+  <!-- TIER 1: UI & Interaction Layer -->
+  <g transform="translate(40, 56)" filter="url(#archShadow)">
+    <rect width="980" height="96" rx="10" fill="url(#layerGradUI)" stroke="rgba(56,189,248,0.3)" stroke-width="1"/>
+    <text x="20" y="24" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="11.5" fill="#38BDF8" letter-spacing="0.05em">1. UI &amp; INTERACTION LAYER (React 18 + Zustand + Tailwind)</text>
+    
+    <!-- Component Cards in Tier 1 -->
+    <g transform="translate(20, 36)">
+      <rect width="215" height="46" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="20" font-family="system-ui, sans-serif" font-weight="600" font-size="11" fill="#FFFFFF">Agent Grid &amp; Terminal Panes</text>
+      <text x="14" y="34" font-family="system-ui, sans-serif" font-size="9.5" fill="#9CA3AF">xterm.js WebGL + Pty Output</text>
+    </g>
+    <g transform="translate(255, 36)">
+      <rect width="215" height="46" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="20" font-family="system-ui, sans-serif" font-weight="600" font-size="11" fill="#FFFFFF">Flow Canvas &amp; Kanban Board</text>
+      <text x="14" y="34" font-family="system-ui, sans-serif" font-size="9.5" fill="#9CA3AF">Interactive Node Graphs &amp; Cards</text>
+    </g>
+    <g transform="translate(490, 36)">
+      <rect width="215" height="46" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="20" font-family="system-ui, sans-serif" font-weight="600" font-size="11" fill="#FFFFFF">Whisper Audio HUD</text>
+      <text x="14" y="34" font-family="system-ui, sans-serif" font-size="9.5" fill="#9CA3AF">Offline Speech-to-Intent</text>
+    </g>
+    <g transform="translate(725, 36)">
+      <rect width="235" height="46" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="20" font-family="system-ui, sans-serif" font-weight="600" font-size="11" fill="#FFFFFF">Control Dock &amp; Git Modals</text>
+      <text x="14" y="34" font-family="system-ui, sans-serif" font-size="9.5" fill="#9CA3AF">Branch Diffs &amp; Onboarding</text>
+    </g>
+  </g>
+
+  <!-- Connectors Tier 1 -> Tier 2 -->
+  <path d="M 530 152 L 530 178" stroke="#38BDF8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrowCyan)" opacity="0.7"/>
+
+  <!-- TIER 2: Orchestration & Planner Layer -->
+  <g transform="translate(40, 180)" filter="url(#archShadow)">
+    <rect width="980" height="96" rx="10" fill="url(#layerGradOrch)" stroke="rgba(168,85,247,0.3)" stroke-width="1"/>
+    <text x="20" y="24" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="11.5" fill="#A855F7" letter-spacing="0.05em">2. ORCHESTRATION &amp; PLANNING CORE (@swarm/mind + @swarm/lead)</text>
+
+    <!-- Component Cards in Tier 2 -->
+    <g transform="translate(20, 36)">
+      <rect width="295" height="46" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="20" font-family="system-ui, sans-serif" font-weight="600" font-size="11" fill="#FFFFFF">Lead Goal Decomposition</text>
+      <text x="14" y="34" font-family="system-ui, sans-serif" font-size="9.5" fill="#C084FC">Breaks prompt into DAG task specs</text>
+    </g>
+    <g transform="translate(335, 36)">
+      <rect width="295" height="46" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="20" font-family="system-ui, sans-serif" font-weight="600" font-size="11" fill="#FFFFFF">SwarmMind Handoff Event Bus</text>
+      <text x="14" y="34" font-family="system-ui, sans-serif" font-size="9.5" fill="#C084FC">Dynamic agent-to-agent message pipe</text>
+    </g>
+    <g transform="translate(650, 36)">
+      <rect width="310" height="46" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="20" font-family="system-ui, sans-serif" font-weight="600" font-size="11" fill="#FFFFFF">File Ownership &amp; Lock Engine</text>
+      <text x="14" y="34" font-family="system-ui, sans-serif" font-size="9.5" fill="#C084FC">Prevents simultaneous file edits</text>
+    </g>
+  </g>
+
+  <!-- Connectors Tier 2 -> Tier 3 -->
+  <path d="M 530 276 L 530 302" stroke="#A855F7" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrowPurple)" opacity="0.7"/>
+
+  <!-- TIER 3: Shared Memory & MCP Bridge -->
+  <g transform="translate(40, 304)" filter="url(#archShadow)">
+    <rect width="980" height="96" rx="10" fill="url(#layerGradMem)" stroke="rgba(129,140,248,0.3)" stroke-width="1"/>
+    <text x="20" y="24" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="11.5" fill="#818CF8" letter-spacing="0.05em">3. SHARED CONTEXT &amp; MEMORY LAYER (@swarm/pheromone + MCP)</text>
+
+    <!-- Component Cards in Tier 3 -->
+    <g transform="translate(20, 36)">
+      <rect width="295" height="46" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="20" font-family="system-ui, sans-serif" font-weight="600" font-size="11" fill="#FFFFFF">SQLite + FTS5 Hybrid Search</text>
+      <text x="14" y="34" font-family="system-ui, sans-serif" font-size="9.5" fill="#A5B4FC">Semantic vectors + keyword matching</text>
+    </g>
+    <g transform="translate(335, 36)">
+      <rect width="295" height="46" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="20" font-family="system-ui, sans-serif" font-weight="600" font-size="11" fill="#FFFFFF">Model Context Protocol Bridge</text>
+      <text x="14" y="34" font-family="system-ui, sans-serif" font-size="9.5" fill="#A5B4FC">Exposes memory via pheromone_query</text>
+    </g>
+    <g transform="translate(650, 36)">
+      <rect width="310" height="46" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="20" font-family="system-ui, sans-serif" font-weight="600" font-size="11" fill="#FFFFFF">Token Budget &amp; Context Injector</text>
+      <text x="14" y="34" font-family="system-ui, sans-serif" font-size="9.5" fill="#A5B4FC">Dynamic window fit (1M+ context)</text>
+    </g>
+  </g>
+
+  <!-- Connectors Tier 3 -> Tier 4 -->
+  <path d="M 530 400 L 530 426" stroke="#818CF8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrowCyan)" opacity="0.7"/>
+
+  <!-- TIER 4: Native Rust Backend -->
+  <g transform="translate(40, 428)" filter="url(#archShadow)">
+    <rect width="980" height="96" rx="10" fill="url(#layerGradRust)" stroke="rgba(16,185,129,0.3)" stroke-width="1"/>
+    <text x="20" y="24" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="11.5" fill="#10B981" letter-spacing="0.05em">4. TAURI RUST BACKEND ENGINE (desktop/src-tauri)</text>
+
+    <!-- Component Cards in Tier 4 -->
+    <g transform="translate(20, 36)">
+      <rect width="215" height="46" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="20" font-family="system-ui, sans-serif" font-weight="600" font-size="11" fill="#FFFFFF">portable-pty Manager</text>
+      <text x="14" y="34" font-family="system-ui, sans-serif" font-size="9.5" fill="#6EE7B7">Async terminal sessions</text>
+    </g>
+    <g transform="translate(255, 36)">
+      <rect width="215" height="46" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="20" font-family="system-ui, sans-serif" font-weight="600" font-size="11" fill="#FFFFFF">Git Worktree Driver</text>
+      <text x="14" y="34" font-family="system-ui, sans-serif" font-size="9.5" fill="#6EE7B7">Zero-copy branch isolation</text>
+    </g>
+    <g transform="translate(490, 36)">
+      <rect width="215" height="46" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="20" font-family="system-ui, sans-serif" font-weight="600" font-size="11" fill="#FFFFFF">rusqlite Vector Engine</text>
+      <text x="14" y="34" font-family="system-ui, sans-serif" font-size="9.5" fill="#6EE7B7">In-memory / Disk embeddings</text>
+    </g>
+    <g transform="translate(725, 36)">
+      <rect width="235" height="46" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="20" font-family="system-ui, sans-serif" font-weight="600" font-size="11" fill="#FFFFFF">CDP Headless Browser</text>
+      <text x="14" y="34" font-family="system-ui, sans-serif" font-size="9.5" fill="#6EE7B7">Chrome DevTools automation</text>
+    </g>
+  </g>
+
+  <!-- Connectors Tier 4 -> Tier 5 -->
+  <path d="M 530 524 L 530 550" stroke="#10B981" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrowGreen)" opacity="0.7"/>
+
+  <!-- TIER 5: Isolated Worktree Execution Layer -->
+  <g transform="translate(40, 552)" filter="url(#archShadow)">
+    <rect width="980" height="96" rx="10" fill="url(#layerGradWorktree)" stroke="rgba(255,107,0,0.3)" stroke-width="1"/>
+    <text x="20" y="24" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="11.5" fill="#FFA24C" letter-spacing="0.05em">5. PARALLEL AGENT EXECUTION (Isolated Git Worktrees)</text>
+
+    <!-- Component Cards in Tier 5 -->
+    <g transform="translate(20, 36)">
+      <rect width="180" height="46" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="20" font-family="ui-monospace, monospace" font-weight="700" font-size="11" fill="#FFA24C">Claude Code</text>
+      <text x="14" y="34" font-family="system-ui, sans-serif" font-size="9.5" fill="#9CA3AF">Worktree .claude/wt-1</text>
+    </g>
+    <g transform="translate(212, 36)">
+      <rect width="180" height="46" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="20" font-family="ui-monospace, monospace" font-weight="700" font-size="11" fill="#10B981">OpenAI Codex</text>
+      <text x="14" y="34" font-family="system-ui, sans-serif" font-size="9.5" fill="#9CA3AF">Worktree .codex/wt-2</text>
+    </g>
+    <g transform="translate(404, 36)">
+      <rect width="180" height="46" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="20" font-family="ui-monospace, monospace" font-weight="700" font-size="11" fill="#38BDF8">xAI Grok Code</text>
+      <text x="14" y="34" font-family="system-ui, sans-serif" font-size="9.5" fill="#9CA3AF">Worktree .grok/wt-3</text>
+    </g>
+    <g transform="translate(596, 36)">
+      <rect width="180" height="46" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="20" font-family="ui-monospace, monospace" font-weight="700" font-size="11" fill="#A855F7">Antigravity CLI</text>
+      <text x="14" y="34" font-family="system-ui, sans-serif" font-size="9.5" fill="#9CA3AF">Worktree .agy/wt-4</text>
+    </g>
+    <g transform="translate(788, 36)">
+      <rect width="172" height="46" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="14" y="20" font-family="ui-monospace, monospace" font-weight="700" font-size="11" fill="#EC4899">OpenCode / Aider</text>
+      <text x="14" y="34" font-family="system-ui, sans-serif" font-size="9.5" fill="#9CA3AF">Local DeepSeek / Ollama</text>
+    </g>
+  </g>
+</svg>

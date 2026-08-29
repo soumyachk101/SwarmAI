@@ -1,0 +1,162 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 440" width="100%" height="100%" aria-label="Swarm AI Hero Orchestration Illustration">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="heroBg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#141926"/>
+      <stop offset="50%" stop-color="#090c12"/>
+      <stop offset="100%" stop-color="#040507"/>
+    </radialGradient>
+
+    <!-- Glass Window Fill -->
+    <linearGradient id="glassFill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#181e2b" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#0d111a" stop-opacity="0.98"/>
+    </linearGradient>
+
+    <!-- Node Card Fill -->
+    <linearGradient id="podFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e2638" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#111622" stop-opacity="0.9"/>
+    </linearGradient>
+
+    <!-- Glow Filters -->
+    <filter id="coreAura" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="windowShadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="10" stdDeviation="15" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Canvas Background -->
+  <rect width="880" height="440" rx="20" fill="url(#heroBg)"/>
+  <rect width="878" height="438" x="1" y="1" rx="19" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+  <!-- Main Desktop App Window Frame -->
+  <g transform="translate(40, 25)" filter="url(#windowShadow)">
+    <rect width="800" height="390" rx="14" fill="url(#glassFill)" stroke="rgba(255,255,255,0.1)" stroke-width="1.2"/>
+
+    <!-- Window Topbar -->
+    <rect width="800" height="38" rx="14" fill="rgba(255,255,255,0.02)"/>
+    <line x1="0" y1="38" x2="800" y2="38" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+    
+    <!-- Window Traffic Lights -->
+    <circle cx="22" cy="19" r="5" fill="#FF5F56"/>
+    <circle cx="38" cy="19" r="5" fill="#FFBD2E"/>
+    <circle cx="54" cy="19" r="5" fill="#27C93F"/>
+
+    <!-- Window Title -->
+    <text x="400" y="23" font-family="system-ui, -apple-system, sans-serif" font-weight="600" font-size="11.5" fill="#9CA3AF" text-anchor="middle">Swarm AI Studio — Multi-Agent Parallel Workspace</text>
+
+    <!-- Branch Indicator Badge -->
+    <g transform="translate(680, 10)">
+      <rect width="105" height="20" rx="4" fill="rgba(255,107,0,0.12)" stroke="rgba(255,107,0,0.3)" stroke-width="1"/>
+      <circle cx="10" cy="10" r="3" fill="#FF6B00"/>
+      <text x="20" y="14" font-family="ui-monospace, monospace" font-weight="600" font-size="9.5" fill="#FFA24C">4 Worktrees</text>
+    </g>
+
+    <!-- Central Neural Hub (SwarmMind Core) -->
+    <g transform="translate(400, 205)" filter="url(#coreAura)">
+      <!-- Pulsing Halo Rings -->
+      <circle r="42" fill="none" stroke="rgba(255,107,0,0.15)" stroke-width="1.5">
+        <animate attributeName="r" values="38;48;38" dur="4s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.6;0.2;0.6" dur="4s" repeatCount="indefinite"/>
+      </circle>
+      <circle r="30" fill="none" stroke="rgba(56,189,248,0.25)" stroke-width="1.5">
+        <animate attributeName="r" values="28;34;28" dur="3s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Center Hexagon -->
+      <polygon points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11" fill="#181e2b" stroke="#FF6B00" stroke-width="2"/>
+      
+      <!-- Core Title -->
+      <text y="4" font-family="system-ui, sans-serif" font-weight="800" font-size="10" fill="#FFFFFF" text-anchor="middle" letter-spacing="0.05em">SWARM</text>
+    </g>
+
+    <!-- Synapse Track Lines from Core to 4 Pods -->
+    <g stroke="rgba(255,255,255,0.12)" stroke-width="1.5" stroke-dasharray="4 4" fill="none">
+      <path d="M 230 115 C 310 115, 340 180, 375 195"/>
+      <path d="M 570 115 C 490 115, 460 180, 425 195"/>
+      <path d="M 230 295 C 310 295, 340 230, 375 215"/>
+      <path d="M 570 295 C 490 295, 460 230, 425 215"/>
+    </g>
+
+    <!-- Animated Synapse Particle Packets -->
+    <circle r="3" fill="#A855F7">
+      <animateMotion dur="3s" repeatCount="indefinite" path="M 230 115 C 310 115, 340 180, 375 195"/>
+    </circle>
+    <circle r="3" fill="#FFA24C">
+      <animateMotion dur="3.4s" repeatCount="indefinite" path="M 570 115 C 490 115, 460 180, 425 195" begin="0.7s"/>
+    </circle>
+    <circle r="3" fill="#10B981">
+      <animateMotion dur="2.8s" repeatCount="indefinite" path="M 230 295 C 310 295, 340 230, 375 215" begin="1.2s"/>
+    </circle>
+    <circle r="3" fill="#38BDF8">
+      <animateMotion dur="3.2s" repeatCount="indefinite" path="M 570 295 C 490 295, 460 230, 425 215" begin="0.4s"/>
+    </circle>
+
+    <!-- POD 1: Lead Architect (Top Left) -->
+    <g transform="translate(45, 75)" filter="url(#softGlow)">
+      <rect width="200" height="85" rx="8" fill="url(#podFill)" stroke="rgba(168,85,247,0.4)" stroke-width="1.2"/>
+      <circle cx="18" cy="22" r="4" fill="#A855F7"/>
+      <text x="30" y="26" font-family="system-ui, sans-serif" font-weight="700" font-size="11.5" fill="#FFFFFF">Lead Planner</text>
+      <text x="186" y="26" font-family="ui-monospace, monospace" font-size="9" fill="#C084FC" text-anchor="end">DAG Specs</text>
+      <line x1="12" y1="38" x2="188" y2="38" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      <text x="14" y="55" font-family="system-ui, sans-serif" font-size="9.5" fill="#9CA3AF">Decomposing goal into subtasks</text>
+      <text x="14" y="70" font-family="ui-monospace, monospace" font-size="9" fill="#A855F7">Handoff → Claude &amp; Codex</text>
+    </g>
+
+    <!-- POD 2: Claude Code (Top Right) -->
+    <g transform="translate(555, 75)" filter="url(#softGlow)">
+      <rect width="200" height="85" rx="8" fill="url(#podFill)" stroke="rgba(255,107,0,0.4)" stroke-width="1.2"/>
+      <circle cx="18" cy="22" r="4" fill="#FF6B00"/>
+      <text x="30" y="26" font-family="system-ui, sans-serif" font-weight="700" font-size="11.5" fill="#FFFFFF">Claude Code Opus 5</text>
+      <text x="186" y="26" font-family="ui-monospace, monospace" font-size="9" fill="#FFA24C" text-anchor="end">wt-1: auth</text>
+      <line x1="12" y1="38" x2="188" y2="38" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      <text x="14" y="55" font-family="system-ui, sans-serif" font-size="9.5" fill="#9CA3AF">Building OAuth &amp; session tokens</text>
+      <text x="14" y="70" font-family="ui-monospace, monospace" font-size="9" fill="#10B981">✓ 14 Tests Passing</text>
+    </g>
+
+    <!-- POD 3: OpenAI Codex (Bottom Left) -->
+    <g transform="translate(45, 255)" filter="url(#softGlow)">
+      <rect width="200" height="85" rx="8" fill="url(#podFill)" stroke="rgba(16,185,129,0.4)" stroke-width="1.2"/>
+      <circle cx="18" cy="22" r="4" fill="#10B981"/>
+      <text x="30" y="26" font-family="system-ui, sans-serif" font-weight="700" font-size="11.5" fill="#FFFFFF">OpenAI Codex 5.6</text>
+      <text x="186" y="26" font-family="ui-monospace, monospace" font-size="9" fill="#34D399" text-anchor="end">wt-2: api</text>
+      <line x1="12" y1="38" x2="188" y2="38" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      <text x="14" y="55" font-family="system-ui, sans-serif" font-size="9.5" fill="#9CA3AF">Writing REST &amp; WebSocket layer</text>
+      <text x="14" y="70" font-family="ui-monospace, monospace" font-size="9" fill="#10B981">✓ Memory Synced</text>
+    </g>
+
+    <!-- POD 4: xAI Grok Code / Antigravity (Bottom Right) -->
+    <g transform="translate(555, 255)" filter="url(#softGlow)">
+      <rect width="200" height="85" rx="8" fill="url(#podFill)" stroke="rgba(56,189,248,0.4)" stroke-width="1.2"/>
+      <circle cx="18" cy="22" r="4" fill="#38BDF8"/>
+      <text x="30" y="26" font-family="system-ui, sans-serif" font-weight="700" font-size="11.5" fill="#FFFFFF">Grok Code / AGY</text>
+      <text x="186" y="26" font-family="ui-monospace, monospace" font-size="9" fill="#38BDF8" text-anchor="end">wt-3: test</text>
+      <line x1="12" y1="38" x2="188" y2="38" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      <text x="14" y="55" font-family="system-ui, sans-serif" font-size="9.5" fill="#9CA3AF">Refactoring &amp; Vitest coverage</text>
+      <text x="14" y="70" font-family="ui-monospace, monospace" font-size="9" fill="#38BDF8">✓ Zero Conflicts</text>
+    </g>
+
+    <!-- Bottom Memory Status Strip -->
+    <g transform="translate(200, 352)">
+      <rect width="400" height="24" rx="6" fill="rgba(18,24,38,0.8)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <circle cx="16" cy="12" r="3.5" fill="#818CF8"/>
+      <text x="28" y="16" font-family="system-ui, sans-serif" font-size="10" fill="#E2E8F0">Pheromone Memory: <tspan fill="#38BDF8" font-family="ui-monospace, monospace">1,420 chunks indexed</tspan> · Zero merge conflicts</text>
+    </g>
+  </g>
+</svg>
