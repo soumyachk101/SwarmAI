@@ -11,8 +11,8 @@ mkdir -p "$RELEASES_DIR/windows"
 mkdir -p "$RELEASES_DIR/android"
 
 # 1. Check for macOS DMG
-APP_SRC="$PROJECT_ROOT/apps/desktop/src-tauri/target/release/bundle/macos/SwarmAI.app"
-DMG_SRC="$PROJECT_ROOT/apps/desktop/src-tauri/target/release/bundle/dmg/SwarmAI_0.1.0_aarch64.dmg"
+APP_SRC="$PROJECT_ROOT/desktop/src-tauri/target/release/bundle/macos/SwarmAI.app"
+DMG_SRC="$PROJECT_ROOT/desktop/src-tauri/target/release/bundle/dmg/SwarmAI_0.1.0_aarch64.dmg"
 
 if [ -d "$APP_SRC" ]; then
     echo "🍎 Packaging macOS DMG from SwarmAI.app..."
@@ -24,21 +24,21 @@ if [ -d "$APP_SRC" ]; then
     rm -rf "$TMP_DMG_DIR"
     cp -f "$DMG_SRC" "$RELEASES_DIR/macOS/SwarmAI.dmg"
     cp -f "$DMG_SRC" "$RELEASES_DIR/macOS/SwarmAI_0.1.0_aarch64.dmg"
-    mkdir -p "$PROJECT_ROOT/apps/web/releases/macOS"
-    cp -f "$DMG_SRC" "$PROJECT_ROOT/apps/web/releases/macOS/SwarmAI.dmg"
-    echo "✅ macOS DMG ready at: releases/macOS/SwarmAI.dmg and apps/web/releases/macOS/SwarmAI.dmg"
+    mkdir -p "$PROJECT_ROOT/web/releases/macOS"
+    cp -f "$DMG_SRC" "$PROJECT_ROOT/web/releases/macOS/SwarmAI.dmg"
+    echo "✅ macOS DMG ready at: releases/macOS/SwarmAI.dmg and web/releases/macOS/SwarmAI.dmg"
 elif [ -f "$DMG_SRC" ]; then
     echo "🍎 Copying existing macOS DMG installer..."
     cp -f "$DMG_SRC" "$RELEASES_DIR/macOS/SwarmAI.dmg"
     cp -f "$DMG_SRC" "$RELEASES_DIR/macOS/SwarmAI_0.1.0_aarch64.dmg"
-    mkdir -p "$PROJECT_ROOT/apps/web/releases/macOS"
-    cp -f "$DMG_SRC" "$PROJECT_ROOT/apps/web/releases/macOS/SwarmAI.dmg"
-    echo "✅ macOS DMG ready at: releases/macOS/SwarmAI.dmg and apps/web/releases/macOS/SwarmAI.dmg"
+    mkdir -p "$PROJECT_ROOT/web/releases/macOS"
+    cp -f "$DMG_SRC" "$PROJECT_ROOT/web/releases/macOS/SwarmAI.dmg"
+    echo "✅ macOS DMG ready at: releases/macOS/SwarmAI.dmg and web/releases/macOS/SwarmAI.dmg"
 fi
 
 # 2. Check for Windows NSIS / MSI
-EXE_SRC=$(find "$PROJECT_ROOT/apps/desktop/src-tauri/target/release/bundle/nsis" -name "*.exe" 2>/dev/null | head -n 1 || true)
-MSI_SRC=$(find "$PROJECT_ROOT/apps/desktop/src-tauri/target/release/bundle/msi" -name "*.msi" 2>/dev/null | head -n 1 || true)
+EXE_SRC=$(find "$PROJECT_ROOT/desktop/src-tauri/target/release/bundle/nsis" -name "*.exe" 2>/dev/null | head -n 1 || true)
+MSI_SRC=$(find "$PROJECT_ROOT/desktop/src-tauri/target/release/bundle/msi" -name "*.msi" 2>/dev/null | head -n 1 || true)
 if [ -n "$EXE_SRC" ] && [ -f "$EXE_SRC" ]; then
     cp -f "$EXE_SRC" "$RELEASES_DIR/windows/SwarmAI_Setup.exe"
     echo "✅ Windows EXE ready at: releases/windows/SwarmAI_Setup.exe"
@@ -49,7 +49,7 @@ if [ -n "$MSI_SRC" ] && [ -f "$MSI_SRC" ]; then
 fi
 
 # 3. Check for Android APK
-APK_SRC=$(find "$PROJECT_ROOT/apps/desktop/src-tauri/gen/android" -name "*release*.apk" -o -name "*app*.apk" 2>/dev/null | head -n 1 || true)
+APK_SRC=$(find "$PROJECT_ROOT/desktop/src-tauri/gen/android" -name "*release*.apk" -o -name "*app*.apk" 2>/dev/null | head -n 1 || true)
 if [ -n "$APK_SRC" ] && [ -f "$APK_SRC" ]; then
     cp -f "$APK_SRC" "$RELEASES_DIR/android/SwarmAI.apk"
     echo "✅ Android APK ready at: releases/android/SwarmAI.apk"

@@ -34,7 +34,7 @@ build/
 out/
 target/
 **/target/
-apps/desktop/src-tauri/target/
+desktop/src-tauri/target/
 .turbo/
 /.turbo/
 *.tsbuildinfo
@@ -61,14 +61,14 @@ releases/**/*.rpm
 
 # Keep gitkeep placeholders
 !releases/**/.gitkeep
-!apps/web/releases/**/.gitkeep
+!web/releases/**/.gitkeep
 
-# Explicitly allow apps/web release binaries for GitHub Pages static site hosting
-!apps/web/releases/**
-!apps/web/releases/**/*.dmg
-!apps/web/releases/**/*.exe
-!apps/web/releases/**/*.msi
-!apps/web/releases/**/*.deb
+# Explicitly allow web release binaries for GitHub Pages static site hosting
+!web/releases/**
+!web/releases/**/*.dmg
+!web/releases/**/*.exe
+!web/releases/**/*.msi
+!web/releases/**/*.deb
 
 # ==============================================================================
 # Databases & Local Runtime Storage

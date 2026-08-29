@@ -15,47 +15,47 @@ importers:
         specifier: ^5.6.0
         version: 5.9.3
 
-  apps/desktop:
+  desktop:
     dependencies:
       '@swarm/agents':
         specifier: workspace:*
-        version: link:../../packages/agents
+        version: link:../packages/agents
       '@swarm/board':
         specifier: workspace:*
-        version: link:../../packages/board
+        version: link:../packages/board
       '@swarm/extension':
         specifier: workspace:*
-        version: link:../../packages/extension
+        version: link:../packages/extension
       '@swarm/flow':
         specifier: workspace:*
-        version: link:../../packages/flow
+        version: link:../packages/flow
       '@swarm/lead':
         specifier: workspace:*
-        version: link:../../packages/lead
+        version: link:../packages/lead
       '@swarm/mind':
         specifier: workspace:*
-        version: link:../../packages/mind
+        version: link:../packages/mind
       '@swarm/pheromone':
         specifier: workspace:*
-        version: link:../../packages/pheromone
+        version: link:../packages/pheromone
       '@swarm/pheromone-mcp':
         specifier: workspace:*
-        version: link:../../packages/pheromone-mcp
+        version: link:../packages/pheromone-mcp
       '@swarm/plugins':
         specifier: workspace:*
-        version: link:../../packages/plugins
+        version: link:../packages/plugins
       '@swarm/reports':
         specifier: workspace:*
-        version: link:../../packages/reports
+        version: link:../packages/reports
       '@swarm/tasks':
         specifier: workspace:*
-        version: link:../../packages/tasks
+        version: link:../packages/tasks
       '@swarm/voice':
         specifier: workspace:*
-        version: link:../../packages/voice
+        version: link:../packages/voice
       '@swarm/workspace':
         specifier: workspace:*
-        version: link:../../packages/workspace
+        version: link:../packages/workspace
       '@tauri-apps/api':
         specifier: ^2.1.0
         version: 2.11.1
