@@ -15,300 +15,47 @@ importers:
         specifier: ^5.6.0
         version: 5.9.3
 
-  agents:
-    dependencies:
-      '@swarm/board':
-        specifier: workspace:*
-        version: link:../board
-      '@swarm/lead':
-        specifier: workspace:*
-        version: link:../lead
-      '@swarm/pheromone':
-        specifier: workspace:*
-        version: link:../pheromone
-      lucide-react:
-        specifier: ^0.400.0
-        version: 0.400.0(react@18.3.1)
-      xterm:
-        specifier: ^5.3.0
-        version: 5.3.0
-      xterm-addon-fit:
-        specifier: ^0.8.0
-        version: 0.8.0(xterm@5.3.0)
-      xterm-addon-search:
-        specifier: ^0.13.0
-        version: 0.13.0(xterm@5.3.0)
-      xterm-addon-webgl:
-        specifier: ^0.16.0
-        version: 0.16.0(xterm@5.3.0)
-      zustand:
-        specifier: ^5.0.0
-        version: 5.0.14(@types/react@18.3.31)(react@18.3.1)
-    devDependencies:
-      '@tauri-apps/api':
-        specifier: ^2.1.0
-        version: 2.11.1
-      '@tauri-apps/plugin-shell':
-        specifier: ^2.0.0
-        version: 2.3.5
-      '@testing-library/jest-dom':
-        specifier: ^6.4.2
-        version: 6.10.0(@testing-library/dom@10.4.1)
-      '@testing-library/react':
-        specifier: ^14.3.1
-        version: 14.3.1(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@types/node':
-        specifier: ^22.0.0
-        version: 22.20.0
-      '@types/react':
-        specifier: ^18.3.0
-        version: 18.3.31
-      '@types/react-dom':
-        specifier: ^18.3.0
-        version: 18.3.7(@types/react@18.3.31)
-      jsdom:
-        specifier: ^24.0.0
-        version: 24.1.3
-      react:
-        specifier: ^18.3.0
-        version: 18.3.1
-      react-dom:
-        specifier: ^18.3.0
-        version: 18.3.1(react@18.3.1)
-      typescript:
-        specifier: ^5.6.0
-        version: 5.9.3
-      vitest:
-        specifier: ^2.1.0
-        version: 2.1.9(@types/node@22.20.0)(jsdom@24.1.3)(lightningcss@1.32.0)
-
-  board:
-    dependencies:
-      lucide-react:
-        specifier: ^0.474.0
-        version: 0.474.0(react@18.3.1)
-      react:
-        specifier: ^18.3.1
-        version: 18.3.1
-      react-dom:
-        specifier: ^18.3.1
-        version: 18.3.1(react@18.3.1)
-      simple-icons:
-        specifier: ^16.27.1
-        version: 16.27.1
-    devDependencies:
-      '@types/react':
-        specifier: ^18.3.0
-        version: 18.3.31
-      '@types/react-dom':
-        specifier: ^18.3.0
-        version: 18.3.7(@types/react@18.3.31)
-      typescript:
-        specifier: ^5.6.0
-        version: 5.9.3
-      vitest:
-        specifier: ^2.1.9
-        version: 2.1.9(@types/node@22.20.0)(jsdom@30.0.1)(lightningcss@1.32.0)
-
-  flow:
-    dependencies:
-      '@swarm/board':
-        specifier: workspace:*
-        version: link:../board
-      lucide-react:
-        specifier: ^0.474.0
-        version: 0.474.0(react@18.3.1)
-      react:
-        specifier: ^18.3.1
-        version: 18.3.1
-      react-dom:
-        specifier: ^18.3.1
-        version: 18.3.1(react@18.3.1)
-      zustand:
-        specifier: ^5.0.0
-        version: 5.0.14(@types/react@18.3.31)(react@18.3.1)
-    devDependencies:
-      '@types/react':
-        specifier: ^18.3.0
-        version: 18.3.31
-      '@types/react-dom':
-        specifier: ^18.3.0
-        version: 18.3.7(@types/react@18.3.31)
-      typescript:
-        specifier: ^5.6.0
-        version: 5.9.3
-      vitest:
-        specifier: ^2.1.9
-        version: 2.1.9(@types/node@22.20.0)(jsdom@30.0.1)(lightningcss@1.32.0)
-
-  lead:
-    dependencies:
-      '@swarm/board':
-        specifier: workspace:*
-        version: link:../board
-      '@swarm/pheromone':
-        specifier: workspace:*
-        version: link:../pheromone
-      lucide-react:
-        specifier: ^0.400.0
-        version: 0.400.0(react@18.3.1)
-    devDependencies:
-      '@tauri-apps/api':
-        specifier: ^2.1.0
-        version: 2.11.1
-      '@tauri-apps/plugin-shell':
-        specifier: ^2.0.0
-        version: 2.3.5
-      '@types/node':
-        specifier: ^22.0.0
-        version: 22.20.0
-      '@types/react':
-        specifier: ^18.3.0
-        version: 18.3.31
-      react:
-        specifier: ^18.3.0
-        version: 18.3.1
-      typescript:
-        specifier: ^5.6.0
-        version: 5.9.3
-      vitest:
-        specifier: ^2.1.0
-        version: 2.1.9(@types/node@22.20.0)(jsdom@30.0.1)(lightningcss@1.32.0)
-
-  pheromone:
-    dependencies:
-      gray-matter:
-        specifier: ^4.0.3
-        version: 4.0.3
-      lucide-react:
-        specifier: ^0.400.0
-        version: 0.400.0(react@18.3.1)
-      remark:
-        specifier: ^15.0.0
-        version: 15.0.1
-      remark-parse:
-        specifier: ^11.0.0
-        version: 11.0.0
-      sql.js:
-        specifier: ^1.12.0
-        version: 1.14.1
-      unified:
-        specifier: ^11.0.0
-        version: 11.0.5
-    devDependencies:
-      '@tauri-apps/api':
-        specifier: ^2.11.1
-        version: 2.11.1
-      '@types/node':
-        specifier: ^22.0.0
-        version: 22.20.0
-      '@types/react':
-        specifier: ^18.3.0
-        version: 18.3.31
-      '@types/sql.js':
-        specifier: ^1.4.11
-        version: 1.4.11
-      react:
-        specifier: ^18.3.0
-        version: 18.3.1
-      typescript:
-        specifier: ^5.6.0
-        version: 5.9.3
-      vitest:
-        specifier: ^2.1.0
-        version: 2.1.9(@types/node@22.20.0)(jsdom@30.0.1)(lightningcss@1.32.0)
-
-  pheromone/pheromone-mcp:
-    dependencies:
-      '@swarm/lead':
-        specifier: workspace:*
-        version: link:../../lead
-      '@swarm/mind':
-        specifier: workspace:*
-        version: link:../../swarmmind
-      '@swarm/pheromone':
-        specifier: workspace:*
-        version: link:..
-    devDependencies:
-      '@types/node':
-        specifier: ^22.0.0
-        version: 22.20.0
-      typescript:
-        specifier: ^5.6.0
-        version: 5.9.3
-
-  reports:
-    dependencies:
-      lucide-react:
-        specifier: ^0.474.0
-        version: 0.474.0(react@18.3.1)
-      react:
-        specifier: ^18.3.1
-        version: 18.3.1
-      react-dom:
-        specifier: ^18.0.0 || ^19.0.0
-        version: 18.3.1(react@18.3.1)
-      zustand:
-        specifier: ^5.0.0
-        version: 5.0.14(@types/react@18.3.31)(react@18.3.1)
-    devDependencies:
-      '@types/node':
-        specifier: ^22.0.0
-        version: 22.20.0
-      '@types/react':
-        specifier: ^18.3.0
-        version: 18.3.31
-      '@types/react-dom':
-        specifier: ^18.3.0
-        version: 18.3.7(@types/react@18.3.31)
-      typescript:
-        specifier: ^5.6.0
-        version: 5.9.3
-      vitest:
-        specifier: ^2.1.0
-        version: 2.1.9(@types/node@22.20.0)(jsdom@30.0.1)(lightningcss@1.32.0)
-
-  swarm:
+  apps/desktop:
     dependencies:
       '@swarm/agents':
         specifier: workspace:*
-        version: link:../agents
+        version: link:../../packages/agents
       '@swarm/board':
         specifier: workspace:*
-        version: link:../board
+        version: link:../../packages/board
       '@swarm/extension':
         specifier: workspace:*
-        version: link:../swarmextension
+        version: link:../../packages/extension
       '@swarm/flow':
         specifier: workspace:*
-        version: link:../flow
+        version: link:../../packages/flow
       '@swarm/lead':
         specifier: workspace:*
-        version: link:../lead
+        version: link:../../packages/lead
       '@swarm/mind':
         specifier: workspace:*
-        version: link:../swarmmind
+        version: link:../../packages/mind
       '@swarm/pheromone':
         specifier: workspace:*
-        version: link:../pheromone
+        version: link:../../packages/pheromone
       '@swarm/pheromone-mcp':
         specifier: workspace:*
-        version: link:../pheromone/pheromone-mcp
+        version: link:../../packages/pheromone-mcp
       '@swarm/plugins':
         specifier: workspace:*
-        version: link:../swarmplugins
+        version: link:../../packages/plugins
       '@swarm/reports':
         specifier: workspace:*
-        version: link:../reports
+        version: link:../../packages/reports
       '@swarm/tasks':
         specifier: workspace:*
-        version: link:../tasks
+        version: link:../../packages/tasks
       '@swarm/voice':
         specifier: workspace:*
-        version: link:../voice
+        version: link:../../packages/voice
       '@swarm/workspace':
         specifier: workspace:*
-        version: link:../workspace
+        version: link:../../packages/workspace
       '@tauri-apps/api':
         specifier: ^2.1.0
         version: 2.11.1
@@ -380,7 +127,102 @@ importers:
         specifier: ^2.1.0
         version: 2.1.9(@types/node@22.20.0)(jsdom@24.1.3)(lightningcss@1.32.0)
 
-  swarmextension:
+  packages/agents:
+    dependencies:
+      '@swarm/board':
+        specifier: workspace:*
+        version: link:../board
+      '@swarm/lead':
+        specifier: workspace:*
+        version: link:../lead
+      '@swarm/pheromone':
+        specifier: workspace:*
+        version: link:../pheromone
+      lucide-react:
+        specifier: ^0.400.0
+        version: 0.400.0(react@18.3.1)
+      xterm:
+        specifier: ^5.3.0
+        version: 5.3.0
+      xterm-addon-fit:
+        specifier: ^0.8.0
+        version: 0.8.0(xterm@5.3.0)
+      xterm-addon-search:
+        specifier: ^0.13.0
+        version: 0.13.0(xterm@5.3.0)
+      xterm-addon-webgl:
+        specifier: ^0.16.0
+        version: 0.16.0(xterm@5.3.0)
+      zustand:
+        specifier: ^5.0.0
+        version: 5.0.14(@types/react@18.3.31)(react@18.3.1)
+    devDependencies:
+      '@tauri-apps/api':
+        specifier: ^2.1.0
+        version: 2.11.1
+      '@tauri-apps/plugin-shell':
+        specifier: ^2.0.0
+        version: 2.3.5
+      '@testing-library/jest-dom':
+        specifier: ^6.4.2
+        version: 6.10.0(@testing-library/dom@10.4.1)
+      '@testing-library/react':
+        specifier: ^14.3.1
+        version: 14.3.1(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      '@types/react':
+        specifier: ^18.3.0
+        version: 18.3.31
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.7(@types/react@18.3.31)
+      jsdom:
+        specifier: ^24.0.0
+        version: 24.1.3
+      react:
+        specifier: ^18.3.0
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.0
+        version: 18.3.1(react@18.3.1)
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.0
+        version: 2.1.9(@types/node@22.20.0)(jsdom@24.1.3)(lightningcss@1.32.0)
+
+  packages/board:
+    dependencies:
+      lucide-react:
+        specifier: ^0.474.0
+        version: 0.474.0(react@18.3.1)
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      simple-icons:
+        specifier: ^16.27.1
+        version: 16.27.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.3.0
+        version: 18.3.31
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.7(@types/react@18.3.31)
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.9
+        version: 2.1.9(@types/node@22.20.0)(jsdom@30.0.1)(lightningcss@1.32.0)
+
+  packages/extension:
     dependencies:
       '@swarm/board':
         specifier: workspace:*
@@ -411,7 +253,72 @@ importers:
         specifier: ^5.6.0
         version: 5.9.3
 
-  swarmmind:
+  packages/flow:
+    dependencies:
+      '@swarm/board':
+        specifier: workspace:*
+        version: link:../board
+      lucide-react:
+        specifier: ^0.474.0
+        version: 0.474.0(react@18.3.1)
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      zustand:
+        specifier: ^5.0.0
+        version: 5.0.14(@types/react@18.3.31)(react@18.3.1)
+    devDependencies:
+      '@types/react':
+        specifier: ^18.3.0
+        version: 18.3.31
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.7(@types/react@18.3.31)
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.9
+        version: 2.1.9(@types/node@22.20.0)(jsdom@30.0.1)(lightningcss@1.32.0)
+
+  packages/lead:
+    dependencies:
+      '@swarm/board':
+        specifier: workspace:*
+        version: link:../board
+      '@swarm/pheromone':
+        specifier: workspace:*
+        version: link:../pheromone
+      lucide-react:
+        specifier: ^0.400.0
+        version: 0.400.0(react@18.3.1)
+    devDependencies:
+      '@tauri-apps/api':
+        specifier: ^2.1.0
+        version: 2.11.1
+      '@tauri-apps/plugin-shell':
+        specifier: ^2.0.0
+        version: 2.3.5
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      '@types/react':
+        specifier: ^18.3.0
+        version: 18.3.31
+      react:
+        specifier: ^18.3.0
+        version: 18.3.1
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.0
+        version: 2.1.9(@types/node@22.20.0)(jsdom@30.0.1)(lightningcss@1.32.0)
+
+  packages/mind:
     dependencies:
       '@swarm/lead':
         specifier: workspace:*
@@ -436,7 +343,69 @@ importers:
         specifier: ^2.1.0
         version: 2.1.9(@types/node@22.20.0)(jsdom@30.0.1)(lightningcss@1.32.0)
 
-  swarmplugins:
+  packages/pheromone:
+    dependencies:
+      gray-matter:
+        specifier: ^4.0.3
+        version: 4.0.3
+      lucide-react:
+        specifier: ^0.400.0
+        version: 0.400.0(react@18.3.1)
+      remark:
+        specifier: ^15.0.0
+        version: 15.0.1
+      remark-parse:
+        specifier: ^11.0.0
+        version: 11.0.0
+      sql.js:
+        specifier: ^1.12.0
+        version: 1.14.1
+      unified:
+        specifier: ^11.0.0
+        version: 11.0.5
+    devDependencies:
+      '@tauri-apps/api':
+        specifier: ^2.11.1
+        version: 2.11.1
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      '@types/react':
+        specifier: ^18.3.0
+        version: 18.3.31
+      '@types/sql.js':
+        specifier: ^1.4.11
+        version: 1.4.11
+      react:
+        specifier: ^18.3.0
+        version: 18.3.1
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.0
+        version: 2.1.9(@types/node@22.20.0)(jsdom@30.0.1)(lightningcss@1.32.0)
+
+  packages/pheromone-mcp:
+    dependencies:
+      '@swarm/lead':
+        specifier: workspace:*
+        version: link:../lead
+      '@swarm/mind':
+        specifier: workspace:*
+        version: link:../mind
+      '@swarm/pheromone':
+        specifier: workspace:*
+        version: link:../pheromone
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+
+  packages/plugins:
     dependencies:
       lucide-react:
         specifier: ^0.474.0
@@ -461,7 +430,38 @@ importers:
         specifier: ^5.6.0
         version: 5.9.3
 
-  tasks:
+  packages/reports:
+    dependencies:
+      lucide-react:
+        specifier: ^0.474.0
+        version: 0.474.0(react@18.3.1)
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.0.0 || ^19.0.0
+        version: 18.3.1(react@18.3.1)
+      zustand:
+        specifier: ^5.0.0
+        version: 5.0.14(@types/react@18.3.31)(react@18.3.1)
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      '@types/react':
+        specifier: ^18.3.0
+        version: 18.3.31
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.7(@types/react@18.3.31)
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.0
+        version: 2.1.9(@types/node@22.20.0)(jsdom@30.0.1)(lightningcss@1.32.0)
+
+  packages/tasks:
     dependencies:
       '@swarm/board':
         specifier: workspace:*
@@ -492,7 +492,7 @@ importers:
         specifier: ^2.1.0
         version: 2.1.9(@types/node@22.20.0)(jsdom@30.0.1)(lightningcss@1.32.0)
 
-  voice:
+  packages/voice:
     dependencies:
       lucide-react:
         specifier: ^0.400.0
@@ -517,7 +517,7 @@ importers:
         specifier: ^2.1.0
         version: 2.1.9(@types/node@22.20.0)(jsdom@30.0.1)(lightningcss@1.32.0)
 
-  workspace:
+  packages/workspace:
     dependencies:
       '@swarm/agents':
         specifier: workspace:*
@@ -1653,6 +1653,7 @@ packages:
   eslint@9.39.4:
     resolution: {integrity: sha512-XoMjdBOwe/esVgEvLmNsD3IRHkm7fbKIUGvrleloJXUZgDHig2IPWNniv+GwjyJXzuNqVjlr5+4yVUZjycJwfQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
     peerDependencies:
       jiti: '*'
