@@ -44,7 +44,7 @@ coverage/
 
 # ==============================================================================
 # Release Installers & Compiled Binaries
-# (Compiled binaries should be published via GitHub Releases / CI, not git tree)
+# (Compiled binaries in root releases/ local staging are ignored)
 # ==============================================================================
 releases/**/*.dmg
 releases/**/*.exe
@@ -54,13 +54,21 @@ releases/**/*.app
 releases/**/*.zip
 releases/**/*.tar.gz
 releases/**/*.rpm
-*.dmg
-*.exe
-*.msi
-*.deb
-*.app
+/releases/*.dmg
+/releases/*.exe
+/releases/*.msi
+/releases/*.deb
+
+# Keep gitkeep placeholders
 !releases/**/.gitkeep
 !download-site/releases/**/.gitkeep
+
+# Explicitly allow download-site release binaries for GitHub Pages static site hosting
+!download-site/releases/**
+!download-site/releases/**/*.dmg
+!download-site/releases/**/*.exe
+!download-site/releases/**/*.msi
+!download-site/releases/**/*.deb
 
 # ==============================================================================
 # Databases & Local Runtime Storage
