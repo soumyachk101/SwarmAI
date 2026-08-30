@@ -283,10 +283,43 @@ export default function HomePage() {
   const handleOpenFolder = async () => {
     try {
       const apis = getTauriAPIs();
-      if (!apis?.open) return;
-      const folderPath = await apis.open({ directory: true, multiple: false, title: "Open Folder" });
-      if (folderPath && typeof folderPath === "string") {
-        await handleFolderSelect(folderPath);
+      if (apis?.open) {
+        const folderPath = await apis.open({ directory: true, multiple: false, title: "Open Folder" });
+        if (folderPath && typeof folderPath === "string") {
+          await handleFolderSelect(folderPath);
+        }
+        return;
+      }
+
+      // Browser Web Fallback (HTML5 File System Access API for Vercel / Chrome / Edge)
+      if (typeof window !== "undefined" && "showDirectoryPicker" in window) {
+        try {
+          const dirHandle = await (window as any).showDirectoryPicker({ mode: "readwrite" });
+          if (dirHandle?.name) {
+            await handleFolderSelect(`/${dirHandle.name}`);
+          }
+        } catch (err: any) {
+          if (err.name !== "AbortError") {
+            console.error("Directory picker error:", err);
+          }
+        }
+        return;
+      }
+
+      // Universal Input Fallback
+      if (typeof document !== "undefined") {
+        const input = document.createElement("input");
+        input.type = "file";
+        (input as any).webkitdirectory = true;
+        input.onchange = async (e: any) => {
+          const files = e.target.files;
+          if (files && files.length > 0) {
+            const firstPath = files[0].webkitRelativePath || files[0].name;
+            const rootDir = firstPath.split("/")[0] || "Workspace";
+            await handleFolderSelect(`/${rootDir}`);
+          }
+        };
+        input.click();
       }
     } catch (e) {
       console.error("Failed to open folder:", e);
