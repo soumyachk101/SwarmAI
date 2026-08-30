@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "turbo run dev",
-    "build": "turbo run build",
+    "build": "turbo run build && cp -r desktop/dist dist",
     "test": "turbo run test",
     "lint": "turbo run lint",
     "package": "./scripts/package-installers.sh",
