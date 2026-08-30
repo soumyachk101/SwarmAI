@@ -3,8 +3,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { X, FolderOpen } from "lucide-react";
-import { invoke } from "@tauri-apps/api/core";
-import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { useWorkspaceStore, folderName, samePath } from "../store.js";
 
 const AGENT_COLORS = ['#c9a227', '#8fae7a', '#7f9db8', '#b79ae0', '#c66b5a', '#7fb3ab'];
@@ -27,17 +25,10 @@ export default function WorkspaceCreateDialog({ open, onClose }: Props) {
     setName("");
     setProjectPath("");
     setCreating(false);
-    // Hand focus back to whatever opened the dialog. Without this the caret
-    // lands on <body> after close and a keyboard user has to Tab in from the
-    // top of the whole app to get back to the sidebar.
     const opener = document.activeElement as HTMLElement | null;
     return () => opener?.focus?.();
   }, [open]);
 
-  // Escape is bound to the window, not the overlay: clicking the backdrop (or
-  // the folder picker stealing and returning focus) leaves focus on <body>,
-  // where a React onKeyDown on the overlay never fires and the dialog becomes
-  // un-dismissable by keyboard.
   useEffect(() => {
     if (!open) return;
     const onEsc = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -47,24 +38,29 @@ export default function WorkspaceCreateDialog({ open, onClose }: Props) {
 
   const handleBrowse = useCallback(async () => {
     try {
-      const apis = { invoke, open: openDialog };
-      if (!apis.open) return;
-      const folderPath = await apis.open({ directory: true, multiple: false, title: "Select Project Folder" });
-      if (folderPath && typeof folderPath === "string") {
-        setProjectPath(folderPath);
+      const isTauri = typeof window !== "undefined" && ("__TAURI_INTERNALS__" in window || "__TAURI__" in window);
+      if (isTauri) {
+        const { open: openDialog } = await import("@tauri-apps/plugin-dialog");
+        const folderPath = await openDialog({ directory: true, multiple: false, title: "Select Project Folder" });
+        if (folderPath && typeof folderPath === "string") {
+          setProjectPath(folderPath);
+        }
+        return;
       }
-    } catch (e) {
-      console.error("Failed to open folder picker:", e);
+      if (typeof window !== "undefined" && "showDirectoryPicker" in window) {
+        const dirHandle = await (window as any).showDirectoryPicker({ mode: "readwrite" });
+        if (dirHandle?.name) {
+          setProjectPath(`/${dirHandle.name}`);
+        }
+      }
+    } catch (e: any) {
+      if (e?.name !== "AbortError") {
+        console.error("Failed to open folder picker:", e);
+      }
     }
   }, []);
 
-  // One folder, one workspace: a second workspace over the same folder gets a
-  // second brain on the same `.pheromone/`, and both then write over each other.
-  // The folder picker can't prevent it, so the dialog has to.
-  const clash = projectPath.trim()
-    ? workspaces.find((w) => samePath(w.boundProjectPath, projectPath.trim()))
-    : undefined;
-  const invalid = clash ? `That folder is already open as “${clash.name}”.` : null;
+  const invalid = Boolean(projectPath && workspaces.some((w) => samePath(w.boundProjectPath, projectPath))) ? `That folder is already open.` : null;
 
   const handleCreate = useCallback(async () => {
     // A name is optional: with a folder picked the agent takes the folder's
@@ -84,9 +80,10 @@ export default function WorkspaceCreateDialog({ open, onClose }: Props) {
     });
     if (projectPath) {
       try {
-        const apis = { invoke, open: openDialog };
-        if (apis.invoke) {
-          await apis.invoke("ensure_pheromone_structure", { projectPath });
+        const isTauri = typeof window !== "undefined" && ("__TAURI_INTERNALS__" in window || "__TAURI__" in window);
+        if (isTauri) {
+          const { invoke } = await import("@tauri-apps/api/core");
+          await invoke("ensure_pheromone_structure", { projectPath });
         }
       } catch (err) { console.warn("[WorkspaceCreateDialog] error:", err); }
     }

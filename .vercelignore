@@ -1,0 +1,13 @@
+# Vercel Ignore
+node_modules
+.git
+.turbo
+dist
+.tauri
+src-tauri/target
+target
+.pnpm-store
+.next
+.cache
+coverage
+*.log

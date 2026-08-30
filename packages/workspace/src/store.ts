@@ -1,11 +1,20 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { appStorage } from '@swarm/agents/storage';
-import { invoke } from '@tauri-apps/api/core';
 import type { TaskCard, NewCardInput } from '@swarm/tasks';
 import { addCard, moveCard } from '@swarm/tasks';
 import { EMPTY_TOOLBOX, type McpServerSpec, type SkillSpec, type Toolbox } from './toolbox.js';
 import { applyToolbox } from './toolboxIO.js';
+
+const isTauriEnv = () => typeof window !== 'undefined' && ('__TAURI_INTERNALS__' in window || '__TAURI__' in window);
+
+async function safeInvoke<T>(cmd: string, args?: Record<string, unknown>): Promise<T> {
+  if (!isTauriEnv()) {
+    return {} as T;
+  }
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke<T>(cmd, args);
+}
 
 /** A git worktree ("tree") under a agent's repo: a separate checked-out
  *  directory on its own branch, so agents in different trees never collide. */
@@ -186,15 +195,15 @@ export const useWorkspaceStore = create<WorkspaceState>()(persist((set, get) => 
     const existing = new Set((ws.worktrees ?? []).map((t) => t.id));
     let taskId = base, n = 2;
     while (existing.has(taskId)) taskId = `${base}-${n++}`;
-    const info = await invoke<{ path: string; branch: string; task_id: string }>('create_worktree', {
+    const info = await safeInvoke<{ path: string; branch: string; task_id: string }>('create_worktree', {
       projectPath: ws.boundProjectPath,
       taskId,
     });
     // Backend may reuse/suffix (e.g. leftover agent/style branch → same tree or style-2).
-    const id = info.task_id || taskId;
-    const already = (ws.worktrees ?? []).find((t) => t.id === id || t.path === info.path);
+    const id = info?.task_id || taskId;
+    const already = (ws.worktrees ?? []).find((t) => t.id === id || t.path === info?.path);
     if (already) return already;
-    const tree: Worktree = { id, name: name.trim() || id, branch: info.branch, path: info.path };
+    const tree: Worktree = { id, name: name.trim() || id, branch: info?.branch || 'main', path: info?.path || '' };
     set((state) => ({
       workspaces: state.workspaces.map((w) =>
         w.id === workspaceId ? { ...w, worktrees: [...(w.worktrees ?? []), tree] } : w,
@@ -210,7 +219,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(persist((set, get) => 
     const ws = get().workspaces.find((w) => w.id === workspaceId);
     const tree = ws?.worktrees?.find((t) => t.id === worktreeId);
     if (!ws || !tree) return;
-    await invoke('remove_worktree', { projectPath: ws.boundProjectPath, worktreePath: tree.path });
+    await safeInvoke('remove_worktree', { projectPath: ws.boundProjectPath, worktreePath: tree.path });
     set((state) => ({
       workspaces: state.workspaces.map((w) =>
         w.id === workspaceId ? { ...w, worktrees: (w.worktrees ?? []).filter((t) => t.id !== worktreeId) } : w,
@@ -224,7 +233,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(persist((set, get) => 
     if (!ws || !tree) throw new Error('Tree not found');
     // Merges tree.branch into the main repo's current branch, then removes the
     // worktree. Throws on merge conflict (git leaves the merge in progress).
-    await invoke('merge_worktree', { projectPath: ws.boundProjectPath, branch: tree.branch, worktreePath: tree.path });
+    await safeInvoke('merge_worktree', { projectPath: ws.boundProjectPath, branch: tree.branch, worktreePath: tree.path });
     set((state) => ({
       workspaces: state.workspaces.map((w) =>
         w.id === workspaceId ? { ...w, worktrees: (w.worktrees ?? []).filter((t) => t.id !== worktreeId) } : w,

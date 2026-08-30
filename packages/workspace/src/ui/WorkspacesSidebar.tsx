@@ -55,12 +55,21 @@ import {
   Gauge,
   type LucideIcon,
 } from "lucide-react";
-import { invoke } from "@tauri-apps/api/core";
 import { useWorkspaceStore, getActiveProjectPath, type Workspace } from "../store.js";
 import { useAgentsStore, type AgentStatus } from "@swarm/agents/ui";
 import { useProjectStore } from "../openFiles.js";
-import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import WorkspaceCreateDialog from "./WorkspaceCreateDialog.js";
+
+const isTauriEnv = (): boolean =>
+  typeof window !== "undefined" && ("__TAURI_INTERNALS__" in window || "__TAURI__" in window);
+
+async function invoke<T = any>(cmd: string, args?: Record<string, unknown>): Promise<T> {
+  if (!isTauriEnv()) {
+    return "" as unknown as T;
+  }
+  const { invoke: tauriInvoke } = await import("@tauri-apps/api/core");
+  return tauriInvoke<T>(cmd, args);
+}
 
 const MIN_WIDTH = 250;
 const MAX_WIDTH = 550;
@@ -494,9 +503,9 @@ function SearchPanel({
         command: "rg",
         args: ["--no-heading", "--line-number", query, projectPath],
       });
-      const lines = grep.split("\n").filter(Boolean).slice(0, 100);
+      const lines = (typeof grep === "string" ? grep : "").split("\n").filter(Boolean).slice(0, 100);
       setResults(
-        lines.flatMap((l) => {
+        lines.flatMap((l: string) => {
           const m = l.match(/^(.*?):(\d+):([\s\S]*)$/);
           return m ? [{ path: m[1], line: parseInt(m[2], 10), text: m[3] }] : [];
         })
@@ -1866,9 +1875,11 @@ function ProjectGroup({
   const colorScheme = colorSchemes[Math.abs(ws.name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0)) % colorSchemes.length];
 
   useEffect(() => {
-    if (!isActive || !ws.boundProjectPath) { setMissing(false); return; }
+    const isTauri = typeof window !== "undefined" && ("__TAURI_INTERNALS__" in window || "__TAURI__" in window);
+    if (!isActive || !ws.boundProjectPath || !isTauri) { setMissing(false); return; }
     let cancelled = false;
-    invoke("list_directory", { path: ws.boundProjectPath })
+    import("@tauri-apps/api/core")
+      .then(({ invoke }) => invoke("list_directory", { path: ws.boundProjectPath }))
       .then(() => { if (!cancelled) setMissing(false); })
       .catch(() => { if (!cancelled) setMissing(true); });
     return () => { cancelled = true; };
@@ -1877,14 +1888,27 @@ function ProjectGroup({
   const bindRepo = async () => {
     setError(null);
     try {
-      const apis = { invoke, open: openDialog };
-      const folder = await apis.open?.({ directory: true, multiple: false, title: "Select a git repository" });
-      if (typeof folder === "string") {
-        const boundTo = useWorkspaceStore.getState().bindFolder(ws.id, folder);
-        activateAndSync(boundTo);
+      const isTauri = typeof window !== "undefined" && ("__TAURI_INTERNALS__" in window || "__TAURI__" in window);
+      if (isTauri) {
+        const { open: openDialog } = await import("@tauri-apps/plugin-dialog");
+        const folder = await openDialog({ directory: true, multiple: false, title: "Select a git repository" });
+        if (typeof folder === "string") {
+          const boundTo = useWorkspaceStore.getState().bindFolder(ws.id, folder);
+          activateAndSync(boundTo);
+        }
+        return;
+      }
+      if (typeof window !== "undefined" && "showDirectoryPicker" in window) {
+        const dirHandle = await (window as any).showDirectoryPicker({ mode: "readwrite" });
+        if (dirHandle?.name) {
+          const boundTo = useWorkspaceStore.getState().bindFolder(ws.id, `/${dirHandle.name}`);
+          activateAndSync(boundTo);
+        }
       }
     } catch (e: any) {
-      setError(String(e?.message ?? e));
+      if (e?.name !== "AbortError") {
+        setError(String(e?.message ?? e));
+      }
     }
   };
 
