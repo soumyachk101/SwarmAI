@@ -637,11 +637,11 @@ export default function ADERightDock({ projectPath, onClose }: Props) {
  return (
  <div
  ref={dockRef}
- className={
- isExpanded
- ? "fixed bottom-0 left-0 right-0 top-11 z-[140] flex flex-col glass-hi shadow-2xl animate-fade-in p-2"
- : "relative h-full flex flex-col glass-rail border-l border-swarm-border/50"
- }
+      className={
+        isExpanded
+          ? "fixed bottom-0 left-0 right-0 top-11 z-[140] flex flex-col glass-hi shadow-2xl animate-fade-in p-2"
+          : "relative h-full flex flex-col glass-rail border-l border-swarm-border/50 min-h-0 overflow-hidden"
+      }
  style={
  isExpanded
  ? {}
@@ -651,10 +651,10 @@ export default function ADERightDock({ projectPath, onClose }: Props) {
  }
  >
         <div
-          className={`shrink-0 flex overflow-x-auto scrollbar-none bg-[#0c0d13]/90 backdrop-blur-md ${
+          className={`shrink-0 flex scrollbar-none bg-swarm-surface/95 backdrop-blur-md ${
             collapsed
-              ? "flex-col items-stretch gap-0.5 py-1 px-1"
-              : "items-center px-1.5 h-10 border-b border-white/[0.06] gap-1"
+              ? "flex-col items-center gap-1.5 py-2 px-1 w-full"
+              : "items-center px-1.5 h-9.5 border-b border-swarm-border/40 gap-1 overflow-x-auto"
           }`}
         >
           {TABS.map((tab) => {
@@ -673,30 +673,39 @@ export default function ADERightDock({ projectPath, onClose }: Props) {
                 title={collapsed ? `${tab.label} — expand panel` : tab.label}
                 aria-label={tab.label}
                 aria-expanded={!collapsed && active}
-                className={`flex items-center justify-center gap-1.5 min-w-0 h-7.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap cursor-pointer ${
-                  collapsed ? "w-8 mx-auto" : "flex-1 px-2"
-                } ${
-                  active
-                    ? "text-white bg-white/[0.08] shadow-xs"
-                    : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]"
+                className={`relative flex items-center justify-center transition-all duration-150 cursor-pointer ${
+                  collapsed
+                    ? `size-9 rounded-xl ${
+                        active
+                          ? "text-swarm-goldHi bg-swarm-gold/[0.16] border border-swarm-gold/40 shadow-[0_0_12px_rgba(var(--swarm-gold),0.2)]"
+                          : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.08]"
+                      }`
+                    : `h-7.5 px-2.5 rounded-lg gap-1.5 text-xs shrink-0 ${
+                        active
+                          ? "text-swarm-goldHi bg-swarm-gold/[0.14] border border-swarm-gold/35 font-semibold shadow-xs"
+                          : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.05]"
+                      }`
                 }`}
               >
-                <Icon className={`size-3.5 shrink-0 ${active ? "text-amber-400" : "text-zinc-500"}`} />
+                {collapsed && active && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-r bg-swarm-gold shadow-[0_0_8px_rgba(var(--swarm-gold),0.8)]" />
+                )}
+                <Icon className={`size-[16px] shrink-0 transition-transform ${active ? "scale-105" : ""}`} />
                 {!compact && !collapsed && <span className="truncate">{tab.label}</span>}
               </button>
             );
           })}
 
-          <button
-            onClick={onClose}
-            className={`size-7 flex items-center justify-center rounded-md text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors shrink-0 cursor-pointer ${
-              collapsed ? "w-full mt-1" : "ml-0.5"
-            }`}
-            title="Close panel"
-            aria-label="Close panel"
-          >
-            <X className="size-3.5" />
-          </button>
+          <div className={collapsed ? "mt-auto pt-2 border-t border-swarm-border/30 w-full flex justify-center" : "ml-auto shrink-0 pl-1"}>
+            <button
+              onClick={onClose}
+              className="size-7 flex items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.08] transition-colors cursor-pointer"
+              title="Close panel"
+              aria-label="Close panel"
+            >
+              <X className="size-3.5" />
+            </button>
+          </div>
         </div>
 
  {!isExpanded && !collapsed && (

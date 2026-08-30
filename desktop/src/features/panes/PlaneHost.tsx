@@ -443,7 +443,7 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
 
     if (swarm.kind === "devchat" || swarm.cli === "devchat")
       return (
-        <div className="flex h-full w-full flex-col overflow-hidden bg-[#0d0f14]">
+        <div className="flex h-full w-full flex-col overflow-hidden bg-swarm-canvas">
           <DevChatStudio
             projectPath={activeWorkspace?.boundProjectPath || workingDir}
             onClose={close}
@@ -890,10 +890,10 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
                   className={`flex flex-col overflow-hidden font-sans antialiased ${
                     shouldHide
                       ? "hidden"
-                      : "relative h-full rounded-2xl border border-white/[0.08] bg-[#12141c]/90 shadow-lg shadow-black/40 transition-[box-shadow,border-color,opacity] duration-200"
+                      : "relative h-full rounded-2xl border border-swarm-border/70 bg-swarm-canvasHi/95 shadow-lg shadow-black/40 transition-[box-shadow,border-color,opacity] duration-200"
                   } ${drag?.id === swarm.id ? "opacity-30" : ""} ${
                     over?.kind === "pane" && over.id === swarm.id ? "ring-2 ring-swarm-gold/70" : ""
-                  } ${focusedPane === swarm.id && !isThisMax ? "ring-1 ring-swarm-gold/40 border-swarm-gold/40 shadow-xl shadow-amber-500/5" : ""}`}
+                  } ${focusedPane === swarm.id && !isThisMax ? "ring-1 ring-swarm-gold/50 border-swarm-gold/60 shadow-xl shadow-swarm-gold/10" : ""}`}
                   style={
                     shouldHide
                       ? undefined
@@ -916,20 +916,15 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
           </div>
         )}
 
-        {/* Live Swarm Telemetry HUD also active on Board View */}
-        {!canvasView && count > 0 && (
-          <SwarmTelemetryHUD agents={flowAgentsMeta} />
-        )}
-
         {/* Overflow hint — smoothly shows remaining hidden panes and hides when at bottom */}
         {!canvasView && !maximizedPane && overflow && scrollBelow > 0 && (
-          <div className="sticky inset-x-0 bottom-1 z-20 flex justify-center">
+          <div className="sticky inset-x-0 bottom-1 z-20 flex justify-center pointer-events-none pb-1">
             <button
               onClick={() => {
                 const el = bodyRef.current;
                 if (el) el.scrollBy({ top: 280, behavior: "smooth" });
               }}
-              className="flex items-center gap-1.5 rounded-full border border-swarm-gold/40 glass-hi px-3 py-0.5 text-micro font-medium text-swarm-goldHi shadow-lg hover:bg-swarm-gold/20 active:scale-95 transition-all cursor-pointer pointer-events-auto"
+              className="flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-[#14161f]/95 backdrop-blur-md px-3 py-1 text-[11px] font-medium text-amber-300 shadow-xl hover:bg-amber-400/20 active:scale-95 transition-all cursor-pointer pointer-events-auto"
               title="Scroll down to see more panes"
             >
               <ChevronDown className="size-3 animate-bounce" />
@@ -938,6 +933,11 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
           </div>
         )}
       </div>
+
+      {/* Live Swarm Telemetry HUD fixed at bottom of Board View */}
+      {!canvasView && count > 0 && (
+        <SwarmTelemetryHUD agents={flowAgentsMeta} />
+      )}
 
       {/* Drag ghost — a small label chip following the cursor while dragging.
           Anchored at the origin and moved by transform: `move` writes that
@@ -1070,27 +1070,28 @@ function PlaneAddMenu({
  */
 function ViewToggle({ view, onChange }: { view: BoardView; onChange: (v: BoardView) => void }) {
   const opts: { id: BoardView; label: string; hint: string; Icon: React.ComponentType<{ size?: number; className?: string }> }[] = [
-    { id: "board", label: "Board", hint: "Every pane in equal slots", Icon: BoardLogo },
-    { id: "flow", label: "Flow", hint: "Place panes freely on an infinite canvas", Icon: FlowMark },
+    { id: "board", label: "Board", hint: "Tile grid layout", Icon: BoardLogo },
+    { id: "flow", label: "Flow", hint: "Interactive node canvas", Icon: FlowMark },
   ];
   return (
-    <div className="flex shrink-0 items-center gap-0.5 rounded-lg glass-inset p-0.5" role="group" aria-label="Layout">
+    <div className="flex shrink-0 items-center gap-0.5 rounded-lg bg-black/40 border border-white/[0.08] p-0.5" role="group" aria-label="Layout">
       {opts.map(({ id, label, hint, Icon }) => {
         const on = view === id;
         return (
           <button
             key={id}
+            type="button"
             onClick={() => onChange(id)}
             title={`${label} — ${hint}`}
             aria-pressed={on}
-            className={`flex items-center gap-1.5 rounded-md px-2 py-1 text-mini font-medium transition-colors ${
+            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all cursor-pointer ${
               on
-                ? "bg-swarm-gold/20 text-swarm-goldHi shadow-[inset_0_1px_0_0_rgb(var(--swarm-text)/0.10)]"
-                : "text-swarm-textMuted hover:bg-swarm-border/40 hover:text-swarm-text"
+                ? "bg-swarm-gold/20 text-swarm-goldHi border border-swarm-gold/30 font-semibold shadow-xs"
+                : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04] border border-transparent"
             }`}
           >
-            <Icon size={14} />
-            {label}
+            <Icon size={12} className={on ? "text-swarm-gold" : "text-zinc-400"} />
+            <span>{label}</span>
           </button>
         );
       })}

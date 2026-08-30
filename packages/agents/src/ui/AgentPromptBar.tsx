@@ -141,10 +141,10 @@ function AgentPromptBar({
        setSettingsMenuOpen(false);
      }
    };
-   window.addEventListener("mousedown", onDown as any);
+   window.addEventListener("click", onDown as any);
    window.addEventListener("keydown", onKey);
    return () => {
-     window.removeEventListener("mousedown", onDown as any);
+     window.removeEventListener("click", onDown as any);
      window.removeEventListener("keydown", onKey);
    };
  }, [modelMenuOpen, effortMenuOpen, settingsMenuOpen, setModelMenuOpen, setEffortMenuOpen, setSettingsMenuOpen]);
@@ -168,26 +168,28 @@ function AgentPromptBar({
  [promptTextareaRef, sendTerminal, setCommandSuggestionsOpen],
  );
 
- return (
- <div className="relative shrink-0 z-20">
- {/* Brand-colored accent glow line */}
- <div
- className="absolute -top-px left-4 right-4 h-px rounded-full"
- style={{
- background: `linear-gradient(90deg, transparent, ${brandColor}90, ${brandColor}50, transparent)`,
- filter: `blur(0.5px) drop-shadow(0 0 3px ${brandColor}60)`,
- }}
- />
-  <div className="p-2.5 pt-2">
-    <div className="relative rounded-2xl border border-white/[0.08] bg-[#0c0e14]/[0.98] backdrop-blur-2xl shadow-2xl shadow-black/50 transition-all duration-200 focus-within:border-white/[0.18] focus-within:shadow-black/60 p-3 flex flex-col gap-2">
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
+  return (
+    <div className="relative shrink-0 z-20 bg-[#0c0e16] border-t border-white/[0.08] p-2">
+      {/* Brand-colored accent glow line */}
+      <div
+        className="absolute -top-px left-4 right-4 h-px rounded-full"
+        style={{
+          background: `linear-gradient(90deg, transparent, ${brandColor}90, ${brandColor}50, transparent)`,
+          filter: `blur(0.5px) drop-shadow(0 0 3px ${brandColor}60)`,
+        }}
+      />
+      <div
+        style={{ backgroundColor: "#121520" }}
+        className="relative rounded-2xl border border-white/[0.12] shadow-2xl shadow-black/80 transition-all duration-200 focus-within:border-swarm-gold/60 focus-within:shadow-black/90 p-2.5 flex flex-col gap-2"
+      >
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
 
       {/* Top: Slash Command Autocomplete & Textarea */}
       <div className="relative w-full">
         {/* Slash Command Autocomplete */}
         {isSlashCommand && commandSuggestionsOpen && commands.length > 0 && (
           <div
-            style={{ backgroundColor: "#151824", opacity: 1, zIndex: 100 }}
+            style={{ backgroundColor: "#151828", opacity: 1, zIndex: 100 }}
             className="absolute bottom-full left-0 mb-2 w-full max-h-[240px] overflow-y-auto rounded-2xl border border-white/[0.2] p-2 shadow-[0_20px_60px_rgba(0,0,0,1)] scrollbar-sleek"
           >
             <div className="px-2.5 py-1.5 text-[10px] font-bold text-white/50 tracking-wider uppercase flex items-center justify-between border-b border-white/[0.1] mb-1.5">
@@ -252,18 +254,24 @@ function AgentPromptBar({
           {/* Model Selector */}
           <div ref={modelMenuRef} className="relative">
             <button
-              onClick={() => {
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
                 setModelMenuOpen((v) => !v);
                 setEffortMenuOpen(false);
                 setSettingsMenuOpen(false);
               }}
-              className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.06] hover:border-white/[0.12] text-xs text-swarm-textDim hover:text-swarm-text transition-all font-medium group"
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs transition-all font-medium cursor-pointer ${
+                modelMenuOpen
+                  ? "bg-swarm-gold/15 border-swarm-gold/50 text-swarm-goldHi shadow-xs"
+                  : "bg-white/[0.04] hover:bg-white/[0.08] border-white/[0.08] hover:border-white/[0.16] text-zinc-300 hover:text-white"
+              }`}
               title={`${brandName}: ${currentModel}`}
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={brandColor} strokeWidth="2.8" strokeLinecap="round" className="shrink-0">
                 <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07l14.14-14.14" />
               </svg>
-              <span className="font-semibold text-swarm-text/90 max-w-[150px] truncate">
+              <span className="font-semibold text-swarm-text max-w-[150px] truncate">
                 {isDetectingModels ? (
                   <span className="flex items-center gap-1">
                     <Loader2 size={10} className="animate-spin text-swarm-gold/70" />
@@ -274,13 +282,17 @@ function AgentPromptBar({
                 )}
               </span>
               {!isDetectingModels && (
-                <ChevronDown size={11} className="text-swarm-textMuted/70 group-hover:text-swarm-text shrink-0" />
+                <ChevronDown size={11} className={`text-zinc-400 transition-transform duration-150 ${modelMenuOpen ? "rotate-180 text-swarm-gold" : ""}`} />
               )}
             </button>
 
             {modelMenuOpen && (
-              <div className="absolute bottom-full left-0 mb-2 min-w-[260px] max-w-[340px] rounded-xl border border-white/[0.12] bg-[#141720] p-1.5 shadow-2xl z-50 animate-fade-in flex flex-col">
-                <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase flex items-center justify-between border-b border-white/[0.06] mb-1">
+              <div
+                onClick={(e) => e.stopPropagation()}
+                style={{ bottom: "calc(100% + 8px)", top: "auto", left: 0, backgroundColor: "#141724" }}
+                className="absolute mb-1.5 min-w-[270px] max-w-[340px] rounded-xl border border-white/[0.16] p-1.5 shadow-[0_20px_60px_rgba(0,0,0,1)] z-[300] animate-scale-in flex flex-col"
+              >
+                <div className="px-2 py-1 text-[10px] font-bold text-zinc-400 tracking-wider uppercase flex items-center justify-between border-b border-white/[0.08] mb-1">
                   <span style={{ color: brandColor }}>{brandName}</span>
                   <div className="flex items-center gap-1.5">
                     {autoModelDetectionError && (
@@ -299,14 +311,14 @@ function AgentPromptBar({
                       value={modelSearchQuery}
                       onChange={(e) => setModelSearchQuery(e.target.value)}
                       placeholder="Search models..."
-                      className="w-full bg-white/[0.05] border border-white/[0.1] rounded-lg px-2 py-1 text-[11px] text-swarm-text placeholder:text-swarm-textMuted/50 focus:outline-none focus:border-swarm-gold/50"
+                      className="w-full bg-white/[0.06] border border-white/[0.12] rounded-lg px-2 py-1 text-[11px] text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:border-swarm-gold/50"
                       onClick={(e) => e.stopPropagation()}
                       autoFocus
                     />
                   </div>
                 )}
 
-                <div className="max-h-[260px] overflow-y-auto custom-scrollbar flex flex-col gap-0.5">
+                <div className="max-h-[260px] overflow-y-auto scrollbar-sleek flex flex-col gap-0.5">
                   {detectedModels
                     .filter((m) => {
                       if (!modelSearchQuery.trim()) return true;
@@ -327,15 +339,15 @@ function AgentPromptBar({
                         <button
                           key={m.id}
                           type="button"
-                          onMouseDown={(e) => {
-                            e.preventDefault();
+                          onClick={(e) => {
                             e.stopPropagation();
                             onSelectModel(m.id, m.label);
+                            setModelMenuOpen(false);
                           }}
-                          className={`flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-xs text-left transition-colors group cursor-pointer ${
+                          className={`flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-xs text-left transition-colors cursor-pointer ${
                             isSelected
-                              ? "bg-white/[0.1] text-white font-medium"
-                              : "text-swarm-textDim hover:bg-white/[0.08] hover:text-swarm-text"
+                              ? "bg-swarm-gold/20 text-swarm-goldHi font-bold"
+                              : "text-zinc-300 hover:bg-white/[0.08] hover:text-white"
                           }`}
                         >
                           <div className="flex items-center gap-1.5 min-w-0 pr-2">
@@ -348,11 +360,11 @@ function AgentPromptBar({
                           </div>
                           <div className="flex items-center gap-1.5 shrink-0">
                             {m.pricing && (
-                              <span className="text-[10px] tabular-nums text-swarm-textMuted/60 group-hover:text-swarm-textMuted/90">
+                              <span className="text-[10px] tabular-nums text-zinc-500">
                                 {m.pricing}
                               </span>
                             )}
-                            {isSelected && <Check size={12} className="text-swarm-gold ml-0.5" />}
+                            {isSelected && <Check size={12} className="text-swarm-gold stroke-[2.5]" />}
                           </div>
                         </button>
                       );
@@ -366,38 +378,58 @@ function AgentPromptBar({
           {supportsEffort && effortLevels && effortLevels.length > 0 && (
             <div ref={effortMenuRef} className="relative">
               <button
-                onClick={() => {
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
                   setEffortMenuOpen((v) => !v);
                   setModelMenuOpen(false);
                   setSettingsMenuOpen(false);
                 }}
-                className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.06] hover:border-white/[0.12] text-xs text-swarm-textDim hover:text-swarm-text transition-all font-medium"
-                title="Reasoning Effort"
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs transition-all font-medium cursor-pointer ${
+                  effortMenuOpen
+                    ? "bg-swarm-gold/15 border-swarm-gold/50 text-swarm-goldHi shadow-xs"
+                    : "bg-white/[0.04] hover:bg-white/[0.08] border-white/[0.08] hover:border-white/[0.16] text-zinc-300 hover:text-white"
+                }`}
+                title="Reasoning Effort (/effort)"
               >
-                <span className="font-semibold text-swarm-text/90">{currentEffort}</span>
-                <ChevronDown size={11} className="text-swarm-textMuted/70" />
+                <span className="font-semibold text-swarm-text">{currentEffort || "Max"}</span>
+                <ChevronDown size={11} className={`text-swarm-textMuted transition-transform duration-150 ${effortMenuOpen ? "rotate-180 text-swarm-gold" : ""}`} />
               </button>
 
               {effortMenuOpen && (
-                <div className="absolute bottom-full left-0 mb-2 min-w-[130px] rounded-xl border border-white/[0.12] bg-[#141720] p-1.5 shadow-2xl z-50 animate-fade-in">
-                  <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase border-b border-white/[0.06] mb-1">
-                    Effort Level
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ bottom: "calc(100% + 8px)", top: "auto", left: 0, backgroundColor: "#141724" }}
+                  className="absolute mb-1.5 min-w-[160px] rounded-xl border border-white/[0.16] p-1.5 shadow-[0_20px_60px_rgba(0,0,0,1)] z-[300] animate-scale-in"
+                >
+                  <div className="px-2.5 py-1 text-[10px] font-mono font-bold text-swarm-gold uppercase tracking-wider border-b border-white/[0.08] mb-1 flex items-center justify-between">
+                    <span>Effort Level</span>
+                    <span className="text-[9px] font-normal text-zinc-500 font-sans">/effort</span>
                   </div>
-                  {effortLevels.map((eff) => (
-                    <button
-                      key={eff.id}
-                      type="button"
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        onSelectEffort(eff.id, eff.label);
-                      }}
-                      className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-xs text-left text-swarm-textDim hover:bg-white/[0.08] hover:text-swarm-text transition-colors cursor-pointer"
-                    >
-                      <span className={eff.isHighlight ? "font-bold text-swarm-goldHi" : ""}>{eff.label}</span>
-                      {currentEffort === eff.label && <Check size={12} className="text-swarm-gold" />}
-                    </button>
-                  ))}
+                  {effortLevels.map((eff) => {
+                    const isSelected =
+                      (currentEffort || "").toLowerCase() === eff.id.toLowerCase() ||
+                      (currentEffort || "").toLowerCase() === eff.label.toLowerCase();
+                    return (
+                      <button
+                        key={eff.id}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectEffort(eff.id, eff.label);
+                          setEffortMenuOpen(false);
+                        }}
+                        className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs text-left transition-colors cursor-pointer ${
+                          isSelected
+                            ? "bg-swarm-gold/20 text-swarm-goldHi font-bold"
+                            : "text-zinc-300 hover:bg-white/[0.08] hover:text-white"
+                        }`}
+                      >
+                        <span className={eff.isHighlight ? "font-bold text-swarm-goldHi" : ""}>{eff.label}</span>
+                        {isSelected && <Check size={13} className="text-swarm-gold stroke-[2.5]" />}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -418,7 +450,8 @@ function AgentPromptBar({
           {/* CLI Shortcuts / Tools */}
           <div ref={settingsMenuRef} className="relative">
             <button
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 setSettingsMenuOpen((v) => !v);
                 setModelMenuOpen(false);
                 setEffortMenuOpen(false);
@@ -430,27 +463,31 @@ function AgentPromptBar({
             </button>
 
             {settingsMenuOpen && (
-              <div className="absolute bottom-full right-0 mb-2 min-w-[185px] rounded-xl border border-white/[0.12] bg-[#141720] p-1.5 shadow-2xl z-50 animate-fade-in">
-                <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase border-b border-white/[0.06] mb-1">
+              <div
+                onClick={(e) => e.stopPropagation()}
+                style={{ bottom: "calc(100% + 8px)", top: "auto", right: 0, backgroundColor: "#141724" }}
+                className="absolute mb-1.5 min-w-[185px] rounded-xl border border-white/[0.16] p-1.5 shadow-[0_20px_60px_rgba(0,0,0,1)] z-[300] animate-scale-in"
+              >
+                <div className="px-2 py-1 text-[10px] font-bold text-swarm-textMuted/70 tracking-wider uppercase border-b border-swarm-border/50 mb-1">
                   Commands
                 </div>
                 {[
                   { label: "Status & Model (/status)", cmd: "\x15/status\r" },
-                  { label: "Check Cost (/cost)", cmd: "\x15/cost\r" },
-                  { label: "Compact Context (/compact)", cmd: "\x15/compact\r" },
-                  { label: "Clear Session (/clear)", cmd: "\x15/clear\r" },
-                  { label: "Doctor Diagnostic (/doctor)", cmd: "\x15/doctor\r" },
-                  { label: "Review Diffs (/review)", cmd: "\x15/review\r" },
-                ].map((sc) => (
+                  { label: "Compact History (/compact)", cmd: "\x15/compact\r" },
+                  { label: "Cost & Tokens (/cost)", cmd: "\x15/cost\r" },
+                  { label: "Clear Screen (/clear)", cmd: "\x15/clear\r" },
+                  { label: "Review Diff (/review)", cmd: "\x15/review\r" },
+                  { label: "Reset Session (/reset)", cmd: "\x15/reset\r" },
+                ].map((item) => (
                   <button
-                    key={sc.label}
+                    key={item.label}
                     onClick={() => {
+                      sendTerminal(item.cmd);
                       setSettingsMenuOpen(false);
-                      sendTerminal(sc.cmd);
                     }}
-                    className="flex w-full items-center rounded-lg px-2 py-1.5 text-xs text-left text-swarm-textDim hover:bg-white/[0.08] hover:text-swarm-text transition-colors cursor-pointer"
+                    className="flex w-full items-center px-2 py-1.5 text-xs text-swarm-textDim hover:bg-white/[0.06] hover:text-swarm-text rounded-md text-left transition-colors cursor-pointer"
                   >
-                    {sc.label}
+                    {item.label}
                   </button>
                 ))}
               </div>
@@ -474,8 +511,7 @@ function AgentPromptBar({
       </div>
     </div>
   </div>
-</div>
- );
+  );
 }
 
 export default AgentPromptBar;

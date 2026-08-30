@@ -242,34 +242,34 @@ export default function VoiceHotkeys() {
   };
 
   return (
-    <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[300] flex items-center gap-3 px-4 py-2 rounded-full border border-amber-500/40 bg-zinc-950/90 text-zinc-100 shadow-[0_12px_40px_rgba(0,0,0,0.8),0_0_24px_rgba(245,158,11,0.25)] backdrop-blur-2xl transition-all duration-300 animate-in fade-in slide-in-from-top-3">
+    <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[300] flex items-center gap-3.5 px-4.5 py-2.5 rounded-full border border-amber-400/40 bg-[#090b10]/95 text-zinc-100 shadow-[0_12px_40px_rgba(0,0,0,0.85),0_0_24px_rgba(251,191,36,0.3)] backdrop-blur-2xl transition-all duration-300 animate-voice-island">
       
       {/* Status Mic or Loader */}
-      <div className="flex items-center gap-2">
-        <div className={`flex size-6 items-center justify-center rounded-full ${
+      <div className="flex items-center gap-2.5">
+        <div className={`flex size-7 items-center justify-center rounded-full transition-all ${
           phase.error
-            ? "bg-red-500/20 text-red-400"
+            ? "bg-red-500/20 text-red-400 border border-red-500/30"
             : phase.busy || phase.isInstalling
-            ? "bg-amber-500/20 text-amber-400"
-            : "bg-red-500/20 text-red-400 shadow-[0_0_12px_rgba(239,68,68,0.4)]"
+            ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+            : "bg-red-500/25 text-red-400 border border-red-500/40 shadow-[0_0_14px_rgba(239,68,68,0.6)]"
         }`}>
           {phase.error ? (
-            <AlertCircle className="size-3.5" />
+            <AlertCircle className="size-4" />
           ) : phase.busy || phase.isInstalling ? (
-            <Loader2 className="size-3.5 animate-spin" />
+            <Loader2 className="size-4 animate-spin" />
           ) : (
-            <Mic className="size-3.5 animate-pulse" />
+            <Mic className="size-4 animate-pulse" />
           )}
         </div>
 
-        {/* Live Audio Visualizer Bars */}
+        {/* Live Audio Visualizer Waveform */}
         {!phase.busy && !phase.isInstalling && !phase.error && (
-          <div className="flex items-center gap-[3px] h-4 px-1">
-            <span className="w-[3px] bg-amber-400 rounded-full animate-[voice-bar_0.8s_ease-in-out_infinite_alternate]" style={{ height: '8px', animationDelay: '0ms' }} />
-            <span className="w-[3px] bg-amber-400 rounded-full animate-[voice-bar_0.6s_ease-in-out_infinite_alternate]" style={{ height: '14px', animationDelay: '150ms' }} />
-            <span className="w-[3px] bg-amber-300 rounded-full animate-[voice-bar_0.9s_ease-in-out_infinite_alternate]" style={{ height: '10px', animationDelay: '300ms' }} />
-            <span className="w-[3px] bg-amber-400 rounded-full animate-[voice-bar_0.7s_ease-in-out_infinite_alternate]" style={{ height: '16px', animationDelay: '75ms' }} />
-            <span className="w-[3px] bg-amber-400 rounded-full animate-[voice-bar_0.5s_ease-in-out_infinite_alternate]" style={{ height: '6px', animationDelay: '220ms' }} />
+          <div className="flex items-center gap-[3.5px] h-6 px-1">
+            <span className="w-[3px] bg-amber-400 rounded-full animate-[voice-wave-1_0.9s_ease-in-out_infinite_alternate]" style={{ height: '8px' }} />
+            <span className="w-[3px] bg-amber-300 rounded-full animate-[voice-wave-2_0.75s_ease-in-out_infinite_alternate]" style={{ height: '14px', animationDelay: '100ms' }} />
+            <span className="w-[3.5px] bg-amber-400 rounded-full animate-[voice-wave-3_0.6s_ease-in-out_infinite_alternate]" style={{ height: '22px', animationDelay: '200ms' }} />
+            <span className="w-[3px] bg-amber-300 rounded-full animate-[voice-wave-4_0.8s_ease-in-out_infinite_alternate]" style={{ height: '16px', animationDelay: '150ms' }} />
+            <span className="w-[3px] bg-amber-400 rounded-full animate-[voice-wave-5_0.95s_ease-in-out_infinite_alternate]" style={{ height: '10px', animationDelay: '50ms' }} />
           </div>
         )}
       </div>
@@ -285,17 +285,17 @@ export default function VoiceHotkeys() {
           </span>
         ) : phase.busy ? (
           <span className="text-amber-300 font-semibold flex items-center gap-1.5">
-            <Sparkles className="size-3.5 text-amber-400" />
+            <Sparkles className="size-3.5 text-amber-400 animate-spin" />
             Transcribing with Whisper.cpp…
           </span>
         ) : transcriptPreview ? (
-          <span className="text-emerald-400 font-medium truncate max-w-[280px]">
+          <span className="text-emerald-400 font-semibold truncate max-w-[280px]">
             &ldquo;{transcriptPreview}&rdquo;
           </span>
         ) : (
           <div className="flex items-center gap-2">
-            <span className="text-zinc-200">Listening…</span>
-            <span className="font-mono text-[11px] text-zinc-400 bg-zinc-800/80 px-1.5 py-0.5 rounded">
+            <span className="text-zinc-200 font-semibold">Listening…</span>
+            <span className="font-mono text-[11px] text-amber-300 bg-amber-400/15 border border-amber-400/25 px-2 py-0.5 rounded-full font-bold">
               {formatTime(seconds)}
             </span>
           </div>
@@ -307,10 +307,10 @@ export default function VoiceHotkeys() {
         onClick={toggleMode}
         disabled={phase.busy || phase.isInstalling}
         title="Click to switch target destination"
-        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all ${
+        className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11.5px] font-semibold transition-all cursor-pointer ${
           phase.mode === "lead"
-            ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30"
-            : "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/30"
+            ? "bg-amber-400/15 text-amber-300 border border-amber-400/30 hover:bg-amber-400/25 shadow-xs"
+            : "bg-cyan-400/15 text-cyan-300 border border-cyan-400/30 hover:bg-cyan-400/25 shadow-xs"
         }`}
       >
         {phase.mode === "lead" ? (
@@ -328,20 +328,20 @@ export default function VoiceHotkeys() {
 
       {/* Action Controls: Send & Cancel */}
       {!phase.busy && !phase.isInstalling && !phase.error && (
-        <div className="flex items-center gap-1 pl-1 border-l border-zinc-800">
+        <div className="flex items-center gap-1 pl-1.5 border-l border-white/[0.1]">
           <button
             onClick={() => finishVoice(true)}
             title="Finish & Transcribe (Enter)"
-            className="p-1 rounded-full text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+            className="size-7 flex items-center justify-center rounded-full text-emerald-400 hover:bg-emerald-500/20 transition-colors cursor-pointer"
           >
-            <Check className="size-3.5" />
+            <Check className="size-4 stroke-[2.5]" />
           </button>
           <button
             onClick={cancelVoice}
             title="Cancel (Esc)"
-            className="p-1 rounded-full text-zinc-400 hover:text-red-400 hover:bg-red-500/20 transition-colors"
+            className="size-7 flex items-center justify-center rounded-full text-zinc-400 hover:text-red-400 hover:bg-red-500/20 transition-colors cursor-pointer"
           >
-            <X className="size-3.5" />
+            <X className="size-4 stroke-[2.5]" />
           </button>
         </div>
       )}

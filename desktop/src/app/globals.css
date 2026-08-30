@@ -453,19 +453,52 @@ select:focus {
   }
 }
 
-@keyframes voice-bar {
-  0% {
-    height: 4px;
-    opacity: 0.5;
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+  width: 0px;
+  height: 0px;
+}
+
+@keyframes voice-wave-1 {
+  0%, 100% { height: 4px; opacity: 0.4; }
+  50% { height: 18px; opacity: 1; }
+}
+
+@keyframes voice-wave-2 {
+  0%, 100% { height: 6px; opacity: 0.5; }
+  50% { height: 22px; opacity: 1; }
+}
+
+@keyframes voice-wave-3 {
+  0%, 100% { height: 8px; opacity: 0.6; }
+  50% { height: 26px; opacity: 1; }
+}
+
+@keyframes voice-wave-4 {
+  0%, 100% { height: 5px; opacity: 0.5; }
+  50% { height: 20px; opacity: 1; }
+}
+
+@keyframes voice-wave-5 {
+  0%, 100% { height: 3px; opacity: 0.4; }
+  50% { height: 14px; opacity: 0.9; }
+}
+
+@keyframes voice-island-pulse {
+  0%, 100% {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(var(--swarm-gold), 0.25), 0 0 0 1px rgba(var(--swarm-gold), 0.3);
   }
   50% {
-    height: 16px;
-    opacity: 1;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), 0 0 32px rgba(var(--swarm-gold), 0.45), 0 0 0 1.5px rgba(var(--swarm-gold), 0.6);
   }
-  100% {
-    height: 7px;
-    opacity: 0.7;
-  }
+}
+
+.animate-voice-island {
+  animation: voice-island-pulse 2.4s ease-in-out infinite;
 }
 
 @keyframes pulse-glow {

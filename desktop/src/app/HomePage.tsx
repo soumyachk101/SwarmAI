@@ -297,109 +297,46 @@ export default function HomePage() {
    * The window's top-left corner, rendered inside the sidebar.
    */
   const appRow = (
-    <>
-      {isMac && (
-        isTauri() ? (
-          <div className="w-[70px] shrink-0 h-full select-none" data-tauri-drag-region />
-        ) : (
-          <MacWindowControls
-            onClose={handleClose}
-            onMinimize={handleMinimize}
-            onMaximize={handleMaximize}
-            isMaximized={isMaximized}
-            className="pl-0 pr-2.5"
-          />
-        )
-      )}
-      <SwarmLogo size={18} className="shrink-0" />
-      <OverflowMenu
-        items={[
-          {
-            id: "open",
-            label: "Open project…",
-            hint: "Start or switch a workspace",
-            icon: FolderOpen,
-            onSelect: handleOpenFolder,
-          },
-          {
-            id: "git",
-            label: "Git & GitHub Hub…",
-            hint: "Commit, push, pull, branches",
-            icon: FolderGit2,
-            onSelect: () => setShowGitModal(true),
-          },
-          {
-            id: "dashboard",
-            label: "Swarm Dashboard",
-            hint: "Live agent metrics & logs",
-            icon: Activity,
-            onSelect: () => setShowDashboard(true),
-          },
-          {
-            id: "templates",
-            label: "Task Templates",
-            hint: "Pre-configured multi-agent workflows",
-            icon: Layers,
-            onSelect: () => setShowTemplatesModal(true),
-          },
-          {
-            id: "diff",
-            label: "Diff Preview",
-            hint: "Worktree changes before merge",
-            icon: FileDiff,
-            onSelect: () => setShowDiffModal(true),
-          },
-          {
-            id: "extensions",
-            label: "Extensions",
-            hint: "Agents and tools from Open-VSX",
-            icon: Blocks,
-            onSelect: () => setShowExtensions(true),
-          },
-          {
-            id: "usage",
-            label: "Plan limits",
-            hint: "Token usage per CLI",
-            icon: Gauge,
-            onSelect: () => setShowUsage(true),
-          },
-          {
-            id: "guide",
-            label: "User Guide & Privacy",
-            hint: "How to use Swarm AI & privacy policy",
-            icon: BookOpen,
-            onSelect: () => setShowGuide(true),
-          },
-          {
-            id: "settings",
-            label: "Settings",
-            hint: "API keys and defaults",
-            icon: Settings,
-            onSelect: () => setShowSettings(true),
-          },
-        ]}
-      />
-      <div className="ml-auto flex shrink-0 items-center gap-0.5">
+    <div className="flex w-full items-center justify-between min-w-0">
+      <div className="flex items-center gap-2 min-w-0">
+        {isMac && (
+          isTauri() ? (
+            <div className="w-[65px] shrink-0 h-full select-none" data-tauri-drag-region />
+          ) : (
+            <MacWindowControls
+              onClose={handleClose}
+              onMinimize={handleMinimize}
+              onMaximize={handleMaximize}
+              isMaximized={isMaximized}
+              className="pl-0 pr-1"
+            />
+          )
+        )}
+        <span className="text-xs font-semibold text-zinc-300 truncate tracking-tight">
+          Workspaces
+        </span>
+      </div>
+      <div className="flex shrink-0 items-center gap-1">
         <button
           onClick={() => setBoardOpen(!boardOpen)}
-          className={`rounded-md p-1 transition-colors ${
+          className={`size-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
             boardOpen
-              ? "text-swarm-goldHi bg-swarm-gold/10"
-              : "text-swarm-textMuted hover:text-swarm-text hover:bg-swarm-border/50"
+              ? "text-swarm-goldHi bg-swarm-gold/[0.18] border border-swarm-gold/40 shadow-xs"
+              : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.08]"
           }`}
-          title="Toggle Tasks"
+          title="Toggle Tasks Panel"
         >
-          <Columns3 size={15} />
+          <Columns3 size={14} />
         </button>
         <button
           onClick={() => toggleLeft()}
-          className="rounded-md p-1 text-swarm-textMuted transition-colors hover:bg-swarm-border/50 hover:text-swarm-text"
+          className="size-7 rounded-lg flex items-center justify-center text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.08] transition-all cursor-pointer"
           title="Collapse sidebar"
         >
-          <PanelLeft size={15} />
+          <PanelLeft size={14} />
         </button>
       </div>
-    </>
+    </div>
   );
 
   useEffect(() => {
@@ -458,30 +395,28 @@ export default function HomePage() {
       */}
       <div
         ref={windowControlsRef}
-        className="fixed right-0 top-0 z-[60] flex h-11 items-center gap-1 px-2"
+        className="fixed right-2 top-1.5 z-[60] flex h-8 items-center gap-1"
         data-tauri-drag-region="deep"
       >
-        {/* Window controls only. Everything that acts on the app moved into
-            the sidebar's overflow menu, which is why this corner is now four
-            buttons instead of ten. */}
-        <div className="flex items-center gap-1">
+        {/* Window controls only */}
+        <div className="flex items-center gap-1 bg-[#121520]/95 backdrop-blur-xl px-1.5 py-0.5 rounded-xl border border-white/[0.12] shadow-lg">
           <button
             onClick={() => window.dispatchEvent(new CustomEvent("swarm:voice:toggle", { detail: { mode: "lead" } }))}
-            className="p-1.5 rounded-md text-swarm-textMuted hover:text-swarm-gold hover:bg-swarm-border/40 transition-colors"
+            className="size-7 rounded-lg flex items-center justify-center text-zinc-400 hover:text-swarm-gold hover:bg-white/[0.08] transition-colors cursor-pointer"
             title="Voice Dictation (Click or Win+Alt / Ctrl+Win)"
           >
-            <Mic size={15} />
+            <Mic size={14} />
           </button>
           <button
             onClick={() => toggleRight()}
-            className={`p-1.5 rounded-md transition-colors ${
+            className={`size-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
               rightOpen
-                ? "text-swarm-goldHi bg-swarm-gold/10"
-                : "text-swarm-textMuted hover:text-swarm-text hover:bg-swarm-border/40"
+                ? "text-swarm-goldHi bg-swarm-gold/[0.18] border border-swarm-gold/40 shadow-xs"
+                : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.08]"
             }`}
             title="Toggle right panel"
           >
-            <PanelRight size={15} />
+            <PanelRight size={14} />
           </button>
           {!isMac && (
             <>
@@ -550,31 +485,32 @@ export default function HomePage() {
             workingDir={projectPath || "~/Desktop/SwarmAI"}
             leading={
               leftOpen ? undefined : (
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 shrink-0">
                   {isMac && (
                     isTauri() ? (
-                      <div className="w-[70px] shrink-0 h-full select-none" data-tauri-drag-region />
+                      <div className="w-[65px] shrink-0 h-full select-none" data-tauri-drag-region />
                     ) : (
                       <MacWindowControls
                         onClose={handleClose}
                         onMinimize={handleMinimize}
                         onMaximize={handleMaximize}
                         isMaximized={isMaximized}
-                        className="pl-0 pr-1.5"
+                        className="pl-0 pr-1"
                       />
                     )
                   )}
                   <button
                     onClick={() => toggleLeft()}
-                    className="shrink-0 rounded-md p-1 text-swarm-textMuted transition-colors hover:bg-swarm-border/50 hover:text-swarm-text"
+                    className="size-7 rounded-lg flex items-center justify-center text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.08] transition-all cursor-pointer"
                     title="Show sidebar"
                   >
-                    <PanelLeft size={15} />
+                    <PanelLeft size={14} />
                   </button>
+                  <div className="h-4 w-px bg-white/[0.12] mx-0.5 shrink-0" />
                 </div>
               )
             }
-            reserveRight={dockVisible ? 0 : windowControlsWidth}
+            reserveRight={dockVisible ? 0 : windowControlsWidth + 16}
           />
           {/* Tasks is docked to the center, outside the plane, so switching
               planes never moves it. A fullscreen plane covers it — the plane's
@@ -598,7 +534,7 @@ export default function HomePage() {
         {dockVisible && (
           <div
             ref={dockRef}
-            className="relative flex-shrink-0"
+            className="relative flex-shrink-0 h-full flex flex-col box-border min-h-0"
             // The dock reaches the window's top-right corner, where the
             // window controls float. Start its content below them.
             style={{ paddingTop: 44 }}
@@ -612,7 +548,7 @@ export default function HomePage() {
           carries the four things worth glancing at — where you are, what the
           repo looks like, and whether anything is running or has failed. */}
       {/* Luxury Pro Developer Status Bar */}
-      <div className="h-7 border-t border-white/[0.08] bg-[#07080d]/98 backdrop-blur-2xl flex items-center gap-2.5 px-3 text-mini select-none z-10 font-sans">
+      <div className="h-7 border-t border-swarm-border/50 bg-swarm-surface/98 backdrop-blur-2xl flex items-center gap-2.5 px-3 text-mini select-none z-10 font-sans text-swarm-textDim">
         {projectPath && (
           <span
             className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/[0.08] text-zinc-300 font-mono text-[11px] max-w-[200px] truncate shadow-xs"
@@ -686,7 +622,18 @@ export default function HomePage() {
           onClose={() => setShowTemplatesModal(false)}
         />
       )}
-      {showSettings && <SettingsPage onClose={() => setShowSettings(false)} />}
+      {showSettings && (
+        <SettingsPage
+          onClose={() => setShowSettings(false)}
+          onOpenProject={handleOpenFolder}
+          onOpenGit={() => setShowGitModal(true)}
+          onOpenDashboard={() => setShowDashboard(true)}
+          onOpenTemplates={() => setShowTemplatesModal(true)}
+          onOpenDiff={() => setShowDiffModal(true)}
+          onOpenExtensions={() => setShowExtensions(true)}
+          onOpenUsage={() => setShowUsage(true)}
+        />
+      )}
       {showExtensions && <ExtensionsMarketplace onClose={() => setShowExtensions(false)} />}
       {showUpdates && <UpdateCheckerModal isOpen={showUpdates} onClose={() => setShowUpdates(false)} />}
       {showGuide && <UserGuideModal isOpen={showGuide} onClose={() => setShowGuide(false)} />}

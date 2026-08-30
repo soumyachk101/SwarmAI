@@ -4,23 +4,8 @@ const config: Config = {
   content: [
     './index.html',
     './src/**/*.{js,ts,jsx,tsx}',
-    // Sibling workspace packages ship React UI with Tailwind classes; scan them
-    // too or their utilities (text sizes, spacing) get purged and render huge.
-    // These paths are case-SENSITIVE on Linux/CI even though macOS APFS lets a
-    // wrong case slide: a stale capitalised glob here matches nothing there and
-    // silently purges every class those packages use.
-    '../tasks/src/**/*.{ts,tsx}',
-    '../agents/src/ui/**/*.{ts,tsx}',
-    '../workspace/src/ui/**/*.{ts,tsx}',
-    '../lead/src/ui/**/*.{ts,tsx}',
-    '../voice/src/ui/**/*.{ts,tsx}',
-    '../pheromone/src/ui/**/*.{ts,tsx}',
-    '../board/src/**/*.{ts,tsx}',
-    '../flow/src/**/*.{ts,tsx}',
-    '../swarmplugins/src/**/*.{ts,tsx}',
-    '../swarmextension/src/**/*.{ts,tsx}',
-    '../tasks/dist/**/*.js',
-    '../swarmplugins/dist/**/*.js',
+    '../packages/*/src/**/*.{js,ts,jsx,tsx}',
+    '../packages/**/ui/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {

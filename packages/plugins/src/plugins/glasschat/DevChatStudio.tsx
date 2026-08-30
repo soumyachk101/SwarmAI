@@ -159,7 +159,7 @@ const INITIAL_MESSAGES: DevChatMessage[] = [
   {
     id: "msg-welcome",
     sender: "assistant",
-    text: "I am your AI Copilot powered by **Claude 5 Opus**. You can ask technical questions, write and refactor code, inspect project structure, or attach context with `@`.",
+    text: "I am your AI Copilot powered by **Claude 5 Opus**. You can ask technical questions, write and refactor code, inspect project structure, and run tasks.",
     timestamp: "Just now",
   },
 ];
@@ -288,12 +288,12 @@ function generateSmartAssistantResponse(query: string, modelName: string): { rep
     if (isHindi) {
       return {
         thought: `1. Formulating capabilities overview in Hindi.`,
-        reply: `Main aapka **AI Assistant & Coding Copilot** hu (powered by ${modelName}).\n\nMain aapki in cheezon me madad kar sakta hu:\n- **Technical Questions**: Kisi bhi language, library ya concept ke baare me detail me discuss karna.\n- **Code & Architecture**: Naye features plan karna, code likhna aur bugs solve karna.\n- **Project Analysis**: \`@git\` se uncommitted diffs ya \`@tree\` se project structure review karna.\n- **Design & UI**: Modern styling frameworks aur libraries ke best recommendations dena.`,
+        reply: `Main aapka **AI Assistant & Coding Copilot** hu (powered by ${modelName}).\n\nMain aapki in cheezon me madad kar sakta hu:\n- **Technical Questions**: Kisi bhi language, library ya concept ke baare me detail me discuss karna.\n- **Code & Architecture**: Naye features plan karna, code likhna aur bugs solve karna.\n- **Project Analysis**: Workspace diffs aur project structure review karna.\n- **Design & UI**: Modern styling frameworks aur libraries ke best recommendations dena.`,
       };
     }
     return {
       thought: `1. Formulating assistant capabilities summary.`,
-      reply: `I am your **AI Copilot** powered by **${modelName}**.\n\nI can help you with:\n- **Conceptual & Technical Discussion**: Explaining complex CS concepts, architectural trade-offs, and workflows.\n- **Code Development**: Writing, refactoring, and debugging clean code across any stack.\n- **Project Context**: Inspecting git diffs with \`@git\` or workspace files with \`@file\`.\n- **System Design & Libraries**: Recommending proven tools, databases, and design patterns.`,
+      reply: `I am your **AI Copilot** powered by **${modelName}**.\n\nI can help you with:\n- **Conceptual & Technical Discussion**: Explaining complex CS concepts, architectural trade-offs, and workflows.\n- **Code Development**: Writing, refactoring, and debugging clean code across any stack.\n- **Project Context**: Inspecting git diffs or workspace files.\n- **System Design & Libraries**: Recommending proven tools, databases, and design patterns.`,
     };
   }
 
@@ -414,26 +414,22 @@ export function DevChatStudio({
   const [liveThinkingStep, setLiveThinkingStep] = useState<string | null>(null);
   const [thinkingElapsed, setThinkingElapsed] = useState<number>(0);
 
-  // Context attachments & @ mentions
+  // Context attachments
   const [attachedContexts, setAttachedContexts] = useState<AttachedContext[]>([]);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
-  const [showMentionMenu, setShowMentionMenu] = useState(false);
-  const [mentionQuery, setMentionQuery] = useState("");
-  const [mentionIndex, setMentionIndex] = useState(0);
 
   // Close dropdown menus on outside click
   useEffect(() => {
-    if (!showModelMenu && !showSessionMenu && !showCliMenu && !showAttachMenu && !showMentionMenu) return;
+    if (!showModelMenu && !showSessionMenu && !showCliMenu && !showAttachMenu) return;
     const onOutside = () => {
       setShowModelMenu(false);
       setShowSessionMenu(false);
       setShowCliMenu(false);
       setShowAttachMenu(false);
-      setShowMentionMenu(false);
     };
     window.addEventListener("click", onOutside);
     return () => window.removeEventListener("click", onOutside);
-  }, [showModelMenu, showSessionMenu, showCliMenu, showAttachMenu, showMentionMenu]);
+  }, [showModelMenu, showSessionMenu, showCliMenu, showAttachMenu]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -729,6 +725,8 @@ export function DevChatStudio({
     };
     setSessions((all) => [newSession, ...all]);
     setActiveSessionId(newId);
+    setInput("");
+    setShowAttachMenu(false);
     setAttachedContexts([]);
     setShowSessionMenu(false);
   };
@@ -777,6 +775,8 @@ export function DevChatStudio({
 
   const handleClear = () => {
     updateCurrentMessages(() => INITIAL_MESSAGES);
+    setInput("");
+    setShowAttachMenu(false);
     setAttachedContexts([]);
   };
 
@@ -842,7 +842,6 @@ export function DevChatStudio({
   // Attach File from disk
   const handleAttachFile = async () => {
     setShowAttachMenu(false);
-    setShowMentionMenu(false);
     try {
       const tauri = typeof window !== "undefined" ? (window as any).__TAURI_INTERNALS__ || (window as any).__TAURI__ : null;
       let selected: string | string[] | null = null;
@@ -991,6 +990,8 @@ export function DevChatStudio({
       const q = textToSend.trim();
       if (!q) return;
 
+      setShowAttachMenu(false);
+
       const pills = attachedContexts.map((c) => c.title);
 
       const userMsg: DevChatMessage = {
@@ -1063,86 +1064,11 @@ export function DevChatStudio({
     [selectedModel, selectedCli, execMode, projectPath, attachedContexts]
   );
 
-  const MENTION_OPTIONS = [
-    {
-      id: "git",
-      name: "@git",
-      label: "Git Diff",
-      desc: "Uncommitted changes & active diff",
-      icon: GitBranch,
-      action: () => handleAttachGitDiff(),
-    },
-    {
-      id: "tree",
-      name: "@tree",
-      label: "Project Tree",
-      desc: "Directory structure & file paths",
-      icon: FolderTree,
-      action: () => handleAttachProjectTree(),
-    },
-    {
-      id: "file",
-      name: "@file",
-      label: "Attach File",
-      desc: "Pick source file from workspace",
-      icon: FileCode,
-      action: () => handleAttachFile(),
-    },
-  ];
-
-  const applyMentionOption = (opt: (typeof MENTION_OPTIONS)[0]) => {
-    const cleanedInput = input.replace(/@([a-zA-Z0-9_\-\.]*)$/, "").trim();
-    setInput(cleanedInput);
-    setShowMentionMenu(false);
-    opt.action();
-  };
-
   const handleInputChange = (val: string) => {
     setInput(val);
-    const match = val.match(/@([a-zA-Z0-9_\-\.]*)$/);
-    if (match) {
-      setMentionQuery(match[1].toLowerCase());
-      setShowMentionMenu(true);
-      setMentionIndex(0);
-    } else {
-      setShowMentionMenu(false);
-    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (showMentionMenu) {
-      const filtered = MENTION_OPTIONS.filter(
-        (o) => o.name.toLowerCase().includes(mentionQuery) || o.label.toLowerCase().includes(mentionQuery)
-      );
-      if (filtered.length > 0) {
-        if (e.key === "ArrowDown") {
-          e.preventDefault();
-          e.stopPropagation();
-          setMentionIndex((prev) => (prev + 1) % filtered.length);
-          return;
-        }
-        if (e.key === "ArrowUp") {
-          e.preventDefault();
-          e.stopPropagation();
-          setMentionIndex((prev) => (prev - 1 + filtered.length) % filtered.length);
-          return;
-        }
-        if (e.key === "Enter" || e.key === "Tab") {
-          e.preventDefault();
-          e.stopPropagation();
-          const selected = filtered[mentionIndex] || filtered[0];
-          applyMentionOption(selected);
-          return;
-        }
-        if (e.key === "Escape") {
-          e.preventDefault();
-          e.stopPropagation();
-          setShowMentionMenu(false);
-          return;
-        }
-      }
-    }
-
     e.stopPropagation();
     e.nativeEvent.stopImmediatePropagation();
     if (e.key === "Enter" && !e.shiftKey) {
@@ -1253,11 +1179,11 @@ export function DevChatStudio({
   const CliIcon = activeCli.icon;
 
   return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#0d0f14] font-sans select-text">
+    <div className="relative flex h-full w-full flex-col overflow-hidden bg-swarm-canvas font-sans select-text">
 
 
       {/* Ultra-Clean Mac/Cursor Grade Header Bar */}
-      <div className="relative z-30 flex h-9 shrink-0 items-center justify-between gap-1.5 border-b border-white/[0.06] bg-[#0c0e14]/95 px-2.5 backdrop-blur-md">
+      <div className="relative z-30 flex h-9 shrink-0 items-center justify-between gap-1.5 border-b border-swarm-border/40 bg-swarm-surface/95 px-2.5 backdrop-blur-md">
         {/* Left: Model Selector */}
         <div className="relative min-w-0 flex-1 max-w-[150px]">
           <button
@@ -1267,17 +1193,17 @@ export function DevChatStudio({
               setShowCliMenu(false);
               setShowSessionMenu(false);
             }}
-            className="flex items-center gap-1.5 rounded-md border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.07] px-2 py-1 text-xs font-medium text-zinc-200 transition-colors cursor-pointer w-full min-w-0"
+            className="flex items-center gap-1.5 rounded-md border border-swarm-border/60 bg-white/[0.03] hover:bg-white/[0.07] px-2 py-1 text-xs font-medium text-swarm-text transition-colors cursor-pointer w-full min-w-0"
           >
-            <ModelIcon size={12} className="text-amber-400 shrink-0" />
+            <ModelIcon size={12} className="text-swarm-gold shrink-0" />
             <span className="truncate text-[11.5px] font-sans flex-1 text-left">{activeModel.name}</span>
-            <ChevronDown size={10} className="text-zinc-500 shrink-0" />
+            <ChevronDown size={10} className="text-swarm-textMuted shrink-0" />
           </button>
 
           {showModelMenu && (
             <div
               onClick={(e) => e.stopPropagation()}
-              className="absolute left-0 top-full mt-1.5 z-[100] w-60 rounded-xl border border-white/[0.10] bg-[#14161f] p-1.5 shadow-2xl animate-scale-in"
+              className="absolute left-0 top-full mt-1.5 z-[100] w-60 rounded-xl border border-swarm-border/80 bg-swarm-surfaceHi p-1.5 shadow-2xl animate-scale-in"
             >
               <div className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
                 Select AI Model
@@ -1444,7 +1370,7 @@ export function DevChatStudio({
 
       {/* Messages Stream */}
       <div
-        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-3.5 space-y-4 scrollbar-sleek bg-[#0a0c10]"
+        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-3.5 space-y-4 scrollbar-sleek bg-swarm-canvas"
         onWheel={(e) => {
           e.stopPropagation();
         }}
@@ -1459,8 +1385,8 @@ export function DevChatStudio({
               className={`flex flex-col ${isUser ? "items-end" : "items-start"} animate-fade-in`}
             >
               {/* Message Header / Meta */}
-              <div className="flex items-center gap-1.5 px-1 pb-1 text-[10.5px] text-zinc-500 font-sans">
-                {!isUser && <Sparkles size={11} className="text-amber-400" />}
+              <div className="flex items-center gap-1.5 px-1 pb-1 text-[10.5px] text-swarm-textMuted font-sans">
+                {!isUser && <Sparkles size={11} className="text-swarm-gold" />}
                 <span>{isUser ? "You" : activeModel.name}</span>
                 <span>·</span>
                 <span className="font-mono text-[10px]">{msg.timestamp}</span>
@@ -1472,7 +1398,7 @@ export function DevChatStudio({
                   {msg.contextPills.map((pill, pIdx) => (
                     <span
                       key={pIdx}
-                      className="inline-flex items-center gap-1 rounded-md bg-amber-400/10 border border-amber-400/20 px-2 py-0.5 text-[10px] text-amber-300 font-mono"
+                      className="inline-flex items-center gap-1 rounded-md bg-swarm-gold/10 border border-swarm-gold/20 px-2 py-0.5 text-[10px] text-swarm-goldHi font-mono"
                     >
                       <Paperclip size={10} />
                       {pill}
@@ -1483,7 +1409,7 @@ export function DevChatStudio({
 
               {/* Collapsible Claude/Gemini Thinking Process Box */}
               {!isUser && msg.thought && (
-                <div className="mb-2 w-full max-w-[88%] overflow-hidden rounded-xl border border-white/[0.06] bg-[#11131a] text-xs">
+                <div className="mb-2 w-full max-w-[88%] overflow-hidden rounded-xl border border-swarm-border/60 bg-swarm-surface text-xs">
                   <button
                     onClick={() => toggleThoughtAccordion(msg.id)}
                     className="flex w-full items-center justify-between px-3 py-1.5 text-zinc-400 hover:text-amber-300 transition-colors"
@@ -1549,15 +1475,15 @@ export function DevChatStudio({
         {/* Live Claude/Gemini Thinking Indicator */}
         {isTyping && (
           <div className="flex flex-col items-start gap-1 animate-fade-in">
-            <div className="flex items-center gap-2 rounded-xl border border-amber-400/30 bg-[#12141c] px-3 py-1.5 text-xs shadow-md">
-              <BrainCircuit size={13} className="text-amber-400 animate-pulse shrink-0" />
-              <span className="font-mono text-[11px] text-amber-300 animate-pulse truncate">
+            <div className="flex items-center gap-2 rounded-xl border border-swarm-gold/40 bg-swarm-surface px-3 py-1.5 text-xs shadow-md">
+              <BrainCircuit size={13} className="text-swarm-gold animate-pulse shrink-0" />
+              <span className="font-mono text-[11px] text-swarm-goldHi animate-pulse truncate">
                 {liveThinkingStep || `Thinking with ${activeModel.name}… (${thinkingElapsed}s)`}
               </span>
               <div className="flex items-center gap-1 ml-auto">
-                <span className="size-1 rounded-full bg-amber-400 animate-bounce" />
-                <span className="size-1 rounded-full bg-amber-400 animate-bounce [animation-delay:0.2s]" />
-                <span className="size-1 rounded-full bg-amber-400 animate-bounce [animation-delay:0.4s]" />
+                <span className="size-1 rounded-full bg-swarm-gold animate-bounce" />
+                <span className="size-1 rounded-full bg-swarm-gold animate-bounce [animation-delay:0.2s]" />
+                <span className="size-1 rounded-full bg-swarm-gold animate-bounce [animation-delay:0.4s]" />
               </div>
             </div>
           </div>
@@ -1567,7 +1493,7 @@ export function DevChatStudio({
       </div>
 
       {/* Input & Context Area */}
-      <div className="shrink-0 p-3.5 bg-gradient-to-t from-[#0d0f14] via-[#0d0f14]/95 to-transparent">
+      <div className="shrink-0 p-3.5 bg-gradient-to-t from-swarm-canvas via-swarm-canvas/95 to-transparent">
         {/* Active Attached Context Chips */}
         {attachedContexts.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5 mb-2 px-1">
@@ -1677,56 +1603,7 @@ export function DevChatStudio({
           </div>
         ) : (
           /* Standard Input Box */
-          <div className="relative flex flex-col rounded-2xl border border-white/[0.08] bg-[#11131a] focus-within:border-amber-400/50 focus-within:ring-1 focus-within:ring-amber-400/20 transition-all shadow-2xl">
-            {/* Interactive @ Mention Context Autocomplete Popup */}
-            {showMentionMenu && (() => {
-              const filtered = MENTION_OPTIONS.filter(
-                (o) => o.name.toLowerCase().includes(mentionQuery) || o.label.toLowerCase().includes(mentionQuery)
-              );
-              if (filtered.length === 0) return null;
-              return (
-                <div
-                  onClick={(e) => e.stopPropagation()}
-                  className="absolute left-2.5 bottom-full mb-2 z-[120] w-72 rounded-xl border border-white/[0.10] bg-[#14161f]/98 backdrop-blur-xl p-1.5 shadow-2xl animate-scale-in"
-                >
-                  <div className="flex items-center justify-between px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400 border-b border-white/[0.06] mb-1">
-                    <span>Context Attachment (@)</span>
-                    <span className="text-zinc-500 font-sans font-normal text-[10px]">Tab or ↵ to attach</span>
-                  </div>
-                  <div className="space-y-0.5">
-                    {filtered.map((opt, idx) => {
-                      const Icon = opt.icon;
-                      const active = idx === mentionIndex;
-                      return (
-                        <button
-                          key={opt.id}
-                          onClick={() => applyMentionOption(opt)}
-                          className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition-colors cursor-pointer ${
-                            active
-                              ? "bg-amber-400/15 text-amber-300"
-                              : "text-zinc-300 hover:bg-white/[0.05] hover:text-white"
-                          }`}
-                        >
-                          <div className={`size-5.5 rounded-md flex items-center justify-center shrink-0 ${
-                            active ? "bg-amber-400/20 text-amber-300" : "bg-white/[0.05] text-zinc-400"
-                          }`}>
-                            <Icon size={12} />
-                          </div>
-                          <div className="flex flex-col min-w-0 flex-1">
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-xs font-medium font-mono text-amber-400">{opt.name}</span>
-                              <span className="text-xs text-zinc-200">{opt.label}</span>
-                            </div>
-                            <span className="text-[10px] text-zinc-400 truncate">{opt.desc}</span>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })()}
-
+          <div className="relative flex flex-col rounded-2xl border border-swarm-border/60 bg-swarm-surface focus-within:border-swarm-gold/50 focus-within:ring-1 focus-within:ring-swarm-gold/20 transition-all shadow-2xl">
             <textarea
               ref={textareaRef}
               value={input}
@@ -1742,8 +1619,8 @@ export function DevChatStudio({
               }}
               placeholder={
                 execMode === "cli"
-                  ? `Execute task with ${activeCli.name}… (type @ to attach context)`
-                  : `Ask ${activeModel.name} anything… (type @ for context)`
+                  ? `Execute task with ${activeCli.name}…`
+                  : `Ask ${activeModel.name} anything…`
               }
               rows={2}
               className="w-full resize-none bg-transparent px-3.5 pt-3 pb-1 text-[12.5px] text-zinc-200 outline-none placeholder:text-zinc-500 font-sans"
@@ -1756,10 +1633,9 @@ export function DevChatStudio({
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowAttachMenu((v) => !v);
-                    setShowMentionMenu(false);
                   }}
                   className="flex items-center gap-1 rounded-md bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] px-2 py-0.5 text-[11px] text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer"
-                  title="Attach Context (@)"
+                  title="Attach Context"
                 >
                   <Paperclip size={11} />
                   <span>Attach</span>

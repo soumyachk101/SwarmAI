@@ -69,14 +69,14 @@ export default function BoardStrip({
     // left, then the scrolling tab block, then + and maximize pinned in-flow at
     // the right — so + can never slide under the maximize button.
     <div
-      className="flex h-11 shrink-0 items-center gap-1.5 border-b border-swarm-border/50 glass-toolbar px-2"
+      className="flex h-10 shrink-0 items-center gap-2 border-b border-white/[0.08] bg-[#0c0e16]/95 backdrop-blur-xl px-2.5 select-none"
       style={reserveRight ? { paddingRight: reserveRight } : undefined}
       data-tauri-drag-region
     >
       {leading}
       {showLogo && (logoNode ?? <BoardLogo size={18} className="shrink-0 text-swarm-gold" />)}
       {viewToggle}
-      {viewToggle && <span className="h-5 w-px shrink-0 bg-swarm-border/60" />}
+      {viewToggle && <div className="h-4 w-px bg-white/[0.12] mx-0.5 shrink-0" />}
 
       {items.length > 0 && (
         <div className="flex flex-1 min-w-0 items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-0.5">
@@ -90,24 +90,24 @@ export default function BoardStrip({
                 onClick={() => onSelect(it.id)}
                 {...activatable(() => onSelect(it.id), it.name)}
                 aria-current={active ? "true" : undefined}
-                className={`group flex h-7 shrink-0 cursor-pointer select-none items-center gap-2 rounded-lg border px-2.5 text-xs font-medium transition-all ${
+                className={`group relative flex h-7 shrink-0 cursor-pointer select-none items-center gap-2 rounded-lg border px-2.5 text-xs transition-all duration-150 ${
                   active
-                    ? "border-white/[0.16] bg-white/[0.08] text-white shadow-sm ring-1 ring-white/[0.06]"
-                    : "border-transparent text-slate-400 hover:bg-white/[0.04] hover:text-slate-200"
+                    ? "border-white/[0.16] bg-[#161a26] text-white shadow-sm font-semibold ring-1 ring-white/[0.08]"
+                    : "border-transparent text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]"
                 }`}
                 title={it.name}
               >
                 <span
-                  className="size-1.5 shrink-0 rounded-full"
-                  style={{ background: t.accent, boxShadow: active ? `0 0 0 3px ${t.accentSoft}` : undefined }}
+                  className="size-2 shrink-0 rounded-full transition-transform duration-150 group-hover:scale-110"
+                  style={{ background: t.accent, boxShadow: active ? `0 0 8px ${t.accent}` : undefined }}
                   aria-hidden
                 />
-                {it.icon && <span className="shrink-0 text-slate-400">{it.icon}</span>}
-                <span className="max-w-[160px] truncate">{it.name}</span>
+                {it.icon && <span className="shrink-0 text-zinc-400">{it.icon}</span>}
+                <span className="max-w-[170px] truncate">{it.name}</span>
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); onClose(it.id); }}
-                  className="shrink-0 rounded p-0.5 opacity-0 transition-opacity hover:bg-white/[0.1] hover:text-white group-hover:opacity-100 focus-visible:opacity-100"
+                  className="shrink-0 rounded p-0.5 opacity-0 transition-all hover:bg-white/[0.12] hover:text-white group-hover:opacity-100 focus-visible:opacity-100"
                   title={`Close ${it.name}`}
                   aria-label={`Close ${it.name}`}
                 >
@@ -120,33 +120,29 @@ export default function BoardStrip({
       )}
 
       {/* + and maximize sit OUTSIDE the scroller and in normal flow */}
-      <button
-        type="button"
-        ref={addRef}
-        onClick={onAdd}
-        className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-white/[0.1] bg-white/[0.05] text-slate-300 transition-all hover:bg-white/[0.1] hover:text-white active:scale-95"
-        title="Add component"
-        aria-label="Add component"
-      >
-        <Plus className="size-4" />
-      </button>
-      {onToggleFullscreen && (
+      <div className="flex items-center gap-1 shrink-0">
         <button
           type="button"
-          onClick={onToggleFullscreen}
-          // Tokenised hover, not bg-black: on the lighter themes a black wash
-          // reads as a hole punched in the toolbar rather than a hover state.
-          // No `ml-auto`: it shoved this button to the far right and left a dead
-          // stretch of toolbar between it and `+` that read as a missing group.
-          // The empty run at the right end is the window controls' reserved
-          // space (reserveRight), not a gap in the layout.
-          className="flex size-6.5 shrink-0 items-center justify-center rounded-md text-swarm-textMuted transition-colors hover:bg-swarm-border/60 hover:text-swarm-text"
-          title={fullscreen ? "Restore" : "Maximize plane"}
-          aria-label={fullscreen ? "Restore" : "Maximize plane"}
+          ref={addRef}
+          onClick={onAdd}
+          className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-white/[0.1] bg-white/[0.04] text-zinc-300 transition-all hover:bg-white/[0.08] hover:border-swarm-gold/40 hover:text-swarm-goldHi active:scale-95 cursor-pointer"
+          title="Add component"
+          aria-label="Add component"
         >
-          {fullscreen ? <Minimize2 className="size-3.5" /> : <Maximize2 className="size-3.5" />}
+          <Plus className="size-3.5" />
         </button>
-      )}
+        {onToggleFullscreen && (
+          <button
+            type="button"
+            onClick={onToggleFullscreen}
+            className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-transparent text-zinc-400 transition-all hover:bg-white/[0.06] hover:text-zinc-100 cursor-pointer"
+            title={fullscreen ? "Restore" : "Maximize plane"}
+            aria-label={fullscreen ? "Restore" : "Maximize plane"}
+          >
+            {fullscreen ? <Minimize2 className="size-3.5" /> : <Maximize2 className="size-3.5" />}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

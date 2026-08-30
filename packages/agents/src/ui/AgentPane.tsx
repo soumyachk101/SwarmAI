@@ -78,21 +78,19 @@ interface EffortOption {
 }
 
 const CLI_BRAND_META: Record<string, { brandName: string; brandColor: string; supportsEffort: boolean; effortLevels?: EffortOption[]; defaultEffort?: string }> = {
- claude: { brandName: "Claude Code Models", brandColor: "#D97757", supportsEffort: true, defaultEffort: "UltraCode", effortLevels: [
- { id: "ultracode", label: "UltraCode", isHighlight: true },
- { id: "max", label: "Max Effort" },
- { id: "xhigh", label: "Extra High" },
- { id: "high", label: "High" },
- { id: "medium", label: "Medium" },
- { id: "low", label: "Low" },
- ]},
- codex: { brandName: "Codex Models", brandColor: "#10A37F", supportsEffort: true, defaultEffort: "High", effortLevels: [
- { id: "ultra", label: "Ultra", isHighlight: true },
- { id: "xhigh", label: "Extra High" },
- { id: "high", label: "High" },
- { id: "medium", label: "Medium" },
- { id: "light", label: "Light" },
- ]},
+  claude: { brandName: "Claude Code Models", brandColor: "#D97757", supportsEffort: true, defaultEffort: "UltraCode", effortLevels: [
+    { id: "ultracode", label: "UltraCode", isHighlight: true },
+    { id: "max", label: "Max" },
+    { id: "high", label: "High" },
+    { id: "medium", label: "Medium" },
+    { id: "low", label: "Low" },
+  ]},
+  codex: { brandName: "Codex Models", brandColor: "#10A37F", supportsEffort: true, defaultEffort: "High", effortLevels: [
+    { id: "xhigh", label: "Extra High", isHighlight: true },
+    { id: "high", label: "High" },
+    { id: "medium", label: "Medium" },
+    { id: "low", label: "Low" },
+  ]},
  opencode: { brandName: "OpenCode Models", brandColor: "#A855F7", supportsEffort: false },
  agy: { brandName: "AGY Models", brandColor: "#4285F4", supportsEffort: false },
  aider: { brandName: "Aider Models", brandColor: "#14B8A6", supportsEffort: false },
@@ -215,6 +213,16 @@ function AgentPane({
       }
     }
   }, [agent.cli, agent.model]);
+
+  // Sync currentEffort with agent.effort or default
+  useEffect(() => {
+    if (agent.effort && agent.effort !== "UltraCode") {
+      setCurrentEffort(agent.effort);
+    } else {
+      const defaultEff = brandMeta.defaultEffort || "Max";
+      setCurrentEffort(defaultEff);
+    }
+  }, [agent.cli, agent.effort, brandMeta.defaultEffort]);
 
  // Auto-detect models
  const autoModelDetection = useAutoModelDetection(agent.cli, paneId);
@@ -460,19 +468,19 @@ function AgentPane({
  >
  {/* Header */}
  <TerminalHeader
- paneId={paneId}
- displayName={displayName}
- spawnState={spawnState}
- isEditing={Boolean(isEditing)}
- editValue={editValue ?? ""}
- agent={{ id: agent.id, cli: agent.cli, cliName: agent.cliName, role: agent.role, branchName: agent.branchName }}
- currentModel={currentModel}
- currentEffort={currentEffort}
- paneWidth={paneWidth}
- onEditChange={onEditChange ?? (() => {})}
- onRename={onRename}
- onCancelRename={onCancelRename}
- headerExtra={headerExtra}
+   paneId={paneId}
+   displayName={displayName}
+   spawnState={spawnState}
+   isEditing={Boolean(isEditing)}
+   editValue={editValue ?? ""}
+   agent={{ id: agent.id, cli: agent.cli, cliName: agent.cliName, role: agent.role, branchName: agent.branchName }}
+   currentModel={currentModel}
+   currentEffort={currentEffort}
+   paneWidth={paneWidth}
+   onEditChange={onEditChange ?? (() => {})}
+   onRename={onRename}
+   onCancelRename={onCancelRename}
+   headerExtra={headerExtra}
  controls={
  <AgentControls
  paneId={paneId}

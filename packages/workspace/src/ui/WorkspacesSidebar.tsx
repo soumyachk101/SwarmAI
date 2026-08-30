@@ -1487,13 +1487,13 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
   return (
     <div
       ref={sidebarRef}
-      className="relative h-full flex flex-col bg-[#090b10] border-r border-white/[0.08] shrink-0 font-sans antialiased select-none"
+      className="relative h-full flex flex-col bg-swarm-canvas border-r border-swarm-border/50 shrink-0 font-sans antialiased select-none"
       style={{ width: sidebarWidth, minWidth: MIN_WIDTH, maxWidth: "50vw" }}
     >
       {/* ── App Top Row (Window Controls on the absolute far-left edge) ─────── */}
       {topBar && (
         <div
-          className="flex h-11 shrink-0 items-center gap-1.5 border-b border-white/[0.06] bg-[#07080d] px-3 z-30"
+          className="flex h-10 shrink-0 items-center gap-1.5 border-b border-white/[0.08] bg-[#0c0e16]/95 backdrop-blur-xl px-2.5 z-30"
           data-tauri-drag-region
         >
           {topBar}
@@ -1502,10 +1502,10 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
 
       {/* ── Sidebar Body: Left Activity Rail + Main Panel ─────────────────── */}
       <div className="flex-1 flex min-h-0 overflow-hidden">
-        {/* ── Vertical Pro Activity Bar Rail (Far Left, 48px) ──────────────── */}
-        <div className="w-[48px] shrink-0 flex flex-col items-center justify-between border-r border-white/[0.06] bg-[#07080c] py-2.5 z-20">
+        {/* ── Vertical Pro Activity Bar Rail (Far Left, 44px) ──────────────── */}
+        <div className="w-11 shrink-0 flex flex-col items-center justify-between border-r border-white/[0.08] bg-[#090b10] py-2 z-20 select-none">
           {/* Top Section: App/Brand Logo & Activity Tabs */}
-          <div className="flex flex-col items-center gap-1.5 w-full pt-1">
+          <div className="flex flex-col items-center gap-1 w-full pt-0.5">
             {/* Activity Bar Tabs */}
             {TABS.map((tab) => {
               const Icon = tab.icon;
@@ -1514,19 +1514,19 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
                 <div key={tab.id} className="relative w-full flex justify-center py-0.5 group">
                   {/* Active Left Indicator Bar */}
                   {active && (
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4.5 rounded-r bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.7)]" />
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4.5 rounded-r bg-swarm-gold shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
                   )}
                   <button
                     onClick={() => { setActiveTab(tab.id); setViewer(null); }}
                     title={tab.label}
                     aria-label={tab.label}
-                    className={`size-8.5 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer ${
+                    className={`size-8 rounded-lg flex items-center justify-center transition-all duration-150 cursor-pointer ${
                       active
-                        ? "text-amber-300 bg-amber-400/[0.12] border border-amber-400/25 shadow-sm"
-                        : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.05]"
+                        ? "text-swarm-goldHi bg-white/[0.08] border border-swarm-gold/30 shadow-xs"
+                        : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.06]"
                     }`}
                   >
-                    <Icon className="size-4" />
+                    <Icon className={`size-4 transition-transform ${active ? "scale-105 text-swarm-gold" : ""}`} />
                   </button>
                 </div>
               );
@@ -1534,44 +1534,36 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
           </div>
 
           {/* Bottom Section: Theme Picker, Gear Settings, Pin & Close Actions */}
-          <div className="flex flex-col items-center gap-1.5 w-full pt-2 border-t border-white/[0.05]">
+          <div className="flex flex-col items-center gap-1 w-full pt-2 border-t border-white/[0.06]">
             {/* Theme Picker Slot */}
             {themePickerSlot}
 
             {/* Settings & Tools Gear Button */}
             <button
-              ref={gearBtnRef}
               onClick={() => {
-                setGearRect(gearBtnRef.current?.getBoundingClientRect() ?? null);
-                setSettingsMenuOpen((v) => !v);
+                onOpenSettings?.();
               }}
-              aria-haspopup="menu"
-              aria-expanded={settingsMenuOpen}
-              className={`size-8.5 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer ${
-                settingsMenuOpen
-                  ? "text-amber-300 bg-amber-400/[0.15] border border-amber-400/30 shadow-sm"
-                  : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.05]"
-              }`}
-              title="Settings & Tools (Open project, Git, Extensions, Usage)"
               aria-label="Settings and Tools"
+              className="size-8 rounded-lg flex items-center justify-center transition-all duration-150 cursor-pointer text-zinc-400 hover:text-swarm-gold hover:bg-white/[0.08] group"
+              title="Settings & Tools"
             >
-              <Settings size={16} className={settingsMenuOpen ? "rotate-45 transition-transform duration-200" : "transition-transform duration-200"} />
+              <Settings size={16} className="group-hover:rotate-45 transition-transform duration-200" />
             </button>
 
             <button
               onClick={onTogglePin}
               className={`size-7.5 flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
-                pinned ? "text-amber-300 bg-amber-400/10 border border-amber-400/20" : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.05]"
+                pinned ? "text-swarm-goldHi bg-swarm-gold/15 border border-swarm-gold/30" : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.06]"
               }`}
               title={pinned ? "Unpin sidebar" : "Pin sidebar"}
               aria-label={pinned ? "Unpin sidebar" : "Pin sidebar"}
             >
-              {pinned ? <PinOff size={12} /> : <Pin size={12} />}
+              {pinned ? <PinOff size={13} /> : <Pin size={13} />}
             </button>
             {onClose && (
               <button
                 onClick={onClose}
-                className="size-7.5 flex items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.05] transition-colors cursor-pointer"
+                className="size-7.5 flex items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.06] transition-colors cursor-pointer"
                 title="Close sidebar"
                 aria-label="Close sidebar"
               >
@@ -1582,7 +1574,7 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
         </div>
 
         {/* ── Main Sidebar Panel Content Area ──────────────────────────────── */}
-        <div className="flex-1 flex flex-col min-w-0 bg-gradient-to-b from-[#0c0e16]/98 to-[#090b11]/98 backdrop-blur-2xl">
+        <div className="flex-1 flex flex-col min-w-0 bg-[#090b10] backdrop-blur-2xl">
 
         {/* Main Tab Content */}
         <div className="flex-1 overflow-hidden flex flex-col min-h-0">
@@ -1601,16 +1593,13 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
           ) : (
             /* Workspaces Tab Content */
             <>
-              {/* Ultra-Clean Mac/Linear Workspace Header */}
-              <div className="flex h-10 shrink-0 items-center justify-between px-3 border-b border-white/[0.06] bg-[#0c0d12]/90 backdrop-blur-md">
+              {/* Ultra-Clean Linear Workspace Header */}
+              <div className="flex h-9 shrink-0 items-center justify-between px-3 border-b border-white/[0.06] bg-[#0c0e18]/80 backdrop-blur-md select-none">
                 <div className="flex items-center gap-2 min-w-0">
-                  <div className="size-4.5 rounded-[5px] bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-zinc-300 shrink-0">
-                    <FolderGit2 size={11} className="text-zinc-400" />
-                  </div>
-                  <span className="text-[12px] font-medium text-zinc-200 tracking-tight">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
                     Workspaces
                   </span>
-                  <span className="text-[11px] font-mono text-zinc-500">
+                  <span className="text-[10px] font-mono text-zinc-500 bg-white/[0.04] px-1.5 py-0.2 rounded border border-white/[0.04]">
                     {visibleWorkspaces.length}
                   </span>
                 </div>
@@ -1618,20 +1607,20 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
                 <div className="flex items-center gap-1 shrink-0">
                   <button
                     onClick={() => setHideSleeping(!hideSleeping)}
-                    className={`size-6.5 flex items-center justify-center rounded-md transition-colors cursor-pointer ${
+                    className={`size-6 flex items-center justify-center rounded-md transition-colors cursor-pointer ${
                       hideSleeping
-                        ? "text-amber-400 bg-amber-400/15"
+                        ? "text-amber-400 bg-amber-400/15 border border-amber-400/30"
                         : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06]"
                     }`}
                     title={hideSleeping ? "Show all workspaces" : "Hide sleeping workspaces"}
                     aria-label="Toggle sleeping workspaces"
                   >
-                    {hideSleeping ? <EyeOff size={12} /> : <Eye size={12} />}
+                    {hideSleeping ? <EyeOff size={11} /> : <Eye size={11} />}
                   </button>
 
                   <button
                     onClick={handleAdd}
-                    className="size-6.5 flex items-center justify-center rounded-md border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                    className="size-6 flex items-center justify-center rounded-md border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 hover:text-white transition-colors cursor-pointer"
                     title="Add Workspace Folder"
                   >
                     <Plus size={12} strokeWidth={2} />
@@ -1641,7 +1630,7 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
 
               {/* Minimal Search input */}
               <div className="px-2.5 py-1.5 border-b border-white/[0.04]">
-                <div className="flex h-7 items-center gap-1.5 rounded-md bg-white/[0.03] border border-white/[0.06] px-2 focus-within:border-amber-400/40 focus-within:bg-white/[0.05] transition-colors">
+                <div className="flex h-7 items-center gap-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06] px-2 focus-within:border-amber-400/40 focus-within:bg-white/[0.05] transition-colors">
                   <Search size={11} className="text-zinc-500 shrink-0" />
                   <input
                     value={searchQuery}
@@ -1664,7 +1653,7 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
               </div>
 
               {/* Workspaces List */}
-              <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#0a0b10]">
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#090b10]">
                 <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-sleek px-1.5 py-1.5 space-y-0.5">
                   {visibleWorkspaces.length === 0 ? (
                     searchQuery ? (
@@ -1732,24 +1721,24 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
                   )}
                 </div>
 
-                {/* Bottom Quick Navigation Links */}
-                <div className="px-2 pt-1.5 pb-1 border-t border-white/[0.05] shrink-0 bg-[#0a0b10]">
+                {/* Bottom Quick Navigation Links: Task Pipeline */}
+                <div className="px-2 py-1.5 border-t border-white/[0.06] shrink-0 bg-[#090b10]">
                   <button
                     onClick={() => setBoardOpen(!boardOpen)}
-                    className={`flex w-full h-7 items-center justify-between px-2 rounded-md text-[11px] font-medium transition-colors cursor-pointer ${
+                    className={`flex w-full h-7.5 items-center justify-between px-2.5 rounded-lg border text-xs font-medium transition-all cursor-pointer ${
                       boardOpen
-                        ? "bg-white/[0.08] text-white"
-                        : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]"
+                        ? "bg-swarm-gold/15 border-swarm-gold/30 text-swarm-goldHi shadow-xs font-semibold"
+                        : "bg-white/[0.02] border-white/[0.06] text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.05] hover:border-white/[0.1]"
                     }`}
                     title="Toggle TaskComb Pipeline Board"
                   >
-                    <div className="flex items-center gap-1.5">
-                      <Network size={12} className={boardOpen ? "text-amber-400" : "text-zinc-500"} />
-                      <span>Task Pipeline</span>
+                    <div className="flex items-center gap-2">
+                      <Network size={13} className={boardOpen ? "text-swarm-gold" : "text-zinc-400"} />
+                      <span className="text-[11.5px]">Task Pipeline</span>
                     </div>
                     {activeWorkspace?.taskCards && activeWorkspace.taskCards.length > 0 && (
-                      <span className="rounded-full bg-white/[0.06] text-zinc-400 px-1.5 py-0.2 text-[10px] font-mono">
-                        {activeWorkspace.taskCards.length}
+                      <span className="rounded-md bg-white/[0.06] border border-white/[0.08] text-zinc-300 px-1.5 py-0.2 text-[10px] font-mono font-semibold">
+                        {activeWorkspace.taskCards.length} tasks
                       </span>
                     )}
                   </button>
@@ -1800,94 +1789,7 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
         document.body,
       )}
 
-      {/* Settings & Tools Popup Menu (Triggered by bottom rail Gear icon) */}
-      {settingsMenuOpen && gearRect && createPortal(
-        <>
-          <div className="fixed inset-0 z-[300]" onClick={() => setSettingsMenuOpen(false)} />
-          <div
-            role="menu"
-            aria-label="Settings and Tools Menu"
-            className="fixed z-[301] w-64 rounded-2xl border border-white/[0.14] bg-[#0d0f17]/98 backdrop-blur-2xl p-1.5 shadow-2xl shadow-black/90 animate-fade-in flex flex-col gap-0.5"
-            style={{
-              left: Math.min(gearRect.right + 8, window.innerWidth - 270),
-              bottom: Math.max(12, window.innerHeight - gearRect.bottom),
-            }}
-          >
-            <div className="px-2.5 py-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500 border-b border-white/[0.06] mb-1 flex items-center justify-between">
-              <span>Settings & Tools</span>
-              <span className="size-1.5 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.8)]" />
-            </div>
 
-            <button
-              onClick={() => { setSettingsMenuOpen(false); onOpenProject?.(); }}
-              className="flex items-center gap-3 w-full px-2.5 py-2 rounded-xl text-left hover:bg-white/[0.08] hover:border-amber-500/30 border border-transparent transition-all group/item cursor-pointer"
-            >
-              <div className="size-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover/item:scale-110 transition-transform shrink-0">
-                <FolderOpen size={14} />
-              </div>
-              <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-xs font-semibold text-zinc-200 group-hover/item:text-amber-300 transition-colors truncate">Open project…</span>
-                <span className="text-[10px] text-zinc-400 truncate">Start or switch a workspace</span>
-              </div>
-            </button>
-
-            <button
-              onClick={() => { setSettingsMenuOpen(false); onOpenGit?.(); }}
-              className="flex items-center gap-3 w-full px-2.5 py-2 rounded-xl text-left hover:bg-white/[0.08] hover:border-cyan-500/30 border border-transparent transition-all group/item cursor-pointer"
-            >
-              <div className="size-7 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover/item:scale-110 transition-transform shrink-0">
-                <FolderGit2 size={14} />
-              </div>
-              <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-xs font-semibold text-zinc-200 group-hover/item:text-cyan-300 transition-colors truncate">Git & GitHub Hub…</span>
-                <span className="text-[10px] text-zinc-400 truncate">Commit, push, pull, branches</span>
-              </div>
-            </button>
-
-            <button
-              onClick={() => { setSettingsMenuOpen(false); onOpenExtensions?.(); }}
-              className="flex items-center gap-3 w-full px-2.5 py-2 rounded-xl text-left hover:bg-white/[0.08] hover:border-purple-500/30 border border-transparent transition-all group/item cursor-pointer"
-            >
-              <div className="size-7 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover/item:scale-110 transition-transform shrink-0">
-                <Blocks size={14} />
-              </div>
-              <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-xs font-semibold text-zinc-200 group-hover/item:text-purple-300 transition-colors truncate">Extensions</span>
-                <span className="text-[10px] text-zinc-400 truncate">Agents and tools from Open-VSX</span>
-              </div>
-            </button>
-
-            <button
-              onClick={() => { setSettingsMenuOpen(false); onOpenUsage?.(); }}
-              className="flex items-center gap-3 w-full px-2.5 py-2 rounded-xl text-left hover:bg-white/[0.08] hover:border-emerald-500/30 border border-transparent transition-all group/item cursor-pointer"
-            >
-              <div className="size-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover/item:scale-110 transition-transform shrink-0">
-                <Gauge size={14} />
-              </div>
-              <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-xs font-semibold text-zinc-200 group-hover/item:text-emerald-300 transition-colors truncate">Plan limits</span>
-                <span className="text-[10px] text-zinc-400 truncate">Token usage per CLI</span>
-              </div>
-            </button>
-
-            <div className="h-px bg-white/[0.06] my-0.5 mx-1" />
-
-            <button
-              onClick={() => { setSettingsMenuOpen(false); onOpenSettings?.(); }}
-              className="flex items-center gap-3 w-full px-2.5 py-2 rounded-xl text-left hover:bg-white/[0.08] hover:border-amber-500/30 border border-transparent transition-all group/item cursor-pointer"
-            >
-              <div className="size-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover/item:scale-110 transition-transform shrink-0">
-                <Settings size={14} />
-              </div>
-              <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-xs font-semibold text-zinc-200 group-hover/item:text-amber-300 transition-colors truncate">Settings</span>
-                <span className="text-[10px] text-zinc-400 truncate">API keys and defaults</span>
-              </div>
-            </button>
-          </div>
-        </>,
-        document.body,
-      )}
 
       {/* Resize handle */}
       <div
@@ -2015,30 +1917,34 @@ function ProjectGroup({
       {/* Linear-style single interactive row */}
       <div
         onClick={() => { if (!isRenaming) onActivate(); }}
-        className={`relative flex items-center h-8 px-2 rounded-lg cursor-pointer transition-colors duration-100 ${
+        className={`relative flex items-center h-7.5 px-2 rounded-md cursor-pointer transition-colors duration-100 select-none ${
           isActive
-            ? "bg-white/[0.08] text-white"
+            ? "bg-white/[0.08] text-white font-medium"
             : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]"
         }`}
       >
-        {/* Active Amber Indicator Pin */}
+        {/* Active Amber Indicator Bar */}
         {isActive && (
           <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r bg-amber-400" />
         )}
 
-        {/* Chevron */}
-        <button
-          onClick={(e) => { e.stopPropagation(); setCollapsed(!collapsed); }}
-          className="text-zinc-500 hover:text-zinc-300 p-0.5 -ml-1 rounded transition-transform"
-        >
-          <ChevronRight
-            size={11}
-            className={`transition-transform duration-150 ${collapsed ? "" : "rotate-90"}`}
-          />
-        </button>
+        {/* Chevron only when there are extra worktree branches */}
+        {trees.length > 0 ? (
+          <button
+            onClick={(e) => { e.stopPropagation(); setCollapsed(!collapsed); }}
+            className="text-zinc-500 hover:text-zinc-300 p-0.5 -ml-1 rounded transition-transform shrink-0"
+          >
+            <ChevronRight
+              size={11}
+              className={`transition-transform duration-150 ${collapsed ? "" : "rotate-90"}`}
+            />
+          </button>
+        ) : (
+          <div className="w-1 shrink-0" />
+        )}
 
-        {/* Icon */}
-        <div className="size-4 flex items-center justify-center shrink-0 ml-0.5 mr-1.5">
+        {/* Folder Icon */}
+        <div className="size-4 flex items-center justify-center shrink-0 mr-1.5">
           <Folder
             size={13}
             className={isActive ? "text-amber-400" : "text-zinc-400 group-hover/item:text-zinc-300"}
@@ -2058,7 +1964,7 @@ function ProjectGroup({
             />
           ) : (
             <span
-              className={`text-[12px] truncate tracking-tight ${isActive ? "font-medium text-white" : "font-normal text-zinc-300 group-hover/item:text-zinc-100"}`}
+              className={`text-[12px] truncate tracking-tight ${isActive ? "font-semibold text-white" : "font-normal text-zinc-300 group-hover/item:text-zinc-100"}`}
               title={ws.name}
               onDoubleClick={onStartRename}
             >
@@ -2066,34 +1972,34 @@ function ProjectGroup({
             </span>
           )}
 
-          <span className="text-[10px] font-mono text-zinc-500 truncate shrink-0">
+          <span className="text-[10px] font-mono text-zinc-500/80 truncate shrink-0">
             {noRepo ? "unbound" : "main"}
           </span>
         </div>
 
         {/* Right Status & Actions */}
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-1 shrink-0 ml-1">
           {hasActive && (
             <span
-              className="size-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]"
-              title="Active Agent Running"
+              className="size-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)] animate-pulse shrink-0"
+              title="Active agent running"
             />
           )}
 
           <div className="flex items-center gap-0.5 opacity-0 group-hover/item:opacity-100 transition-opacity">
             <button
               onClick={(e) => { e.stopPropagation(); if (noRepo) { bindRepo(); return; } setAdding(!adding); setError(null); }}
-              className="size-5 flex items-center justify-center rounded text-zinc-400 hover:text-white hover:bg-white/[0.08]"
+              className="size-4.5 flex items-center justify-center rounded text-zinc-400 hover:text-white hover:bg-white/[0.08]"
               title={noRepo ? "Bind folder" : "New worktree branch"}
             >
-              {noRepo ? <FolderPlus size={11} /> : <Plus size={11} />}
+              {noRepo ? <FolderPlus size={10} /> : <Plus size={10} />}
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); onMenu(e); }}
-              className="size-5 flex items-center justify-center rounded text-zinc-400 hover:text-white hover:bg-white/[0.08]"
+              className="size-4.5 flex items-center justify-center rounded text-zinc-400 hover:text-white hover:bg-white/[0.08]"
               title="Workspace actions"
             >
-              <MoreHorizontal size={11} />
+              <MoreHorizontal size={10} />
             </button>
           </div>
         </div>
@@ -2121,24 +2027,9 @@ function ProjectGroup({
 
       {error && <div className="my-1 ml-5 pl-2 text-[10px] text-red-400 break-words font-mono">{error}</div>}
 
-      {/* Sub-tree branches */}
-      {!collapsed && (
+      {/* Sub-tree branches (only rendered if there are custom worktrees) */}
+      {trees.length > 0 && !collapsed && (
         <div className="ml-4 pl-3.5 border-l border-white/[0.06] my-0.5 space-y-0.5">
-          {/* Primary branch */}
-          <div
-            onClick={noRepo ? bindRepo : onActivate}
-            className="flex items-center justify-between h-6 px-1.5 rounded hover:bg-white/[0.04] cursor-pointer text-zinc-400 hover:text-zinc-200 transition-colors"
-          >
-            <div className="flex items-center gap-1.5 min-w-0">
-              <GitBranch size={10} className="text-zinc-500 shrink-0" />
-              <span className="text-[11px] font-mono truncate text-zinc-400">primary (main)</span>
-            </div>
-            {hasActive && (
-              <span className="text-[9px] font-mono text-emerald-400 px-1 py-0.2 rounded bg-emerald-500/10">live</span>
-            )}
-          </div>
-
-          {/* Worktree branches */}
           {trees.map((t) => (
             <div
               key={t.id}
@@ -2275,28 +2166,28 @@ function CollapsibleSection({
   return (
     <div
       onClick={onToggle}
-      className={`group flex h-6.5 shrink-0 items-center justify-between px-2.5 text-[10px] font-semibold tracking-wider text-swarm-textMuted/70 select-none transition-colors ${
-        onToggle ? "cursor-pointer hover:text-swarm-textDim" : ""
+      className={`group flex h-6.5 shrink-0 items-center justify-between px-2.5 text-[10px] font-semibold tracking-wider text-zinc-400 select-none transition-colors ${
+        onToggle ? "cursor-pointer hover:text-zinc-200" : ""
       }`}
     >
       <div className="flex items-center gap-1.5 min-w-0">
         {onToggle && (
           <ChevronRight
             size={11}
-            className={`transition-transform duration-150 text-swarm-textMuted/60 group-hover:text-swarm-gold ${
+            className={`transition-transform duration-150 text-zinc-500 group-hover:text-amber-400 ${
               collapsed ? "" : "rotate-90"
             }`}
           />
         )}
-        <span className="uppercase tracking-[0.06em] font-medium">{label}</span>
+        <span className="uppercase tracking-[0.06em] font-semibold text-zinc-400">{label}</span>
         {count !== undefined && (
-          <span className="text-[10px] text-swarm-textMuted/50 tabular-nums">
+          <span className="text-[10px] text-zinc-500 font-mono tabular-nums">
             {count}
           </span>
         )}
         {activeCount !== undefined && activeCount > 0 && (
-          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-swarm-ok leading-none">
-            <span className="size-1.5 rounded-full bg-swarm-ok animate-pulse" />
+          <span className="inline-flex items-center gap-1 text-[10px] font-mono text-emerald-400 leading-none">
+            <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
             {activeCount}
           </span>
         )}
@@ -2366,33 +2257,30 @@ function ActiveWorkspaceDetail({
               return (
                 <div
                   key={a.id}
-                  className="group flex h-7 items-center gap-2 rounded-md px-2 text-xs text-zinc-300 transition-colors hover:bg-white/[0.04] hover:text-white"
-                  title={`${label}\n${a.cliName}${a.model ? ` · ${a.model}` : ""}\n${status}`}
+                  className="group flex h-7 items-center gap-1.5 rounded-lg px-2 text-xs text-zinc-300 transition-colors hover:bg-white/[0.04] hover:text-white cursor-default"
+                  title={`${label}\n${a.cliName}${a.model ? ` · ${a.model}` : ""}\nStatus: ${status}`}
                 >
                   <span className={`size-1.5 shrink-0 rounded-full ${
-                    isRunning ? "bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]" : "bg-zinc-600"
+                    isRunning ? "bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)] animate-pulse" : "bg-zinc-600"
                   }`} />
                   {brand ? (
                     <BrandGlyph brand={brand} size={13} className="shrink-0 opacity-80 group-hover:opacity-100" />
                   ) : (
                     <AgentMark size={13} className="shrink-0 text-zinc-500" />
                   )}
-                  <span className="min-w-0 truncate font-normal text-zinc-200 text-[11.5px]">{label}</span>
+                  <span className="min-w-0 flex-1 truncate font-medium text-zinc-200 text-[11.5px]" title={label}>
+                    {label}
+                  </span>
                   {a.isLead && (
-                    <span className="inline-flex items-center gap-0.5 rounded px-1 py-0.2 text-[9px] font-medium text-amber-400 bg-amber-400/15 uppercase">
+                    <span className="inline-flex items-center gap-0.5 rounded px-1 py-0.2 text-[9px] font-semibold text-amber-400 bg-amber-400/15 uppercase shrink-0">
                       <LeadCrown size={8} />
                       lead
                     </span>
                   )}
-                  {a.model && (
-                    <span className="shrink-0 text-[10px] text-zinc-500 font-mono truncate max-w-[70px]">
-                      {a.model}
-                    </span>
-                  )}
-                  <span className={`ml-auto shrink-0 text-[9px] font-mono px-1.5 py-0.2 rounded ${
+                  <span className={`shrink-0 text-[9.5px] font-mono px-1.5 py-0.5 rounded border ${
                     isRunning
-                      ? "text-emerald-400 bg-emerald-500/10"
-                      : "text-zinc-500"
+                      ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+                      : "text-zinc-500 bg-white/[0.02] border-white/[0.04]"
                   }`}>
                     {status}
                   </span>

@@ -275,29 +275,29 @@ export default function LeadPanel() {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-[#090a0f]">
+    <div className="flex flex-col h-full overflow-hidden bg-swarm-canvas">
       {/* Lead Mission Control Header Bar with Obsidian Luxury Styling */}
-      <div className="border-b border-white/[0.06] bg-[#0d0e15]/95 px-3 py-2.5 flex flex-col gap-2 backdrop-blur-xl">
+      <div className="border-b border-swarm-border/40 bg-swarm-surface/95 px-3 py-2 flex flex-col gap-2 backdrop-blur-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="flex size-6 items-center justify-center rounded-lg bg-amber-400/15 text-amber-400 border border-amber-400/30 shadow-xs">
+            <div className="flex size-6 items-center justify-center rounded-lg bg-swarm-gold/15 text-swarm-gold border border-swarm-gold/30 shadow-xs">
               <LeadCrown size={13} />
             </div>
             <div className="flex flex-col min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="text-xs font-semibold text-white truncate">
+                <span className="text-xs font-semibold text-swarm-text truncate">
                   {lead.customName || lead.cliName}
                 </span>
                 <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
               </div>
-              <span className="text-[10px] font-mono text-zinc-500">Autonomous Orchestrator</span>
+              <span className="text-[10px] font-mono text-swarm-textMuted">Autonomous Orchestrator</span>
             </div>
           </div>
           <LeadModeSelect />
         </div>
 
         {/* Dynamic Mission Commander Dock */}
-        <div className="flex flex-col gap-2 bg-[#12141d] border border-white/[0.08] rounded-xl p-2.5 focus-within:border-amber-400/40 focus-within:ring-1 focus-within:ring-amber-400/20 transition-all shadow-inner">
+        <div className="flex flex-col gap-2 bg-swarm-canvasHi/90 border border-swarm-border/50 rounded-xl p-2.5 focus-within:border-swarm-gold/40 focus-within:ring-1 focus-within:ring-swarm-gold/20 transition-all shadow-inner">
           <div className="flex items-center gap-1.5 min-w-0">
             <input
               ref={inputRef}
