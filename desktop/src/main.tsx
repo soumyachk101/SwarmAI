@@ -1,3 +1,20 @@
+// Web Browser Polyfill for Tauri Internals (allows running as a website on Vercel)
+if (typeof window !== 'undefined' && !('__TAURI_INTERNALS__' in window)) {
+  (window as any).__TAURI_INTERNALS__ = {
+    transformCallback: (callback?: any) => (typeof callback === 'function' ? callback : () => {}),
+    invoke: async (cmd: string, args: any) => {
+      console.debug(`[Web Mock IPC] ${cmd}`, args);
+      if (cmd === 'list_directory' || cmd === 'pheromone_list_memory_files') return { files: [] };
+      if (cmd === 'pheromone_ensure_structure') return { success: true, created_files: [] };
+      if (cmd === 'pheromone_list_sessions') return { sessions: [] };
+      if (cmd === 'read_file' || cmd === 'pheromone_read_memory_file') return '';
+      return { success: true };
+    },
+    convertFileSrc: (src: string) => src,
+    metadata: { currentWindow: { label: 'main' } },
+  };
+}
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import HomePage from './app/HomePage';
