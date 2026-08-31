@@ -28,27 +28,29 @@ const dirKey = (dir?: string | null) => dir ?? "";
  * one where they asked for.
  */
 export async function isAlreadySpawned(paneId: string, dir?: string | null): Promise<boolean> {
-  if (!spawned.has(paneId)) return false;
+ if (!spawned.has(paneId)) return false;
 
-  if (spawned.get(paneId) !== dirKey(dir)) {
-    // A running shell/agent cannot be relocated, so honour the new tree by
-    // replacing it. Its transcript goes too: it belongs to the old checkout.
-    await invoke("kill_terminal", { paneId }).catch(() => {});
-    forgetSpawn(paneId);
-    return false;
-  }
+ if (spawned.get(paneId) !== dirKey(dir)) {
+ // A running shell/agent cannot be relocated, so honour the new tree by
+ // replacing it. Its transcript goes too: it belongs to the old checkout.
+ await invoke("kill_terminal", { paneId }).catch(() => {});
+ forgetSpawn(paneId);
+ return false;
+ }
 
-  try {
-    if (await invoke<boolean>("is_process_alive", { paneId })) return true;
-  } catch {
-    // treat an unanswerable check as dead — better a respawn than a blank pane
-  }
-  forgetSpawn(paneId);
-  return false;
+ try {
+ if (await invoke<boolean>("is_process_alive", { paneId })) return true;
+ } catch {
+ // IPC unavailable — assume process is still alive to avoid killing a running agent.
+ // The alive-check interval in AgentTerminal will retry and catch a truly dead process.
+ return true;
+ }
+ forgetSpawn(paneId);
+ return false;
 }
 
 export function markSpawned(paneId: string, dir?: string | null): void {
-  spawned.set(paneId, dirKey(dir));
+ spawned.set(paneId, dirKey(dir));
 }
 
 /**
@@ -58,20 +60,20 @@ export function markSpawned(paneId: string, dir?: string | null): void {
  * close apart from a remount without an async IPC round-trip.
  */
 export function isTrackedAsSpawned(paneId: string): boolean {
-  return spawned.has(paneId);
+ return spawned.has(paneId);
 }
 
 /** Called when the pane is closed for real (the pty is killed with it). */
 export function forgetSpawn(paneId: string): void {
-  spawned.delete(paneId);
-  transcripts.delete(paneId);
+ spawned.delete(paneId);
+ transcripts.delete(paneId);
 }
 
 export function saveTranscript(paneId: string, text: string): void {
-  if (!spawned.has(paneId)) return;
-  transcripts.set(paneId, text.slice(-MAX_REPLAY));
+ if (!spawned.has(paneId)) return;
+ transcripts.set(paneId, text.slice(-MAX_REPLAY));
 }
 
 export function takeTranscript(paneId: string): string {
-  return transcripts.get(paneId) ?? "";
+ return transcripts.get(paneId) ?? "";
 }

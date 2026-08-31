@@ -5,6 +5,27 @@ import { RoleManager, type Role } from './roles/index.js';
 import type { WorktreeOps, WorktreeInfo } from './ports.js';
 import type { HandoffManager } from './handoffs/index.js';
 
+function safeUUID(): string {
+	if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+		return crypto.randomUUID();
+	}
+	// Fallback: cryptographically-stronger than Math.random
+	const array = new Uint8Array(16);
+	if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+		crypto.getRandomValues(array);
+	} else {
+		// Last resort: timestamp + Math.random (still better than pure Math.random)
+		const timestamp = Date.now().toString(36);
+		const randPart = Array.from({ length: 8 }, () =>
+			Math.floor(Math.random() * 36).toString(36)
+		).join('');
+		return `${timestamp}-${randPart}`;
+	}
+	// Convert to standard UUID format
+	const hex = Array.from(array).map(b => b.toString(16).padStart(2, '0')).join('');
+	return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
 export interface TaskSpec {
  id: string;
  description: string;
@@ -75,7 +96,7 @@ export class Orchestrator {
  worktree = await this.worktree.create(task.id);
  }
 
- const agentId = `agent-${task.id}-${crypto.randomUUID().slice(0, 8)}`;
+ const agentId = `agent-${task.id}-${safeUUID().slice(0, 8)}`;
  this.registry.register({
  id: agentId,
  taskId: task.id,
@@ -148,5 +169,11 @@ export class Orchestrator {
  status: 'failed',
  reviewerNotes,
  });
+ }
+
+ /** Release all held resources so the instance can be garbage-collected. */
+ dispose(): void {
+ this.registry.clear();
+ this.locks.clear();
  }
 }

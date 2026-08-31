@@ -109,9 +109,26 @@ export function getOrchestrator(projectPath: string) {
 /** Test seam: drop cached state (also used when a project closes). */
 export function resetOrchestrator(projectPath?: string) {
  if (projectPath) {
- orchestrators.delete(normalizeProjectPath(projectPath));
+ cleanupOrchestrator(projectPath);
  } else {
- orchestrators.clear();
+ for (const key of orchestrators.keys()) {
+ cleanupOrchestrator(key);
+ }
+ }
+}
+
+/**
+ * Dispose a single project's orchestrator and remove it from the cache.
+ * Call this when a project is closed or the user switches away, so that
+ * registries, lock maps, and handoff managers are released instead of
+ * growing the Map unboundedly.
+ */
+export function cleanupOrchestrator(projectPath: string): void {
+ const key = normalizeProjectPath(projectPath);
+ const orch = orchestrators.get(key);
+ if (orch) {
+ try { orch.dispose(); } catch { /* ignore cleanup errors */ }
+ orchestrators.delete(key);
  }
 }
 

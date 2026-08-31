@@ -30,6 +30,22 @@ import { useAgentsStore } from "./agentsStore.js";
 import type { LeadMode } from "@swarm/lead";
 
 // ---------------------------------------------------------------------------
+// Pheromone instance cache
+// ---------------------------------------------------------------------------
+// Pheromone.create() opens a SQLite connection per call. Cache one instance
+// per sync directory so handoff/session writes reuse the same connection.
+const pheromoneCache = new Map<string, Promise<InstanceType<typeof Pheromone>>>();
+
+function getCachedPheromone(dir: string): Promise<InstanceType<typeof Pheromone>> {
+ let cached = pheromoneCache.get(dir);
+ if (!cached) {
+ cached = Pheromone.create(dir);
+ pheromoneCache.set(dir, cached);
+ }
+ return cached;
+}
+
+// ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
@@ -169,6 +185,10 @@ function AgentTerminal({
  let lastSyncedCols = 0;
  let lastSyncedRows = 0;
  let loopsStarted = false;
+
+// Reset loopsStarted on cleanup so a re-run of this effect or a new
+// component instance (same paneId) always starts with a clean slate.
+const resetLoopsStarted = () => { loopsStarted = false; };
  let summarySaved = false;
  let lastFlushedLength = 0;
  const transcriptRef = { current: "" };
@@ -186,6 +206,10 @@ function AgentTerminal({
  if (aliveCheckInterval) {
  clearInterval(aliveCheckInterval);
  aliveCheckInterval = null;
+ }
+ if (liveHandoffInterval) {
+ clearInterval(liveHandoffInterval);
+ liveHandoffInterval = null;
  }
  };
 
@@ -232,7 +256,7 @@ function AgentTerminal({
  if (!transcript) return;
  onSetSyncing(true);
  try {
- const pheromoneInstance = await Pheromone.create(syncDir);
+ const pheromoneInstance = await getCachedPheromone(syncDir);
  await appendHandoffEntry(pheromoneInstance, syncDir, transcript, force ? "(manual sync)" : "(in progress)");
  lastFlushedLength = transcript.length;
  onSetLastSync(Date.now());
@@ -271,6 +295,7 @@ function AgentTerminal({
  if (detectCommandNotFoundError(output, agent.cli)) {
  onSpawnStateChange("notFound");
  invoke("kill_terminal", { paneId }).catch(console.error);
+ saveSessionSummary(transcriptRef.current);
  if (stallTimer) { clearTimeout(stallTimer); stallTimer = null; }
  stopReadOutput();
  return;
@@ -310,7 +335,7 @@ function AgentTerminal({
  console.log(`[Pheromone] Saving session ${sessionId} for ${agent.cliName} in ${saveDir}`);
 
  try {
- const pheromoneInstance = await Pheromone.create(saveDir);
+ const pheromoneInstance = await getCachedPheromone(saveDir);
  const rawSessionContent = `# ${agent.cliName} Session Log\n\nDate: ${dateStr}\nAgent: ${agent.cli}\nProject: ${saveDir}\n\n## Raw Transcript\n\n\`\`\`\n${cleanTranscript || "(empty session)"}\n\`\`\`\n`;
 
  await pheromoneInstance.writeMemoryFile(
@@ -378,6 +403,12 @@ function AgentTerminal({
  codex: ["--dangerously-bypass-approvals-and-sandbox"],
  };
  const bypassEnabled = agentsHost().permissionBypassEnabled();
+ if (bypassEnabled) {
+ console.warn(
+ `[Security] Permission bypass is ENABLED for ${agent.cliName} (${agent.cli}). ` +
+ `This disables the CLI's built-in safety checks. Only use in trusted environments.`
+ );
+ }
  const fullArgs = [...(bypassEnabled ? (bypassFlags[command] || []) : []), ...(agent.args || [])];
 
  await invoke("spawn_terminal", {
@@ -572,6 +603,7 @@ function AgentTerminal({
 
  return () => {
  disposed = true;
+ resetLoopsStarted();
  if (stallTimer) clearTimeout(stallTimer);
  if (resizeDebounce) clearTimeout(resizeDebounce);
  if (liveHandoffInterval) clearInterval(liveHandoffInterval);

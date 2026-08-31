@@ -697,5 +697,10 @@ export default memo(AgentPane, function areEqual(prev: AgentPaneProps, next: Age
  if (prev.onEditChange !== next.onEditChange) return false;
  if (prev.onCancelRename !== next.onCancelRename) return false;
  if (prev.headerExtra !== next.headerExtra) return false;
+ if (prev.agent.role !== next.agent.role) return false;
+ if (prev.agent.branchName !== next.agent.branchName) return false;
+ if (prev.agent.workspaceId !== next.agent.workspaceId) return false;
+ if (prev.agent.isLead !== next.agent.isLead) return false;
+ if (prev.agent.leadMode !== next.agent.leadMode) return false;
  return true;
 });

@@ -4,8 +4,8 @@
 // layer only performs the side effects it asks for.
 export { TauriWorktreeOps, tauriHandoffFs } from './adapters.js';
 export {
-  planDispatch, getOrchestrator, resetOrchestrator,
-  dispatchGoal, approveTask, rejectTask,
+ planDispatch, getOrchestrator, resetOrchestrator, cleanupOrchestrator,
+ dispatchGoal, approveTask, rejectTask,
 } from './dispatch.js';
 export type { DispatchResult, DispatchPlanEntry, WorktreeInfo } from './dispatch.js';
 export { useDispatchStore } from './dispatchStore.js';

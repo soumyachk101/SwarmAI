@@ -8,7 +8,7 @@ import { OpenVsxPane } from "@swarm/extension";
 import { extensionAgentProps } from "./extensionAgent";
 import { setVoiceHost } from "@swarm/voice/ui";
 import {
-  useDispatchStore, dispatchGoal, approveTask, rejectTask,
+  useDispatchStore, dispatchGoal, approveTask, rejectTask, cleanupOrchestrator,
 } from "@swarm/mind/tauri";
 import { useSettingsStore } from "@/features/settings/settingsStore";
 import { useWorkspaceStore, workspaceForFolder, getActiveProjectPath, samePath } from "@swarm/workspace";
@@ -78,7 +78,12 @@ function toolContextFor(wsId: string): ToolContext {
     },
     switchWorkspace: (id) => {
       if (!ws().workspaces.some((w) => w.id === id)) return false;
-      ws().setActiveWorkspace(id);
+      const previousPath = getActiveProjectPath();
+ ws().setActiveWorkspace(id);
+ const newPath = getActiveProjectPath();
+ if (previousPath && newPath && previousPath !== newPath) {
+ cleanupOrchestrator(previousPath);
+ }
       return true;
     },
     // Pane tools see this agent's panes only — a lead must never rename or

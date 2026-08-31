@@ -34,7 +34,25 @@ if (typeof window !== "undefined") {
 
 export const appStorage = createJSONStorage(() =>
  typeof localStorage !== "undefined"
- ? localStorage
+ ? {
+ getItem: (k: string) => {
+ try { return localStorage.getItem(k); } catch { return null; }
+ },
+ setItem: (k: string, v: string) => {
+ try {
+ localStorage.setItem(k, v);
+ } catch (e) {
+ if (e instanceof Error && e.name === "QuotaExceededError") {
+ console.warn(`[Storage] localStorage quota exceeded for key ${k}. Consider clearing old data.`);
+ } else {
+ throw e;
+ }
+ }
+ },
+ removeItem: (k: string) => {
+ try { localStorage.removeItem(k); } catch { /* ignore */ }
+ },
+ }
  : {
  getItem: (k: string) => memory.get(k) ?? null,
  setItem: (k: string, v: string) => void memory.set(k, v),

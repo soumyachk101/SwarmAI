@@ -15,6 +15,6 @@ export function withHandoffLock<T>(folder: string, fn: () => Promise<T>): Promis
   const prev = chains.get(folder) ?? Promise.resolve();
   // Run next regardless of whether the previous write resolved or threw.
   const next = prev.then(fn, fn);
-  chains.set(folder, next.catch(() => {}));
+  chains.set(folder, next.catch((e) => { console.error(`[handoffQueue] Write failed for folder ${folder}:`, e); }));
   return next;
 }

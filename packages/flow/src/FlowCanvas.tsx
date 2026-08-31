@@ -1,6 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useIsomorphicLayoutEffect, useRef, useState } from "react";
+
+const useIsomorphicLayoutEffect =
+ typeof window !== "undefined" ? useIsomorphicLayoutEffect : useEffect;
 import { DEFAULT_CAMERA, GRID, clampZoom, screenToWorld, type Camera } from "./camera.js";
 import { useCanvasStore } from "./canvasStore.js";
 import CanvasNode from "./CanvasNode.js";
@@ -61,11 +64,11 @@ export default function FlowCanvas({
   const ids = items.map((i) => i.id);
   const idKey = ids.join("|");
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     for (const id of ids) ensureNode(id, ids);
   }, [idKey]);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = viewportRef.current;
     if (!el) return;
     const ro = new ResizeObserver(() => {

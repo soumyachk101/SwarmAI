@@ -203,7 +203,11 @@ export const useAgentsStore = create<AgentsState>()(
         });
         // The crowned pane lives in the right dock — open it, or the promotion
         // would leave the agent with nowhere to render.
-        agentsHost().revealLeadDock();
+ try {
+ agentsHost().revealLeadDock();
+ } catch {
+ // host not ready — dock appears on next interaction
+ }
         return true;
       },
       demoteLead: (workspaceId) =>

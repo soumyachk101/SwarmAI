@@ -57,10 +57,13 @@ interface TerminalPaneProps {
 // What's left is the fallback for a generic "shell" pane opened with no command:
 // it was hardcoded to powershell.exe, which on macOS/Linux spawned nothing and
 // left a black rectangle that looked like a broken terminal.
-function defaultShellCommand(): string {
- const ua = typeof navigator === "undefined" ? "" : navigator.userAgent;
- if (/Windows/i.test(ua)) return "powershell.exe";
- return /Mac OS X|Macintosh/i.test(ua) ? "zsh" : "bash";
+async function getDefaultShell(): Promise<string> {
+	try {
+		return await invoke<string>("get_default_shell");
+	} catch {
+		// Fallback based on platform if IPC fails.
+		return typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform || "") ? "zsh" : "bash";
+	}
 }
 
 // xterm's theme with a real opaque background — see AgentPane's paneXtermTheme
@@ -247,7 +250,7 @@ export default function TerminalPane({
 
  // Spawn terminal — the shell the launcher picked, else the platform's own.
  try {
- const command = shellCommand || defaultShellCommand();
+ const command = shellCommand || await getDefaultShell();
  // Re-fit right before spawn — get_project_path/get_home_dir above is
  // awaited IPC, and if the grid was still settling during that gap,
  // terminal.cols read without one more fit() here is stale.

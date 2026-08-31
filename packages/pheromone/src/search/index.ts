@@ -110,16 +110,17 @@ export class SearchEngine {
  // skip the full rebuild — it's already in sync.
  try {
  const count = db.exec("SELECT COUNT(*) FROM chunks_fts4");
- if (count.length > 0 && parseInt(count[0].values[0][0] as string, 10) > 0) {
- 	// Mirror has rows; verify it matches the chunks table count.
- 	const chunksCount = db.exec("SELECT COUNT(*) FROM chunks");
- 	if (
- 	 chunksCount.length > 0 &&
- 	 parseInt(count[0].values[0][0] as string, 10) ===
- 	 parseInt(chunksCount[0].values[0][0] as string, 10)
- 	) {
- 	 return; // Mirror is already in sync with chunks
- 	}
+ if (count.length === 0) return; // FTS4 table doesn't exist yet
+ if (parseInt(count[0].values[0][0] as string, 10) > 0) {
+ // Mirror has rows; verify it matches the chunks table count.
+ const chunksCount = db.exec("SELECT COUNT(*) FROM chunks");
+ if (
+ chunksCount.length > 0 &&
+ parseInt(count[0].values[0][0] as string, 10) ===
+ parseInt(chunksCount[0].values[0][0] as string, 10)
+ ) {
+ return; // Mirror is already in sync with chunks
+ }
  }
  } catch { /* table just created — fall through to rebuild */ }
  // Rebuild from scratch — cheap for the small DB sizes Pheromone handles,
@@ -196,7 +197,9 @@ export class SearchEngine {
  // Cosine similarity: dot product of two L2-normalised vectors.
  // Dividing by queryNorm only once (it's constant across all candidates).
  const dot = queryEmbedding.reduce((s, v, i) => s + v * embeddingArray[i], 0);
- const score = Math.max(0, Math.min(1, dot / queryNorm));
+ const storedNorm = Math.sqrt(embeddingArray.reduce((s, v) => s + v * v, 0));
+ if (storedNorm === 0) continue; // skip zero-length embeddings
+ const score = Math.max(0, Math.min(1, dot / (queryNorm * storedNorm)));
  if (score >= minScore) {
  results.push({ chunk: this.rowToChunk(row), score, source: 'vector' });
  }

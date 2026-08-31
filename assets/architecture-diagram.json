@@ -1,0 +1,66 @@
+{
+ "schema_version": 1,
+ "diagram_type": "architecture",
+ "meta": {
+ "title": "Swarm AI Architecture",
+ "quality_profile": "standard"
+ },
+ "layout": {
+ "mode": "grid",
+ "cols": 8,
+ "cellW": 128,
+ "cellH": 28
+ },
+ "components": [
+ { "id": "agent-grid", "type": "frontend", "label": "Agent Grid", "row": 0, "col": 0 },
+ { "id": "flow-canvas", "type": "frontend", "label": "Flow Canvas", "row": 0, "col": 2 },
+ { "id": "whisper-hud", "type": "frontend", "label": "Whisper HUD", "row": 0, "col": 4 },
+ { "id": "control-dock", "type": "frontend", "label": "Control Dock", "row": 0, "col": 6 },
+ { "id": "lead-planner", "type": "backend", "label": "Lead Planner", "row": 2, "col": 0 },
+ { "id": "swarmmind-bus", "type": "messagebus", "label": "SwarmMind Bus", "row": 2, "col": 3 },
+ { "id": "file-lock", "type": "backend", "label": "File Lock", "row": 2, "col": 6 },
+ { "id": "sqlite-fts5", "type": "database", "label": "SQLite FTS5", "row": 4, "col": 0 },
+ { "id": "mcp-bridge", "type": "backend", "label": "MCP Bridge", "row": 4, "col": 3 },
+ { "id": "token-budget", "type": "backend", "label": "Token Budget", "row": 4, "col": 6 },
+ { "id": "pty-manager", "type": "backend", "label": "PTY Manager", "row": 6, "col": 0 },
+ { "id": "git-worktree", "type": "backend", "label": "Git Worktree", "row": 6, "col": 3 },
+ { "id": "vector-engine", "type": "database", "label": "Vector Engine", "row": 6, "col": 6 },
+ { "id": "claude-code", "type": "external", "label": "Claude Code", "row": 8, "col": 0 },
+ { "id": "openai-codex", "type": "external", "label": "OpenAI Codex", "row": 8, "col": 3 }
+ ],
+ "boundaries": [
+ { "kind": "region", "label": "UI & Interaction", "wraps": ["agent-grid", "flow-canvas", "whisper-hud", "control-dock"] },
+ { "kind": "region", "label": "Orchestration & Planning", "wraps": ["lead-planner", "swarmmind-bus", "file-lock"] },
+ { "kind": "region", "label": "Shared Context & Memory", "wraps": ["sqlite-fts5", "mcp-bridge", "token-budget"] },
+ { "kind": "region", "label": "Tauri Rust Backend", "wraps": ["pty-manager", "git-worktree", "vector-engine"] },
+ { "kind": "region", "label": "Parallel Agent Execution", "wraps": ["claude-code", "openai-codex"] }
+ ],
+ "connections": [
+ { "from": "agent-grid", "to": "lead-planner" },
+ { "from": "agent-grid", "to": "swarmmind-bus" },
+ { "from": "flow-canvas", "to": "lead-planner" },
+ { "from": "flow-canvas", "to": "swarmmind-bus" },
+ { "from": "whisper-hud", "to": "lead-planner", "fromSide": "left", "toSide": "right" },
+ { "from": "control-dock", "to": "file-lock" },
+ { "from": "lead-planner", "to": "swarmmind-bus" },
+ { "from": "lead-planner", "to": "sqlite-fts5" },
+ { "from": "swarmmind-bus", "to": "mcp-bridge" },
+ { "from": "file-lock", "to": "git-worktree" },
+ { "from": "sqlite-fts5", "to": "mcp-bridge" },
+ { "from": "sqlite-fts5", "to": "vector-engine", "fromSide": "right", "toSide": "left" },
+ { "from": "mcp-bridge", "to": "token-budget" },
+ { "from": "token-budget", "to": "pty-manager", "fromSide": "left", "toSide": "right" },
+ { "from": "pty-manager", "to": "claude-code" },
+ { "from": "pty-manager", "to": "openai-codex" },
+ { "from": "git-worktree", "to": "claude-code" },
+ { "from": "git-worktree", "to": "openai-codex" },
+ { "from": "vector-engine", "to": "mcp-bridge" }
+ ],
+ "cards": [
+ { "dot": "cyan", "title": "Frontend", "items": ["React 18 + Zustand + Tailwind", "xterm.js, flow canvas, whisper HUD"] },
+ { "dot": "orange", "title": "Orchestration", "items": ["Lead planner decomposes goals into DAG specs", "SwarmMind event bus routes handoffs"] },
+ { "dot": "violet", "title": "Memory", "items": ["SQLite + FTS5 search", "MCP bridge", "Token budget 1M+ context"] },
+ { "dot": "emerald", "title": "Rust Backend", "items": ["portable-pty", "Git worktree driver", "rusqlite vector engine"] },
+ { "dot": "amber", "title": "Agent Execution", "items": ["2 isolated git worktrees", "Shared pheromone memory", "Zero merge conflicts"] }
+ ]
+}
