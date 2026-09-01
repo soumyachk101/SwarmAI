@@ -1941,11 +1941,11 @@ function ProjectGroup({
   };
 
   return (
-    <div className="group/item relative py-0.5">
+    <div className="group/item relative py-1">
       {/* Linear-style single interactive row */}
       <div
         onClick={() => { if (!isRenaming) onActivate(); }}
-        className={`relative flex items-center h-7.5 px-2 rounded-md cursor-pointer transition-colors duration-100 select-none ${
+        className={`relative flex items-center h-8.5 px-2.5 rounded-lg cursor-pointer transition-all duration-150 select-none ${
           isActive
             ? "bg-white/[0.08] text-white font-medium"
             : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]"
