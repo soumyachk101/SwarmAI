@@ -16,6 +16,7 @@ export interface LaunchOptions {
  paneId: string;
  task: string;
  agentType: 'claude' | 'codex' | 'aider' | 'antigravity' | 'opencode' | 'kimi' | 'cline' | 'cursor' | 'kiro' | 'kilo';
+ effort?: string;
  openFiles?: string[];
  gitDiff?: string;
 }
@@ -64,6 +65,7 @@ export class AgentLauncher {
  openFiles: options.openFiles || [],
  gitDiff: options.gitDiff,
  pheromoneContext,
+ effort: options.effort,
  };
 
  const command = adapter.getCommand(launchContext);
