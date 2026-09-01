@@ -258,6 +258,11 @@ function AgentPane({
  return () => clearTimeout(timer);
  }, [spawnState]);
 
+ // Surface auto-model detection failure in the connecting overlay
+ useEffect(() => {
+ setModelDetectionWarning(!!autoModelDetectionError && spawnState === "connecting");
+ }, [autoModelDetectionError, spawnState]);
+
   // Close pane-level dropdowns on outside click / Escape
   useEffect(() => {
     const open = handoffMenuOpen || commandSuggestionsOpen;
@@ -609,6 +614,14 @@ function AgentPane({
  Still nothing after {STALL_HINT_MS / 1000}s — is{" "}
  <code className="font-mono">{agent.cli}</code> installed
  and on your PATH?
+ </span>
+ )}
+ {modelDetectionWarning && (
+ <span className="text-mini text-swarm-err max-w-[220px]">
+ <AlertTriangle size={11} className="inline -mt-0.5 mr-1" />
+ Could not detect available models automatically.
+ Use <code className="font-mono">/model</code> to pick one
+ manually.
  </span>
  )}
  </>
