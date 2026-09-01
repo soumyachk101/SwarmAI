@@ -147,10 +147,19 @@ export default function FlowCanvas({
     }
   };
 
-  const endPan = () => {
-    panning.current = null;
-    setIsPanning(false);
-  };
+ const GRID = 10;
+ const endPan = () => {
+ const currentCam = useCanvasStore.getState().cameras[swarmId] ?? cam;
+ if (panning.current) {
+ useCanvasStore.getState().setCamera(swarmId, {
+ ...currentCam,
+ x: Math.round(currentCam.x / GRID) * GRID,
+ y: Math.round(currentCam.y / GRID) * GRID,
+ });
+ }
+ panning.current = null;
+ setIsPanning(false);
+ };
 
   /* ── Wheel: pan/zoom only over the backdrop ─────────────────────────── */
   const settleTimer = useRef<number | null>(null);
@@ -244,15 +253,48 @@ export default function FlowCanvas({
         />
       )}
 
-      {/* The background surface dot grid */}
+      {/* ── Cosmic Galaxy Background (Nebula, Starfield & Celestial Grid) ────── */}
       <div
         data-canvas-backdrop="true"
-        className="absolute inset-0 canvas-surface"
-        style={{
-          backgroundSize: `${dot}px ${dot}px, ${dot * 5}px ${dot * 5}px`,
-          backgroundPosition: `${originX}px ${originY}px, ${originX}px ${originY}px`,
-        }}
-      />
+        className="absolute inset-0 bg-[#04050a] overflow-hidden pointer-events-none"
+      >
+        {/* Deep Stellar Nebula Gradients */}
+        <div
+          className="absolute inset-0 opacity-60 mix-blend-screen"
+          style={{
+            backgroundImage: `
+              radial-gradient(ellipse 90% 70% at 20% 20%, rgba(99, 102, 241, 0.22), transparent 70%),
+              radial-gradient(ellipse 70% 60% at 85% 80%, rgba(168, 85, 247, 0.18), transparent 60%),
+              radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.12), transparent 55%),
+              radial-gradient(circle at 75% 25%, rgba(245, 158, 11, 0.10), transparent 45%),
+              radial-gradient(circle at 30% 80%, rgba(236, 72, 153, 0.12), transparent 50%)
+            `,
+          }}
+        />
+
+        {/* Dynamic Celestial Coordinate Grid moving with Camera */}
+        <div
+          data-canvas-backdrop="true"
+          className="absolute inset-0 opacity-40 pointer-events-auto"
+          style={{
+            backgroundImage: `
+              radial-gradient(circle 1px at center, rgba(255, 255, 255, 0.35) 1px, transparent 1px),
+              linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px)
+            `,
+            backgroundSize: `${dot}px ${dot}px, ${dot * 5}px ${dot * 5}px, ${dot * 5}px ${dot * 5}px`,
+            backgroundPosition: `${originX}px ${originY}px, ${originX}px ${originY}px, ${originX}px ${originY}px`,
+          }}
+        />
+
+        {/* Ambient Starlight Vignette */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: "radial-gradient(circle at center, transparent 40%, rgba(3, 4, 8, 0.75) 100%)",
+          }}
+        />
+      </div>
 
       {items.length === 0 && emptyState && (
         <div data-canvas-backdrop="true" className="pointer-events-none absolute inset-0 flex items-center justify-center">

@@ -1514,32 +1514,27 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
       {/* ── Sidebar Body: Left Activity Rail + Main Panel ─────────────────── */}
       <div className="flex-1 flex min-h-0 overflow-hidden">
         {/* ── Vertical Pro Activity Bar Rail (Far Left, 44px) ──────────────── */}
-        <div className="w-11 shrink-0 flex flex-col items-center justify-between border-r border-white/[0.08] bg-[#090b10] py-2 z-20 select-none">
+        <div className="w-11 shrink-0 flex flex-col items-center justify-between border-r border-white/[0.06] bg-[#07080c] py-2.5 z-20 select-none">
           {/* Top Section: App/Brand Logo & Activity Tabs */}
-          <div className="flex flex-col items-center gap-1 w-full pt-0.5">
+          <div className="flex flex-col items-center gap-1.5 w-full">
             {/* Activity Bar Tabs */}
             {TABS.map((tab) => {
               const Icon = tab.icon;
               const active = activeTab === tab.id;
               return (
-                <div key={tab.id} className="relative w-full flex justify-center py-0.5 group">
-                  {/* Active Left Indicator Bar */}
-                  {active && (
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4.5 rounded-r bg-swarm-gold shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
-                  )}
-                  <button
-                    onClick={() => { setActiveTab(tab.id); setViewer(null); }}
-                    title={tab.label}
-                    aria-label={tab.label}
-                    className={`size-8 rounded-lg flex items-center justify-center transition-all duration-150 cursor-pointer ${
-                      active
-                        ? "text-swarm-goldHi bg-white/[0.08] border border-swarm-gold/30 shadow-xs"
-                        : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.06]"
-                    }`}
-                  >
-                    <Icon className={`size-4 transition-transform ${active ? "scale-105 text-swarm-gold" : ""}`} />
-                  </button>
-                </div>
+                <button
+                  key={tab.id}
+                  onClick={() => { setActiveTab(tab.id); setViewer(null); }}
+                  title={tab.label}
+                  aria-label={tab.label}
+                  className={`relative size-8 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer ${
+                    active
+                      ? "text-amber-400 bg-amber-400/15 border border-amber-400/30 shadow-[0_0_10px_rgba(251,191,36,0.15)]"
+                      : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.06] border border-transparent"
+                  }`}
+                >
+                  <Icon className={`size-4 transition-transform ${active ? "scale-105" : ""}`} />
+                </button>
               );
             })}
           </div>
@@ -1555,16 +1550,16 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
                 onOpenSettings?.();
               }}
               aria-label="Settings and Tools"
-              className="size-8 rounded-lg flex items-center justify-center transition-all duration-150 cursor-pointer text-zinc-400 hover:text-swarm-gold hover:bg-white/[0.08] group"
+              className="size-7.5 rounded-lg flex items-center justify-center transition-all duration-150 cursor-pointer text-zinc-400 hover:text-white hover:bg-white/[0.08] group"
               title="Settings & Tools"
             >
-              <Settings size={16} className="group-hover:rotate-45 transition-transform duration-200" />
+              <Settings size={15} className="group-hover:rotate-45 transition-transform duration-200" />
             </button>
 
             <button
               onClick={onTogglePin}
               className={`size-7.5 flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
-                pinned ? "text-swarm-goldHi bg-swarm-gold/15 border border-swarm-gold/30" : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.06]"
+                pinned ? "text-amber-400 bg-amber-400/15 border border-amber-400/30" : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.06]"
               }`}
               title={pinned ? "Unpin sidebar" : "Pin sidebar"}
               aria-label={pinned ? "Unpin sidebar" : "Pin sidebar"}
@@ -1600,19 +1595,19 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
           ) : activeTab === "devtools" ? (
             <DevToolsPanel projectPath={projectPath || null} />
           ) : activeTab === "agent" ? (
- <AgentPanel />
- ) : activeTab === "fleet" ? (
+            <AgentPanel />
+          ) : activeTab === "fleet" ? (
             <FleetPanel onSelectWorkspace={(wsId) => activateAndSync(wsId)} />
           ) : (
             /* Workspaces Tab Content */
             <>
               {/* Ultra-Clean Linear Workspace Header */}
-              <div className="flex h-9 shrink-0 items-center justify-between px-3 border-b border-white/[0.06] bg-[#0c0e18]/80 backdrop-blur-md select-none">
+              <div className="flex h-9 shrink-0 items-center justify-between px-3 border-b border-white/[0.06] bg-[#0c0e16]/90 backdrop-blur-md select-none">
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-300">
                     Workspaces
                   </span>
-                  <span className="text-[10px] font-mono text-zinc-500 bg-white/[0.04] px-1.5 py-0.2 rounded border border-white/[0.04]">
+                  <span className="text-[10px] font-mono text-zinc-400 bg-white/[0.04] px-1.5 py-0.2 rounded border border-white/[0.06]">
                     {visibleWorkspaces.length}
                   </span>
                 </div>
@@ -1633,7 +1628,7 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
 
                   <button
                     onClick={handleAdd}
-                    className="size-6 flex items-center justify-center rounded-md border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                    className="size-6 flex items-center justify-center rounded-md border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] text-zinc-300 hover:text-white transition-colors cursor-pointer"
                     title="Add Workspace Folder"
                   >
                     <Plus size={12} strokeWidth={2} />
@@ -1642,8 +1637,8 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
               </div>
 
               {/* Minimal Search input */}
-              <div className="px-2.5 py-1.5 border-b border-white/[0.04]">
-                <div className="flex h-7 items-center gap-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06] px-2 focus-within:border-amber-400/40 focus-within:bg-white/[0.05] transition-colors">
+              <div className="px-2.5 py-2 border-b border-white/[0.04]">
+                <div className="flex h-7.5 items-center gap-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06] px-2.5 focus-within:border-amber-400/40 focus-within:bg-white/[0.05] transition-colors">
                   <Search size={11} className="text-zinc-500 shrink-0" />
                   <input
                     value={searchQuery}
@@ -1672,22 +1667,22 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
                     searchQuery ? (
                       <EmptyNote
                         text="Nothing matches that filter"
-                        hint="Filters match a workHive's name and its folder."
+                        hint="Filters match a workspace name and its folder."
                         actionLabel="Clear filter"
                         onAction={() => setSearchQuery("")}
                       />
                     ) : hideSleeping ? (
                       <EmptyNote
-                        text="Every workHive is asleep"
+                        text="Every workspace is asleep"
                         hint="Sleeping means no agent is running in it."
                         actionLabel="Show sleeping"
                         onAction={() => setHideSleeping(false)}
                       />
                     ) : (
                       <EmptyNote
-                        text="No workHives yet"
-                        hint="A workHive is one workspace folder."
-                        actionLabel="New WorkHive"
+                        text="No workspaces yet"
+                        hint="A workspace is one folder."
+                        actionLabel="New Workspace"
                         onAction={handleAdd}
                       />
                     )
@@ -1740,13 +1735,13 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
                     onClick={() => setBoardOpen(!boardOpen)}
                     className={`flex w-full h-7.5 items-center justify-between px-2.5 rounded-lg border text-xs font-medium transition-all cursor-pointer ${
                       boardOpen
-                        ? "bg-swarm-gold/15 border-swarm-gold/30 text-swarm-goldHi shadow-xs font-semibold"
+                        ? "bg-amber-400/15 border-amber-400/30 text-amber-200 shadow-xs font-semibold"
                         : "bg-white/[0.02] border-white/[0.06] text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.05] hover:border-white/[0.1]"
                     }`}
                     title="Toggle TaskComb Pipeline Board"
                   >
                     <div className="flex items-center gap-2">
-                      <Network size={13} className={boardOpen ? "text-swarm-gold" : "text-zinc-400"} />
+                      <Network size={13} className={boardOpen ? "text-amber-400" : "text-zinc-400"} />
                       <span className="text-[11.5px]">Task Pipeline</span>
                     </div>
                     {activeWorkspace?.taskCards && activeWorkspace.taskCards.length > 0 && (
@@ -1941,137 +1936,126 @@ function ProjectGroup({
   };
 
   return (
-    <div className="group/item relative py-1">
-      {/* Linear-style single interactive row */}
+    <div className={`group/item relative rounded-xl p-2.5 transition-all duration-200 select-none mb-1.5 border ${
+      isActive
+        ? "bg-gradient-to-br from-[#181a24] via-[#12141c] to-[#0c0d14] border-amber-400/35 shadow-[0_4px_24px_rgba(0,0,0,0.5),0_0_12px_rgba(251,191,36,0.08)] ring-1 ring-amber-400/15"
+        : "bg-[#0e1017]/80 hover:bg-[#141622] border-white/[0.06] hover:border-white/[0.12] shadow-xs"
+    }`}>
+      {/* Top Header Row of the Card */}
       <div
         onClick={() => { if (!isRenaming) onActivate(); }}
-        className={`relative flex items-center h-8.5 px-2.5 rounded-lg cursor-pointer transition-all duration-150 select-none ${
-          isActive
-            ? "bg-white/[0.06] text-white font-medium shadow-sm ring-1 ring-white/[0.08]"
-            : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]"
-        }`}
+        className="flex items-center gap-2.5 cursor-pointer"
       >
-        {/* Active Amber Indicator Bar */}
-        {isActive && (
-          <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r bg-amber-400" />
-        )}
-
-        {/* Chevron only when there are extra worktree branches */}
-        {trees.length > 0 ? (
-          <button
-            onClick={(e) => { e.stopPropagation(); setCollapsed(!collapsed); }}
-            className="text-zinc-500 hover:text-zinc-300 p-0.5 -ml-1 rounded transition-transform shrink-0"
-          >
-            <ChevronRight
-              size={11}
-              className={`transition-transform duration-150 ${collapsed ? "" : "rotate-90"}`}
-            />
-          </button>
-        ) : (
-          <div className="w-1 shrink-0" />
-        )}
-
-        {/* Folder Icon */}
-        <div className="size-4 flex items-center justify-center shrink-0 mr-1.5">
-          <Folder
-            size={13}
-            className={isActive ? "text-amber-400" : "text-zinc-400 group-hover/item:text-zinc-300"}
-          />
+        {/* Monogram / Folder Icon Badge */}
+        <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 font-mono font-bold text-[11px] transition-transform group-hover/item:scale-105 ${
+          isActive
+            ? "bg-amber-400/15 text-amber-300 border border-amber-400/30 shadow-[0_0_10px_rgba(251,191,36,0.2)]"
+            : "bg-white/[0.04] text-zinc-400 border border-white/[0.08]"
+        }`}>
+          {initials}
         </div>
 
-        {/* Title */}
-        <div className="flex-1 min-w-0 flex items-center gap-1.5">
-          {isRenaming ? (
-            <input
-              autoFocus
-              value={editValue}
-              onChange={(e) => onEditChange(e.target.value)}
-              onBlur={onCommitRename}
-              onKeyDown={(e) => { if (e.key === "Enter") onCommitRename(); if (e.key === "Escape") onCancelRename(); }}
-              className="bg-transparent border-b border-amber-400 text-xs text-white outline-none font-sans w-full"
-            />
-          ) : (
-            <span
-              className={`text-[12px] truncate tracking-tight ${isActive ? "font-semibold text-white" : "font-normal text-zinc-300 group-hover/item:text-zinc-100"}`}
-              title={ws.name}
-              onDoubleClick={onStartRename}
-            >
-              {ws.name}
-            </span>
-          )}
-
-          <span className="text-[10px] font-mono text-zinc-500/80 truncate shrink-0">
-            {noRepo ? "unbound" : "main"}
-          </span>
-        </div>
-
-        {/* Right Status & Actions */}
-        <div className="flex items-center gap-1 shrink-0 ml-1">
-          {hasActive && (
-            <span
-              className="size-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)] animate-pulse shrink-0"
-              title="Active agent running"
-            />
-          )}
-
-          <div className="flex items-center gap-0.5 opacity-0 group-hover/item:opacity-100 transition-opacity">
-            <button
-              onClick={(e) => { e.stopPropagation(); if (noRepo) { bindRepo(); return; } setAdding(!adding); setError(null); }}
-              className="size-4.5 flex items-center justify-center rounded text-zinc-400 hover:text-white hover:bg-white/[0.08]"
-              title={noRepo ? "Bind folder" : "New worktree branch"}
-            >
-              {noRepo ? <FolderPlus size={10} /> : <Plus size={10} />}
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); onMenu(e); }}
-              className="size-4.5 flex items-center justify-center rounded text-zinc-400 hover:text-white hover:bg-white/[0.08]"
-              title="Workspace actions"
-            >
-              <MoreHorizontal size={10} />
-            </button>
+        {/* Name & Sub-details */}
+        <div className="flex-1 min-w-0 flex flex-col justify-center">
+          <div className="flex items-center gap-1.5">
+            {isRenaming ? (
+              <input
+                autoFocus
+                value={editValue}
+                onChange={(e) => onEditChange(e.target.value)}
+                onBlur={onCommitRename}
+                onKeyDown={(e) => { if (e.key === "Enter") onCommitRename(); if (e.key === "Escape") onCancelRename(); }}
+                className="bg-transparent border-b border-amber-400 text-xs text-white outline-none font-sans w-full"
+              />
+            ) : (
+              <span
+                className={`text-[12.5px] truncate tracking-tight font-medium ${isActive ? "text-white font-semibold" : "text-zinc-300 group-hover/item:text-white"}`}
+                title={ws.name}
+                onDoubleClick={onStartRename}
+              >
+                {ws.name}
+              </span>
+            )}
           </div>
+
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <span className="text-[9.5px] font-mono text-zinc-400 bg-black/40 px-1.5 py-0.2 rounded border border-white/[0.06] shrink-0">
+              {noRepo ? "unbound" : "main"}
+            </span>
+
+            {trees.length > 0 && (
+              <span className="text-[9.5px] font-mono text-zinc-500 bg-white/[0.03] px-1 py-0.2 rounded">
+                +{trees.length} branches
+              </span>
+            )}
+
+            {hasActive && (
+              <span className="inline-flex items-center gap-1 text-[9.5px] font-medium text-emerald-400 font-mono">
+                <span className="size-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)] animate-pulse" />
+                running
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Card Actions */}
+        <div className="flex items-center gap-0.5 shrink-0 opacity-70 group-hover/item:opacity-100 transition-opacity">
+          <button
+            onClick={(e) => { e.stopPropagation(); if (noRepo) { bindRepo(); return; } setAdding(!adding); setError(null); }}
+            className="size-6 flex items-center justify-center rounded-md text-zinc-400 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer"
+            title={noRepo ? "Bind folder" : "New worktree branch"}
+          >
+            {noRepo ? <FolderPlus size={12} /> : <Plus size={12} />}
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); onMenu(e); }}
+            className="size-6 flex items-center justify-center rounded-md text-zinc-400 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer"
+            title="Workspace actions"
+          >
+            <MoreHorizontal size={12} />
+          </button>
         </div>
       </div>
 
       {/* New Tree Inline Input */}
       {adding && (
-        <div className="my-1 ml-5 pl-2 flex items-center gap-1">
+        <div className="mt-2 pt-2 border-t border-white/[0.06] flex items-center gap-1.5">
           <input
             autoFocus
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") submit(); if (e.key === "Escape") { setAdding(false); setName(""); } }}
             placeholder="branch-name"
-            className="h-6 min-w-0 flex-1 rounded border border-white/[0.1] bg-black/60 px-2 text-[11px] text-zinc-100 outline-none focus:border-amber-400/50 font-mono"
+            className="h-6.5 min-w-0 flex-1 rounded-lg border border-white/[0.1] bg-black/60 px-2 text-[11px] text-zinc-100 outline-none focus:border-amber-400/50 font-mono"
           />
-          <button onClick={submit} disabled={busy || !name.trim()} className="flex size-5.5 shrink-0 items-center justify-center rounded text-amber-300 hover:bg-white/[0.08] disabled:opacity-40">
-            {busy ? <LoaderCircle className="size-3 animate-spin" /> : <Check className="size-3" />}
+          <button onClick={submit} disabled={busy || !name.trim()} className="flex size-6 shrink-0 items-center justify-center rounded-lg text-amber-300 hover:bg-white/[0.08] disabled:opacity-40">
+            {busy ? <LoaderCircle className="size-3 animate-spin" /> : <Check className="size-3.5" />}
           </button>
-          <button onClick={() => { setAdding(false); setName(""); }} className="flex size-5.5 shrink-0 items-center justify-center rounded text-zinc-400 hover:text-zinc-200">
-            <X className="size-3" />
+          <button onClick={() => { setAdding(false); setName(""); }} className="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-200">
+            <X className="size-3.5" />
           </button>
         </div>
       )}
 
-      {error && <div className="my-1 ml-5 pl-2 text-[10px] text-red-400 break-words font-mono">{error}</div>}
+      {error && <div className="mt-1.5 text-[10px] text-red-400 break-words font-mono">{error}</div>}
 
-      {/* Sub-tree branches (only rendered if there are custom worktrees) */}
+      {/* Sub-tree branches within card */}
       {trees.length > 0 && !collapsed && (
-        <div className="ml-4 pl-3.5 border-l border-white/[0.06] my-0.5 space-y-0.5">
+        <div className="mt-2 pt-1.5 border-t border-white/[0.06] space-y-0.5">
           {trees.map((t) => (
             <div
               key={t.id}
-              className="group/tree flex items-center justify-between h-6 px-1.5 rounded hover:bg-white/[0.04] cursor-pointer text-zinc-400 hover:text-zinc-200 transition-colors"
+              className="group/tree flex items-center justify-between h-6.5 px-2 rounded-lg hover:bg-white/[0.04] cursor-pointer text-zinc-400 hover:text-zinc-200 transition-colors"
             >
               <div className="flex items-center gap-1.5 min-w-0">
                 <GitBranch size={10} className="text-amber-400/60 shrink-0" />
                 <span className="text-[11px] font-mono truncate text-zinc-400">{t.name}</span>
               </div>
               <div className="flex items-center gap-0.5 opacity-0 group-hover/tree:opacity-100 transition-opacity">
-                <button onClick={() => merge(t.id)} className="p-0.5 text-zinc-400 hover:text-amber-300 rounded" title="Merge into main">
+                <button onClick={() => merge(t.id)} className="p-1 text-zinc-400 hover:text-amber-300 rounded" title="Merge into main">
                   <GitMerge size={10} />
                 </button>
-                <button onClick={() => remove(t.id)} className="p-0.5 text-zinc-400 hover:text-red-400 rounded" title="Remove branch">
+                <button onClick={() => remove(t.id)} className="p-1 text-zinc-400 hover:text-red-400 rounded" title="Remove branch">
                   <Trash2 size={10} />
                 </button>
               </div>
@@ -2259,8 +2243,11 @@ function ActiveWorkspaceDetail({
   const runningCount = mine.filter((a) => statuses[a.id] === "running" || statuses[a.id] === "launching").length;
   const recent = (ws.boundProjectPath ? openFiles[ws.boundProjectPath] : undefined) ?? NO_FILES;
 
+  const setActivePaneId = useAgentsStore((s) => s.setActivePaneId);
+  const activePaneId = useAgentsStore((s) => s.activePaneId);
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col border-t border-white/[0.05] pt-1 bg-[#0a0b10]">
+    <div className="flex min-h-0 flex-1 flex-col border-t border-white/[0.05] pt-1 bg-[#090b10]">
       {/* Agents Section */}
       <CollapsibleSection
         label="Agents"
@@ -2271,7 +2258,7 @@ function ActiveWorkspaceDetail({
       />
 
       {!agentsCollapsed && (
-        <div className="min-h-0 shrink overflow-y-auto overflow-x-hidden scrollbar-sleek px-1.5 pb-1.5 flex flex-col gap-0.5 max-h-[48%]">
+        <div className="min-h-0 shrink overflow-y-auto overflow-x-hidden scrollbar-sleek px-1.5 pb-1.5 flex flex-col gap-1 max-h-[48%]">
           {mine.length === 0 ? (
             <p className="px-2 py-1 text-[11px] text-zinc-500 font-sans italic">
               No agents active
@@ -2282,21 +2269,28 @@ function ActiveWorkspaceDetail({
               const label = a.customName || a.cliName;
               const brand = cliBrand(a.cli);
               const isRunning = status === "running" || status === "launching";
+              const isSelected = activePaneId === a.id;
+
               return (
                 <div
                   key={a.id}
-                  className="group flex h-7 items-center gap-1.5 rounded-lg px-2 text-xs text-zinc-300 transition-colors hover:bg-white/[0.04] hover:text-white cursor-default"
-                  title={`${label}\n${a.cliName}${a.model ? ` · ${a.model}` : ""}\nStatus: ${status}`}
+                  onClick={() => setActivePaneId(a.id)}
+                  className={`group flex h-7.5 items-center gap-2 rounded-lg px-2 text-xs transition-all cursor-pointer select-none ${
+                    isSelected
+                      ? "bg-white/[0.08] text-white border border-white/[0.1] shadow-xs"
+                      : "text-zinc-300 hover:bg-white/[0.04] hover:text-white border border-transparent"
+                  }`}
+                  title={`${label}\n${a.cliName}${a.model ? ` · ${a.model}` : ""}\nStatus: ${status} (Click to focus)`}
                 >
                   <span className={`size-1.5 shrink-0 rounded-full ${
                     isRunning ? "bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)] animate-pulse" : "bg-zinc-600"
                   }`} />
                   {brand ? (
-                    <BrandGlyph brand={brand} size={13} className="shrink-0 opacity-80 group-hover:opacity-100" />
+                    <BrandGlyph brand={brand} size={13} className="shrink-0 opacity-85 group-hover:opacity-100" />
                   ) : (
                     <AgentMark size={13} className="shrink-0 text-zinc-500" />
                   )}
-                  <span className="min-w-0 flex-1 truncate font-medium text-zinc-200 text-[11.5px]" title={label}>
+                  <span className="min-w-0 flex-1 truncate font-medium text-[11.5px]" title={label}>
                     {label}
                   </span>
                   {a.isLead && (
@@ -2307,7 +2301,7 @@ function ActiveWorkspaceDetail({
                   )}
                   <span className={`shrink-0 text-[9.5px] font-mono px-1.5 py-0.5 rounded border ${
                     isRunning
-                      ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+                      ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20 font-medium"
                       : "text-zinc-500 bg-white/[0.02] border-white/[0.04]"
                   }`}>
                     {status}

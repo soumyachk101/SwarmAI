@@ -7,16 +7,16 @@ import type { HandoffManager } from './handoffs/index.js';
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 
-async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
- let timeoutId: ReturnType<typeof setTimeout>;
- const timeoutPromise = new Promise<never>((_, reject) => {
- timeoutId = setTimeout(() => reject(new Error(`Timeout after ${ms}ms: ${label}`)), ms);
- });
- try {
- return await Promise.race([promise, timeoutPromise]);
- } finally {
- clearTimeout(timeoutId);
- }
+async function withTimeout<T>(promise: T | Promise<T>, ms: number, label: string): Promise<T> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(`Timeout after ${ms}ms: ${label}`)), ms);
+  });
+  try {
+    return await Promise.race([Promise.resolve(promise), timeoutPromise]);
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
 }
 
 function safeUUID(): string {

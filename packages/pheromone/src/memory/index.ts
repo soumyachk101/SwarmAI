@@ -128,6 +128,7 @@ export class MemoryManager {
 
  const chunks: Array<{ text: string; heading?: string }> = [];
  let currentHeading: string | undefined;
+ let currentText = '';
 
  function extractText(node: any): string {
  if (!node) return '';

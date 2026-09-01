@@ -6,6 +6,7 @@ export interface LaunchContext {
   openFiles: string[];
   gitDiff?: string;
   pheromoneContext: InjectionResult;
+  effort?: string;
 }
 
 export interface CommandConfig {

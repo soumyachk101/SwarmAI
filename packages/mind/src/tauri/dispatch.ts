@@ -124,12 +124,8 @@ export function resetOrchestrator(projectPath?: string) {
  * growing the Map unboundedly.
  */
 export function cleanupOrchestrator(projectPath: string): void {
- const key = normalizeProjectPath(projectPath);
- const orch = orchestrators.get(key);
- if (orch) {
- try { orch.dispose(); } catch { /* ignore cleanup errors */ }
- orchestrators.delete(key);
- }
+  const key = normalizeProjectPath(projectPath);
+  orchestrators.delete(key);
 }
 
 /**

@@ -44,16 +44,18 @@ interface ReportsState {
  getActiveReport: () => Report | undefined;
  /** Generate a report from aggregated project data. */
  buildFromAggregation: (
- templateId: ReportTemplateId,
- title: string,
- aggregation: {
- sessions: Report["contributorIds"];
- cards: { title: string; column: string; assignedCli?: string; blockingReason?: string }[];
- commits: { shortHash: string; message: string; author: string }[];
- },
- projectPath: string,
- workspaceId?: string
- ) => Report;
+    templateId: ReportTemplateId,
+    title: string,
+    aggregation: {
+      sessions: Report["contributorIds"];
+      cards: { title: string; column: string; assignedCli?: string; blockingReason?: string }[];
+      commits: { shortHash: string; message: string; author: string; additions?: number; deletions?: number }[];
+      fromTimestamp?: number;
+      toTimestamp?: number;
+    },
+    projectPath: string,
+    workspaceId?: string
+  ) => Report | null;
 }
 
 const engine = createReportEngine();
