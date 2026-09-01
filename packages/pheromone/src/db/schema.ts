@@ -58,9 +58,15 @@ export function initializeSchema(db: initSqlJs.Database): void {
  // Generated column for vector search performance — stores the byte-length
  // of the embedding blob as an indexable proxy, enabling LIMIT push-down
  // in vector queries instead of full-table scans in JS.
+ const stmt = db.prepare("PRAGMA table_info(chunks)");
+ const hasNorm = stmt.getAsObject().hasOwnProperty("embedding_norm") ||
+ Array.from({ length: stmt.getColumnNames().length }, () => stmt.step()).some((r: any) => r.name === "embedding_norm");
+ stmt.free();
+ if (!hasNorm) {
  db.run(`
  ALTER TABLE chunks ADD COLUMN embedding_norm REAL GENERATED ALWAYS AS (length(embedding)) STORED
  `);
+ }
 
  // FTS4 virtual table for keyword search (sql.js compatible — the bundled
  // sql.js build has NO fts5 module, only fts4). SearchEngine also creates a

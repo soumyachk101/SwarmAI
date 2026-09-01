@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useIsomorphicLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 const useIsomorphicLayoutEffect =
- typeof window !== "undefined" ? useIsomorphicLayoutEffect : useEffect;
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 import { DEFAULT_CAMERA, GRID, clampZoom, screenToWorld, type Camera } from "./camera.js";
 import { useCanvasStore } from "./canvasStore.js";
 import CanvasNode from "./CanvasNode.js";

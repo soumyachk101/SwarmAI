@@ -38,12 +38,13 @@ export class PheromoneDatabase {
  }
 
  private migrate(): void {
- if (this.tableExists('chunks')) return;
  const version = getSchemaVersion(this.db);
+ if (version >= CURRENT_SCHEMA_VERSION) return;
  if (version === 0) {
  initializeSchema(this.db);
  setSchemaVersion(this.db, CURRENT_SCHEMA_VERSION);
  }
+ // Future: add per-version migration steps here (version 1 -> 2, etc.)
  }
 
  private tableExists(name: string): boolean {

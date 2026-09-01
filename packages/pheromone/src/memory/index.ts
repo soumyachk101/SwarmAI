@@ -11,6 +11,9 @@ import { type FileSystemPort, NodeFileSystem } from '../ports.js';
  * Rejects absolute paths, `..` traversal, and any path that escapes the base directory.
  */
 function validateRelativePath(projectPath: string, relativePath: string): string {
+ if (!relativePath || relativePath.trim() === '') {
+ throw new Error('Empty path not allowed');
+ }
  if (relativePath.startsWith('/')) {
  throw new Error(`Absolute paths not allowed: ${relativePath}`);
  }
@@ -125,25 +128,104 @@ export class MemoryManager {
 
  const chunks: Array<{ text: string; heading?: string }> = [];
  let currentHeading: string | undefined;
- let currentText = '';
+
+ function extractText(node: any): string {
+ if (!node) return '';
+ switch (node.type) {
+ case 'text':
+ return node.value || '';
+ case 'inlineCode':
+ return `\`${node.value || ''}\``;
+ case 'strong':
+ return `**${extractChildrenText(node)}**`;
+ case 'emphasis':
+ return `*${extractChildrenText(node)}*`;
+ case 'link':
+ return `[${extractChildrenText(node)}](${node.url || ''})`;
+ case 'image':
+ return `![${node.alt || ''}](${node.url || ''})`;
+ case 'code':
+ return `\`\`\`${node.lang || ''}\n${node.value || ''}\n\`\`\``;
+ case 'heading':
+ return node.children.map((c: any) => extractText(c)).join('');
+ case 'paragraph':
+ return extractChildrenText(node);
+ case 'list':
+ const items = (node.children || []).map((c: any) => `- ${extractChildrenText(c)}`).join('\n');
+ return items;
+ case 'listItem':
+ return extractChildrenText(node);
+ case 'blockquote':
+ return `> ${extractChildrenText(node)}`;
+ case 'table': {
+ const rows = (node.children || []).map((row: any) => {
+ const cells = (row.children || []).map((cell: any) => extractChildrenText(cell)).join(' | ');
+ return `| ${cells} |`;
+ });
+ return rows.join('\n');
+ }
+ case 'tableRow':
+ case 'tableCell':
+ return extractChildrenText(node);
+ case 'thematicBreak':
+ return '---';
+ case 'break':
+ return '\n';
+ case 'root':
+ case 'parent':
+ return extractChildrenText(node);
+ default:
+ return extractChildrenText(node);
+ }
+ }
+
+ function extractChildrenText(node: any): string {
+ if (!node || !node.children) return '';
+ return node.children.map((c: any) => extractText(c)).join('');
+ }
+
+ function flushText(text: string) {
+ if (text.trim()) {
+ chunks.push({ text: text.trim(), heading: currentHeading });
+ }
+ }
 
  for (const node of tree.children as any[]) {
- if (node.type === 'heading') {
- if (currentText.trim()) {
- chunks.push({ text: currentText.trim(), heading: currentHeading });
+ switch (node.type) {
+ case 'heading':
+ flushText(currentText);
  currentText = '';
- }
- currentHeading = node.children.map((c: { value: string }) => c.value).join('');
- } else if (node.type === 'paragraph') {
- const text = node.children.map((c: { value: string }) => c.value).join('');
- currentText += text + '\n\n';
+ currentHeading = node.children.map((c: any) => extractText(c)).join('');
+ break;
+ case 'paragraph':
+ currentText += extractText(node) + '\n\n';
+ break;
+ case 'code':
+ flushText(currentText);
+ currentText = '';
+ chunks.push({ text: extractText(node), heading: currentHeading });
+ break;
+ case 'list':
+ flushText(currentText);
+ currentText = '';
+ chunks.push({ text: extractText(node), heading: currentHeading });
+ break;
+ case 'blockquote':
+ flushText(currentText);
+ currentText = '';
+ chunks.push({ text: extractText(node), heading: currentHeading });
+ break;
+ case 'table':
+ flushText(currentText);
+ currentText = '';
+ chunks.push({ text: extractText(node), heading: currentHeading });
+ break;
+ default:
+ currentText += extractText(node) + '\n\n';
  }
  }
 
- if (currentText.trim()) {
- chunks.push({ text: currentText.trim(), heading: currentHeading });
- }
-
+ flushText(currentText);
  return chunks;
  }
 }

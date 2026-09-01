@@ -77,7 +77,7 @@ const WIDTH_KEY = "swarm.sidebarWidth";
 
 const clampWidth = (px: number) => Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, px));
 
-type LeftTab = "workspaces" | "explorer" | "search" | "git" | "devtools" | "fleet";
+type LeftTab = "workspaces" | "explorer" | "search" | "git" | "devtools" | "agent" | "fleet";
 
 // Tokens, not raw Tailwind palette entries: bg-green-400 stayed the same green
 // in Rose, Forest and Dracula and clashed with every one of them.
@@ -1490,6 +1490,7 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
     { id: "git", label: "Git Control", icon: FolderGit2 },
     { id: "search", label: "Global Search", icon: Search },
     { id: "devtools", label: "DevTools", icon: Wrench },
+ { id: "agent", label: "Agents", icon: Sparkles },
     { id: "fleet", label: "Swarm Fleet", icon: Cpu },
   ];
 
@@ -1597,7 +1598,9 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
             <SearchPanel projectPath={projectPath || null} onOpen={setViewer} />
           ) : activeTab === "devtools" ? (
             <DevToolsPanel projectPath={projectPath || null} />
-          ) : activeTab === "fleet" ? (
+          ) : activeTab === "agent" ? (
+ <AgentPanel />
+ ) : activeTab === "fleet" ? (
             <FleetPanel onSelectWorkspace={(wsId) => activateAndSync(wsId)} />
           ) : (
             /* Workspaces Tab Content */
