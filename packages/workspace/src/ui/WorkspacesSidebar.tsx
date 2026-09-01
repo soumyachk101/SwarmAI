@@ -1667,7 +1667,7 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
 
               {/* Workspaces List */}
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#090b10]">
-                <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-sleek px-1.5 py-1.5 space-y-0.5">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-sleek px-2 py-2 space-y-1">
                   {visibleWorkspaces.length === 0 ? (
                     searchQuery ? (
                       <EmptyNote
