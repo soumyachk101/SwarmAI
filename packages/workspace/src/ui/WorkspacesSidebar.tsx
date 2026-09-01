@@ -59,6 +59,7 @@ import { useWorkspaceStore, getActiveProjectPath, type Workspace } from "../stor
 import { useAgentsStore, type AgentStatus } from "@swarm/agents/ui";
 import { useProjectStore } from "../openFiles.js";
 import WorkspaceCreateDialog from "./WorkspaceCreateDialog.js";
+import AgentPanel from "./AgentPanel.js";
 
 const isTauriEnv = (): boolean =>
   typeof window !== "undefined" && ("__TAURI_INTERNALS__" in window || "__TAURI__" in window);
