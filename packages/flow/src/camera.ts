@@ -31,7 +31,7 @@ export const MAX_PAN = 5000;
 
 export const clampZoom = (z: number) => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z));
 
-const clampPan = (v: number) => Math.max(-MAX_PAN, Math.min(MAX_PAN, v));
+export const clampPan = (v: number) => Math.max(-MAX_PAN, Math.min(MAX_PAN, v));
 
 export const DEFAULT_CAMERA: Camera = { x: 0, y: 0, zoom: 1 };
 
@@ -58,7 +58,7 @@ export function zoomAbout(cam: Camera, sx: number, sy: number, factor: number): 
 
 /** Pan by a screen-space delta (a drag), converted to world units. */
 export function panBy(cam: Camera, dxScreen: number, dyScreen: number): Camera {
-  return { ...cam, x: cam.x + dxScreen / cam.zoom, y: cam.y + dyScreen / cam.zoom };
+  return { ...cam, x: clampPan(cam.x + dxScreen / cam.zoom), y: clampPan(cam.y + dyScreen / cam.zoom) };
 }
 
 export function boundsOf(rects: Rect[]): Rect | null {

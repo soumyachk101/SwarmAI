@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import {
-  DEFAULT_CAMERA, clampZoom, fitTo, panBy, placeNear, snap, zoomAbout,
+  DEFAULT_CAMERA, clampZoom, clampPan, fitTo, panBy, placeNear, snap, zoomAbout,
   type Camera, type Rect,
 } from "./camera.js";
 
