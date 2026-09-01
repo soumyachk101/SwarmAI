@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, Search } from "lucide-react";
 
 interface AgentPanelProps {
 	projectPath?: string | null;
@@ -7,6 +7,16 @@ interface AgentPanelProps {
 
 export default function AgentPanel({ projectPath }: AgentPanelProps) {
 	const [agents, setAgents] = useState<AgentInfo[]>([]);
+	const [search, setSearch] = useState("");
+
+	const filteredAgents = agents.filter((a) => {
+		if (!search.trim()) return true;
+		const q = search.toLowerCase();
+		return (
+			a.name.toLowerCase().includes(q) ||
+			(a.workingDir || projectPath || "~/").toLowerCase().includes(q)
+		);
+	});
 
 	const handleClose = useCallback((id: string) => {
 		setAgents((prev) => prev.filter((a) => a.id !== id));
@@ -21,20 +31,34 @@ export default function AgentPanel({ projectPath }: AgentPanelProps) {
 						Agents
 					</span>
 					<span className="text-[10px] font-mono text-zinc-500 bg-white/[0.04] px-1.5 py-0.2 rounded border border-white/[0.04]">
-						{agents.length}
+						{filteredAgents.length}/{agents.length}
 					</span>
+				</div>
+			</div>
+
+			{/* Search */}
+			<div className="shrink-0 px-2 pt-2">
+				<div className="relative">
+					<Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-zinc-500" />
+					<input
+						type="text"
+						value={search}
+						onChange={(e) => setSearch(e.target.value)}
+						placeholder="Filter agents..."
+						className="w-full text-xs bg-white/[0.03] border border-white/[0.06] rounded-md pl-7 pr-2 py-1.5 text-zinc-300 placeholder-zinc-600 focus:outline-none focus:border-white/[0.12]"
+					/>
 				</div>
 			</div>
 
 			{/* Agent list */}
 			<div className="flex-1 overflow-y-auto p-2 space-y-2">
-				{agents.length === 0 ? (
+				{filteredAgents.length === 0 ? (
 					<div className="flex flex-col items-center justify-center h-full text-zinc-500 text-xs gap-2 py-8">
 						<span>No active agents</span>
 						<span className="text-[10px]">Launch an agent from the terminal</span>
 					</div>
 				) : (
-					agents.map((agent) => (
+					filteredAgents.map((agent) => (
 						<div
 							key={agent.id}
 							className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-2"
