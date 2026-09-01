@@ -6,7 +6,7 @@ export { default as CanvasEdges } from "./CanvasEdges.js";
 export { useCanvasStore, DEFAULT_NODE_SIZE, type NodeBox, type CanvasEdge } from "./canvasStore.js";
 export {
   DEFAULT_CAMERA, MIN_ZOOM, MAX_ZOOM, GRID,
-  clampZoom, screenToWorld, worldToScreen, zoomAbout, panBy, boundsOf, fitTo, placeNear, snap,
+  clampZoom, clampPan, screenToWorld, worldToScreen, zoomAbout, panBy, boundsOf, fitTo, placeNear, snap,
   type Camera, type Rect,
 } from "./camera.js";
 export { default as FlowMark } from "./FlowMark.js";
