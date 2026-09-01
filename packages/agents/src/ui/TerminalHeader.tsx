@@ -25,7 +25,8 @@ interface TerminalHeaderProps {
   currentModel?: string;
   currentEffort?: string;
   paneWidth: number;
-  onEditChange: (value: string) => void;
+  autoModelDetectionError?: string;
+ onEditChange: (value: string) => void;
   onRename?: () => void;
   onCancelRename?: () => void;
   headerExtra?: React.ReactNode;

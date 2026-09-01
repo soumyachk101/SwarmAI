@@ -156,6 +156,7 @@ function AgentPane({
  const [paneWidth, setPaneWidth] = useState(0);
  const [menuOpen, setMenuOpen] = useState(false);
  const [copied, setCopied] = useState(false);
+ const [modelDetectionWarning, setModelDetectionWarning] = useState(false);
 
  // Prompt bar state
  const [promptInput, setPromptInput] = useState("");
