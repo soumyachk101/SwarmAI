@@ -31,6 +31,9 @@ import './app/globals.css';
 // user's last choice) is ready when React mounts.
 initTheme();
 
+// Register lead host and other platform integrations before React mounts.
+registerHosts();
+
 // Global Window.open Interceptor for Tauri Desktop App:
 // Embedded widgets (like GlassChat) call window.open() for browser sign-in/OAuth.
 // Only whitelisted auth origins are rewritten; everything else falls through
