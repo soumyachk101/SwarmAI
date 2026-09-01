@@ -130,16 +130,16 @@ export function useUpdateChecker() {
         throw new Error(`GitHub API returned status ${res.status}`);
       }
 
-      // Skip prereleases unless explicitly requested
- if ((data as any).prerelease && !(data as any).draft) {
+      const data = await res.json();
+
+ // Skip prereleases unless explicitly requested
+ if (data.prerelease && !data.draft) {
  setHasUpdate(false);
  setLastChecked(new Date());
  markChecked();
  setIsChecking(false);
  return;
  }
-
- const data = await res.json();
       const releaseTag = data.tag_name || data.name || "";
       const isNewer = compareVersions(CURRENT_APP_VERSION, releaseTag);
 
