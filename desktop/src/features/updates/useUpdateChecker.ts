@@ -54,6 +54,38 @@ export function useUpdateChecker() {
 
   const platform = detectCurrentPlatform();
 
+ // Rate-limit update checks to at most once per hour
+ const CHECK_COOLDOWN_MS = 60 * 60 * 1000;
+ const CACHE_KEY = "swarm.lastUpdateCheck";
+
+ const canCheck = (): boolean => {
+ if (typeof window === "undefined") return true;
+ try {
+ const last = localStorage.getItem(CACHE_KEY);
+ if (!last) return true;
+ return Date.now() - Number(last) > CHECK_COOLDOWN_MS;
+ } catch {
+ return true;
+ }
+ };
+
+ const markChecked = () => {
+ if (typeof window === "undefined") return;
+ try {
+ localStorage.setItem(CACHE_KEY, String(Date.now()));
+ } catch {
+ // storage full or unavailable
+ }
+ };
+
+ const formatBytes = (bytes: number): string => {
+ if (bytes === 0) return "0 B";
+ const k = 1024;
+ const sizes = ["B", "KB", "MB", "GB"];
+ const i = Math.floor(Math.log(bytes) / Math.log(k));
+ return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+ };
+
   const compareVersions = (current: string, latest: string): boolean => {
     const cleanCurrent = current.replace(/^v/, "").trim();
     const cleanLatest = latest.replace(/^v/, "").trim();
@@ -98,7 +130,16 @@ export function useUpdateChecker() {
         throw new Error(`GitHub API returned status ${res.status}`);
       }
 
-      const data = await res.json();
+      // Skip prereleases unless explicitly requested
+ if ((data as any).prerelease && !(data as any).draft) {
+ setHasUpdate(false);
+ setLastChecked(new Date());
+ markChecked();
+ setIsChecking(false);
+ return;
+ }
+
+ const data = await res.json();
       const releaseTag = data.tag_name || data.name || "";
       const isNewer = compareVersions(CURRENT_APP_VERSION, releaseTag);
 
