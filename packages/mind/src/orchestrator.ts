@@ -5,6 +5,20 @@ import { RoleManager, type Role } from './roles/index.js';
 import type { WorktreeOps, WorktreeInfo } from './ports.js';
 import type { HandoffManager } from './handoffs/index.js';
 
+const DEFAULT_TIMEOUT_MS = 30_000;
+
+async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+ let timeoutId: ReturnType<typeof setTimeout>;
+ const timeoutPromise = new Promise<never>((_, reject) => {
+ timeoutId = setTimeout(() => reject(new Error(`Timeout after ${ms}ms: ${label}`)), ms);
+ });
+ try {
+ return await Promise.race([promise, timeoutPromise]);
+ } finally {
+ clearTimeout(timeoutId);
+ }
+}
+
 function safeUUID(): string {
 	if (typeof crypto !== 'undefined' && crypto.randomUUID) {
 		return crypto.randomUUID();
@@ -93,7 +107,11 @@ export class Orchestrator {
 
  if (roleDef.needsWorktree) {
  // await: WorktreeOps may be async (the desktop app goes through Tauri IPC).
- worktree = await this.worktree.create(task.id);
+ worktree = await withTimeout(
+ this.worktree.create(task.id),
+ DEFAULT_TIMEOUT_MS,
+ 'worktree.create'
+ );
  }
 
  const agentId = `agent-${task.id}-${safeUUID().slice(0, 8)}`;
@@ -141,7 +159,11 @@ export class Orchestrator {
  let merged = false;
  if (agent.worktreePath) {
  try {
- await this.worktree.mergeAndRemove(agent.worktreePath, agent.branchName);
+ await withTimeout(
+ this.worktree.mergeAndRemove(agent.worktreePath, agent.branchName),
+ DEFAULT_TIMEOUT_MS,
+ 'worktree.mergeAndRemove'
+ );
  merged = true;
  } catch (e) {
  this.registry.updateStatus(agentId, 'awaiting-review');
