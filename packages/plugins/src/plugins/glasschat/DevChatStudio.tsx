@@ -1407,28 +1407,6 @@ export function DevChatStudio({
                 </div>
               )}
 
-              {/* Collapsible Claude/Gemini Thinking Process Box */}
-              {!isUser && msg.thought && (
-                <div className="mb-2 w-full max-w-[88%] overflow-hidden rounded-xl border border-swarm-border/60 bg-swarm-surface text-xs">
-                  <button
-                    onClick={() => toggleThoughtAccordion(msg.id)}
-                    className="flex w-full items-center justify-between px-3 py-1.5 text-zinc-400 hover:text-amber-300 transition-colors"
-                  >
-                    <div className="flex items-center gap-1.5 text-[11px] font-mono">
-                      <BrainCircuit size={11} className="text-amber-400" />
-                      <span>Thought for {msg.thoughtDuration || 3}s</span>
-                    </div>
-                    {isThoughtExpanded ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
-                  </button>
-
-                  {isThoughtExpanded && (
-                    <div className="border-t border-white/[0.04] bg-black/40 p-2.5 font-mono text-[11px] leading-relaxed text-zinc-400 whitespace-pre-wrap">
-                      {msg.thought}
-                    </div>
-                  )}
-                </div>
-              )}
-
               {/* Bubble Body */}
               <div
                 className={`text-[12.5px] leading-relaxed max-w-[88%] ${
