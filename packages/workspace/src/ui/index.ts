@@ -9,3 +9,4 @@ export { default as WorkspacesSidebar } from './WorkspacesSidebar.js';
 export { default as WorkspaceCreateDialog } from './WorkspaceCreateDialog.js';
 export { default as WorktreeSelect } from './WorktreeSelect.js';
 export { default as ToolboxPane } from './ToolboxPane.js';
+export { default as AgentPanel } from './AgentPanel.js';

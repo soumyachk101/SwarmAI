@@ -103,7 +103,9 @@ export default function BrowserPane({
 
  client.on("Page.screencastFrame", (p: any) => {
  setFrame(p.data);
- client!.send("Page.screencastFrameAck", { sessionId: p.sessionId }, sessionId).catch(() => {});
+ const c = clientRef.current, s = sessionRef.current;
+ if (!c) return;
+ c.send("Page.screencastFrameAck", { sessionId: p.sessionId }, s).catch(() => {});
  });
  client.on("Page.frameNavigated", (p: any) => {
  if (p.frame?.parentId) return;
@@ -151,7 +153,7 @@ export default function BrowserPane({
  invoke("stop_cdp_browser").catch(() => {});
  })();
  };
- }, [paneId, initialUrl, clearScreenshot, bootNonce, applyMetrics]);
+ }, [paneId, clearScreenshot, bootNonce]); // initialUrl excluded — tracked via ref to prevent re-boot loops
 
  /* ── Keep the emulated viewport matched to the pane size ────────── */
  useEffect(() => {

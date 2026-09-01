@@ -155,17 +155,18 @@ export const useReportsStore = create<ReportsState>()(
  },
 
  buildFromAggregation: (templateId, title, aggregation, projectPath, workspaceId) => {
- const report = engine.buildReport(
- {
- sessions: aggregation.sessions.map((id) => ({
+ if (!aggregation.sessions.length) return null;
+
+ const sessions = aggregation.sessions.map((id) => ({
  id,
  agentType: "unknown",
  agentName: id,
  title: "Session",
  timestamp: Date.now(),
  outcome: "success" as const,
- })),
- cards: aggregation.cards.map((c) => ({
+ }));
+
+ const cards = aggregation.cards.map((c) => ({
  id: `card-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
  title: c.title,
  description: c.title,
@@ -174,20 +175,27 @@ export const useReportsStore = create<ReportsState>()(
  blockingReason: c.blockingReason,
  createdAt: Date.now(),
  updatedAt: Date.now(),
- })),
- commits: aggregation.commits.map((c) => ({
+ }));
+
+ const commits = aggregation.commits.map((c) => ({
  hash: c.shortHash,
  shortHash: c.shortHash,
  author: c.author,
  message: c.message,
  timestamp: Date.now(),
- additions: 0,
- deletions: 0,
- })),
+ additions: c.additions ?? 0,
+ deletions: c.deletions ?? 0,
+ }));
+
+ const report = engine.buildReport(
+ {
+ sessions,
+ cards,
+ commits,
  projectName: projectPath.split(/[\\/]/).filter(Boolean).pop() ?? "project",
  projectPath,
- fromTimestamp: Date.now() - 86400000,
- toTimestamp: Date.now(),
+ fromTimestamp: aggregation.fromTimestamp ?? Date.now() - 86400000,
+ toTimestamp: aggregation.toTimestamp ?? Date.now(),
  },
  { templateId, title, projectPath, workspaceId }
  );

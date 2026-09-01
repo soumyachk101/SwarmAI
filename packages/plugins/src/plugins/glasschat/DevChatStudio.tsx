@@ -159,7 +159,7 @@ const INITIAL_MESSAGES: DevChatMessage[] = [
   {
     id: "msg-welcome",
     sender: "assistant",
-    text: "I am your AI Copilot powered by **Claude 5 Opus**. You can ask technical questions, write and refactor code, inspect project structure, and run tasks.",
+    text: "I am your AI Copilot. You can ask technical questions, write and refactor code, inspect project structure, and run tasks.",
     timestamp: "Just now",
   },
 ];

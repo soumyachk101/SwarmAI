@@ -8,7 +8,7 @@
  * 2. Tauri `invoke('store_secret' / 'get_secret')` — Rust backend command
  * that can forward to any OS secret store the host implements.
  *
- * IMPORTANT: This module does NOT fall back to localStorage for writes.
+ * IMPORTANT: This module does NOT fall back to localStorage for any operation.
  * Falling back silently to plaintext storage defeats the entire purpose
  * of secure storage. If no secure backend is available, we throw a
  * descriptive error so the caller can decide how to proceed.
@@ -20,50 +20,43 @@
 import { invoke } from '@tauri-apps/api/core';
 
 export interface SecureStorage {
- get(key: string): Promise<string | null>;
- set(key: string, value: string): Promise<void>;
- delete(key: string): Promise<void>;
+	get(key: string): Promise<string | null>;
+	set(key: string, value: string): Promise<void>;
+	delete(key: string): Promise<void>;
 }
 
 // ── Public API ────────────────────────────────────────────────────────
+
+function getSecureError(e: unknown): Error {
+	const msg = e instanceof Error ? e.message : String(e);
+	return new Error(`Secure storage operation failed: ${msg}`);
+}
+
 export async function secureGet(key: string): Promise<string | null> {
-  try {
-    return (await invoke<string | null>('get_secret', { key })) ?? null;
-  } catch (e) {
-    if ((e as any)?.message?.includes('not found') || (e as any)?.code === 'NOT_FOUND') {
-      return null;
-    }
-    // Fallback to localStorage in web / dev environment if tauri command is unavailable
-    try {
-      return localStorage.getItem(key);
-    } catch {
-      return null;
-    }
-  }
+	try {
+		return (await invoke<string | null>('get_secret', { key })) ?? null;
+	} catch (e) {
+		if ((e as any)?.message?.includes('not found') || (e as any)?.code === 'NOT_FOUND') {
+			return null;
+		}
+		throw getSecureError(e);
+	}
 }
 
 export async function secureSet(key: string, value: string): Promise<void> {
-  try {
-    await invoke('store_secret', { key, value });
-  } catch (e) {
-    try {
-      localStorage.setItem(key, value);
-    } catch {
-      throw new Error(`Secure storage write failed for key "${key}": ${e}`);
-    }
-  }
+	try {
+		await invoke('store_secret', { key, value });
+	} catch (e) {
+		throw new Error(`Secure storage write failed for key "${key}": ${getSecureError(e).message}`);
+	}
 }
 
 export async function secureDelete(key: string): Promise<void> {
-  try {
-    await invoke('delete_secret', { key });
-  } catch (e) {
-    try {
-      localStorage.removeItem(key);
-    } catch {
-      // Ignored
-    }
-  }
+	try {
+		await invoke('delete_secret', { key });
+	} catch (e) {
+		throw getSecureError(e);
+	}
 }
 
 /**
@@ -75,29 +68,29 @@ export async function secureDelete(key: string): Promise<void> {
  * secure store.
  */
 export async function migrateLocalStorageToSecure(
-  keys: string[]
+	keys: string[]
 ): Promise<{ migrated: string[]; skipped: string[] }> {
-  const migrated: string[] = [];
-  const skipped: string[] = [];
+	const migrated: string[] = [];
+	const skipped: string[] = [];
 
-  for (const key of keys) {
-    let localValue: string | null = null;
-    try {
-      localValue = localStorage.getItem(key);
-    } catch {
-      continue;
-    }
-    if (!localValue) { skipped.push(key); continue; }
+	for (const key of keys) {
+		let localValue: string | null = null;
+		try {
+			localValue = localStorage.getItem(key);
+		} catch {
+			continue;
+		}
+		if (!localValue) { skipped.push(key); continue; }
 
-    try {
-      await secureSet(key, localValue);
-      localStorage.removeItem(key);
-      migrated.push(key);
-    } catch (e) {
-      console.error(`[secureStorage] migration failed for key "${key}":`, e);
-      skipped.push(key);
-    }
-  }
+		try {
+			await secureSet(key, localValue);
+			localStorage.removeItem(key);
+			migrated.push(key);
+		} catch (e) {
+			console.error(`[secureStorage] migration failed for key "${key}":`, e);
+			skipped.push(key);
+		}
+	}
 
-  return { migrated, skipped };
+	return { migrated, skipped };
 }
