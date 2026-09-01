@@ -78,47 +78,25 @@ interface EffortOption {
 }
 
 const CLI_BRAND_META: Record<string, { brandName: string; brandColor: string; supportsEffort: boolean; effortLevels?: EffortOption[]; defaultEffort?: string }> = {
-  claude: { brandName: "Claude Code Models", brandColor: "#D97757", supportsEffort: true, defaultEffort: "UltraCode", effortLevels: [
-    { id: "ultracode", label: "UltraCode", isHighlight: true },
-    { id: "max", label: "Max" },
-    { id: "high", label: "High" },
-    { id: "medium", label: "Medium" },
-    { id: "low", label: "Low" },
-  ]},
-  codex: { brandName: "Codex Models", brandColor: "#10A37F", supportsEffort: true, defaultEffort: "High", effortLevels: [
-    { id: "xhigh", label: "Extra High", isHighlight: true },
-    { id: "high", label: "High" },
-    { id: "medium", label: "Medium" },
-    { id: "low", label: "Low" },
-  ]},
+ claude: { brandName: "Claude Code Models", brandColor: "#D97757", supportsEffort: true, defaultEffort: "UltraCode", effortLevels: [
+ { id: "ultracode", label: "UltraCode", isHighlight: true },
+ { id: "max", label: "Max" },
+ { id: "high", label: "High" },
+ { id: "medium", label: "Medium" },
+ { id: "low", label: "Low" },
+ ]},
+ codex: { brandName: "Codex Models", brandColor: "#10A37F", supportsEffort: true, defaultEffort: "High", effortLevels: [
+ { id: "xhigh", label: "Extra High", isHighlight: true },
+ { id: "high", label: "High" },
+ { id: "medium", label: "Medium" },
+ { id: "low", label: "Low" },
+ ]},
  opencode: { brandName: "OpenCode Models", brandColor: "#A855F7", supportsEffort: false },
  agy: { brandName: "AGY Models", brandColor: "#4285F4", supportsEffort: false },
  aider: { brandName: "Aider Models", brandColor: "#14B8A6", supportsEffort: false },
  cline: { brandName: "Cline Models", brandColor: "#6C5CE7", supportsEffort: false },
  kilo: { brandName: "Kilo Models", brandColor: "#F59E0B", supportsEffort: false },
 };
-
-/** Maps an effort level to the best matching model ID for a given CLI. */
-function getModelIdForEffort(cli: string, effortId: string): string | undefined {
- const e = effortId.toLowerCase();
- switch (cli) {
- case "claude": {
- if (e === "ultracode" || e === "ultra" || e === "max") return "claude-fable-5-1m";
- if (e === "high") return "claude-fable-5";
- if (e === "medium") return "claude-sonnet-5";
- if (e === "low") return "claude-haiku-4-5";
- break;
- }
- case "codex": {
- if (e === "xhigh") return "codex-5-6-sol";
- if (e === "high") return "codex-5-6-terra";
- if (e === "medium") return "codex-5-6-luna";
- if (e === "low") return "codex-o4-mini";
- break;
- }
- }
- return undefined;
-}
 
 function getCliBrandMeta(cli: string) {
  const c = (cli || "").toLowerCase();
@@ -178,7 +156,6 @@ function AgentPane({
  const [paneWidth, setPaneWidth] = useState(0);
  const [menuOpen, setMenuOpen] = useState(false);
  const [copied, setCopied] = useState(false);
- const [modelDetectionWarning, setModelDetectionWarning] = useState(false);
 
  // Prompt bar state
  const [promptInput, setPromptInput] = useState("");
@@ -224,28 +201,28 @@ function AgentPane({
  const compactHeader = paneWidth > 0 && paneWidth < 240;
  const displayName = agent.customName || agent.cliName;
 
-  // Sync currentModel with agent.model or default
-  useEffect(() => {
-    if (agent.model) {
-      const entry = getModelById(agent.cli, agent.model) || detectedModels.find((m) => m.id === agent.model || m.label === agent.model);
-      setCurrentModel(entry ? entry.label : agent.model);
-    } else {
-      const defaultModel = getDefaultModelForCli(agent.cli);
-      if (defaultModel) {
-        setCurrentModel(defaultModel.label);
-      }
-    }
-  }, [agent.cli, agent.model]);
+ // Sync currentModel with agent.model or default
+ useEffect(() => {
+ if (agent.model) {
+ const entry = getModelById(agent.cli, agent.model) || detectedModels.find((m) => m.id === agent.model || m.label === agent.model);
+ setCurrentModel(entry ? entry.label : agent.model);
+ } else {
+ const defaultModel = getDefaultModelForCli(agent.cli);
+ if (defaultModel) {
+ setCurrentModel(defaultModel.label);
+ }
+ }
+ }, [agent.cli, agent.model]);
 
-  // Sync currentEffort with agent.effort or default
-  useEffect(() => {
-    if (agent.effort && agent.effort !== "UltraCode") {
-      setCurrentEffort(agent.effort);
-    } else {
-      const defaultEff = brandMeta.defaultEffort || "Max";
-      setCurrentEffort(defaultEff);
-    }
-  }, [agent.cli, agent.effort, brandMeta.defaultEffort]);
+ // Sync currentEffort with agent.effort or default
+ useEffect(() => {
+ if (agent.effort && agent.effort !== "UltraCode") {
+ setCurrentEffort(agent.effort);
+ } else {
+ const defaultEff = brandMeta.defaultEffort || "Max";
+ setCurrentEffort(defaultEff);
+ }
+ }, [agent.cli, agent.effort, brandMeta.defaultEffort]);
 
  // Auto-detect models
  const autoModelDetection = useAutoModelDetection(agent.cli, paneId);
@@ -280,33 +257,28 @@ function AgentPane({
  return () => clearTimeout(timer);
  }, [spawnState]);
 
- // Surface auto-model detection failure in the connecting overlay
+ // Close pane-level dropdowns on outside click / Escape
  useEffect(() => {
- setModelDetectionWarning(!!autoModelDetectionError && spawnState === "connecting");
- }, [autoModelDetectionError, spawnState]);
-
-  // Close pane-level dropdowns on outside click / Escape
-  useEffect(() => {
-    const open = handoffMenuOpen || commandSuggestionsOpen;
-    if (!open) return;
-    const onDown = (e: globalThis.MouseEvent) => {
-      const target = e.target as Node;
-      if (handoffMenuOpen && !handoffMenuRef.current?.contains(target)) setHandoffMenuOpen(false);
-      if (commandSuggestionsOpen && !promptTextareaRef.current?.contains(target)) setCommandSuggestionsOpen(false);
-    };
-    const onKey = (e: globalThis.KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setHandoffMenuOpen(false);
-        setCommandSuggestionsOpen(false);
-      }
-    };
-    window.addEventListener("mousedown", onDown);
-    window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("mousedown", onDown);
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [handoffMenuOpen, commandSuggestionsOpen, promptTextareaRef]);
+ const open = handoffMenuOpen || commandSuggestionsOpen;
+ if (!open) return;
+ const onDown = (e: globalThis.MouseEvent) => {
+ const target = e.target as Node;
+ if (handoffMenuOpen && !handoffMenuRef.current?.contains(target)) setHandoffMenuOpen(false);
+ if (commandSuggestionsOpen && !promptTextareaRef.current?.contains(target)) setCommandSuggestionsOpen(false);
+ };
+ const onKey = (e: globalThis.KeyboardEvent) => {
+ if (e.key === "Escape") {
+ setHandoffMenuOpen(false);
+ setCommandSuggestionsOpen(false);
+ }
+ };
+ window.addEventListener("mousedown", onDown);
+ window.addEventListener("keydown", onKey);
+ return () => {
+ window.removeEventListener("mousedown", onDown);
+ window.removeEventListener("keydown", onKey);
+ };
+ }, [handoffMenuOpen, commandSuggestionsOpen, promptTextareaRef]);
 
  // ---- Handlers ----
 
@@ -347,17 +319,6 @@ function AgentPane({
  useAgentsStore.getState().updateAgent(paneId, { effort: label });
  const cleanCmd = normaliseEffort(effortId) || effortId.toLowerCase().split(" ")[0];
  sendTerminal(`\x15/effort ${cleanCmd}\r`);
- // Also update the model to one that best matches the selected effort level
- const recommendedModelId = getModelIdForEffort(agent.cli, effortId);
- if (recommendedModelId) {
- const entry = getModelById(agent.cli, recommendedModelId);
- if (entry) {
- setCurrentModel(entry.label);
- autoModelDetection.markUserChosen();
- useAgentsStore.getState().updateAgent(paneId, { model: recommendedModelId });
- sendTerminal(`\x15/model ${entry.cliFlag}\r`);
- }
- }
  };
 
  const handleCheckUsage = () => sendTerminal(`\x15/status\r`);
@@ -507,20 +468,20 @@ function AgentPane({
  >
  {/* Header */}
  <TerminalHeader
-   paneId={paneId}
-   displayName={displayName}
-   spawnState={spawnState}
-   isEditing={Boolean(isEditing)}
-   editValue={editValue ?? ""}
-   agent={{ id: agent.id, cli: agent.cli, cliName: agent.cliName, role: agent.role, branchName: agent.branchName }}
-   currentModel={currentModel}
-   currentEffort={currentEffort}
-   paneWidth={paneWidth}
+ paneId={paneId}
+ displayName={displayName}
+ spawnState={spawnState}
+ isEditing={Boolean(isEditing)}
+ editValue={editValue ?? ""}
+ agent={{ id: agent.id, cli: agent.cli, cliName: agent.cliName, role: agent.role, branchName: agent.branchName }}
+ currentModel={currentModel}
+ currentEffort={currentEffort}
+ paneWidth={paneWidth}
  autoModelDetectionError={autoModelDetectionError ?? undefined}
-   onEditChange={onEditChange ?? (() => {})}
-   onRename={onRename}
-   onCancelRename={onCancelRename}
-   headerExtra={headerExtra}
+ onEditChange={onEditChange ?? (() => {})}
+ onRename={onRename}
+ onCancelRename={onCancelRename}
+ headerExtra={headerExtra}
  controls={
  <AgentControls
  paneId={paneId}
@@ -545,7 +506,6 @@ function AgentPane({
  syncNowRef={syncNowRef}
  />
  }
- />
 
  {/* Terminal */}
  <AgentTerminal
@@ -650,14 +610,6 @@ function AgentPane({
  and on your PATH?
  </span>
  )}
- {modelDetectionWarning && (
- <span className="text-mini text-swarm-err max-w-[220px]">
- <AlertTriangle size={11} className="inline -mt-0.5 mr-1" />
- Could not detect available models automatically.
- Use <code className="font-mono">/model</code> to pick one
- manually.
- </span>
- )}
  </>
  )}
  </div>
@@ -742,7 +694,6 @@ export default memo(AgentPane, function areEqual(prev: AgentPaneProps, next: Age
  if (prev.onClose !== next.onClose) return false;
  if (prev.onToggleMaximize !== next.onToggleMaximize) return false;
  if (prev.onRename !== next.onRename) return false;
- if (prev.onEditChange !== next.onEditChange) return false;
  if (prev.onCancelRename !== next.onCancelRename) return false;
  if (prev.headerExtra !== next.headerExtra) return false;
  if (prev.agent.role !== next.agent.role) return false;
