@@ -98,6 +98,28 @@ const CLI_BRAND_META: Record<string, { brandName: string; brandColor: string; su
  kilo: { brandName: "Kilo Models", brandColor: "#F59E0B", supportsEffort: false },
 };
 
+/** Maps an effort level to the best matching model ID for a given CLI. */
+function getModelIdForEffort(cli: string, effortId: string): string | undefined {
+ const e = effortId.toLowerCase();
+ switch (cli) {
+ case "claude": {
+ if (e === "ultracode" || e === "ultra" || e === "max") return "claude-fable-5-1m";
+ if (e === "high") return "claude-fable-5";
+ if (e === "medium") return "claude-sonnet-5";
+ if (e === "low") return "claude-haiku-4-5";
+ break;
+ }
+ case "codex": {
+ if (e === "xhigh") return "codex-5-6-sol";
+ if (e === "high") return "codex-5-6-terra";
+ if (e === "medium") return "codex-5-6-luna";
+ if (e === "low") return "codex-o4-mini";
+ break;
+ }
+ }
+ return undefined;
+}
+
 function getCliBrandMeta(cli: string) {
  const c = (cli || "").toLowerCase();
  return CLI_BRAND_META[c] ?? { brandColor: "#E5A93C", supportsEffort: false };
@@ -325,6 +347,17 @@ function AgentPane({
  useAgentsStore.getState().updateAgent(paneId, { effort: label });
  const cleanCmd = normaliseEffort(effortId) || effortId.toLowerCase().split(" ")[0];
  sendTerminal(`\x15/effort ${cleanCmd}\r`);
+ // Also update the model to one that best matches the selected effort level
+ const recommendedModelId = getModelIdForEffort(agent.cli, effortId);
+ if (recommendedModelId) {
+ const entry = getModelById(agent.cli, recommendedModelId);
+ if (entry) {
+ setCurrentModel(entry.label);
+ autoModelDetection.markUserChosen();
+ useAgentsStore.getState().updateAgent(paneId, { model: recommendedModelId });
+ sendTerminal(`\x15/model ${entry.cliFlag}\r`);
+ }
+ }
  };
 
  const handleCheckUsage = () => sendTerminal(`\x15/status\r`);
