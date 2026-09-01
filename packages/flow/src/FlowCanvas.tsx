@@ -59,7 +59,15 @@ export default function FlowCanvas({
   const setConnectingFrom = useCanvasStore((s) => s.setConnectingFrom);
 
   const stored = cameras[swarmId];
-  const cam: Camera = stored ? { ...stored, zoom: clampZoom(stored.zoom) || 1 } : DEFAULT_CAMERA;
+  const PAN_LIMIT = 8000;
+ const cam: Camera = stored
+ ? {
+ ...stored,
+ zoom: clampZoom(stored.zoom) || 1,
+ x: Math.max(-PAN_LIMIT, Math.min(PAN_LIMIT, stored.x ?? DEFAULT_CAMERA.x)),
+ y: Math.max(-PAN_LIMIT, Math.min(PAN_LIMIT, stored.y ?? DEFAULT_CAMERA.y)),
+ }
+ : DEFAULT_CAMERA;
 
   const ids = items.map((i) => i.id);
   const idKey = ids.join("|");
