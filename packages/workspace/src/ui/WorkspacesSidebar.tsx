@@ -1947,7 +1947,7 @@ function ProjectGroup({
         onClick={() => { if (!isRenaming) onActivate(); }}
         className={`relative flex items-center h-8.5 px-2.5 rounded-lg cursor-pointer transition-all duration-150 select-none ${
           isActive
-            ? "bg-white/[0.08] text-white font-medium"
+            ? "bg-white/[0.06] text-white font-medium shadow-sm ring-1 ring-white/[0.08]"
             : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]"
         }`}
       >
