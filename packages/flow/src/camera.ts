@@ -26,8 +26,12 @@ export interface Rect {
 
 export const MIN_ZOOM = 0.2;
 export const MAX_ZOOM = 2.5;
+/** Max world-space offset (in either direction) before panning is clamped. */
+export const MAX_PAN = 5000;
 
 export const clampZoom = (z: number) => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z));
+
+const clampPan = (v: number) => Math.max(-MAX_PAN, Math.min(MAX_PAN, v));
 
 export const DEFAULT_CAMERA: Camera = { x: 0, y: 0, zoom: 1 };
 

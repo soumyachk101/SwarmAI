@@ -2,7 +2,7 @@ import { type ReactNode, type ReactElement } from "react";
 import { useAgentsStore } from "./agentsStore.js";
 import { themeForKind, PANE_HEADER_CLASS, PANE_TITLE_CLASS } from "@swarm/board";
 import RoleBadge from "./RoleBadge.js";
-import { LeadCrown } from "@swarm/board";
+import { LeadCrown, AlertTriangle } from "@swarm/board";
 import AgentStatusIndicator from "./AgentStatusIndicator.js";
 
 // ---------------------------------------------------------------------------
