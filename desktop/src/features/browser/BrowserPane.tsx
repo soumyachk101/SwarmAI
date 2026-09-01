@@ -105,7 +105,7 @@ export default function BrowserPane({
  setFrame(p.data);
  const c = clientRef.current, s = sessionRef.current;
  if (!c) return;
- c.send("Page.screencastFrameAck", { sessionId: p.sessionId }, s).catch(() => {});
+ c.send("Page.screencastFrameAck", { sessionId: p.sessionId }, s ?? undefined).catch(() => {});
  });
  client.on("Page.frameNavigated", (p: any) => {
  if (p.frame?.parentId) return;

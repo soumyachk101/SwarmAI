@@ -97,9 +97,9 @@ export default function HomePage() {
   const [showDiffModal, setShowDiffModal] = useState(false);
   const [showTemplatesModal, setShowTemplatesModal] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
- const [showShortcuts, setShowShortcuts] = useState(false);
- const onboarding = useOnboarding();
- const [gitStatus, setGitStatus] = useState<{
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const onboarding = useOnboarding();
+  const [gitStatus, setGitStatus] = useState<{
     branch: string;
     changed: number;
   } | null>(null);

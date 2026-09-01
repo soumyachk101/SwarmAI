@@ -12,7 +12,7 @@ import {
   BoardLogo, BoardStrip, themeForKind, type StripItem,
   LeadCrown, BrandGlyph, cliBrand, shellBrand, AgentMark,
 } from "@swarm/board";
-import { FlowCanvas, FlowMark, useCanvasStore, SwarmTelemetryHUD } from "@swarm/flow";
+import { FlowCanvas, FlowMark, useCanvasStore } from "@swarm/flow";
 import { OpenVsxLogo, OpenVsxPane } from "@swarm/extension";
 import { invoke } from "@tauri-apps/api/core";
 import { AgentPane } from "@swarm/agents/ui";
@@ -933,11 +933,6 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
           </div>
         )}
       </div>
-
-      {/* Live Swarm Telemetry HUD fixed at bottom of Board View */}
-      {!canvasView && count > 0 && (
-        <SwarmTelemetryHUD agents={flowAgentsMeta} />
-      )}
 
       {/* Drag ghost — a small label chip following the cursor while dragging.
           Anchored at the origin and moved by transform: `move` writes that
