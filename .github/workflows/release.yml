@@ -85,3 +85,15 @@ jobs:
             desktop/src-tauri/target/release/bundle/deb/*.deb
             desktop/src-tauri/target/release/bundle/appimage/*.AppImage
           if-no-files-found: warn
+
+  publish-winget:
+    needs: build-desktop
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: windows-latest
+    steps:
+      - name: Publish to Windows Package Manager (WinGet)
+        uses: vedantmgoyal2009/winget-releaser@v2
+        with:
+          identifier: SoumyaChakraborty.SwarmAI
+          token: ${{ secrets.WINGET_TOKEN || secrets.GITHUB_TOKEN }}
+

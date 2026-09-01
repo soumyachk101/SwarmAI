@@ -1,0 +1,30 @@
+# Created using wingetcreate 1.6.5.0
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
+
+PackageIdentifier: SoumyaChakraborty.SwarmAI
+PackageVersion: 0.1.0
+PackageLocale: en-US
+Publisher: Soumya Chakraborty
+PublisherUrl: https://github.com/soumyachk101
+PublisherSupportUrl: https://github.com/soumyachk101/SwarmAI/issues
+Author: Soumya Chakraborty
+PackageName: SwarmAI
+PackageUrl: https://github.com/soumyachk101/SwarmAI
+License: MIT
+LicenseUrl: https://github.com/soumyachk101/SwarmAI/blob/main/LICENSE
+Copyright: Copyright (c) 2026 Soumya Chakraborty
+ShortDescription: Autonomous Multi-Agent AI Swarm IDE & Desktop Application
+Description: SwarmAI is an autonomous multi-agent developer environment and IDE that coordinates Claude Code, Codex, Antigravity, and AI agents in parallel.
+Moniker: swarmai
+Tags:
+  - ai
+  - agent
+  - swarm
+  - ide
+  - developer-tools
+  - coding-assistant
+  - claude
+  - terminal
+ReleaseNotesUrl: https://github.com/soumyachk101/SwarmAI/releases/tag/v0.1.0
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0
