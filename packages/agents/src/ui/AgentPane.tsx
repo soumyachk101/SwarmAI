@@ -506,6 +506,7 @@ function AgentPane({
  syncNowRef={syncNowRef}
  />
  }
+ />
 
  {/* Terminal */}
  <AgentTerminal
