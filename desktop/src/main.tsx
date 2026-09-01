@@ -33,41 +33,50 @@ initTheme();
 
 // Global Window.open Interceptor for Tauri Desktop App:
 // Embedded widgets (like GlassChat) call window.open() for browser sign-in/OAuth.
-// If the widget builds a relative URL on localhost (e.g. http://localhost:5173/signin?...),
-// we rewrite the origin to https://glasschat.app and delegate to system default browser.
-if (typeof window !== 'undefined') {
-  const originalOpen = window.open;
-  window.open = function (url?: string | URL, target?: string, features?: string) {
-    if (url) {
-      let urlStr = typeof url === 'string' ? url : url.toString();
+// Only whitelisted auth origins are rewritten; everything else falls through
+// to the system browser via Tauri shell.
+const ALLOWED_OPEN_ORIGINS = [
+ "https://glasschat.app",
+ "https://accounts.google.com",
+ "https://github.com",
+ "https://login.microsoftonline.com",
+ "https://openidprovider.net",
+];
 
-      // Rewrite GlassChat auth URLs to official https://glasschat.app origin
-      if (
-        urlStr.includes("desktopAuth=") ||
-        urlStr.includes("/signin") ||
-        urlStr.includes("provider=") ||
-        urlStr.includes("glasschat")
-      ) {
-        urlStr = urlStr.replace(/^http:\/\/localhost:\d+/, "https://glasschat.app");
-        if (urlStr.startsWith("/")) {
-          urlStr = `https://glasschat.app${urlStr}`;
-        }
-      }
-
-      if (urlStr.startsWith("http://") || urlStr.startsWith("https://")) {
-        import('@tauri-apps/plugin-shell')
-          .then(({ open: openShellUrl }) => openShellUrl(urlStr))
-          .catch(() => originalOpen.call(window, urlStr, target, features));
-        return null;
-      }
-    }
-    return originalOpen.call(window, url, target, features);
-  };
+function isAllowedAuthUrl(urlStr: string): boolean {
+ try {
+ const url = new URL(urlStr);
+ return ALLOWED_OPEN_ORIGINS.some((origin) => url.origin === origin || urlStr.startsWith(origin));
+ } catch {
+ return false;
+ }
 }
 
-// Every feature lives in its own package; this hands each one the app-side
-// capabilities it declared. Must run before the first render.
-registerHosts();
+if (typeof window !== 'undefined') {
+ const originalOpen = window.open;
+ window.open = function (url?: string | URL, target?: string, features?: string) {
+ if (url) {
+ let urlStr = typeof url === 'string' ? url : url.toString();
+
+ // Only rewrite known auth widget URLs
+ if (isAllowedAuthUrl(urlStr)) {
+ urlStr = urlStr.replace(/^http:\/\/localhost:\d+/, "https://glasschat.app");
+ if (urlStr.startsWith("/")) {
+ urlStr = `https://glasschat.app${urlStr}`;
+ }
+ }
+
+ if (urlStr.startsWith('http://') || urlStr.startsWith('https://')) {
+ import('@tauri-apps/plugin-shell')
+ .then(({ open: openShellUrl }) => openShellUrl(urlStr))
+ .catch(() => originalOpen.call(window, urlStr, target, features));
+ return null;
+ }
+ }
+ return originalOpen.call(window, url, target, features);
+ };
+}
+
 
 import ErrorBoundary from './shared/ErrorBoundary';
 
