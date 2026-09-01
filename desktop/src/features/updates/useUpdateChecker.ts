@@ -172,6 +172,7 @@ export function useUpdateChecker() {
           name: a.name,
           size: a.size,
  sizeFormatted: formatBytes(a.size),
+ sizeFormatted: formatBytes(a.size),
           downloadUrl: a.url,
           browserDownloadUrl: a.browser_download_url,
           isCurrentPlatform: isCurrent,
