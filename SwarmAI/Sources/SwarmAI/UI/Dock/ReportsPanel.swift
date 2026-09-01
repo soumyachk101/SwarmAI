@@ -1,0 +1,161 @@
+import SwiftUI
+
+// MARK: - Reports Panel
+
+struct ReportsPanel: View {
+ @Bindable var agentsStore: AgentsStore
+ @Bindable var taskStore: TaskStore
+
+ var body: some View {
+ VStack(alignment: .leading, spacing: 0) {
+ HStack {
+ Text("Reports")
+ .font(.swarm(.sm, weight: .semibold))
+ .foregroundStyle(.swarmTextPrimary)
+
+ Spacer()
+ }
+ .padding(.horizontal, 12)
+ .padding(.vertical, 10)
+
+ Divider()
+ .background(.swarmBorderSubtle)
+
+ ScrollView {
+ VStack(spacing: 12) {
+ // Execution metrics
+ VStack(alignment: .leading, spacing: 8) {
+ Text("Execution Metrics")
+ .font(.swarm(.xs, weight: .semibold))
+ .foregroundStyle(.swarmTextSecondary)
+
+ MetricRow(label: "Total Sessions", value: "\(agentsStore.agents.count)", icon: "cpu.fill")
+ MetricRow(label: "Tokens Used", value: "\(agentsStore.agents.reduce(0) { $0 + $1.tokenUsage.total })", icon: "text.alignleft")
+ MetricRow(label: "Avg Duration", value: "2.4m", icon: "clock.fill")
+ MetricRow(label: "Tasks Completed", value: "\(taskStore.tasks.filter { $0.status == .done }.count)", icon: "checkmark.circle.fill")
+ }
+ .padding(.horizontal, 12)
+ .padding(.vertical, 8)
+
+ Divider()
+ .background(.swarmBorderSubtle)
+
+ // Cost breakdown
+ VStack(alignment: .leading, spacing: 8) {
+ Text("Cost Breakdown")
+ .font(.swarm(.xs, weight: .semibold))
+ .foregroundStyle(.swarmTextSecondary)
+
+ ForEach(agentsStore.agents) { agent in
+ CostBar(agent: agent)
+ }
+ }
+ .padding(.horizontal, 12)
+ .padding(.vertical, 8)
+
+ Divider()
+ .background(.swarmBorderSubtle)
+
+ // Event stream
+ VStack(alignment: .leading, spacing: 8) {
+ Text("Recent Events")
+ .font(.swarm(.xs, weight: .semibold))
+ .foregroundStyle(.swarmTextSecondary)
+
+ EventRow(icon: "play.circle", text: "Worker-1 started", time: "2m ago")
+ EventRow(icon: "checkmark.circle", text: "Task completed", time: "5m ago")
+ EventRow(icon: "exclamationmark.triangle", text: "Worker-2 error", time: "8m ago")
+ EventRow(icon: "arrow.triangle.branch", text: "Git push to main", time: "12m ago")
+ }
+ .padding(.horizontal, 12)
+ .padding(.vertical, 8)
+ }
+ }
+ .background(.swarmCanvas)
+ }
+}
+
+struct MetricRow: View {
+ let label: String
+ let value: String
+ let icon: String
+
+ var body: some View {
+ HStack(spacing: 8) {
+ Image(systemName: icon)
+ .font(.swarm(.xs))
+ .foregroundStyle(.swarmGold)
+
+ Text(label)
+ .font(.swarm(.sm))
+ .foregroundStyle(.swarmTextSecondary)
+
+ Spacer()
+
+ Text(value)
+ .font(.swarm(.sm, weight: .medium))
+ .foregroundStyle(.swarmTextPrimary)
+ }
+ }
+
+struct CostBar: View {
+ let agent: Agent
+
+ var body: some View {
+ HStack(spacing: 8) {
+ // Agent color indicator
+ Circle()
+ .fill(agent.agentType.brandColor)
+ .frame(width: 8, height: 8)
+
+ Text(agent.name)
+ .font(.swarm(.xs))
+ .foregroundStyle(.swarmTextSecondary)
+ .frame(width: 80, alignment: .leading)
+
+ // Cost bar
+ let cost = Double(agent.tokenUsage.total) / 100000.0
+ let clampedCost = min(max(cost, 0), 1.0)
+
+ GeometryReader { geo in
+ RoundedRectangle(cornerRadius: 3)
+ .fill(.swarmSurfaceHover)
+ .frame(height: 6)
+
+ RoundedRectangle(cornerRadius: 3)
+ .fill(agent.agentType.brandColor)
+ .frame(width: geo.size.width * clampedCost, height: 6)
+ }
+
+ Text("$\(String(format: "%.2f", cost))")
+ .font(.swarm(.micro))
+ .foregroundStyle(.swarmTextTertiary)
+ .frame(width: 40, alignment: .trailing)
+ }
+ .padding(.vertical, 2)
+ }
+}
+
+struct EventRow: View {
+ let icon: String
+ let text: String
+ let time: String
+
+ var body: some View {
+ HStack(spacing: 8) {
+ Image(systemName: icon)
+ .font(.swarm(.xs))
+ .foregroundStyle(.swarmTextTertiary)
+
+ Text(text)
+ .font(.swarm(.xs))
+ .foregroundStyle(.swarmTextSecondary)
+
+ Spacer()
+
+ Text(time)
+ .font(.swarm(.micro))
+ .foregroundStyle(.swarmTextTertiary)
+ }
+ .padding(.vertical, 2)
+}
