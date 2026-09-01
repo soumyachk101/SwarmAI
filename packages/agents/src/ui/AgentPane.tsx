@@ -516,6 +516,7 @@ function AgentPane({
    currentModel={currentModel}
    currentEffort={currentEffort}
    paneWidth={paneWidth}
+ autoModelDetectionError={autoModelDetectionError ?? undefined}
    onEditChange={onEditChange ?? (() => {})}
    onRename={onRename}
    onCancelRename={onCancelRename}
