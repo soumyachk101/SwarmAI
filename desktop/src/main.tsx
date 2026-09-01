@@ -46,7 +46,7 @@ const ALLOWED_OPEN_ORIGINS = [
 function isAllowedAuthUrl(urlStr: string): boolean {
  try {
  const url = new URL(urlStr);
- return ALLOWED_OPEN_ORIGINS.some((origin) => url.origin === origin || urlStr.startsWith(origin));
+ return ALLOWED_OPEN_ORIGINS.some((origin) => url.origin === origin);
  } catch {
  return false;
  }
