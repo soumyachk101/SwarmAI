@@ -27,22 +27,22 @@ public struct Provider: Identifiable, Codable, Sendable, Hashable {
  public var isActive: Bool
 
  public init(
- id: UUID = UUID(),
- name: String,
- apiKey: String,
- models: [String],
- defaultModel: String,
- endpoint: String,
- baseURL: String? = nil,
- isActive: Bool = true
+     id: UUID = UUID(),
+     name: String,
+     apiKey: String = "",
+     models: [String] = [],
+     defaultModel: String = "",
+     endpoint: String = "",
+     baseURL: String? = nil,
+     isActive: Bool = true
  ) {
- self.id = id
- self.name = name
- self.apiKey = apiKey
- self.models = models
- self.defaultModel = defaultModel
- self.endpoint = endpoint
- self.baseURL = baseURL
- self.isActive = isActive
+     self.id = id
+     self.name = name
+     self.apiKey = apiKey
+     self.models = models
+     self.defaultModel = defaultModel
+     self.endpoint = endpoint
+     self.baseURL = baseURL
+     self.isActive = isActive
  }
 }

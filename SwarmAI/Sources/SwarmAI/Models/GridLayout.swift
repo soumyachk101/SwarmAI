@@ -41,6 +41,28 @@ public enum GridPreset: String, Codable, Sendable, CaseIterable {
  case .focus: "Focus"
  }
  }
+
+ /// Default column count for this preset.
+ public var defaultColumns: Int {
+ switch self {
+ case .auto, .twoByTwo, .master: 2
+ case .threeByThree: 3
+ case .fourByFour: 4
+ case .columns: 3
+ case .rows, .focus: 1
+ }
+ }
+
+ /// Default row count for this preset.
+ public var defaultRows: Int {
+ switch self {
+ case .auto, .twoByTwo, .master: 2
+ case .threeByThree: 3
+ case .fourByFour: 4
+ case .columns, .focus: 1
+ case .rows: 3
+ }
+ }
 }
 
 /// Grid layout configuration for arranging terminal panes.

@@ -55,20 +55,23 @@ final class AgentsStore {
  agents.first { $0.id == id }
  }
 
- func setGridLayout(_ preset: GridPreset) {
- let positions = agents.enumerated().map { index, agent in
- PanePosition(
- id: UUID(),
- paneId: agent.id.uuidString,
- x: 0, y: 0,
- width: preset.columns,
- height: preset.rows,
- paneType: .agent
- )
- }
- gridLayout = GridLayout(columns: preset.columns, rows: preset.rows, panePositions: positions)
- saveToStorage()
- }
+  func setGridLayout(_ preset: GridPreset) {
+    var layout = GridLayout(columns: preset.defaultColumns, rows: preset.defaultRows, preset: preset)
+    let positions = agents.enumerated().map { index, agent in
+      PanePosition(
+        id: UUID(),
+        paneId: agent.id.uuidString,
+        x: index % max(layout.columns, 1),
+        y: index / max(layout.columns, 1),
+        width: 1,
+        height: 1,
+        paneType: .agent
+      )
+    }
+    layout.panePositions = positions
+    gridLayout = layout
+    saveToStorage()
+  }
 
  func agentCount(for status: AgentStatus) -> Int {
  agents.filter { $0.status == status }.count

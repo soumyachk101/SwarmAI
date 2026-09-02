@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - Fleet Tab
 
 struct FleetTab: View {
- @Bindable var agentsStore: AgentsStore
+ @Environment(\.agentsStore) private var agentsStore
 
  var body: some View {
  VStack(alignment: .leading, spacing: 0) {
@@ -49,6 +49,7 @@ struct FleetTab: View {
  }
  }
  .background(.swarmCanvas)
+ }
  }
 }
 
@@ -108,7 +109,7 @@ struct AgentCard: View {
  .fill(agent.status.color)
  .frame(width: 6, height: 6)
 
- Text(agent.status.rawValue)
+ Text(agent.status.displayName)
  .font(.swarm(.micro))
  .foregroundStyle(.swarmTextTertiary)
  }

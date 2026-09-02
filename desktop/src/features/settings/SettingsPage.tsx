@@ -23,6 +23,7 @@ import ModelsSection from "./ModelsSection";
 import UpdatesSection from "./UpdatesSection";
 import UserGuideSection from "./UserGuideSection";
 import PrivacySection from "./PrivacySection";
+import { useSplashStore } from "@/features/splash";
 
 interface SettingsPageProps {
   onClose: () => void;
@@ -128,6 +129,17 @@ export default function SettingsPage({
         icon: Gauge,
         color: "text-rose-400 bg-rose-400/10 border-rose-400/20",
         action: () => { onClose(); onOpenUsage?.(); },
+      },
+      {
+        id: "splash",
+        title: "Replay Startup Animation",
+        desc: "Watch the premium cinematic 3D Swarm AI opening sequence",
+        icon: Sparkles,
+        color: "text-amber-400 bg-amber-400/10 border-amber-400/20",
+        action: () => {
+          onClose();
+          useSplashStore.getState().openSplash(true);
+        },
       },
     ];
 

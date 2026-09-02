@@ -36,6 +36,7 @@ import { useUiStore } from "./uiStore.js";
 import { usePlaneStore } from "@/features/panes/planeStore";
 import { leadHost } from "@swarm/lead/ui";
 import { modelArgs } from "@swarm/agents/cli-configs";
+import { useSplashStore } from "@/features/splash";
 
 export interface PaletteCommand {
   id: string;
@@ -58,6 +59,7 @@ interface CommandPaletteProps {
   onOpenDashboard?: () => void;
   onOpenTemplates?: () => void;
   onOpenDiff?: () => void;
+  onReplayOpening?: () => void;
 }
 
 export default function CommandPalette({
@@ -71,6 +73,7 @@ export default function CommandPalette({
   onOpenDashboard,
   onOpenTemplates,
   onOpenDiff,
+  onReplayOpening,
 }: CommandPaletteProps) {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -320,6 +323,18 @@ export default function CommandPalette({
     },
 
     // Views & Tools
+    {
+      id: "replay-splash",
+      category: "Views & Tools",
+      label: "/intro (or /splash)",
+      hint: "Replay premium cinematic startup animation",
+      icon: <Sparkles size={16} className="text-amber-400" />,
+      action: () => {
+        if (onReplayOpening) onReplayOpening();
+        else useSplashStore.getState().openSplash(true);
+        onClose();
+      },
+    },
     {
       id: "swarm-dashboard",
       category: "Views & Tools",

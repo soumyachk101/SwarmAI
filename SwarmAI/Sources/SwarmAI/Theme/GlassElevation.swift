@@ -10,6 +10,17 @@ enum GlassElevation: String, CaseIterable {
  case glassInset = "glassInset" // Inputs/wells (elevation -1)
  case glassHi = "glassHi" // Modals/popovers (elevation 3)
 
+ var appearDuration: Double {
+ switch self {
+ case .appCanvas: return 0
+ case .glass: return 0.7
+ case .glassToolbar: return 0.5
+ case .glassRail: return 0.5
+ case .glassInset: return 0.4
+ case .glassHi: return 0.8
+ }
+ }
+
  var material: Material {
  switch self {
  case .appCanvas: return .clear
@@ -84,6 +95,80 @@ extension View {
 
  func glassHi(_ theme: Theme? = nil) -> some View {
  self.modifier(GlassEffect(elevation: .glassHi, theme: theme ?? ThemeStore.shared.currentTheme, showBorder: true))
+ }
+
+ // MARK: - Animated Glass Transition
+
+ func glassTransition(from: GlassElevation, to: GlassElevation, progress: CGFloat) -> some View {
+ self.modifier(GlassTransitionModifier(from: from, to: to, progress: progress))
+ }
+
+ // MARK: - Glass Appearance Animation
+
+ func glassAppear(_ elevation: GlassElevation = .glass) -> some View {
+ self.modifier(GlassAppearModifier(elevation: elevation))
+ }
+}
+
+// MARK: - Glass Transition Modifier
+
+struct GlassTransitionModifier: ViewModifier {
+ let from: GlassElevation
+ let to: GlassElevation
+ let progress: CGFloat
+
+ func body(content: Content) -> some View {
+ let clampedProgress = max(0, min(1, progress))
+ let currentCornerRadius = from.cornerRadius + (to.cornerRadius - from.cornerRadius) * clampedProgress
+ let currentBorderWidth = from.borderWidth + (to.borderWidth - from.borderWidth) * clampedProgress
+ let fromMaterial = from.material
+ let toMaterial = to.material
+
+ return content
+ .background(fromMaterial.opacity(1 - clampedProgress))
+ .background(toMaterial.opacity(clampedProgress))
+ .clipShape(RoundedRectangle(cornerRadius: currentCornerRadius))
+ .overlay {
+ if currentBorderWidth > 0 {
+ RoundedRectangle(cornerRadius: currentCornerRadius)
+ .stroke(Color.white.opacity(0.3), lineWidth: currentBorderWidth)
+ }
+ }
+ }
+}
+
+// MARK: - Glass Appear Modifier
+
+struct GlassAppearModifier: ViewModifier {
+ let elevation: GlassElevation
+ @State private var appearProgress: CGFloat = 0
+ @State private var hasAppeared: Bool = false
+
+ func body(content: Content) -> some View {
+ let duration = elevation.appearDuration
+ let targetCornerRadius = elevation.cornerRadius
+ let targetBorderWidth = elevation.borderWidth
+ let targetShadowRadius: CGFloat = elevation == .glassHi ? 20 : 8
+ let targetShadowY: CGFloat = elevation == .glassHi ? 10 : 4
+
+ return content
+ .background(elevation.material.opacity(appearProgress))
+ .clipShape(RoundedRectangle(cornerRadius: 16 + (targetCornerRadius - 16) * appearProgress))
+ .overlay {
+ if appearProgress > 0 && targetBorderWidth > 0 {
+ RoundedRectangle(cornerRadius: 16 + (targetCornerRadius - 16) * appearProgress)
+ .stroke(Color.white.opacity(0.3 * appearProgress), lineWidth: targetBorderWidth * appearProgress)
+ }
+ }
+ .shadow(color: .black.opacity(0.2 * appearProgress), radius: targetShadowRadius * appearProgress, x: 0, y: targetShadowY * appearProgress)
+ .onAppear {
+ if !hasAppeared {
+ hasAppeared = true
+ withAnimation(.easeOut(duration: duration)) {
+ appearProgress = 1
+ }
+ }
+ }
  }
 }
 

@@ -9,7 +9,7 @@ public enum PaneType: String, Codable, Sendable, CaseIterable {
  case browser
  case emulator
  case toolbox
- case extension
+ case `extension`
  case chat
 
  /// Human-readable display name.
@@ -25,7 +25,7 @@ public enum PaneType: String, Codable, Sendable, CaseIterable {
  case .browser: "globe"
  case .emulator: "iphone"
  case .toolbox: "wrench.fill"
- case .extension: "puzzlepiece.extension.fill"
+ case .`extension`: "puzzlepiece.extension.fill"
  case .chat: "bubble.left.and.bubble.right.fill"
  }
  }

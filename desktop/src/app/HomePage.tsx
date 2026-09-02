@@ -50,7 +50,8 @@ import SwarmDashboardModal from "@/features/dashboard/SwarmDashboardModal";
 import DiffPreviewModal from "@/features/diff/DiffPreviewModal";
 import TaskTemplatesModal from "@/features/templates/TaskTemplatesModal";
 import MacWindowControls from "@/shared/MacWindowControls";
-import { BookOpen, Activity, FileDiff, Layers } from "lucide-react";
+import { BookOpen, Activity, FileDiff, Layers, Sparkles } from "lucide-react";
+import { AppOpeningAnimation, useSplashStore } from "@/features/splash";
 
 
 /**
@@ -451,6 +452,52 @@ export default function HomePage() {
           >
             <PanelRight size={14} />
           </button>
+          <OverflowMenu
+            items={[
+              {
+                id: "replay-splash",
+                label: "Replay Opening Animation",
+                hint: "Cinematic 3D intro",
+                icon: Sparkles,
+                onSelect: () => useSplashStore.getState().openSplash(true),
+              },
+              {
+                id: "dashboard",
+                label: "Swarm Dashboard",
+                hint: "Live telemetry & logs",
+                icon: Activity,
+                onSelect: () => setShowDashboard(true),
+              },
+              {
+                id: "templates",
+                label: "Task Templates",
+                hint: "Multi-agent pipelines",
+                icon: Layers,
+                onSelect: () => setShowTemplatesModal(true),
+              },
+              {
+                id: "extensions",
+                label: "Extensions Marketplace",
+                hint: "Agents & tools",
+                icon: Blocks,
+                onSelect: () => setShowExtensions(true),
+              },
+              {
+                id: "settings",
+                label: "Settings & Tools",
+                hint: "API keys & models",
+                icon: Settings,
+                onSelect: () => setShowSettings(true),
+              },
+              {
+                id: "guide",
+                label: "User Guide & Docs",
+                hint: "Architecture & manual",
+                icon: BookOpen,
+                onSelect: () => setShowGuide(true),
+              },
+            ]}
+          />
           {!isMac && (
             <>
               <div className="w-px h-4 bg-swarm-border/40 mx-0.5" />
@@ -688,10 +735,14 @@ export default function HomePage() {
         onOpenDashboard={() => setShowDashboard(true)}
         onOpenTemplates={() => setShowTemplatesModal(true)}
         onOpenDiff={() => setShowDiffModal(true)}
+        onReplayOpening={() => useSplashStore.getState().openSplash(true)}
       />
 
       {/* Global voice hotkeys: Ctrl+Win (type anywhere) · Ctrl+Alt (Agent). */}
       <VoiceHotkeys />
+
+      {/* Luxury Cinematic Swarm AI Opening Animation */}
+      <AppOpeningAnimation />
     </div>
   );
 }

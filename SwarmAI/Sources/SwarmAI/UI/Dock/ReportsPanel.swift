@@ -3,8 +3,9 @@ import SwiftUI
 // MARK: - Reports Panel
 
 struct ReportsPanel: View {
- @Bindable var agentsStore: AgentsStore
- @Bindable var taskStore: TaskStore
+ @Environment(\.agentsStore) private var agentsStore
+ @Environment(\.taskStore) private var taskStore
+ @State private var contentAppeared = false
 
  var body: some View {
  VStack(alignment: .leading, spacing: 0) {
@@ -17,6 +18,15 @@ struct ReportsPanel: View {
  }
  .padding(.horizontal, 12)
  .padding(.vertical, 10)
+ .overlay(alignment: .bottom) {
+ Rectangle()
+ .fill(.swarmGold)
+ .frame(height: 1.5)
+ .frame(width: contentAppeared ? 40 : 0, alignment: .center)
+ .animation(.easeOut(duration: 0.5), value: contentAppeared)
+ }
+ .opacity(contentAppeared ? 1 : 0)
+ .animation(.easeOut(duration: 0.4).delay(0.05), value: contentAppeared)
 
  Divider()
  .background(.swarmBorderSubtle)
@@ -46,7 +56,7 @@ struct ReportsPanel: View {
  .font(.swarm(.xs, weight: .semibold))
  .foregroundStyle(.swarmTextSecondary)
 
- ForEach(agentsStore.agents) { agent in
+ ForEach(Array(agentsStore.agents.enumerated()), id: \.element.id) { index, agent in
  CostBar(agent: agent)
  }
  }
@@ -71,7 +81,17 @@ struct ReportsPanel: View {
  .padding(.vertical, 8)
  }
  }
+ .padding(.horizontal, 12)
+ .padding(.vertical, 8)
  .background(.swarmCanvas)
+ }
+ .modifier(PanelEntryModifier(appeared: $contentAppeared))
+ }
+ .onAppear {
+ contentAppeared = false
+ DispatchQueue.main.asyncAfter(deadline: .now() + 0.02) {
+ contentAppeared = true
+ }
  }
 }
 
@@ -79,6 +99,7 @@ struct MetricRow: View {
  let label: String
  let value: String
  let icon: String
+ @State private var rowAppeared = false
 
  var body: some View {
  HStack(spacing: 8) {
@@ -96,10 +117,13 @@ struct MetricRow: View {
  .font(.swarm(.sm, weight: .medium))
  .foregroundStyle(.swarmTextPrimary)
  }
+ .modifier(RowEntryModifier(appeared: $rowAppeared, delay: 0.15))
  }
+}
 
 struct CostBar: View {
  let agent: Agent
+ @State private var barAppeared = false
 
  var body: some View {
  HStack(spacing: 8) {
@@ -133,6 +157,7 @@ struct CostBar: View {
  .frame(width: 40, alignment: .trailing)
  }
  .padding(.vertical, 2)
+ .modifier(RowEntryModifier(appeared: $barAppeared, delay: 0.22))
  }
 }
 
@@ -140,6 +165,7 @@ struct EventRow: View {
  let icon: String
  let text: String
  let time: String
+ @State private var rowAppeared = false
 
  var body: some View {
  HStack(spacing: 8) {
@@ -158,4 +184,6 @@ struct EventRow: View {
  .foregroundStyle(.swarmTextTertiary)
  }
  .padding(.vertical, 2)
+ .modifier(RowEntryModifier(appeared: $rowAppeared, delay: 0.28))
+ }
 }

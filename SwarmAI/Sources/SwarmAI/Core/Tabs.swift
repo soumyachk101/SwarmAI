@@ -24,6 +24,10 @@ enum SidebarTab: String, CaseIterable {
  var index: Int {
  Self.allCases.firstIndex(of: self) ?? 0
  }
+
+ var title: String {
+ rawValue
+ }
 }
 
 enum DockTab: String, CaseIterable {
@@ -45,6 +49,10 @@ enum DockTab: String, CaseIterable {
 
  var index: Int {
  Self.allCases.firstIndex(of: self) ?? 0
+ }
+
+ var title: String {
+ rawValue
  }
 }
 

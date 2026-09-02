@@ -6,6 +6,8 @@ struct CommandPaletteView: View {
  @Environment(\.dismiss) var dismiss
  @State private var query: String = ""
  @State private var selectedIndex: Int = 0
+ @State private var isPresented = false
+ @State private var searchWidth: CGFloat = 0
 
  let commands: [CommandItem] = [
  CommandItem(title: "New Agent Session", subtitle: "Spawn a new coding agent", icon: "plus.circle", action: .newAgent),
@@ -19,25 +21,28 @@ struct CommandPaletteView: View {
  CommandItem(title: "Cycle Theme", subtitle: "Switch to the next theme", icon: "paintbrush", action: .cycleTheme),
  ]
 
- let filteredCommands: [CommandItem] {
+ var filteredCommands: [CommandItem] {
  if query.isEmpty { return commands }
  return commands.filter { $0.title.localizedCaseInsensitiveContains(query) || $0.subtitle.localizedCaseInsensitiveContains(query) }
  }
 
  var body: some View {
  ZStack {
- Color.black.opacity(0.4)
+ // Backdrop — ultraThinMaterial at 0.7 opacity, fades in over 0.2s
+ Color.clear
  .ignoresSafeArea()
+ .background(.ultraThinMaterial.opacity(isPresented ? 0.7 : 0))
  .onTapGesture { dismiss() }
+ .animation(.easeOut(duration: 0.2), value: isPresented)
 
  VStack(spacing: 0) {
- // Search field
+ // Search field — expands width from 0 to full
  HStack(spacing: 10) {
  Image(systemName: "magnifyingglass")
  .font(.swarm(.sm))
  .foregroundStyle(.swarmTextTertiary)
 
- TextField("Type a command...", text: $query, axis: .vertical)
+ TextField("Type a command...", text: $query)
  .font(.swarm(.base))
  .foregroundStyle(.swarmTextPrimary)
  .textFieldStyle(.plain)
@@ -63,11 +68,13 @@ struct CommandPaletteView: View {
  .padding(.horizontal, 16)
  .padding(.vertical, 12)
  .background(.swarmSurface)
+ .frame(maxWidth: searchWidth)
+ .animation(.spring(response: 0.4, dampingFraction: 0.85).delay(0.1), value: searchWidth)
 
  Divider()
  .background(.swarmBorderSubtle)
 
- // Results
+ // Results — cascade in with 30ms stagger per item
  if filteredCommands.isEmpty {
  ContentUnavailableView(
  "No Results",
@@ -110,7 +117,13 @@ struct CommandPaletteView: View {
  }
  }
  .buttonStyle(.plain)
- }
+ .opacity(isPresented ? 1 : 0)
+ .offset(y: isPresented ? 0 : 8)
+ .animation(
+ .easeOut(duration: 0.2)
+ .delay(0.15 + Double(index) * 0.03),
+ value: isPresented
+ )
  }
  .padding(.horizontal, 8)
  .padding(.vertical, 4)
@@ -132,24 +145,29 @@ struct CommandPaletteView: View {
  }
  .frame(width: 500)
  .background(.swarmSurface)
- .cornerRadius(12)
+ .cornerRadius(20)
  .shadow(color: .black.opacity(0.4), radius: 30, x: 0, y: 10)
- }
- }
- .onReceive(keyPressPublisher(for: .upArrow)) { _ in
- selectedIndex = max(0, selectedIndex - 1)
- }
- .onReceive(keyPressPublisher(for: .downArrow)) { _ in
- selectedIndex = min(filteredCommands.count - 1, selectedIndex + 1)
- }
- .onReceive(keyPressPublisher(for: .escape)) { _ in
- dismiss()
+ .scaleEffect(isPresented ? 1.0 : 0.95)
+ .opacity(isPresented ? 1 : 0)
+ .animation(.easeOut(duration: 0.2).delay(0.05), value: isPresented)
  }
  .onAppear {
- selectedIndex = 0
+ isPresented = true
+ searchWidth = 500
  }
  .onChange(of: query) { _, _ in
  selectedIndex = 0
+ }
+ }
+
+ private func executeSelectedCommand() {
+ guard !filteredCommands.isEmpty else { return }
+ let index = min(selectedIndex, filteredCommands.count - 1)
+ executeCommand(filteredCommands[index])
+ }
+
+ private func executeCommand(_ cmd: CommandItem) {
+ dismiss()
  }
 }
 
@@ -173,33 +191,4 @@ enum CommandAction {
  case openGit
  case openSettings
  case cycleTheme
-}
-
-private func executeSelectedCommand() {
- guard !filteredCommands.isEmpty else { return }
- let index = min(selectedIndex, filteredCommands.count - 1)
- executeCommand(filteredCommands[index])
-}
-
-private func executeCommand(_ cmd: CommandItem) {
- // Handle command - in real app this would trigger appropriate action
- dismiss()
-}
-
-// MARK: - Keyboard Helper
-
-import Combine
-
-func keyPressPublisher(for key: KeyEquivalent) -> AnyPublisher<Void, Never> {
- Publishers.Merge(
- NotificationCenter.default.publisher(for: NSApplication.willUpdateNotification)
- .compactMap { _ in NSApp.currentEvent }
- .filter { $0.keyCode == key.rawValue }
- .map { _ in () },
- NotificationCenter.default.publisher(for: NSApplication.didUpdateNotification)
- .compactMap { _ in NSApp.currentEvent }
- .filter { $0.keyCode == key.rawValue }
- .map { _ in () }
- )
- .eraseToAnyPublisher()
 }

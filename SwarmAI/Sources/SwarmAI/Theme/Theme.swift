@@ -281,6 +281,7 @@ enum ThemeToken: String, CaseIterable {
 
 @Observable
 final class ThemeStore {
+ static let shared = ThemeStore()
  var currentThemeId: String = "obsidian-charcoal"
  var themeMode: ThemeMode = .dark
 
@@ -306,6 +307,16 @@ final class ThemeStore {
  setTheme(Theme.allThemes[nextIndex].id)
  }
 
+ func transitionToTheme(_ id: String, animated: Bool = true) {
+ guard animated else {
+ setTheme(id)
+ return
+ }
+ withAnimation(.swarmSlow) {
+ setTheme(id)
+ }
+ }
+
  var colorScheme: ColorScheme? {
  switch themeMode {
  case .light: return .light
@@ -321,6 +332,10 @@ enum ThemeMode: String, CaseIterable {
  case system = "System"
  case light = "Light"
  case dark = "Dark"
+
+ var title: String {
+ rawValue
+ }
 }
 
 // MARK: - Color Helpers

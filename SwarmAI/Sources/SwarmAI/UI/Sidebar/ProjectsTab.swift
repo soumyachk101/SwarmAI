@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - Projects Tab
 
 struct ProjectsTab: View {
- @Bindable var workspaceStore: WorkspaceStore
+ @Environment(\.workspaceStore) private var workspaceStore
 
  var body: some View {
  VStack(alignment: .leading, spacing: 0) {

@@ -25,6 +25,17 @@ public enum AgentStatus: String, Codable, Sendable {
  public var isFinished: Bool {
  self == .done || self == .error || self == .terminating
  }
+
+ /// Status display color.
+ public var color: Color {
+   switch self {
+   case .idle: .swarmTextTertiary
+   case .launching, .running: .swarmSuccess
+   case .error: .swarmError
+   case .done: .swarmGold
+   case .terminating: .swarmWarning
+   }
+ }
 }
 
 /// The role of an agent in the swarm hierarchy.
@@ -41,10 +52,11 @@ public enum AgentRole: String, Codable, Sendable {
 
 /// The operating mode for lead agents.
 @frozen
-public enum LeadMode: String, Codable, Sendable {
- case steward
- case forager
- case stinger
+public enum LeadMode: String, Codable, Sendable, CaseIterable, Identifiable {
+  public var id: String { rawValue }
+  case steward
+  case forager
+  case stinger
 
  /// Human-readable display name for the lead mode.
  public var displayName: String {
@@ -66,7 +78,8 @@ public enum LeadMode: String, Codable, Sendable {
 
 /// Supported AI coding agents and terminals.
 @frozen
-public enum AgentType: String, Codable, Sendable, CaseIterable {
+public enum AgentType: String, Codable, Sendable, CaseIterable, Identifiable {
+ public var id: String { rawValue }
  case claudeCode = "claude_code"
  case codex
  case aider

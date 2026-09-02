@@ -8,24 +8,24 @@ final class DispatchStore {
  struct DispatchedTask: Identifiable, Codable {
  let id: UUID
  let goal: String
- let status: TaskDispatchStatus
+ var status: TaskDispatchStatus
  let createdAt: Date
- let completedAt: Date?
- let subtasks: [SubTask]
+ var completedAt: Date?
+ var subtasks: [SubTask]
  }
 
  struct SubTask: Identifiable, Codable {
  let id: UUID
  let title: String
- let assigneeId: UUID?
- let status: SubTaskStatus
+ var assigneeId: UUID?
+ var status: SubTaskStatus
  }
 
  struct ApprovalRequest: Identifiable, Codable {
  let id: UUID
  let taskId: UUID
  let description: String
- let status: ApprovalStatus
+ var status: ApprovalStatus
  let createdAt: Date
  }
 

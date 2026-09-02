@@ -44,7 +44,7 @@ public enum MemoryType: String, Codable, Sendable, CaseIterable {
 /// can deposit and retrieve information about the workspace state, plans,
 /// handoffs, and session notes.
 @Observable
-public class Memory: Codable, Identifiable {
+public final class Memory: Codable, Identifiable {
  /// Unique identifier for this memory entry.
  public let id: UUID
 

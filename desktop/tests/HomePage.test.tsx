@@ -279,9 +279,9 @@ describe("HomePage", () => {
  });
 
  it("renders the board toggle button", () => {
- render(<HomePage />);
- expect(screen.getByTitle("Toggle Tasks")).toBeDefined();
- });
+    render(<HomePage />);
+    expect(screen.getByTitle("Toggle Tasks Panel")).toBeDefined();
+  });
 
  it("renders the overflow menu with items", () => {
  render(<HomePage />);

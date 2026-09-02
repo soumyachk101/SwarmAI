@@ -52,7 +52,7 @@ final class TaskStore {
  ("Set up git worktree management", .inProgress, .high),
  ]
  for (title, status, priority) in demoData {
- var task = Task(title: title, status: status, priority: priority)
+ let task = Task(title: title, status: status, priority: priority)
  tasks.append(task)
  }
  saveToStorage()
@@ -72,21 +72,6 @@ final class TaskStore {
 }
 
 // MARK: - Task Supporting Types
-
-enum TaskStatus: String, Codable, CaseIterable {
- case backlog = "Backlog"
- case todo = "To Do"
- case inProgress = "In Progress"
- case review = "Review"
- case done = "Done"
-}
-
-enum TaskPriority: String, Codable, CaseIterable {
- case low = "Low"
- case medium = "Medium"
- case high = "High"
- case critical = "Critical"
-}
 
 enum TaskView: String, CaseIterable {
  case pipeline = "Pipeline"

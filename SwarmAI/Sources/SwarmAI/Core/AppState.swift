@@ -2,6 +2,8 @@ import SwiftUI
 
 @Observable
 final class AppState {
+ static let shared = AppState()
+
  var isLeftSidebarOpen: Bool = true
  var isRightDockOpen: Bool = true
  var isCommandPaletteOpen: Bool = false

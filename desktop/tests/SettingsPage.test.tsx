@@ -35,8 +35,8 @@ describe("SettingsPage", () => {
  });
 
  it("renders without crashing", () => {
- render(<SettingsPage onClose={mockOnClose} />);
- expect(screen.getByText("Settings")).toBeDefined();
+    render(<SettingsPage onClose={mockOnClose} />);
+    expect(screen.getByText("Settings & Tools")).toBeDefined();
  });
 
  it("renders the close button", () => {
@@ -95,76 +95,84 @@ describe("SettingsPage", () => {
  expect(screen.getByText("Updates & Releases")).toBeDefined();
  });
 
- it("renders ModelsSection by default", () => {
- render(<SettingsPage onClose={mockOnClose} />);
- expect(screen.getByTestId("models-section")).toBeDefined();
- });
+  it("renders Tools & Workflows section by default", () => {
+    render(<SettingsPage onClose={mockOnClose} />);
+    expect(screen.getByTestId("tools-section")).toBeDefined();
+  });
 
- it("renders ProvidersSection when providers nav is clicked", () => {
- render(<SettingsPage onClose={mockOnClose} />);
- const providersButton = screen.getByText("API Providers").closest("button");
- fireEvent.click(providersButton!);
- expect(screen.getByTestId("providers-section")).toBeDefined();
- });
+  it("renders ModelsSection when models nav is clicked", () => {
+    render(<SettingsPage onClose={mockOnClose} />);
+    const modelsButton = screen.getByText("Models & Defaults").closest("button");
+    fireEvent.click(modelsButton!);
+    expect(screen.getByTestId("models-section")).toBeDefined();
+  });
 
- it("renders UserGuideSection when guide nav is clicked", () => {
- render(<SettingsPage onClose={mockOnClose} />);
- const guideButton = screen.getByText("User Guide & Docs").closest("button");
- fireEvent.click(guideButton!);
- expect(screen.getByTestId("guide-section")).toBeDefined();
- });
+  it("renders ProvidersSection when providers nav is clicked", () => {
+    render(<SettingsPage onClose={mockOnClose} />);
+    const providersButton = screen.getByText("API Providers").closest("button");
+    fireEvent.click(providersButton!);
+    expect(screen.getByTestId("providers-section")).toBeDefined();
+  });
 
- it("renders PrivacySection when privacy nav is clicked", () => {
- render(<SettingsPage onClose={mockOnClose} />);
- const privacyButton = screen.getByText("Privacy & Security").closest("button");
- fireEvent.click(privacyButton!);
- expect(screen.getByTestId("privacy-section")).toBeDefined();
- });
+  it("renders UserGuideSection when guide nav is clicked", () => {
+    render(<SettingsPage onClose={mockOnClose} />);
+    const guideButton = screen.getByText("User Guide & Docs").closest("button");
+    fireEvent.click(guideButton!);
+    expect(screen.getByTestId("guide-section")).toBeDefined();
+  });
 
- it("renders UpdatesSection when updates nav is clicked", () => {
- render(<SettingsPage onClose={mockOnClose} />);
- const updatesButton = screen.getByText("Updates & Releases").closest("button");
- fireEvent.click(updatesButton!);
- expect(screen.getByTestId("updates-section")).toBeDefined();
- });
+  it("renders PrivacySection when privacy nav is clicked", () => {
+    render(<SettingsPage onClose={mockOnClose} />);
+    const privacyButton = screen.getByText("Privacy & Security").closest("button");
+    fireEvent.click(privacyButton!);
+    expect(screen.getByTestId("privacy-section")).toBeDefined();
+  });
 
- it("switches back to ModelsSection when clicked again", () => {
- render(<SettingsPage onClose={mockOnClose} />);
- const providersButton = screen.getByText("API Providers").closest("button");
- fireEvent.click(providersButton!);
- expect(screen.getByTestId("providers-section")).toBeDefined();
+  it("renders UpdatesSection when updates nav is clicked", () => {
+    render(<SettingsPage onClose={mockOnClose} />);
+    const updatesButton = screen.getByText("Updates & Releases").closest("button");
+    fireEvent.click(updatesButton!);
+    expect(screen.getByTestId("updates-section")).toBeDefined();
+  });
 
- const modelsButton = screen.getByText("Models & Defaults").closest("button");
- fireEvent.click(modelsButton!);
- expect(screen.getByTestId("models-section")).toBeDefined();
- });
+  it("switches back to Tools section when clicked again", () => {
+    render(<SettingsPage onClose={mockOnClose} />);
+    const providersButton = screen.getByText("API Providers").closest("button");
+    fireEvent.click(providersButton!);
+    expect(screen.getByTestId("providers-section")).toBeDefined();
 
- it("calls onClose on Escape key", () => {
- render(<SettingsPage onClose={mockOnClose} />);
- fireEvent.keyDown(window, { key: "Escape" });
- expect(mockOnClose).toHaveBeenCalled();
- });
+    const toolsButton = screen.getByText("Tools & Workflows").closest("button");
+    fireEvent.click(toolsButton!);
+    expect(screen.getByTestId("tools-section")).toBeDefined();
+  });
 
- it("renders the Reload button", () => {
- render(<SettingsPage onClose={mockOnClose} />);
- expect(screen.getByText("Reload")).toBeDefined();
- });
+  it("calls onClose on Escape key", () => {
+    render(<SettingsPage onClose={mockOnClose} />);
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(mockOnClose).toHaveBeenCalled();
+  });
 
- it("nav items have icons", () => {
- render(<SettingsPage onClose={mockOnClose} />);
- const navButtons = screen.getAllByRole("button").filter(btn =>
- btn.textContent?.includes("Models") ||
- btn.textContent?.includes("Providers") ||
- btn.textContent?.includes("Guide") ||
- btn.textContent?.includes("Privacy") ||
- btn.textContent?.includes("Updates")
- );
- expect(navButtons.length).toBeGreaterThanOrEqual(5);
- });
+  it("renders the Reload button", () => {
+    render(<SettingsPage onClose={mockOnClose} />);
+    expect(screen.getByText("Reload")).toBeDefined();
+  });
 
- it("highlights the active nav item", () => {
- render(<SettingsPage onClose={mockOnClose} />);
- const modelsButton = screen.getByText("Models & Defaults").closest("button");
- expect(modelsButton?.className).toContain("bg-swarm-gold");
- });
+  it("nav items have icons", () => {
+    render(<SettingsPage onClose={mockOnClose} />);
+    const navButtons = screen.getAllByRole("button").filter(btn =>
+      btn.textContent?.includes("Tools") ||
+      btn.textContent?.includes("Models") ||
+      btn.textContent?.includes("Providers") ||
+      btn.textContent?.includes("Guide") ||
+      btn.textContent?.includes("Privacy") ||
+      btn.textContent?.includes("Updates")
+    );
+    expect(navButtons.length).toBeGreaterThanOrEqual(6);
+  });
+
+  it("highlights the active nav item", () => {
+    render(<SettingsPage onClose={mockOnClose} />);
+    const toolsButton = screen.getAllByText("Tools & Workflows")[0].closest("button");
+    expect(toolsButton?.className).toContain("bg-swarm-gold");
+  });
 });
