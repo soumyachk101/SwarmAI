@@ -73,7 +73,7 @@ struct GitPanelView: View {
             Menu {
               ForEach(branches, id: \.self) { branch in
                 Button(branch) {
-                  Task { await checkoutBranch(branch) }
+                  _Concurrency.Task { await checkoutBranch(branch) }
                 }
               }
             } label: {
@@ -94,7 +94,7 @@ struct GitPanelView: View {
             .buttonStyle(.plain)
 
             Button("Pull") {
-              Task { await pull() }
+              _Concurrency.Task { await pull() }
             }
             .font(.swarm(.xs))
             .foregroundStyle(.swarmTextSecondary)
@@ -113,7 +113,7 @@ struct GitPanelView: View {
               Spacer()
               if let staged = gitStatus?.stagedFiles, !staged.isEmpty {
                 Button("Unstage All") {
-                  Task { await unstageAll() }
+                  _Concurrency.Task { await unstageAll() }
                 }
                 .font(.swarmMono(.micro))
                 .foregroundStyle(.swarmTextTertiary)
@@ -132,7 +132,7 @@ struct GitPanelView: View {
                   )
                   Spacer()
                   Button {
-                    Task { await unstage(file.path) }
+                    _Concurrency.Task { await unstage(file.path) }
                   } label: {
                     Image(systemName: "minus")
                       .font(.swarm(.micro))
@@ -157,7 +157,7 @@ struct GitPanelView: View {
               Spacer()
               if let unstaged = gitStatus?.unstagedFiles, !unstaged.isEmpty {
                 Button("Stage All") {
-                  Task { await stageAll() }
+                  _Concurrency.Task { await stageAll() }
                 }
                 .font(.swarmMono(.micro))
                 .foregroundStyle(.swarmGold)
@@ -176,7 +176,7 @@ struct GitPanelView: View {
                   )
                   Spacer()
                   Button {
-                    Task { await stage(file.path) }
+                    _Concurrency.Task { await stage(file.path) }
                   } label: {
                     Image(systemName: "plus")
                       .font(.swarm(.micro))
@@ -201,7 +201,7 @@ struct GitPanelView: View {
                 GitSectionHeader(title: "Untracked (\(untracked.count))")
                 Spacer()
                 Button("Stage All") {
-                  Task { await stageAll() }
+                  _Concurrency.Task { await stageAll() }
                 }
                 .font(.swarmMono(.micro))
                 .foregroundStyle(.swarmGold)
@@ -218,7 +218,7 @@ struct GitPanelView: View {
                   )
                   Spacer()
                   Button {
-                    Task { await stage(file.path) }
+                    _Concurrency.Task { await stage(file.path) }
                   } label: {
                     Image(systemName: "plus")
                       .font(.swarm(.micro))
@@ -246,7 +246,7 @@ struct GitPanelView: View {
               .cornerRadius(6)
 
             Button {
-              Task { await commitAndPush() }
+              _Concurrency.Task { await commitAndPush() }
             } label: {
               Text("Commit & Push")
                 .font(.swarm(.sm, weight: .medium))

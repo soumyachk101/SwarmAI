@@ -85,12 +85,12 @@ struct ReportsPanel: View {
  .padding(.vertical, 8)
  .background(.swarmCanvas)
  }
- .modifier(PanelEntryModifier(appeared: $contentAppeared))
- }
+ .modifier(PanelEntryModifier(appeared: contentAppeared))
  .onAppear {
  contentAppeared = false
  DispatchQueue.main.asyncAfter(deadline: .now() + 0.02) {
  contentAppeared = true
+ }
  }
  }
 }

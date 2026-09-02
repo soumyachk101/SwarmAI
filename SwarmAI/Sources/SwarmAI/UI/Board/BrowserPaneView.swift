@@ -227,7 +227,7 @@ public struct BrowserPaneView: View {
       HStack(spacing: 4) {
         // Screenshot Capture Button
         Button {
-          Task {
+          _Concurrency.Task {
             await browserStore.captureScreenshot()
           }
         } label: {
@@ -543,100 +543,5 @@ public struct BrowserPaneView: View {
         .foregroundStyle(Color.swarmBorderSubtle),
       alignment: .top
     )
-  }
-}
-
-// MARK: - Emulator Pane
-
-public struct EmulatorPaneView: View {
-  let avds: [(String, String)] = [
-    ("Pixel 7 API 34", "Running"),
-    ("Pixel 6 API 33", "Stopped"),
-    ("Nexus 5X API 30", "Stopped"),
-  ]
-
-  @State private var selectedAvd: String = "Pixel 7 API 34"
-
-  public init() {}
-
-  public var body: some View {
-    VStack(spacing: 0) {
-      // Emulator toolbar
-      HStack {
-        Text("Emulator")
-          .font(.swarm(.sm, weight: .medium))
-          .foregroundStyle(Color.swarmTextPrimary)
-
-        Spacer()
-
-        Picker("", selection: $selectedAvd) {
-          ForEach(avds, id: \.0) { name, _ in
-            Text(name)
-          }
-        }
-        .pickerStyle(.menu)
-        .font(.swarm(.xs))
-      }
-      .padding(.horizontal, 10)
-      .padding(.vertical, 6)
-      .background(Color.swarmSurface)
-
-      Divider()
-        .background(Color.swarmBorderSubtle)
-
-      // AVD list
-      ScrollView {
-        VStack(spacing: 8) {
-          ForEach(avds, id: \.0) { name, status in
-            AvdRow(name: name, status: status)
-          }
-          .padding(.horizontal, 12)
-          .padding(.vertical, 4)
-        }
-      }
-
-      Spacer()
-    }
-    .background(Color.swarmCanvas)
-  }
-}
-
-public struct AvdRow: View {
-  let name: String
-  let status: String
-
-  public init(name: String, status: String) {
-    self.name = name
-    self.status = status
-  }
-
-  public var body: some View {
-    HStack(spacing: 10) {
-      Circle()
-        .fill(status == "Running" ? Color.swarmSuccess : Color.swarmTextTertiary)
-        .frame(width: 8, height: 8)
-
-      VStack(alignment: .leading, spacing: 2) {
-        Text(name)
-          .font(.swarm(.sm, weight: .medium))
-          .foregroundStyle(Color.swarmTextPrimary)
-
-        Text(status)
-          .font(.swarm(.micro))
-          .foregroundStyle(status == "Running" ? Color.swarmSuccess : Color.swarmTextTertiary)
-      }
-
-      Spacer()
-
-      Button(status == "Running" ? "Stop" : "Launch") { }
-        .font(.swarm(.xs))
-        .foregroundStyle(Color.swarmGold)
-        .buttonStyle(.plain)
-    }
-    .padding(10)
-    .background {
-      RoundedRectangle(cornerRadius: 8)
-        .fill(Color.swarmSurface)
-    }
   }
 }

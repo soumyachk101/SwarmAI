@@ -82,7 +82,7 @@ struct GitTab: View {
       Menu {
         ForEach(branches, id: \.self) { branch in
           Button {
-            Task { await switchBranch(to: branch) }
+            _Concurrency.Task { await switchBranch(to: branch) }
           } label: {
             HStack {
               Text(branch)
@@ -123,7 +123,7 @@ struct GitTab: View {
       }
 
       Button {
-        Task { await refreshGit() }
+        _Concurrency.Task { await refreshGit() }
       } label: {
         Image(systemName: "arrow.clockwise")
           .font(.swarm(.xs))
@@ -142,7 +142,7 @@ struct GitTab: View {
         Spacer()
         if let staged = gitStatus?.stagedFiles, !staged.isEmpty {
           Button("Unstage All") {
-            Task { await unstageFiles([]) }
+            _Concurrency.Task { await unstageFiles([]) }
           }
           .font(.swarmMono(.micro))
           .foregroundStyle(.swarmTextTertiary)
@@ -154,7 +154,7 @@ struct GitTab: View {
         ForEach(staged) { file in
           HStack(spacing: 6) {
             Button {
-              Task { await unstageFiles([file.path]) }
+              _Concurrency.Task { await unstageFiles([file.path]) }
             } label: {
               Image(systemName: "minus.circle")
                 .font(.swarm(.xs))
@@ -167,7 +167,7 @@ struct GitTab: View {
               .foregroundStyle(.swarmTextPrimary)
               .lineLimit(1)
               .onTapGesture {
-                Task { await showDiff(for: file.path, staged: true) }
+                _Concurrency.Task { await showDiff(for: file.path, staged: true) }
               }
 
             Spacer()
@@ -194,7 +194,7 @@ struct GitTab: View {
         Spacer()
         if let unstaged = gitStatus?.unstagedFiles, !unstaged.isEmpty {
           Button("Stage All") {
-            Task { await stageFiles([]) }
+            _Concurrency.Task { await stageFiles([]) }
           }
           .font(.swarmMono(.micro))
           .foregroundStyle(.swarmGold)
@@ -206,7 +206,7 @@ struct GitTab: View {
         ForEach(unstaged) { file in
           HStack(spacing: 6) {
             Button {
-              Task { await stageFiles([file.path]) }
+              _Concurrency.Task { await stageFiles([file.path]) }
             } label: {
               Image(systemName: "plus.circle")
                 .font(.swarm(.xs))
@@ -219,13 +219,13 @@ struct GitTab: View {
               .foregroundStyle(.swarmTextSecondary)
               .lineLimit(1)
               .onTapGesture {
-                Task { await showDiff(for: file.path, staged: false) }
+                _Concurrency.Task { await showDiff(for: file.path, staged: false) }
               }
 
             Spacer()
 
             Button {
-              Task { await discardChanges([file.path]) }
+              _Concurrency.Task { await discardChanges([file.path]) }
             } label: {
               Image(systemName: "arrow.uturn.backward")
                 .font(.swarm(.micro))
@@ -256,7 +256,7 @@ struct GitTab: View {
             SectionHeader(title: "Untracked", count: untracked.count)
             Spacer()
             Button("Stage All") {
-              Task { await stageFiles(untracked.map(\.path)) }
+              _Concurrency.Task { await stageFiles(untracked.map(\.path)) }
             }
             .font(.swarmMono(.micro))
             .foregroundStyle(.swarmGold)
@@ -266,7 +266,7 @@ struct GitTab: View {
           ForEach(untracked) { file in
             HStack(spacing: 6) {
               Button {
-                Task { await stageFiles([file.path]) }
+                _Concurrency.Task { await stageFiles([file.path]) }
               } label: {
                 Image(systemName: "plus.circle")
                   .font(.swarm(.xs))
@@ -312,7 +312,7 @@ struct GitTab: View {
 
       HStack(spacing: 8) {
         Button {
-          Task { await commit(stageAll: false) }
+          _Concurrency.Task { await commit(stageAll: false) }
         } label: {
           Text("Commit")
             .font(.swarm(.sm, weight: .medium))
@@ -326,7 +326,7 @@ struct GitTab: View {
         .disabled(commitMessage.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 
         Button {
-          Task { await commit(stageAll: true) }
+          _Concurrency.Task { await commit(stageAll: true) }
         } label: {
           Text("Commit All")
             .font(.swarm(.sm, weight: .medium))
@@ -346,7 +346,7 @@ struct GitTab: View {
   private var syncControlsView: some View {
     HStack(spacing: 8) {
       Button {
-        Task { await pull() }
+        _Concurrency.Task { await pull() }
       } label: {
         Label("Pull", systemImage: "arrow.down")
           .font(.swarm(.xs))
@@ -359,7 +359,7 @@ struct GitTab: View {
       .buttonStyle(.plain)
 
       Button {
-        Task { await push() }
+        _Concurrency.Task { await push() }
       } label: {
         Label("Push", systemImage: "arrow.up")
           .font(.swarm(.xs))

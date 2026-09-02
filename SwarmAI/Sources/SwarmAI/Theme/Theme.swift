@@ -3,7 +3,8 @@ import SwiftUI
 // MARK: - Theme Protocol
 
 struct Theme: Identifiable, Codable, Hashable, CaseIterable {
- let id: String
+	static var allCases: [Theme] { allThemes }
+	let id: String
  let displayName: String
  let description: String
  let colors: ThemeColors
@@ -280,91 +281,81 @@ enum ThemeToken: String, CaseIterable {
 // MARK: - ThemeManager
 
 @Observable
-final class ThemeStore {
- static let shared = ThemeStore()
- var currentThemeId: String = "obsidian-charcoal"
- var themeMode: ThemeMode = .dark
+public final class ThemeStore: @unchecked Sendable {
+	public static let shared = ThemeStore()
+	public var currentThemeId: String = "obsidian-charcoal"
+	public var themeMode: ThemeMode = .dark
 
- var currentTheme: Theme {
- Theme.theme(for: currentThemeId) ?? Theme.allThemes[0]
- }
+	var currentTheme: Theme {
+		Theme.theme(for: currentThemeId) ?? Theme.allThemes[0]
+	}
 
- init() {
- if let saved = UserDefaults.standard.string(forKey: "selectedTheme"),
- let theme = Theme.theme(for: saved) {
- currentThemeId = saved
- }
- }
+	init() {
+		if let saved = UserDefaults.standard.string(forKey: "selectedTheme"),
+		   Theme.theme(for: saved) != nil {
+			currentThemeId = saved
+		}
+	}
 
- func setTheme(_ id: String) {
- currentThemeId = id
- UserDefaults.standard.set(id, forKey: "selectedTheme")
- }
+	func setTheme(_ id: String) {
+		currentThemeId = id
+		UserDefaults.standard.set(id, forKey: "selectedTheme")
+	}
 
- func cycleTheme() {
- let currentIndex = Theme.allThemes.firstIndex { $0.id == currentThemeId } ?? 0
- let nextIndex = (currentIndex + 1) % Theme.allThemes.count
- setTheme(Theme.allThemes[nextIndex].id)
- }
+	func cycleTheme() {
+		let currentIndex = Theme.allThemes.firstIndex { $0.id == currentThemeId } ?? 0
+		let nextIndex = (currentIndex + 1) % Theme.allThemes.count
+		setTheme(Theme.allThemes[nextIndex].id)
+	}
 
- func transitionToTheme(_ id: String, animated: Bool = true) {
- guard animated else {
- setTheme(id)
- return
- }
- withAnimation(.swarmSlow) {
- setTheme(id)
- }
- }
+	func transitionToTheme(_ id: String, animated: Bool = true) {
+		guard animated else {
+			setTheme(id)
+			return
+		}
+		withAnimation(.swarmSlow) {
+			setTheme(id)
+		}
+	}
 
- var colorScheme: ColorScheme? {
- switch themeMode {
- case .light: return .light
- case .dark: return .dark
- case .system: return nil
- }
- }
+	var colorScheme: ColorScheme? {
+		switch themeMode {
+		case .light: return .light
+		case .dark: return .dark
+		case .system: return nil
+		}
+	}
 }
 
 // MARK: - Theme Mode
 
-enum ThemeMode: String, CaseIterable {
- case system = "System"
- case light = "Light"
- case dark = "Dark"
+public enum ThemeMode: String, CaseIterable {
+	case system = "System"
+	case light = "Light"
+	case dark = "Dark"
 
- var title: String {
- rawValue
- }
+	public var title: String {
+		rawValue
+	}
 }
 
 // MARK: - Color Helpers
 
 extension Color {
- init(theme: Theme, token: ThemeToken) {
- let rgb = theme.rgb(for: token)
- self.init(red: rgb[0] / 255.0, green: rgb[1] / 255.0, blue: rgb[2] / 255.0)
- }
+	init(theme: Theme, token: ThemeToken) {
+		let rgb = theme.rgb(for: token)
+		self.init(red: rgb[0] / 255.0, green: rgb[1] / 255.0, blue: rgb[2] / 255.0)
+	}
 
- static func from(theme: Theme, token: ThemeToken) -> Color {
- Color(theme: theme, token: token)
- }
+	static func from(theme: Theme, token: ThemeToken) -> Color {
+		Color(theme: theme, token: token)
+	}
 
- init(hex: String) {
- let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
- var int: UInt64 = 0
- Scanner(string: hex).scanHexInt64(&int)
- let r = Double((int >> 16) & 0xFF) / 255.0
- let g = Double((int >> 8) & 0xFF) / 255.0
- let b = Double(int & 0xFF) / 255.0
- self.init(red: r, green: g, blue: b)
- }
-
- func toHex() -> String {
- let components = UIColor(self).cgColor.components!
- let r = Int(components[0] * 255)
- let g = Int(components[1] * 255)
- let b = Int(components[2] * 255)
- return String(format: "#%02X%02X%02X", r, g, b)
- }
+	func toHex() -> String {
+		guard let nsColor = NSColor(self).usingColorSpace(.sRGB) else { return "#000000" }
+		let r = Int(nsColor.redComponent * 255)
+		let g = Int(nsColor.greenComponent * 255)
+		let b = Int(nsColor.blueComponent * 255)
+		return String(format: "#%02X%02X%02X", r, g, b)
+	}
 }

@@ -69,7 +69,7 @@ public enum TaskPriority: String, Codable, Sendable, CaseIterable {
 
 /// A task in the kanban board, representing work to be done.
 @Observable
-public class Task: Codable, Identifiable, Hashable {
+public final class Task: Codable, Identifiable, Hashable, @unchecked Sendable {
  /// Unique identifier for the task.
  public let id: UUID
 
@@ -194,5 +194,15 @@ public class Task: Codable, Identifiable, Hashable {
  /// Touch the updatedAt timestamp to mark the task as recently modified.
  public func touch() {
  updatedAt = Date()
+ }
+
+ // MARK: - Hashable & Equatable
+
+ public static func == (lhs: Task, rhs: Task) -> Bool {
+   lhs.id == rhs.id
+ }
+
+ public func hash(into hasher: inout Hasher) {
+   hasher.combine(id)
  }
 }

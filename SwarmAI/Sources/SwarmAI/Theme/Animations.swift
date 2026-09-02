@@ -56,6 +56,27 @@ extension Animation {
 
  // Splash particles
  static let swarmParticleBurst = Animation.spring(response: 0.8, dampingFraction: 0.6)
+
+ // Splash glow pulse — continuous
+ static let swarmGlowPulse = Animation.easeInOut(duration: 2.0).repeatForever(autoreverses: true)
+
+ // Logo stamp-in reveal
+ static let swarmLogoReveal = Animation.spring(response: 0.6, dampingFraction: 0.8)
+
+ // Tagline fade-in
+ static let swarmTaglineFade = Animation.easeIn(duration: 0.8)
+
+ // Loading dot pulse
+ static let swarmLoadingPulse = Animation.easeInOut(duration: 0.6)
+
+ // Slide up entry
+ static let swarmSlideUp = Animation.spring(response: 0.5, dampingFraction: 0.85)
+
+ // Slide right/left entry
+ static let swarmSlideRight = Animation.spring(response: 0.5, dampingFraction: 0.85)
+
+ // Splash exit transition
+ static let swarmSplashExit = Animation.easeIn(duration: 0.5)
 }
 
 // MARK: - Stagger Helper
@@ -197,24 +218,29 @@ public enum SwarmSequenceStep {
 /// ])
 /// ```
 public extension View {
- func swarmSequence(_ steps: [SwarmSequenceStep]) -> some View {
- // Compute cumulative delays so each step starts after the previous one.
- var cumulativeDelay: Double = 0
- let animations: [Animation] = steps.map { step in
- let anim: Animation
- switch step {
- case .fade(let delay):
- anim = .swarmEntrySpring.delay(delay)
- case .slide(let edge, let delay):
- anim = .swarmSidebarEntry.delay(delay)
- case .scale(let delay):
- anim = .swarmPaneMaterialize.delay(delay)
- case .materialize(let delay):
- anim = .swarmPaneMaterialize.delay(delay)
- }
- cumulativeDelay += delay
- return anim
- }
+  func swarmSequence(_ steps: [SwarmSequenceStep]) -> some View {
+    // Compute cumulative delays so each step starts after the previous one.
+    var cumulativeDelay: Double = 0
+    let animations: [Animation] = steps.map { step in
+      let stepDelay: Double
+      let anim: Animation
+      switch step {
+      case .fade(let delay):
+        stepDelay = delay
+        anim = .swarmEntrySpring.delay(cumulativeDelay + delay)
+      case .slide(let edge, let delay):
+        stepDelay = delay
+        anim = .swarmSidebarEntry.delay(cumulativeDelay + delay)
+      case .scale(let delay):
+        stepDelay = delay
+        anim = .swarmPaneMaterialize.delay(cumulativeDelay + delay)
+      case .materialize(let delay):
+        stepDelay = delay
+        anim = .swarmPaneMaterialize.delay(cumulativeDelay + delay)
+      }
+      cumulativeDelay += stepDelay
+      return anim
+    }
 
  // Apply the first animation; subsequent ones can be layered by the caller
  // on individual subviews. Here we apply the primary entrance animation.

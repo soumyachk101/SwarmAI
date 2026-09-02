@@ -140,23 +140,23 @@ public enum AgentType: String, Codable, Sendable, CaseIterable, Identifiable {
 
  /// Brand color for this agent type (matching simple-icons palette).
  public var brandColor: Color {
- switch self {
- case .claudeCode: Color(hex: "#D97757") // Anthropic orange
- case .codex: Color(hex: "#1A1A2E") // OpenAI black
- case .aider: Color(hex: "#7654B4") // Aider purple
- case .cursor: Color(hex: "#1A1A2E") // Cursor dark
- case .openCode: Color(hex: "#4A90D9") // OpenCode blue
- case .cline: Color(hex: "#9B59B6") // Cline purple
- case .kilo: Color(hex: "#FFD700") // Kilo gold
- case .kimiCode: Color(hex: "#1A1A2E") // dark
- case .kiro: Color(hex: "#6C5CE7") // Kiro indigo
- case .antigravity: Color(hex: "#FF6B6B") // Antigravity red
- case .plainTerminal: Color(hex: "#2D2D2D") // Terminal dark gray
- case .geminiCli: Color(hex: "#4285F4") // Google blue
- case .deepSeek: Color(hex: "#0066FF") // DeepSeek blue
- case .grok: Color(hex: "#1DA1F2") // Grok/X blue
- case .droid: Color(hex: "#00FF88") // Droid green
- }
+   switch self {
+   case .claudeCode: Color(hex: "#D97757") ?? .orange // Anthropic orange
+   case .codex: Color(hex: "#1A1A2E") ?? .gray // OpenAI black
+   case .aider: Color(hex: "#7654B4") ?? .purple // Aider purple
+   case .cursor: Color(hex: "#1A1A2E") ?? .gray // Cursor dark
+   case .openCode: Color(hex: "#4A90D9") ?? .blue // OpenCode blue
+   case .cline: Color(hex: "#9B59B6") ?? .purple // Cline purple
+   case .kilo: Color(hex: "#FFD700") ?? .yellow // Kilo gold
+   case .kimiCode: Color(hex: "#1A1A2E") ?? .gray // dark
+   case .kiro: Color(hex: "#6C5CE7") ?? .indigo // Kiro indigo
+   case .antigravity: Color(hex: "#FF6B6B") ?? .red // Antigravity red
+   case .plainTerminal: Color(hex: "#2D2D2D") ?? .gray // Terminal dark gray
+   case .geminiCli: Color(hex: "#4285F4") ?? .blue // Google blue
+   case .deepSeek: Color(hex: "#0066FF") ?? .blue // DeepSeek blue
+   case .grok: Color(hex: "#1DA1F2") ?? .blue // Grok/X blue
+   case .droid: Color(hex: "#00FF88") ?? .green // Droid green
+   }
  }
 
  /// Brand colors dictionary for all agent types.

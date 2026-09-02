@@ -237,8 +237,8 @@ public final class EmulatorService: @unchecked Sendable {
         runningProcesses[name] = process
 
         // Trigger refresh after a delay to detect boot
-        Task {
-            try? await Task.sleep(nanoseconds: 3_000_000_000)
+        _Concurrency.Task {
+            try? await _Concurrency.Task.sleep(nanoseconds: 3_000_000_000)
             await self.refresh()
         }
     }
@@ -254,7 +254,7 @@ public final class EmulatorService: @unchecked Sendable {
             _ = try await runProcessAsync(executable: adb, args: ["-s", serial, "reboot", "-p"])
         }
 
-        try? await Task.sleep(nanoseconds: 1_000_000_000)
+        try? await _Concurrency.Task.sleep(nanoseconds: 1_000_000_000)
         await refresh()
     }
 

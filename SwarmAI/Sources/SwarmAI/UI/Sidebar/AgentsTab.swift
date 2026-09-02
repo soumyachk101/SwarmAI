@@ -17,7 +17,7 @@ struct AgentsTab: View {
     Spacer()
 
     Button {
-     agentsStore.spawnAgent(selectedAgentType)
+     _ = agentsStore.spawnAgent(selectedAgentType)
     } label: {
      HStack(spacing: 4) {
       Image(systemName: "plus")

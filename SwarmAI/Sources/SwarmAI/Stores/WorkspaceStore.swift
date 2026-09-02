@@ -1,9 +1,9 @@
 import SwiftUI
 
 @Observable
-final class WorkspaceStore {
- var workspaces: [Workspace] = []
- var activeWorkspaceId: UUID?
+public final class WorkspaceStore: @unchecked Sendable {
+  public var workspaces: [Workspace] = []
+  public var activeWorkspaceId: UUID?
 
  init() {
  loadFromStorage()

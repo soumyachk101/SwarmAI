@@ -1,23 +1,29 @@
 import SwiftUI
 
 @Observable
-final class AppState {
- static let shared = AppState()
+public final class AppState: @unchecked Sendable {
+  public static let shared = AppState()
 
- var isLeftSidebarOpen: Bool = true
- var isRightDockOpen: Bool = true
- var isCommandPaletteOpen: Bool = false
- var isSettingsOpen: Bool = false
- var activeLeftTab: SidebarTab = .projects
- var activeRightTab: DockTab = .lead
- var activePlane: Plane = .board
- var boardView: BoardView = .grid
- var isFullscreen: Bool = false
- var workspaceName: String = "Swarm Workspace"
- var isVoiceActive: Bool = false
- var activeAgentsCount: Int = 0
- var gitBranch: String = "main"
- var engineStatus: String = "Idle"
+  public var isLeftSidebarOpen: Bool = true
+  public var isRightDockOpen: Bool = true
+  public var isCommandPaletteOpen: Bool = false
+  public var isSettingsOpen: Bool = false
+  public var isDashboardPresented: Bool = false
+  public var isDiffPreviewPresented: Bool = false
+  public var isTaskTemplatesPresented: Bool = false
+  public var isUserGuidePresented: Bool = false
+  public var isUpdateCheckerPresented: Bool = false
+
+  public var activeLeftTab: SidebarTab = .projects
+  public var activeRightTab: DockTab = .lead
+  public var activePlane: Plane = .board
+  public var boardView: BoardView = .grid
+  public var isFullscreen: Bool = false
+  public var workspaceName: String = "Swarm Workspace"
+  public var isVoiceActive: Bool = false
+  public var activeAgentsCount: Int = 0
+  public var gitBranch: String = "main"
+  public var engineStatus: String = "Idle"
 
  init() {
  // Load persisted values from UserDefaults

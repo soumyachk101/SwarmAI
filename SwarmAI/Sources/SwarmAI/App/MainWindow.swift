@@ -16,29 +16,38 @@ struct MainWindow: View {
 	@State private var extensionStore = ExtensionStore()
 	@State private var dispatchStore = DispatchStore()
 	@State private var projectStore = ProjectStore()
-	@State private var windowHasAppeared = false
+
+	@State private var entryPhase: EntryPhase = .idle
+	@State private var hasStartedSequence: Bool = false
 
 	var body: some View {
 		ZStack {
-			// Background canvas
+			// Background canvas with subtle vignette
 			Color.swarmCanvas
 				.ignoresSafeArea()
+				.overlay(alignment: .center) {
+					SubtleVignette()
+						.allowsHitTesting(false)
+				}
 
 			// Main layout
 			HStack(spacing: 0) {
 				// Left Sidebar
 				if appState.isLeftSidebarOpen {
 					LeftSidebar()
-						.opacity(windowHasAppeared ? 1 : 0)
-						.offset(x: windowHasAppeared ? 0 : -30)
-						.animation(.swarmSlideRight, value: windowHasAppeared)
+						.opacity(entryPhase >= .sidebarIn ? 1 : 0)
+						.offset(x: entryPhase >= .sidebarIn ? 0 : -30)
+						.animation(.swarmSidebarEntry, value: entryPhase)
 				}
 
 				// Center content
 				VStack(spacing: 0) {
-					SwarmTitleBar()
+					SwarmTitleBar(entryPhase: $entryPhase)
 
 					BoardStrip()
+						.opacity(entryPhase >= .boardStripIn ? 1 : 0)
+						.offset(y: entryPhase >= .boardStripIn ? 0 : -20)
+						.animation(.swarmSlideUp.delay(0.72), value: entryPhase)
 
 					// Board / Browser / Emulator
 					Group {
@@ -52,74 +61,72 @@ struct MainWindow: View {
 						case .emulator: EmulatorPaneView()
 						}
 					}
-					.ignoresSafeArea(container: .windows)
-					.opacity(windowHasAppeared ? 1 : 0)
-					.offset(y: windowHasAppeared ? 0 : 20)
-					.scaleEffect(windowHasAppeared ? 1 : 0.98)
-					.animation(.spring(response: 0.5, dampingFraction: 0.85).delay(0.1), value: windowHasAppeared)
+					.ignoresSafeArea()
+					.opacity(entryPhase >= .contentIn ? 1 : 0)
+					.offset(y: entryPhase >= .contentIn ? 0 : 20)
+					.scaleEffect(entryPhase >= .contentIn ? 1 : 0.98)
+					.animation(.swarmContentEntry.delay(0.87), value: entryPhase)
 
 					StatusBar()
+						.opacity(entryPhase >= .statusBarIn ? 1 : 0)
+						.offset(y: entryPhase >= .statusBarIn ? 0 : 20)
+						.animation(.swarmStatusEntry.delay(0.97), value: entryPhase)
 				}
 
 				// Right Dock
 				if appState.isRightDockOpen {
 					RightDock()
-						.opacity(windowHasAppeared ? 1 : 0)
-						.offset(x: windowHasAppeared ? 0 : 30)
-						.animation(.swarmSlideRight, value: windowHasAppeared)
+						.opacity(entryPhase >= .dockIn ? 1 : 0)
+						.offset(x: entryPhase >= .dockIn ? 0 : 30)
+						.animation(.swarmDockEntry, value: entryPhase)
 				}
 			}
-			.environment(appState)
-			.environment(themeStore)
-			.environment(agentsStore)
-			.environment(workspaceStore)
-			.environment(taskStore)
-			.environment(settingsStore)
-			.environment(uiStore)
-			.environment(planeStore)
-			.environment(canvasStore)
-			.environment(browserStore)
-			.environment(extensionStore)
-			.environment(dispatchStore)
-			.environment(projectStore)
-			.opacity(windowHasAppeared ? 1 : 0)
-			.animation(.easeOut(duration: 0.5), value: windowHasAppeared)
+			.opacity(entryPhase >= .frameIn ? 1 : 0)
+			.scaleEffect(entryPhase >= .frameIn ? 1 : 0.97)
+			.animation(.swarmEntrySpring.delay(0.3), value: entryPhase)
+
+			// Splash screen overlay
+			if entryPhase == .splashActive {
+				SplashScreenView(isLaunching: .constant(true))
+					.transition(.opacity)
+					.zIndex(999)
+			}
 
 			// Modals overlay
 			ZStack {
-				if appState.isCommandPaletteOpen || appState.isCommandPalettePresented {
+				if appState.isCommandPaletteOpen {
 					CommandPaletteView()
-						.transition(.opacity.combined(with: .scale(scale: 0.95)))
+						.transition(.opacity.combined(with: .scale(scale: 0.92)))
 				}
 
-				if appState.isSettingsOpen || appState.isSettingsPresented {
+				if appState.isSettingsOpen {
 					SettingsView()
-						.transition(.opacity.combined(with: .scale(scale: 0.95)))
+						.transition(.opacity.combined(with: .scale(scale: 0.92)))
 				}
 
 				if appState.isDashboardPresented {
-					DashboardModalView()
-						.transition(.opacity.combined(with: .scale(scale: 0.95)))
+					SwarmDashboardModal()
+						.transition(.opacity.combined(with: .scale(scale: 0.92)))
 				}
 
 				if appState.isDiffPreviewPresented {
-					DiffPreviewModalView()
-						.transition(.opacity.combined(with: .scale(scale: 0.95)))
+					DiffPreviewModal()
+						.transition(.opacity.combined(with: .scale(scale: 0.92)))
 				}
 
 				if appState.isTaskTemplatesPresented {
-					TaskTemplatesModalView()
-						.transition(.opacity.combined(with: .scale(scale: 0.95)))
+					TaskTemplatesModal()
+						.transition(.opacity.combined(with: .scale(scale: 0.92)))
 				}
 
 				if appState.isUserGuidePresented {
-					UserGuideModalView()
-						.transition(.opacity.combined(with: .scale(scale: 0.95)))
+					UserGuideModal()
+						.transition(.opacity.combined(with: .scale(scale: 0.92)))
 				}
 
 				if appState.isUpdateCheckerPresented {
-					UpdateCheckerModalView()
-						.transition(.opacity.combined(with: .scale(scale: 0.95)))
+					UpdateCheckerModal()
+						.transition(.opacity.combined(with: .scale(scale: 0.92)))
 				}
 			}
 			.environment(appState)
@@ -129,14 +136,84 @@ struct MainWindow: View {
 			.ignoresSafeArea()
 		}
 		.frame(minWidth: 1200, minHeight: 800)
-		.animation(.easeInOut(duration: 0.3), value: themeStore.currentThemeId)
+		.animation(.swarmSlow, value: themeStore.currentThemeId)
 		.onAppear {
 			appState.activeAgentsCount = agentsStore.agents.filter { $0.status == .running }.count
 			appState.engineStatus = agentsStore.agents.contains(where: { $0.status == .running }) ? "Running" : "Idle"
 
-			withAnimation(.easeOut(duration: 0.5)) {
-				windowHasAppeared = true
+			guard !hasStartedSequence else { return }
+			hasStartedSequence = true
+			startEntrySequence()
+		}
+	}
+
+	// MARK: - Entry Sequence Orchestration
+
+	private func startEntrySequence() {
+		entryPhase = .splashActive
+
+		// Phase 1: splash exits → frame appears (at 2.3s splash duration)
+		DispatchQueue.main.asyncAfter(deadline: .now() + 2.3) {
+			entryPhase = .splashExiting
+			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+				entryPhase = .frameIn
 			}
 		}
+
+		// Phase 2: sidebar slides in (0.1s after frame)
+		DispatchQueue.main.asyncAfter(deadline: .now() + 2.9) {
+			entryPhase = .sidebarIn
+		}
+
+		// Phase 3: dock slides in (0.15s after sidebar)
+		DispatchQueue.main.asyncAfter(deadline: .now() + 3.05) {
+			entryPhase = .dockIn
+		}
+
+		// Phase 4: title bar cascades in (simultaneous with dock)
+		DispatchQueue.main.asyncAfter(deadline: .now() + 3.05) {
+			entryPhase = .titlebarIn
+		}
+
+		// Phase 5: board strip slides up (0.1s after titlebar)
+		DispatchQueue.main.asyncAfter(deadline: .now() + 3.15) {
+			entryPhase = .boardStripIn
+		}
+
+		// Phase 6: content area reveals (0.15s after boardStrip)
+		DispatchQueue.main.asyncAfter(deadline: .now() + 3.3) {
+			entryPhase = .contentIn
+		}
+
+		// Phase 7: status bar slides up (0.1s after content)
+		DispatchQueue.main.asyncAfter(deadline: .now() + 3.4) {
+			entryPhase = .statusBarIn
+		}
+
+		// Complete
+		DispatchQueue.main.asyncAfter(deadline: .now() + 3.6) {
+			entryPhase = .complete
+		}
+	}
+}
+
+// MARK: - Subtle Vignette
+
+struct SubtleVignette: View {
+	var body: some View {
+		Rectangle()
+			.fill(
+				RadialGradient(
+					colors: [
+						.clear,
+						Color.black.opacity(0.15),
+						Color.black.opacity(0.3)
+					],
+					center: .center,
+					startRadius: 100,
+					endRadius: 600
+				)
+			)
+			.ignoresSafeArea()
 	}
 }

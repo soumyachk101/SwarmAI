@@ -1,11 +1,11 @@
 import SwiftUI
 
 @Observable
-final class AgentsStore {
- var agents: [Agent] = []
- var gridLayout: GridLayout = GridLayout(columns: 2, rows: 2, panePositions: [])
- var maximizedPaneId: String?
- var activePaneId: String?
+public final class AgentsStore: @unchecked Sendable {
+  public var agents: [Agent] = []
+  public var gridLayout: GridLayout = GridLayout(columns: 2, rows: 2, panePositions: [])
+  public var maximizedPaneId: String?
+  public var activePaneId: String?
 
  init() {
  loadFromStorage()

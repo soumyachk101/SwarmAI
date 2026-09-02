@@ -24,7 +24,7 @@ struct AppCommands: Commands {
 			.keyboardShortcut("n", modifiers: [.command, .shift])
 
 			Button("Quick Goal Dispatch...") {
-				appState.isCommandPalettePresented = true
+				appState.isCommandPaletteOpen = true
 			}
 			.keyboardShortcut("d", modifiers: [.command, .shift])
 
@@ -56,7 +56,7 @@ struct AppCommands: Commands {
 
 		CommandGroup(replacing: .toolbar) {
 			Button("Command Palette") {
-				appState.isCommandPalettePresented.toggle()
+				appState.isCommandPaletteOpen.toggle()
 			}
 			.keyboardShortcut("k", modifiers: .command)
 
@@ -78,7 +78,7 @@ struct AppCommands: Commands {
 			Divider()
 
 			Button("Settings...") {
-				appState.isSettingsPresented.toggle()
+				appState.isSettingsOpen.toggle()
 			}
 			.keyboardShortcut(",", modifiers: .command)
 		}
@@ -127,7 +127,7 @@ struct AppCommands: Commands {
 
 		CommandMenu("Swarm") {
 			Button("Dispatch Goal to Lead...") {
-				appState.isCommandPalettePresented = true
+				appState.isCommandPaletteOpen = true
 			}
 			.keyboardShortcut("d", modifiers: [.command, .shift])
 

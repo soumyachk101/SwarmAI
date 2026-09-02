@@ -7,7 +7,7 @@ import SwiftUI
 /// output for an agent's terminal pane. Output is stored as a ring
 /// buffer to prevent unbounded memory growth.
 @Observable
-public class TerminalSession: Codable, Identifiable {
+public final class TerminalSession: Codable, Identifiable {
  /// Unique identifier for the terminal session.
  public let id: UUID
 

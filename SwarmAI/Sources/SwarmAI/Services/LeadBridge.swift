@@ -528,7 +528,7 @@ public final class LeadBridge: @unchecked Sendable {
 
         await MainActor.run {
           self.activeThought = thoughtText
-          var thought = LeadThought(
+          let thought = LeadThought(
             step: self.currentStep,
             mode: self.currentMode,
             thought: thoughtText,
@@ -673,7 +673,7 @@ public final class LeadBridge: @unchecked Sendable {
       return ("Grid board updated to \(cols)x\(rows)", nil)
 
     case "listWorktrees":
-      let rootPath = workspaceStore?.workspaces.first?.rootPath ?? "."
+      let rootPath = workspaceStore?.workspaces.first?.path ?? "."
       let trees = (try? await WorktreeService.shared.listWorktrees(repoPath: rootPath)) ?? []
       let names = trees.map { $0.name }.joined(separator: ", ")
       return ("Worktrees: [\(names.isEmpty ? "None active" : names)]", nil)

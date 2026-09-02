@@ -51,7 +51,7 @@ struct ExplorerTab: View {
 
         // Refresh
         Button {
-          Task {
+          _Concurrency.Task {
             await fileManager.refresh()
           }
         } label: {
@@ -163,7 +163,7 @@ struct ExplorerTab: View {
 
           if searchText.isEmpty, let activeWs = workspaceStore.activeWorkspace {
             Button("Scan \(activeWs.name)") {
-              Task {
+              _Concurrency.Task {
                 await fileManager.loadWorkspace(at: activeWs.path)
               }
             }
@@ -285,7 +285,7 @@ struct ExplorerTab: View {
     let parent = targetParentPath.isEmpty ? currentRootPath : targetParentPath
     do {
       let createdPath = try fileManager.createFile(at: parent, name: newItemName.trimmingCharacters(in: .whitespaces))
-      Task {
+      _Concurrency.Task {
         await fileManager.refresh()
         if let activeId = workspaceStore.activeWorkspaceId {
           projectStore.openFile(createdPath, workspaceId: activeId)
@@ -301,7 +301,7 @@ struct ExplorerTab: View {
     let parent = targetParentPath.isEmpty ? currentRootPath : targetParentPath
     do {
       _ = try fileManager.createFolder(at: parent, name: newItemName.trimmingCharacters(in: .whitespaces))
-      Task {
+      _Concurrency.Task {
         await fileManager.refresh()
       }
     } catch {
@@ -430,14 +430,14 @@ struct FileTreeItemView: View {
 
         Button("Duplicate") {
           _ = try? WorkspaceFileManager.shared.duplicateItem(at: node.path)
-          Task {
+          _Concurrency.Task {
             await WorkspaceFileManager.shared.refresh()
           }
         }
 
         Button("Delete", role: .destructive) {
           try? WorkspaceFileManager.shared.deleteItem(at: node.path)
-          Task {
+          _Concurrency.Task {
             await WorkspaceFileManager.shared.refresh()
           }
         }

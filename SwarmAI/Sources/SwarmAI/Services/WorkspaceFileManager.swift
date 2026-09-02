@@ -250,14 +250,14 @@ public final class WorkspaceFileManager {
   public var filterText: String = ""
 
   // Ignored directory names for fast scanning & searching
-  public static let defaultIgnoredDirectories: Set<String> = [
+  nonisolated public static let defaultIgnoredDirectories: Set<String> = [
     ".git", ".build", "node_modules", ".DerivedData", ".swiftpm",
     ".Trash", ".DS_Store", "Pods", "target", "dist", "build",
     ".next", ".cache", ".idea", ".vscode", "xcuserdata"
   ]
 
   // Binary extensions to skip during text searches
-  public static let binaryExtensions: Set<String> = [
+  nonisolated public static let binaryExtensions: Set<String> = [
     "png", "jpg", "jpeg", "gif", "svg", "webp", "ico", "bmp", "tiff", "heic",
     "zip", "tar", "gz", "tgz", "7z", "rar", "dmg", "iso", "pkg",
     "pdf", "exe", "dylib", "so", "a", "o", "class", "pyc", "wasm",
@@ -348,7 +348,7 @@ public final class WorkspaceFileManager {
 
   // MARK: - Recursive Tree Builder
 
-  private static func scanDirectory(
+  nonisolated private static func scanDirectory(
     at dirPath: String,
     rootPath: String,
     showHidden: Bool,
@@ -510,7 +510,7 @@ public final class WorkspaceFileManager {
     isSearching = false
   }
 
-  private static func performSearch(
+  nonisolated private static func performSearch(
     query: String,
     in rootPath: String,
     caseSensitive: Bool,
@@ -603,7 +603,7 @@ public final class WorkspaceFileManager {
     return results
   }
 
-  private static func classifyLine(_ line: String, query: String) -> SearchResultType {
+  nonisolated private static func classifyLine(_ line: String, query: String) -> SearchResultType {
     let lower = line.lowercased()
     if lower.hasPrefix("func ") || lower.hasPrefix("def ") || lower.hasPrefix("fn ") ||
        lower.hasPrefix("class ") || lower.hasPrefix("struct ") || lower.hasPrefix("enum ") ||

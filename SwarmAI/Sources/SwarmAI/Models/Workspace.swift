@@ -7,7 +7,7 @@ import SwiftUI
 /// actively working on. Each workspace has its own set of git worktrees,
 /// open files, and associated agents.
 @Observable
-public class Workspace: Codable, Identifiable {
+public final class Workspace: Codable, Identifiable {
  /// Unique identifier for the workspace.
  public let id: UUID
 

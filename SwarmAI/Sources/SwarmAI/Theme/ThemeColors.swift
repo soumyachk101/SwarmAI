@@ -9,63 +9,63 @@ public extension Color {
 
 	// MARK: - Semantic Color Helpers
 
-	public static var swarmCanvas: Color {
+	static var swarmCanvas: Color {
 		Color.from(theme: ThemeStore.shared.currentTheme, token: .canvas)
 	}
 
-	public static var swarmSurface: Color {
+	static var swarmSurface: Color {
 		Color.from(theme: ThemeStore.shared.currentTheme, token: .surface)
 	}
 
-	public static var swarmSurfaceHover: Color {
+	static var swarmSurfaceHover: Color {
 		Color.from(theme: ThemeStore.shared.currentTheme, token: .surfaceHover)
 	}
 
-	public static var swarmSurfaceActive: Color {
+	static var swarmSurfaceActive: Color {
 		Color.from(theme: ThemeStore.shared.currentTheme, token: .surfaceActive)
 	}
 
-	public static var swarmGold: Color {
+	static var swarmGold: Color {
 		Color.from(theme: ThemeStore.shared.currentTheme, token: .gold)
 	}
 
-	public static var swarmGoldHover: Color {
+	static var swarmGoldHover: Color {
 		Color.from(theme: ThemeStore.shared.currentTheme, token: .goldHover)
 	}
 
-	public static var swarmTextPrimary: Color {
+	static var swarmTextPrimary: Color {
 		Color.from(theme: ThemeStore.shared.currentTheme, token: .textPrimary)
 	}
 
-	public static var swarmTextSecondary: Color {
+	static var swarmTextSecondary: Color {
 		Color.from(theme: ThemeStore.shared.currentTheme, token: .textSecondary)
 	}
 
-	public static var swarmTextTertiary: Color {
+	static var swarmTextTertiary: Color {
 		Color.from(theme: ThemeStore.shared.currentTheme, token: .textTertiary)
 	}
 
-	public static var swarmBorder: Color {
+	static var swarmBorder: Color {
 		Color.from(theme: ThemeStore.shared.currentTheme, token: .border)
 	}
 
-	public static var swarmBorderSubtle: Color {
+	static var swarmBorderSubtle: Color {
 		Color.from(theme: ThemeStore.shared.currentTheme, token: .borderSubtle)
 	}
 
-	public static var swarmSuccess: Color {
+	static var swarmSuccess: Color {
 		Color.from(theme: ThemeStore.shared.currentTheme, token: .success)
 	}
 
-	public static var swarmWarning: Color {
+	static var swarmWarning: Color {
 		Color.from(theme: ThemeStore.shared.currentTheme, token: .warning)
 	}
 
-	public static var swarmError: Color {
+	static var swarmError: Color {
 		Color.from(theme: ThemeStore.shared.currentTheme, token: .error)
 	}
 
-	public static var swarmInfo: Color {
+	static var swarmInfo: Color {
 		Color.from(theme: ThemeStore.shared.currentTheme, token: .info)
 	}
 }

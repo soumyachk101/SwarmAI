@@ -74,7 +74,7 @@ public struct TaskTemplatesModal: View {
         case privacy = "Privacy & Security"
     }
 
-    public init(isOpen: Binding<Bool>, initialTab: ModalTab = .templates) {
+    public init(isOpen: Binding<Bool> = .constant(true), initialTab: ModalTab = .templates) {
         self._isOpen = isOpen
         self.initialTab = initialTab
     }

@@ -4,11 +4,10 @@ import SwiftUI
 
 struct StatusBar: View {
 	@Environment(\.appState) private var appState
+	@State private var isAppearing: Bool = true
 
-	// Entrance animation state
-	@State private var hasAppeared = false
 	@State private var agentCountDisplay: Int = 0
-	@State private var statusTextIndex: Int = 0
+	@State private var targetCount: Int = 0
 
 	private var displayStatus: String {
 		if appState.engineStatus == "Running" { return "Running" }
@@ -19,80 +18,24 @@ struct StatusBar: View {
 	var body: some View {
 		HStack(spacing: 16) {
 			// Git branch
-			HStack(spacing: 6) {
-				Image(systemName: "arrow.triangle.branch")
-					.font(.swarm(.xs))
-					.foregroundStyle(.swarmTextTertiary)
-					.opacity(hasAppeared ? 1 : 0)
-					.offset(y: hasAppeared ? 0 : 20)
-					.animation(.swarmSlideUp.delay(0.3), value: hasAppeared)
-
-				Text(appState.gitBranch)
-					.font(.swarm(.xs))
-					.foregroundStyle(.swarmTextSecondary)
-					.opacity(hasAppeared ? 1 : 0)
-					.offset(y: hasAppeared ? 0 : 20)
-					.animation(.swarmSlideUp.delay(0.35), value: hasAppeared)
-			}
-			.padding(.horizontal, 8)
-			.padding(.vertical, 4)
-			.background {
-				RoundedRectangle(cornerRadius: 4)
-					.fill(.swarmSurfaceHover.opacity(0.5))
-			}
-			.onTapGesture {
-				// Show Git Control Modal
-			}
+			GitBranchBadge()
+				.swarmStaggerItem(index: 0, delay: 0.0, factor: 0.04, animation: .swarmSlideUp)
 
 			Spacer()
 
 			// Active agents count
-			HStack(spacing: 6) {
-				Circle()
-					.fill(appState.activeAgentsCount > 0 ? .swarmSuccess : .swarmTextTertiary)
-					.frame(width: 6, height: 6)
-
-				Text("\(agentCountDisplay) agent\(agentCountDisplay == 1 ? "" : "s")")
-					.font(.swarm(.xs))
-					.foregroundStyle(.swarmTextSecondary)
-					.opacity(hasAppeared ? 1 : 0)
-					.offset(y: hasAppeared ? 0 : 20)
-					.animation(.swarmSlideUp.delay(0.4), value: hasAppeared)
-			}
+			AgentCountBadge(count: agentCountDisplay)
+				.swarmStaggerItem(index: 1, delay: 0.08, factor: 0.04, animation: .swarmSlideUp)
 
 			// Engine status
-			HStack(spacing: 6) {
-				Circle()
-					.fill(appState.engineStatus == "Running" ? .swarmSuccess : .swarmTextTertiary)
-					.frame(width: 6, height: 6)
-					.opacity(hasAppeared ? 1 : 0)
-					.offset(y: hasAppeared ? 0 : 20)
-					.animation(.swarmSlideUp.delay(0.45), value: hasAppeared)
+			EngineStatusBadge(status: displayStatus)
+				.swarmStaggerItem(index: 2, delay: 0.16, factor: 0.04, animation: .swarmSlideUp)
 
-				Text(displayStatus)
-					.font(.swarm(.xs))
-					.foregroundStyle(.swarmTextSecondary)
-					.opacity(hasAppeared ? 1 : 0)
-					.offset(y: hasAppeared ? 0 : 20)
-					.animation(.swarmSlideUp.delay(0.5), value: hasAppeared)
-			}
-
-			// Spacer
 			Spacer()
 
 			// Connection indicator
-			HStack(spacing: 4) {
-				Circle()
-					.fill(.swarmSuccess)
-					.frame(width: 6, height: 6)
-
-				Text("Connected")
-					.font(.swarm(.xs))
-					.foregroundStyle(.swarmTextTertiary)
-					.opacity(hasAppeared ? 1 : 0)
-					.offset(y: hasAppeared ? 0 : 20)
-					.animation(.swarmSlideUp.delay(0.55), value: hasAppeared)
-			}
+			ConnectionIndicator()
+				.swarmStaggerItem(index: 3, delay: 0.24, factor: 0.04, animation: .swarmSlideUp)
 		}
 		.padding(.horizontal, 16)
 		.padding(.vertical, 6)
@@ -103,27 +46,130 @@ struct StatusBar: View {
 			Capsule()
 				.fill(.swarmBorderSubtle)
 				.frame(height: 1)
-				.scaleEffect(x: hasAppeared ? 1 : 0, y: 1, anchor: .leading)
-				.animation(.swarmDrawLine.delay(0.35), value: hasAppeared)
+				.scaleEffect(x: isAppearing ? 1 : 0, y: 1, anchor: .leading)
+				.animation(.swarmDrawLine, value: isAppearing)
 		}
 		.onAppear {
-			guard !hasAppeared else { return }
+			guard isAppearing else { return }
+			targetCount = appState.activeAgentsCount
+			animateCountUp(from: 0, to: targetCount)
+		}
+	}
 
-			// Count-up animation for agent count
-			let targetCount = appState.activeAgentsCount
-			if targetCount > 0 {
-				for i in 1...targetCount {
-					DispatchQueue.main.asyncAfter(deadline: .now() + 0.3 + Double(i) * 0.05) {
-						withAnimation(.easeOut(duration: 0.15)) {
-							agentCountDisplay = i
-						}
-					}
+	// MARK: - Count-Up Animation
+
+	private func animateCountUp(from start: Int, to end: Int) {
+		guard end > start else {
+			agentCountDisplay = end
+			return
+		}
+		_Concurrency.Task { @MainActor in
+			for current in start...end {
+				try? await _Concurrency.Task.sleep(nanoseconds: 50_000_000)
+				withAnimation(.swarmQuick) {
+					agentCountDisplay = current
 				}
 			}
+		}
+	}
+}
 
-			withAnimation(.swarmSlideUp.delay(0.3)) {
-				hasAppeared = true
+// MARK: - Git Branch Badge
+
+struct GitBranchBadge: View {
+	@Environment(\.appState) private var appState
+	@State private var isHovered: Bool = false
+
+	var body: some View {
+		HStack(spacing: 6) {
+			Image(systemName: "arrow.triangle.branch")
+				.font(.swarm(.xs))
+				.foregroundStyle(.swarmTextTertiary)
+
+			Text(appState.gitBranch)
+				.font(.swarm(.xs))
+				.foregroundStyle(.swarmTextSecondary)
+		}
+		.padding(.horizontal, 8)
+		.padding(.vertical, 4)
+		.background {
+			RoundedRectangle(cornerRadius: 4)
+				.fill(.swarmSurfaceHover.opacity(isHovered ? 0.7 : 0.5))
+		}
+		.scaleEffect(isHovered ? 1.02 : 1.0)
+		.onHover { hovering in
+			isHovered = hovering
+		}
+	}
+}
+
+// MARK: - Agent Count Badge
+
+struct AgentCountBadge: View {
+	let count: Int
+
+	var body: some View {
+		HStack(spacing: 6) {
+			Circle()
+				.fill(count > 0 ? .swarmSuccess : .swarmTextTertiary)
+				.frame(width: 6, height: 6)
+
+			Text("\(count) agent\(count == 1 ? "" : "s")")
+				.font(.swarm(.xs))
+				.foregroundStyle(.swarmTextSecondary)
+		}
+	}
+}
+
+// MARK: - Engine Status Badge
+
+struct EngineStatusBadge: View {
+	let status: String
+	@State private var pulsePhase: CGFloat = 0
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+	var isRunning: Bool { status == "Running" }
+
+	var body: some View {
+		HStack(spacing: 6) {
+			Circle()
+				.fill(isRunning ? .swarmSuccess : .swarmTextTertiary)
+				.frame(width: 6, height: 6)
+				.scaleEffect(reduceMotion ? 1 : (isRunning ? 1 + 0.3 * pulsePhase : 1))
+				.shadow(
+					color: (isRunning ? Color.swarmSuccess : Color.swarmTextTertiary).opacity(reduceMotion ? 0 : 0.5 + 0.3 * pulsePhase),
+					radius: reduceMotion ? 0 : 2 + 4 * pulsePhase,
+					x: 0,
+					y: 0
+				)
+
+			Text(status)
+				.font(.swarm(.xs))
+				.foregroundStyle(.swarmTextSecondary)
+		}
+		.onAppear {
+			guard isRunning && !reduceMotion else { return }
+			withAnimation(.easeInOut(duration: 1.6).repeatForever(autoreverses: true)) {
+				pulsePhase = 1.0
 			}
+		}
+	}
+}
+
+// MARK: - Connection Indicator
+
+struct ConnectionIndicator: View {
+	@State private var isHovered: Bool = false
+
+	var body: some View {
+		HStack(spacing: 4) {
+			Circle()
+				.fill(.swarmSuccess)
+				.frame(width: 6, height: 6)
+
+			Text("Connected")
+				.font(.swarm(.xs))
+				.foregroundStyle(.swarmTextTertiary)
 		}
 	}
 }

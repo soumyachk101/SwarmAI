@@ -82,7 +82,7 @@ public struct SwarmDashboardModal: View {
         case logs = "Aggregated Logs"
     }
 
-    public init(isOpen: Binding<Bool>) {
+    public init(isOpen: Binding<Bool> = .constant(true)) {
         self._isOpen = isOpen
     }
 

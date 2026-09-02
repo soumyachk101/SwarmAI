@@ -1,42 +1,42 @@
 import SwiftUI
 
 @Observable
-final class TaskStore {
- var tasks: [Task] = []
- var activeTaskId: UUID?
- var viewMode: TaskView = .pipeline
+public final class TaskStore: @unchecked Sendable {
+  public var tasks: [Task] = []
+  public var activeTaskId: UUID?
+  public var viewMode: TaskView = .pipeline
 
- init() {
- loadFromStorage()
- if tasks.isEmpty {
- seedDemoTasks()
- }
- }
+  public init() {
+    loadFromStorage()
+    if tasks.isEmpty {
+      seedDemoTasks()
+    }
+  }
 
- func createTask(title: String, description: String = "") -> Task {
- let task = Task(title: title, description: description)
- tasks.append(task)
- saveToStorage()
- return task
- }
+  public func createTask(title: String, description: String = "") -> Task {
+    let task = Task(title: title, description: description)
+    tasks.append(task)
+    saveToStorage()
+    return task
+  }
 
- func updateTaskStatus(_ id: UUID, status: TaskStatus) {
- if let index = tasks.firstIndex(where: { $0.id == id }) {
- tasks[index].status = status
- tasks[index].updatedAt = Date()
- saveToStorage()
- }
- }
+  public func updateTaskStatus(_ id: UUID, status: TaskStatus) {
+    if let index = tasks.firstIndex(where: { $0.id == id }) {
+      tasks[index].status = status
+      tasks[index].updatedAt = Date()
+      saveToStorage()
+    }
+  }
 
- func deleteTask(_ id: UUID) {
- tasks.removeAll { $0.id == id }
- if activeTaskId == id { activeTaskId = nil }
- saveToStorage()
- }
+  public func deleteTask(_ id: UUID) {
+    tasks.removeAll { $0.id == id }
+    if activeTaskId == id { activeTaskId = nil }
+    saveToStorage()
+  }
 
- func moveTask(_ id: UUID, to status: TaskStatus) {
- updateTaskStatus(id, status)
- }
+  public func moveTask(_ id: UUID, to status: TaskStatus) {
+    updateTaskStatus(id, status: status)
+  }
 
  func tasks(for status: TaskStatus) -> [Task] {
  tasks.filter { $0.status == status }
@@ -73,9 +73,9 @@ final class TaskStore {
 
 // MARK: - Task Supporting Types
 
-enum TaskView: String, CaseIterable {
- case pipeline = "Pipeline"
- case progress = "Progress"
- case list = "List"
- case history = "History"
+public enum TaskView: String, CaseIterable {
+  case pipeline = "Pipeline"
+  case progress = "Progress"
+  case list = "List"
+  case history = "History"
 }

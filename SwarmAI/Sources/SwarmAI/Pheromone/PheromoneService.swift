@@ -1,6 +1,42 @@
 import Foundation
 import SwiftUI
 
+// MARK: - Embedder
+
+public enum PheromoneEmbedder {
+    public static func embed(_ text: String, dimension: Int = 384) -> [Float] {
+        var vector = [Float](repeating: 0.0, count: dimension)
+        let clean = text.lowercased()
+        guard !clean.isEmpty else { return vector }
+
+        let bytes = Array(clean.utf8)
+        for i in 0..<bytes.count {
+            let h1 = Int(bytes[i])
+            vector[h1 % dimension] += 1.0
+            if i + 1 < bytes.count {
+                let h2 = (h1 &* 31 &+ Int(bytes[i + 1])) & 0x7FFFFFFF
+                vector[h2 % dimension] += 2.0
+            }
+            if i + 2 < bytes.count {
+                let h3 = (h1 &* 961 &+ Int(bytes[i + 1]) &* 31 &+ Int(bytes[i + 2])) & 0x7FFFFFFF
+                vector[h3 % dimension] += 3.0
+            }
+        }
+
+        var norm: Float = 0
+        for v in vector {
+            norm += v * v
+        }
+        norm = sqrt(norm)
+        if norm > 0 {
+            for i in 0..<dimension {
+                vector[i] /= norm
+            }
+        }
+        return vector
+    }
+}
+
 // MARK: - Search Result Model
 
 public struct PheromoneSearchResult: Identifiable, Sendable {
@@ -10,12 +46,12 @@ public struct PheromoneSearchResult: Identifiable, Sendable {
         case hybrid
     }
 
-    public var id: String { chunk.id }
-    public let chunk: MemoryChunk
+    public var id: Int64 { chunk.id }
+    public let chunk: ChunkRecord
     public let score: Double
     public let source: SearchSource
 
-    public init(chunk: MemoryChunk, score: Double, source: SearchSource) {
+    public init(chunk: ChunkRecord, score: Double, source: SearchSource) {
         self.chunk = chunk
         self.score = score
         self.source = source
@@ -211,7 +247,7 @@ public final class PheromoneService: @unchecked Sendable {
         """
 
         try? FileManager.default.createDirectory(atPath: logDir, withIntermediateDirectories: true)
-        try? content.write(toFile: logPath, atomically: true, encoding: .utf8)
+        try? content.write(toFile: logPath, atomically: true, encoding: String.Encoding.utf8)
     }
 
     public func storeMemory(workspacePath: String, file: String, heading: String?, content: String) async throws {

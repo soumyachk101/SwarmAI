@@ -100,7 +100,7 @@ public struct UpdateCheckerModal: View {
     @State private var showOtherPlatforms: Bool = false
     @State private var isPresented: Bool = false
 
-    public init(isOpen: Binding<Bool>) {
+    public init(isOpen: Binding<Bool> = .constant(true)) {
         self._isOpen = isOpen
     }
 

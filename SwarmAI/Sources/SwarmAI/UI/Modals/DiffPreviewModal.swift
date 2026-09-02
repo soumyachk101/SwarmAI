@@ -73,7 +73,7 @@ public struct DiffPreviewModal: View {
     }
 
     public init(
-        isOpen: Binding<Bool>,
+        isOpen: Binding<Bool> = .constant(true),
         branchName: String = "agent/task-worktree",
         projectPath: String? = nil,
         onApproveMerge: (() -> Void)? = nil,
@@ -641,7 +641,7 @@ public struct DiffPreviewModal: View {
                 ]
             }
 
-            let lines = parseGitDiff(diffOutput)
+            let lines = Self.parseGitDiff(diffOutput)
 
             DispatchQueue.main.async {
                 self.diffRawText = diffOutput
@@ -653,7 +653,7 @@ public struct DiffPreviewModal: View {
         }
     }
 
-    private func parseGitDiff(_ text: String) -> [DiffLineModel] {
+    nonisolated private static func parseGitDiff(_ text: String) -> [DiffLineModel] {
         var result: [DiffLineModel] = []
         var oldLine = 1
         var newLine = 1
@@ -687,7 +687,7 @@ public struct DiffPreviewModal: View {
         return result
     }
 
-    private func extractStartLine(_ hunkHeader: String, prefix: String) -> Int? {
+    nonisolated private static func extractStartLine(_ hunkHeader: String, prefix: String) -> Int? {
         // e.g. @@ -45,7 +45,12 @@
         guard let range = hunkHeader.range(of: prefix) else { return nil }
         let after = hunkHeader[range.upperBound...]
@@ -767,7 +767,7 @@ public struct DiffPreviewModal: View {
 
     // MARK: - Sample Demo Diff
 
-    private static let sampleDemoDiff = """
+    nonisolated private static let sampleDemoDiff = """
     diff --git a/Sources/SwarmAI/SwarmMind/Orchestrator.swift b/Sources/SwarmAI/SwarmMind/Orchestrator.swift
     index 8a3f912..e72a440 100644
     --- a/Sources/SwarmAI/SwarmMind/Orchestrator.swift

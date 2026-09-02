@@ -6,7 +6,7 @@ import SwiftUI
 /// Agents are reference types (classes) so that multiple views observe
 /// the same mutable state such as terminal output and status changes.
 @Observable
-public class Agent: Codable, Identifiable, Hashable {
+public final class Agent: Codable, Identifiable, Hashable, @unchecked Sendable {
  /// Unique identifier for the agent.
  public let id: UUID
 

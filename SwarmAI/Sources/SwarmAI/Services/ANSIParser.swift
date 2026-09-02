@@ -271,7 +271,7 @@ public enum ANSIParser {
             }
         }
         
-        return processedLines.joined(separatedBy: "\n")
+        return processedLines.joined(separator: "\n")
     }
     
     // MARK: - Private SGR Handler

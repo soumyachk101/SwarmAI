@@ -214,7 +214,7 @@ public final class GitService: @unchecked Sendable {
     at path: String
   ) async throws -> (stdout: String, stderr: String) {
     let gitPath = try resolveGitExecutable()
-    let repoURL = URL(fileURLWithPath: path).standardizingPath
+    let repoURL = URL(fileURLWithPath: path).standardized
 
     var isDirectory: ObjCBool = false
     guard FileManager.default.fileExists(atPath: repoURL.path, isDirectory: &isDirectory),

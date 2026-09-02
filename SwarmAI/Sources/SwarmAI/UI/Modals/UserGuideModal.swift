@@ -35,7 +35,7 @@ public struct UserGuideModal: View {
         case privacy = "Privacy & Security"
     }
 
-    public init(isOpen: Binding<Bool>, initialChapter: String = "getting-started") {
+    public init(isOpen: Binding<Bool> = .constant(true), initialChapter: String = "getting-started") {
         self._isOpen = isOpen
         self.initialChapter = initialChapter
     }
