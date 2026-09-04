@@ -4,6 +4,7 @@ import SwiftUI
 
 struct SessionLauncher: View {
  @Environment(\.dismiss) var dismiss
+ @Environment(\.agentsStore) private var agentsStore
  @State private var selectedMode: LaunchMode = .agent
  @State private var agentCount: Int = 1
  @State private var taskPrompt: String = ""
@@ -23,11 +24,35 @@ struct SessionLauncher: View {
  Color.clear
  .ignoresSafeArea()
  .background(.black.opacity(isPresented ? 0.4 : 0))
+ .allowsHitTesting(isPresented)
  .scaleEffect(isPresented ? 1.0 : 0.8)
- .onTapGesture { dismiss() }
+ .onTapGesture { dismissLauncher() }
  .animation(.spring(response: 0.4, dampingFraction: 0.85), value: isPresented)
 
+ // Hidden Escape Button for macOS keyboard shortcut routing
+ Button("") {
+ dismissLauncher()
+ }
+ .keyboardShortcut(.cancelAction)
+ .keyboardShortcut(.escape, modifiers: [])
+ .opacity(0)
+ .frame(width: 0, height: 0)
+
  VStack(spacing: 24) {
+ // Top bar with close button
+ HStack {
+ Spacer()
+ Button {
+ dismissLauncher()
+ } label: {
+ Image(systemName: "xmark.circle.fill")
+ .font(.system(size: 20))
+ .foregroundStyle(.swarmTextTertiary)
+ }
+ .buttonStyle(.plain)
+ }
+ .padding(.top, 8)
+
  // Title
  VStack(spacing: 8) {
  Image(systemName: "ant.fill")
@@ -172,7 +197,7 @@ struct SessionLauncher: View {
 
  // Launch button
  Button {
- // Launch agents
+ launchSwarmAgents()
  } label: {
  HStack(spacing: 8) {
  Image(systemName: "play.fill")
@@ -196,7 +221,36 @@ struct SessionLauncher: View {
  .padding(.horizontal, 40)
  .frame(maxWidth: 500)
  }
- .onAppear { isPresented = true }
+ .onKeyPress(.escape) {
+ dismissLauncher()
+ return .handled
+ }
+ .onAppear {
+ withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+ isPresented = true
+ }
+ }
+ }
+
+ private func launchSwarmAgents() {
+ let types = selectedAgents.isEmpty ? [.claudeCode] : selectedAgents
+ for i in 0..<agentCount {
+ let agentType = types[i % types.count]
+ let agent = agentsStore.spawnAgent(agentType, name: "\(agentType.displayName) #\(i + 1)")
+ if !taskPrompt.isEmpty {
+ agent.role = .builder
+ }
+ }
+ dismissLauncher()
+ }
+
+ private func dismissLauncher() {
+ withAnimation(.spring(response: 0.25, dampingFraction: 0.85)) {
+ isPresented = false
+ }
+ DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+ dismiss()
+ }
  }
 }
 

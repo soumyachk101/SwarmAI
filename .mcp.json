@@ -8,9 +8,9 @@
       "type": "stdio",
       "command": "node",
       "args": [
-        "/Users/soumyachakraborty/Documents/Projects-939/AI-Agents/swarm-ai/pheromone/pheromone-mcp/dist/server.js",
+        "/Users/soumyachakraborty/Documents/01-Projects/Projects-939/AI-Agents/swarm-ai/packages/pheromone-mcp/dist/server.js",
         "--project",
-        "/Users/soumyachakraborty/Documents/Projects-939/AI-Agents/swarm-ai"
+        "/Users/soumyachakraborty/Documents/01-Projects/Projects-939/AI-Agents/swarm-ai"
       ]
     }
   }

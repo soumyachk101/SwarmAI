@@ -94,12 +94,12 @@ extension Provider {
     name: "Anthropic",
     apiKey: "",
     models: [
-      "claude-3-7-sonnet-20250219",
-      "claude-3-5-sonnet-20241022",
-      "claude-3-5-haiku-20241022",
-      "claude-3-opus-20240229"
+ "claude-sonnet-4-20250514",
+ "claude-opus-4-20250514",
+ "claude-haiku-4-20250501",
+ "claude-3-7-sonnet-20250219"
     ],
-    defaultModel: "claude-3-7-sonnet-20250219",
+ defaultModel: "claude-sonnet-4-20250514",
     endpoint: "https://api.anthropic.com/v1/messages",
     baseURL: "https://api.anthropic.com",
     isActive: true
@@ -109,13 +109,13 @@ extension Provider {
     name: "OpenAI",
     apiKey: "",
     models: [
-      "gpt-4o",
-      "gpt-4o-mini",
-      "o1",
-      "o3-mini",
-      "gpt-4-turbo"
+ "gpt-4.1",
+ "gpt-4.1-mini",
+ "gpt-4o",
+ "o3",
+ "o4-mini"
     ],
-    defaultModel: "gpt-4o",
+ defaultModel: "gpt-4.1",
     endpoint: "https://api.openai.com/v1/chat/completions",
     baseURL: "https://api.openai.com",
     isActive: true
@@ -125,13 +125,13 @@ extension Provider {
     name: "Google Gemini",
     apiKey: "",
     models: [
-      "gemini-2.5-flash",
-      "gemini-2.5-pro",
-      "gemini-2.0-flash",
-      "gemini-1.5-pro",
-      "gemini-1.5-flash"
+ "gemini-2.5-pro",
+ "gemini-2.5-flash",
+ "gemini-2.5-flash-lite",
+ "gemini-2.0-flash",
+ "gemini-1.5-pro"
     ],
-    defaultModel: "gemini-2.5-flash",
+ defaultModel: "gemini-2.5-pro",
     endpoint: "https://generativelanguage.googleapis.com/v1beta/models",
     baseURL: "https://generativelanguage.googleapis.com",
     isActive: true
@@ -141,14 +141,14 @@ extension Provider {
     name: "OpenRouter",
     apiKey: "",
     models: [
-      "anthropic/claude-3.7-sonnet",
-      "openai/gpt-4o",
-      "meta-llama/llama-3.3-70b-instruct",
-      "deepseek/deepseek-r1",
-      "deepseek/deepseek-chat",
+ "anthropic/claude-sonnet-4-20250514",
+ "openai/gpt-4.1",
+ "meta-llama/llama-4-maverick",
+ "deepseek/deepseek-r1",
+ "google/gemini-2.5-pro"
       "google/gemini-2.5-flash"
     ],
-    defaultModel: "anthropic/claude-3.7-sonnet",
+ defaultModel: "anthropic/claude-sonnet-4-20250514",
     endpoint: "https://openrouter.ai/api/v1/chat/completions",
     baseURL: "https://openrouter.ai/api",
     isActive: true
@@ -456,7 +456,7 @@ public final class LLMClient: @unchecked Sendable {
       request.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
       request.timeoutInterval = 10
 
-      let testModel = provider.defaultModel.isEmpty ? "claude-3-5-haiku-20241022" : provider.defaultModel
+      let testModel = provider.defaultModel.isEmpty ? "claude-haiku-4-5" : provider.defaultModel
       let body: [String: Any] = [
         "model": testModel,
         "max_tokens": 1,
@@ -576,7 +576,7 @@ public final class LLMClient: @unchecked Sendable {
       }
       let (data, response) = try await session.data(for: request)
       guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
-        return provider.models.isEmpty ? ["gpt-4o", "gpt-4o-mini", "o1", "o3-mini", "gpt-4-turbo"] : provider.models
+        return provider.models.isEmpty ? ["gpt-4.1", "gpt-4o", "gpt-4o-mini", "o3", "o4-mini"] : provider.models
       }
       if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
          let dataArray = json["data"] as? [[String: Any]] {

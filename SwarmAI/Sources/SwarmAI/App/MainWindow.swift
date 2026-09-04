@@ -4,6 +4,7 @@ import SwiftUI
 
 struct MainWindow: View {
 	@Environment(\.themeStore) private var themeStore
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	@State private var appState = AppState()
 	@State private var agentsStore = AgentsStore()
 	@State private var workspaceStore = WorkspaceStore()
@@ -18,7 +19,7 @@ struct MainWindow: View {
 	@State private var projectStore = ProjectStore()
 
 	@State private var entryPhase: EntryPhase = .idle
-	@State private var hasStartedSequence: Bool = false
+	@State private var isSplashDismissed: Bool = false
 
 	var body: some View {
 		ZStack {
@@ -47,7 +48,7 @@ struct MainWindow: View {
 					BoardStrip()
 						.opacity(entryPhase >= .boardStripIn ? 1 : 0)
 						.offset(y: entryPhase >= .boardStripIn ? 0 : -20)
-						.animation(.swarmSlideUp.delay(0.72), value: entryPhase)
+						.animation(.swarmSlideUp.delay(0.11), value: entryPhase)
 
 					// Board / Browser / Emulator
 					Group {
@@ -65,12 +66,12 @@ struct MainWindow: View {
 					.opacity(entryPhase >= .contentIn ? 1 : 0)
 					.offset(y: entryPhase >= .contentIn ? 0 : 20)
 					.scaleEffect(entryPhase >= .contentIn ? 1 : 0.98)
-					.animation(.swarmContentEntry.delay(0.87), value: entryPhase)
+					.animation(.swarmContentEntry.delay(0.15), value: entryPhase)
 
 					StatusBar()
 						.opacity(entryPhase >= .statusBarIn ? 1 : 0)
 						.offset(y: entryPhase >= .statusBarIn ? 0 : 20)
-						.animation(.swarmStatusEntry.delay(0.97), value: entryPhase)
+						.animation(.swarmStatusEntry.delay(0.21), value: entryPhase)
 				}
 
 				// Right Dock
@@ -83,13 +84,22 @@ struct MainWindow: View {
 			}
 			.opacity(entryPhase >= .frameIn ? 1 : 0)
 			.scaleEffect(entryPhase >= .frameIn ? 1 : 0.97)
-			.animation(.swarmEntrySpring.delay(0.3), value: entryPhase)
+			.animation(.swarmEntrySpring.delay(0.08), value: entryPhase)
 
 			// Splash screen overlay
-			if entryPhase == .splashActive {
-				SplashScreenView(isLaunching: .constant(true))
-					.transition(.opacity)
-					.zIndex(999)
+			if !isSplashDismissed && (entryPhase == .splashActive || entryPhase == .splashExiting) {
+				SplashScreenView(isLaunching: Binding(
+					get: { !isSplashDismissed && entryPhase == .splashActive },
+					set: { if !$0 {
+						// Let splash's own burst animation finish before completing
+						DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+							appState.completeEntryNow()
+						}
+					}}
+				))
+				.transition(.opacity)
+				.zIndex(999)
+				.allowsHitTesting(entryPhase == .splashActive)
 			}
 
 			// Modals overlay
@@ -105,96 +115,66 @@ struct MainWindow: View {
 				}
 
 				if appState.isDashboardPresented {
-					SwarmDashboardModal()
+					SwarmDashboardModal(isOpen: $appState.isDashboardPresented)
 						.transition(.opacity.combined(with: .scale(scale: 0.92)))
 				}
 
 				if appState.isDiffPreviewPresented {
-					DiffPreviewModal()
+					DiffPreviewModal(isOpen: $appState.isDiffPreviewPresented)
 						.transition(.opacity.combined(with: .scale(scale: 0.92)))
 				}
 
 				if appState.isTaskTemplatesPresented {
-					TaskTemplatesModal()
+					TaskTemplatesModal(isOpen: $appState.isTaskTemplatesPresented)
 						.transition(.opacity.combined(with: .scale(scale: 0.92)))
 				}
 
 				if appState.isUserGuidePresented {
-					UserGuideModal()
+					UserGuideModal(isOpen: $appState.isUserGuidePresented)
 						.transition(.opacity.combined(with: .scale(scale: 0.92)))
 				}
 
 				if appState.isUpdateCheckerPresented {
-					UpdateCheckerModal()
+					UpdateCheckerModal(isOpen: $appState.isUpdateCheckerPresented)
 						.transition(.opacity.combined(with: .scale(scale: 0.92)))
 				}
 			}
-			.environment(appState)
-			.environment(agentsStore)
-			.environment(taskStore)
-			.environment(settingsStore)
 			.ignoresSafeArea()
 		}
-		.frame(minWidth: 1200, minHeight: 800)
+		.frame(minWidth: 1100, minHeight: 700)
+		.environment(appState)
+		.environment(\.appState, appState)
+		.environment(agentsStore)
+		.environment(\.agentsStore, agentsStore)
+		.environment(workspaceStore)
+		.environment(\.workspaceStore, workspaceStore)
+		.environment(taskStore)
+		.environment(\.taskStore, taskStore)
+		.environment(settingsStore)
+		.environment(\.settingsStore, settingsStore)
+		.environment(uiStore)
+		.environment(\.uiStore, uiStore)
+		.environment(planeStore)
+		.environment(\.planeStore, planeStore)
+		.environment(canvasStore)
+		.environment(\.canvasStore, canvasStore)
+		.environment(browserStore)
+		.environment(\.browserStore, browserStore)
+		.environment(extensionStore)
+		.environment(\.extensionStore, extensionStore)
+		.environment(dispatchStore)
+		.environment(\.dispatchStore, dispatchStore)
+		.environment(projectStore)
+		.environment(\.projectStore, projectStore)
+		.environment(themeStore)
+		.environment(\.themeStore, themeStore)
 		.animation(.swarmSlow, value: themeStore.currentThemeId)
 		.onAppear {
 			appState.activeAgentsCount = agentsStore.agents.filter { $0.status == .running }.count
 			appState.engineStatus = agentsStore.agents.contains(where: { $0.status == .running }) ? "Running" : "Idle"
 
-			guard !hasStartedSequence else { return }
-			hasStartedSequence = true
-			startEntrySequence()
+			appState.startEntrySequence(reduceMotion: reduceMotion)
 		}
-	}
-
-	// MARK: - Entry Sequence Orchestration
-
-	private func startEntrySequence() {
-		entryPhase = .splashActive
-
-		// Phase 1: splash exits → frame appears (at 2.3s splash duration)
-		DispatchQueue.main.asyncAfter(deadline: .now() + 2.3) {
-			entryPhase = .splashExiting
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-				entryPhase = .frameIn
-			}
-		}
-
-		// Phase 2: sidebar slides in (0.1s after frame)
-		DispatchQueue.main.asyncAfter(deadline: .now() + 2.9) {
-			entryPhase = .sidebarIn
-		}
-
-		// Phase 3: dock slides in (0.15s after sidebar)
-		DispatchQueue.main.asyncAfter(deadline: .now() + 3.05) {
-			entryPhase = .dockIn
-		}
-
-		// Phase 4: title bar cascades in (simultaneous with dock)
-		DispatchQueue.main.asyncAfter(deadline: .now() + 3.05) {
-			entryPhase = .titlebarIn
-		}
-
-		// Phase 5: board strip slides up (0.1s after titlebar)
-		DispatchQueue.main.asyncAfter(deadline: .now() + 3.15) {
-			entryPhase = .boardStripIn
-		}
-
-		// Phase 6: content area reveals (0.15s after boardStrip)
-		DispatchQueue.main.asyncAfter(deadline: .now() + 3.3) {
-			entryPhase = .contentIn
-		}
-
-		// Phase 7: status bar slides up (0.1s after content)
-		DispatchQueue.main.asyncAfter(deadline: .now() + 3.4) {
-			entryPhase = .statusBarIn
-		}
-
-		// Complete
-		DispatchQueue.main.asyncAfter(deadline: .now() + 3.6) {
-			entryPhase = .complete
-		}
-	}
 }
 
 // MARK: - Subtle Vignette

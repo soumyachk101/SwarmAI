@@ -1,64 +1,131 @@
 import SwiftUI
+import AppKit
 
 // MARK: - Theme Protocol
 
-struct Theme: Identifiable, Codable, Hashable, CaseIterable {
-	static var allCases: [Theme] { allThemes }
-	let id: String
- let displayName: String
- let description: String
- let colors: ThemeColors
+public struct Theme: Identifiable, Codable, Hashable, CaseIterable, Sendable {
+	public static var allCases: [Theme] { allThemes }
+	public let id: String
+	public let displayName: String
+	public let description: String
+	public let colors: ThemeColors
 
- struct ThemeColors: Codable, Hashable {
- let canvas: [Double] // RGB 0-255
- let surface: [Double]
- let surfaceHover: [Double]
- let surfaceActive: [Double]
- let gold: [Double]
- let goldHover: [Double]
- let textPrimary: [Double]
- let textSecondary: [Double]
- let textTertiary: [Double]
- let border: [Double]
- let borderSubtle: [Double]
- let success: [Double]
- let warning: [Double]
- let error: [Double]
- let info: [Double]
- }
+	public struct ThemeColors: Codable, Hashable, Sendable {
+		public let canvas: [Double] // RGB 0-255
+		public let surface: [Double]
+		public let surfaceHover: [Double]
+		public let surfaceActive: [Double]
+		public let surfaceRaised: [Double]
+		public let surfaceOverlay: [Double]
+		public let gold: [Double]
+		public let goldHover: [Double]
+		public let textPrimary: [Double]
+		public let textSecondary: [Double]
+		let textTertiary: [Double]
+		public let textInverse: [Double]
+		public let border: [Double]
+		public let borderSubtle: [Double]
+		public let borderFocus: [Double]
+		public let shadowColor: [Double]
+		public let success: [Double]
+		public let warning: [Double]
+		public let error: [Double]
+		public let info: [Double]
 
- func color(for token: ThemeToken) -> Color {
- let rgb = rgb(for: token)
- return Color(red: rgb[0], green: rgb[1], blue: rgb[2])
- }
+		public init(
+			canvas: [Double],
+			surface: [Double],
+			surfaceHover: [Double],
+			surfaceActive: [Double],
+			surfaceRaised: [Double]? = nil,
+			surfaceOverlay: [Double]? = nil,
+			gold: [Double],
+			goldHover: [Double],
+			textPrimary: [Double],
+			textSecondary: [Double],
+			textTertiary: [Double],
+			textInverse: [Double]? = nil,
+			border: [Double],
+			borderSubtle: [Double],
+			borderFocus: [Double]? = nil,
+			shadowColor: [Double]? = nil,
+			success: [Double],
+			warning: [Double],
+			error: [Double],
+			info: [Double]
+		) {
+			self.canvas = canvas
+			self.surface = surface
+			self.surfaceHover = surfaceHover
+			self.surfaceActive = surfaceActive
+			self.surfaceRaised = surfaceRaised ?? surfaceHover
+			self.surfaceOverlay = surfaceOverlay ?? surface
+			self.gold = gold
+			self.goldHover = goldHover
+			self.textPrimary = textPrimary
+			self.textSecondary = textSecondary
+			self.textTertiary = textTertiary
+			self.textInverse = textInverse ?? canvas
+			self.border = border
+			self.borderSubtle = borderSubtle
+			self.borderFocus = borderFocus ?? gold
+			self.shadowColor = shadowColor ?? [0, 0, 0]
+			self.success = success
+			self.warning = warning
+			self.error = error
+			self.info = info
+		}
+	}
 
- func rgb(for token: ThemeToken) -> [Double] {
- switch token {
- case .canvas: return colors.canvas
- case .surface: return colors.surface
- case .surfaceHover: return colors.surfaceHover
- case .surfaceActive: return colors.surfaceActive
- case .gold: return colors.gold
- case .goldHover: return colors.goldHover
- case .textPrimary: return colors.textPrimary
- case .textSecondary: return colors.textSecondary
- case .textTertiary: return colors.textTertiary
- case .border: return colors.border
- case .borderSubtle: return colors.borderSubtle
- case .success: return colors.success
- case .warning: return colors.warning
- case .error: return colors.error
- case .info: return colors.info
- }
- }
+	public init(
+		id: String,
+		displayName: String,
+		description: String,
+		colors: ThemeColors
+	) {
+		self.id = id
+		self.displayName = displayName
+		self.description = description
+		self.colors = colors
+	}
 
- static let allThemes: [Theme] = [
- Theme(
- id: "obsidian-charcoal",
- displayName: "Obsidian Charcoal",
- description: "Default dark theme with gold accents",
- colors: ThemeColors(
- canvas: [18, 18, 20],
+	public func color(for token: ThemeToken) -> Color {
+		let rgb = rgb(for: token)
+		return Color(red: rgb[0] / 255.0, green: rgb[1] / 255.0, blue: rgb[2] / 255.0)
+	}
+
+	public func rgb(for token: ThemeToken) -> [Double] {
+		switch token {
+		case .canvas: return colors.canvas
+		case .surface: return colors.surface
+		case .surfaceHover: return colors.surfaceHover
+		case .surfaceActive: return colors.surfaceActive
+		case .surfaceRaised: return colors.surfaceRaised
+		case .surfaceOverlay: return colors.surfaceOverlay
+		case .gold: return colors.gold
+		case .goldHover: return colors.goldHover
+		case .textPrimary: return colors.textPrimary
+		case .textSecondary: return colors.textSecondary
+		case .textTertiary: return colors.textTertiary
+		case .textInverse: return colors.textInverse
+		case .border: return colors.border
+		case .borderSubtle: return colors.borderSubtle
+		case .borderFocus: return colors.borderFocus
+		case .shadowColor: return colors.shadowColor
+		case .success: return colors.success
+		case .warning: return colors.warning
+		case .error: return colors.error
+		case .info: return colors.info
+		}
+	}
+
+	public static let allThemes: [Theme] = [
+		Theme(
+			id: "obsidian-charcoal",
+			displayName: "Charcoal Gold",
+			description: "Default luxury dark charcoal theme with warm gold accents",
+			colors: ThemeColors(
+				canvas: [18, 18, 20],
  surface: [28, 28, 32],
  surfaceHover: [38, 38, 44],
  surfaceActive: [48, 48, 56],
@@ -253,29 +320,392 @@ struct Theme: Identifiable, Codable, Hashable, CaseIterable {
  )
  ]
 
- static func theme(for id: String) -> Theme? {
- allThemes.first { $0.id == id }
- }
+ 	public static func theme(for id: String) -> Theme? {
+		if let match = allThemes.first(where: { $0.id == id }) {
+			return match
+		}
+		// Match common aliases gracefully
+		switch id.lowercased() {
+		case "charcoal", "charcoal-gold", "charcoal gold", "obsidian-charcoal", "default":
+			return allThemes.first { $0.id == "obsidian-charcoal" }
+		case "midnight", "midnight-cyberpunk":
+			return allThemes.first { $0.id == "midnight-cyberpunk" }
+		case "matrix", "matrix-phosphor":
+			return allThemes.first { $0.id == "matrix-phosphor" }
+		case "nordic", "nordic-polar-frost":
+			return allThemes.first { $0.id == "nordic-polar-frost" }
+		case "crimson", "crimson-eclipse":
+			return allThemes.first { $0.id == "crimson-eclipse" }
+		case "swarm", "swarm-dark":
+			return allThemes.first { $0.id == "swarm-dark" }
+		case "obsidian", "obsidian-oled":
+			return allThemes.first { $0.id == "obsidian-oled" }
+		case "graphite":
+			return allThemes.first { $0.id == "graphite" }
+		case "amber", "honey-amber":
+			return allThemes.first { $0.id == "honey-amber" }
+		default:
+			return nil
+		}
+	}
+}
+
+// MARK: - Theme Kind
+
+public enum ThemeKind: String, Codable, Hashable, Sendable, CaseIterable {
+	case dark = "dark"
+	case light = "light"
+	case midnight = "midnight"
+
+	public var title: String {
+		rawValue.capitalized
+	}
+}
+
+// MARK: - Theme Data Model
+
+public struct ThemeScheme: Identifiable, Codable, Hashable, Sendable {
+	public let id: String
+	public let name: String
+	public let kind: ThemeKind
+
+	public var isDark: Bool {
+		kind != .light
+	}
+
+	// MARK: - Semantic Surface & Background
+
+	public let background: Color
+	public let surface: Color
+	public let surfaceSecondary: Color
+	public let surfaceElevated: Color
+	public let border: Color
+	public let borderSubtle: Color
+
+	// MARK: - Text Colors
+
+	public let textPrimary: [Double]
+	public let textSecondary: Color
+	public let textTertiary: Color
+	public let textDisabled: Color
+	public let textInverse: Color
+
+	// MARK: - Accent Colors
+
+	public let accentPrimary: Color
+	public let accentSecondary: Color
+	public let accentSuccess: Color
+	public let accentWarning: Color
+	public let accentError: Color
+
+	// MARK: - Terminal Colors
+
+	public let terminalBackground: Color
+	public let terminalText: Color
+	public let terminalCursor: Color
+	public let terminalSelection: Color
+	public let terminalBorder: Color
+
+	// MARK: - ANSI Palette
+
+	public let ansiStandard: [Color]
+	public let ansiBright: [Color]
+
+	// MARK: - Computed Conveniences
+
+	public var accent: Color {
+		accentPrimary
+	}
+
+	public var primaryText: Color {
+		Color(red: textPrimary[0] / 255.0, green: textPrimary[1] / 255.0, blue: textPrimary[2] / 255.0)
+	}
+
+	// MARK: - Init
+
+	public init(
+		id: String,
+		name: String,
+		kind: ThemeKind,
+		background: Color,
+		surface: Color,
+		surfaceSecondary: Color,
+		surfaceElevated: Color,
+		border: Color,
+		borderSubtle: Color,
+		textPrimary: [Double],
+		textSecondary: Color,
+		textTertiary: Color,
+		textDisabled: Color,
+		textInverse: Color,
+		accentPrimary: Color,
+		accentSecondary: Color,
+		accentSuccess: Color,
+		accentWarning: Color,
+		accentError: Color,
+		terminalBackground: Color,
+		terminalText: Color,
+		terminalCursor: Color,
+		terminalSelection: Color,
+		terminalBorder: Color,
+		ansiStandard: [Color],
+		ansiBright: [Color]
+	) {
+		self.id = id
+		self.name = name
+		self.kind = kind
+		self.background = background
+		self.surface = surface
+		self.surfaceSecondary = surfaceSecondary
+		self.surfaceElevated = surfaceElevated
+		self.border = border
+		self.borderSubtle = borderSubtle
+		self.textPrimary = textPrimary
+		self.textSecondary = textSecondary
+		self.textTertiary = textTertiary
+		self.textDisabled = textDisabled
+		self.textInverse = textInverse
+		self.accentPrimary = accentPrimary
+		self.accentSecondary = accentSecondary
+		self.accentSuccess = accentSuccess
+		self.accentWarning = accentWarning
+		self.accentError = accentError
+		self.terminalBackground = terminalBackground
+		self.terminalText = terminalText
+		self.terminalCursor = terminalCursor
+		self.terminalSelection = terminalSelection
+		self.terminalBorder = terminalBorder
+		self.ansiStandard = ansiStandard
+		self.ansiBright = ansiBright
+	}
+}
+
+// MARK: - ThemeScheme Presets
+
+public extension ThemeScheme {
+	static let dark: ThemeScheme = ThemeScheme(
+		id: "swarm-dark",
+		name: "Swarm Dark",
+		kind: .dark,
+		background: Color(red: 0.059, green: 0.059, blue: 0.078),
+		surface: Color(red: 0.098, green: 0.098, blue: 0.125),
+		surfaceSecondary: Color(red: 0.122, green: 0.122, blue: 0.157),
+		surfaceElevated: Color(red: 0.149, green: 0.149, blue: 0.188),
+		border: Color(red: 0.200, green: 0.200, blue: 0.235),
+		borderSubtle: Color(red: 0.157, green: 0.157, blue: 0.192),
+		textPrimary: [228, 225, 238],
+		textSecondary: Color(red: 0.663, green: 0.647, blue: 0.718),
+		textTertiary: Color(red: 0.510, green: 0.498, blue: 0.561),
+		textDisabled: Color(red: 0.380, green: 0.368, blue: 0.420),
+		textInverse: Color(red: 0.078, green: 0.078, blue: 0.110),
+		accentPrimary: Color(red: 0.455, green: 0.373, blue: 1.000),
+		accentSecondary: Color(red: 0.600, green: 0.467, blue: 1.000),
+		accentSuccess: Color(red: 0.396, green: 0.800, blue: 0.580),
+		accentWarning: Color(red: 1.000, green: 0.780, blue: 0.278),
+		accentError: Color(red: 1.000, green: 0.388, blue: 0.388),
+		terminalBackground: Color(red: 0.047, green: 0.047, blue: 0.063),
+		terminalText: Color(red: 0.816, green: 0.800, blue: 0.906),
+		terminalCursor: Color(red: 0.455, green: 0.373, blue: 1.000),
+		terminalSelection: Color(red: 0.455, green: 0.373, blue: 1.000).opacity(0.3),
+		terminalBorder: Color(red: 0.180, green: 0.180, blue: 0.220),
+		ansiStandard: [
+			Color(red: 0.000, green: 0.000, blue: 0.000),
+			Color(red: 0.675, green: 0.263, blue: 0.263),
+			Color(red: 0.267, green: 0.549, blue: 0.267),
+			Color(red: 0.529, green: 0.549, blue: 0.267),
+			Color(red: 0.278, green: 0.333, blue: 0.678),
+			Color(red: 0.557, green: 0.278, blue: 0.678),
+			Color(red: 0.278, green: 0.518, blue: 0.518),
+			Color(red: 0.663, green: 0.647, blue: 0.718),
+			Color(red: 0.388, green: 0.388, blue: 0.447),
+			Color(red: 1.000, green: 0.396, blue: 0.396),
+			Color(red: 0.396, green: 1.000, blue: 0.396),
+			Color(red: 1.000, green: 1.000, blue: 0.396),
+			Color(red: 0.396, green: 0.498, blue: 1.000),
+			Color(red: 1.000, green: 0.396, blue: 1.000),
+			Color(red: 0.396, green: 1.000, blue: 1.000),
+			Color(red: 0.910, green: 0.898, blue: 0.933),
+		],
+		ansiBright: [
+			Color(red: 0.663, green: 0.663, blue: 0.663),
+			Color(red: 1.000, green: 0.459, blue: 0.459),
+			Color(red: 0.459, green: 1.000, blue: 0.459),
+			Color(red: 1.000, green: 1.000, blue: 0.459),
+			Color(red: 0.459, green: 0.624, blue: 1.000),
+			Color(red: 1.000, green: 0.459, blue: 1.000),
+			Color(red: 0.459, green: 1.000, blue: 1.000),
+			Color(red: 1.000, green: 1.000, blue: 1.000),
+			Color(red: 0.510, green: 0.510, blue: 0.561),
+			Color(red: 1.000, green: 0.616, blue: 0.616),
+			Color(red: 0.616, green: 1.000, blue: 0.616),
+			Color(red: 1.000, green: 1.000, blue: 0.616),
+			Color(red: 0.616, green: 0.733, blue: 1.000),
+			Color(red: 1.000, green: 0.616, blue: 1.000),
+			Color(red: 0.616, green: 1.000, blue: 1.000),
+			Color(red: 1.000, green: 1.000, blue: 1.000),
+		]
+	)
+
+	static let light: ThemeScheme = ThemeScheme(
+		id: "swarm-light",
+		name: "Swarm Light",
+		kind: .light,
+		background: Color(red: 0.980, green: 0.980, blue: 0.984),
+		surface: Color(red: 1.000, green: 1.000, blue: 1.000),
+		surfaceSecondary: Color(red: 0.941, green: 0.941, blue: 0.945),
+		surfaceElevated: Color(red: 1.000, green: 1.000, blue: 1.000),
+		border: Color(red: 0.820, green: 0.820, blue: 0.843),
+		borderSubtle: Color(red: 0.886, green: 0.886, blue: 0.898),
+		textPrimary: [26, 26, 46],
+		textSecondary: Color(red: 0.290, green: 0.290, blue: 0.416),
+		textTertiary: Color(red: 0.510, green: 0.498, blue: 0.561),
+		textDisabled: Color(red: 0.690, green: 0.690, blue: 0.718),
+		textInverse: Color(red: 1.000, green: 1.000, blue: 1.000),
+		accentPrimary: Color(red: 0.000, green: 0.400, blue: 1.000),
+		accentSecondary: Color(red: 0.200, green: 0.522, blue: 1.000),
+		accentSuccess: Color(red: 0.063, green: 0.725, blue: 0.506),
+		accentWarning: Color(red: 0.961, green: 0.620, blue: 0.043),
+		accentError: Color(red: 0.937, green: 0.267, blue: 0.267),
+		terminalBackground: Color(red: 0.106, green: 0.106, blue: 0.122),
+		terminalText: Color(red: 0.808, green: 0.796, blue: 0.886),
+		terminalCursor: Color(red: 0.000, green: 0.400, blue: 1.000),
+		terminalSelection: Color(red: 0.000, green: 0.400, blue: 1.000).opacity(0.25),
+		terminalBorder: Color(red: 0.769, green: 0.769, blue: 0.788),
+		ansiStandard: [
+			Color(red: 0.000, green: 0.000, blue: 0.000),
+			Color(red: 0.675, green: 0.263, blue: 0.263),
+			Color(red: 0.267, green: 0.549, blue: 0.267),
+			Color(red: 0.529, green: 0.549, blue: 0.267),
+			Color(red: 0.278, green: 0.333, blue: 0.678),
+			Color(red: 0.557, green: 0.278, blue: 0.678),
+			Color(red: 0.278, green: 0.518, blue: 0.518),
+			Color(red: 0.663, green: 0.647, blue: 0.718),
+			Color(red: 0.388, green: 0.388, blue: 0.447),
+			Color(red: 1.000, green: 0.396, blue: 0.396),
+			Color(red: 0.396, green: 1.000, blue: 0.396),
+			Color(red: 1.000, green: 1.000, blue: 0.396),
+			Color(red: 0.396, green: 0.498, blue: 1.000),
+			Color(red: 1.000, green: 0.396, blue: 1.000),
+			Color(red: 0.396, green: 1.000, blue: 1.000),
+			Color(red: 0.910, green: 0.898, blue: 0.933),
+		],
+		ansiBright: [
+			Color(red: 0.663, green: 0.663, blue: 0.663),
+			Color(red: 1.000, green: 0.459, blue: 0.459),
+			Color(red: 0.459, green: 1.000, blue: 0.459),
+			Color(red: 1.000, green: 1.000, blue: 0.459),
+			Color(red: 0.459, green: 0.624, blue: 1.000),
+			Color(red: 1.000, green: 0.459, blue: 1.000),
+			Color(red: 0.459, green: 1.000, blue: 1.000),
+			Color(red: 1.000, green: 1.000, blue: 1.000),
+			Color(red: 0.510, green: 0.510, blue: 0.561),
+			Color(red: 1.000, green: 0.616, blue: 0.616),
+			Color(red: 0.616, green: 1.000, blue: 0.616),
+			Color(red: 1.000, green: 1.000, blue: 0.616),
+			Color(red: 0.616, green: 0.733, blue: 1.000),
+			Color(red: 1.000, green: 0.616, blue: 1.000),
+			Color(red: 0.616, green: 1.000, blue: 1.000),
+			Color(red: 1.000, green: 1.000, blue: 1.000),
+		]
+	)
+
+	static let midnight: ThemeScheme = ThemeScheme(
+		id: "midnight-ocean",
+		name: "Midnight Ocean",
+		kind: .midnight,
+		background: Color(red: 0.012, green: 0.020, blue: 0.063),
+		surface: Color(red: 0.031, green: 0.047, blue: 0.110),
+		surfaceSecondary: Color(red: 0.039, green: 0.059, blue: 0.145),
+		surfaceElevated: Color(red: 0.051, green: 0.071, blue: 0.169),
+		border: Color(red: 0.145, green: 0.192, blue: 0.302),
+		borderSubtle: Color(red: 0.090, green: 0.118, blue: 0.196),
+		textPrimary: [200, 215, 235],
+		textSecondary: Color(red: 0.580, green: 0.647, blue: 0.757),
+		textTertiary: Color(red: 0.420, green: 0.498, blue: 0.624),
+		textDisabled: Color(red: 0.310, green: 0.380, blue: 0.498),
+		textInverse: Color(red: 0.012, green: 0.020, blue: 0.063),
+		accentPrimary: Color(red: 0.000, green: 0.851, blue: 1.000),
+		accentSecondary: Color(red: 0.278, green: 0.655, blue: 1.000),
+		accentSuccess: Color(red: 0.278, green: 0.851, blue: 0.667),
+		accentWarning: Color(red: 1.000, green: 0.851, blue: 0.278),
+		accentError: Color(red: 1.000, green: 0.369, blue: 0.369),
+		terminalBackground: Color(red: 0.004, green: 0.012, blue: 0.039),
+		terminalText: Color(red: 0.741, green: 0.800, blue: 0.902),
+		terminalCursor: Color(red: 0.000, green: 0.851, blue: 1.000),
+		terminalSelection: Color(red: 0.000, green: 0.851, blue: 1.000).opacity(0.3),
+		terminalBorder: Color(red: 0.106, green: 0.157, blue: 0.267),
+		ansiStandard: [
+			Color(red: 0.000, green: 0.000, blue: 0.000),
+			Color(red: 0.675, green: 0.263, blue: 0.263),
+			Color(red: 0.267, green: 0.549, blue: 0.267),
+			Color(red: 0.529, green: 0.549, blue: 0.267),
+			Color(red: 0.278, green: 0.333, blue: 0.678),
+			Color(red: 0.557, green: 0.278, blue: 0.678),
+			Color(red: 0.278, green: 0.518, blue: 0.518),
+			Color(red: 0.663, green: 0.647, blue: 0.718),
+			Color(red: 0.388, green: 0.388, blue: 0.447),
+			Color(red: 1.000, green: 0.396, blue: 0.396),
+			Color(red: 0.396, green: 1.000, blue: 0.396),
+			Color(red: 1.000, green: 1.000, blue: 0.396),
+			Color(red: 0.396, green: 0.498, blue: 1.000),
+			Color(red: 1.000, green: 0.396, blue: 1.000),
+			Color(red: 0.396, green: 1.000, blue: 1.000),
+			Color(red: 0.910, green: 0.898, blue: 0.933),
+		],
+		ansiBright: [
+			Color(red: 0.663, green: 0.663, blue: 0.663),
+			Color(red: 1.000, green: 0.459, blue: 0.459),
+			Color(red: 0.459, green: 1.000, blue: 0.459),
+			Color(red: 1.000, green: 1.000, blue: 0.459),
+			Color(red: 0.459, green: 0.624, blue: 1.000),
+			Color(red: 1.000, green: 0.459, blue: 1.000),
+			Color(red: 0.459, green: 1.000, blue: 1.000),
+			Color(red: 1.000, green: 1.000, blue: 1.000),
+			Color(red: 0.510, green: 0.510, blue: 0.561),
+			Color(red: 1.000, green: 0.616, blue: 0.616),
+			Color(red: 0.616, green: 1.000, blue: 0.616),
+			Color(red: 1.000, green: 1.000, blue: 0.616),
+			Color(red: 0.616, green: 0.733, blue: 1.000),
+			Color(red: 1.000, green: 0.616, blue: 1.000),
+			Color(red: 0.616, green: 1.000, blue: 1.000),
+			Color(red: 1.000, green: 1.000, blue: 1.000),
+		]
+	)
+
+	// MARK: - All Themes
+
+	static let allThemes: [ThemeScheme] = [dark, light, midnight]
+
+	// MARK: - Lookup
+
+	static func preset(for kind: ThemeKind) -> ThemeScheme? {
+		allThemes.first { $0.kind == kind }
+	}
 }
 
 // MARK: - Theme Token
 
-enum ThemeToken: String, CaseIterable {
- case canvas
- case surface
- case surfaceHover
- case surfaceActive
- case gold
- case goldHover
- case textPrimary
- case textSecondary
- case textTertiary
- case border
- case borderSubtle
- case success
- case warning
- case error
- case info
+public enum ThemeToken: String, CaseIterable, Sendable {
+	case canvas
+	case surface
+	case surfaceHover
+	case surfaceActive
+	case surfaceRaised
+	case surfaceOverlay
+	case gold
+	case goldHover
+	case textPrimary
+	case textSecondary
+	case textTertiary
+	case textInverse
+	case border
+	case borderSubtle
+	case borderFocus
+	case shadowColor
+	case success
+	case warning
+	case error
+	case info
 }
 
 // MARK: - ThemeManager
@@ -286,29 +716,34 @@ public final class ThemeStore: @unchecked Sendable {
 	public var currentThemeId: String = "obsidian-charcoal"
 	public var themeMode: ThemeMode = .dark
 
-	var currentTheme: Theme {
+	public var currentTheme: Theme {
 		Theme.theme(for: currentThemeId) ?? Theme.allThemes[0]
 	}
 
-	init() {
+	public init() {
 		if let saved = UserDefaults.standard.string(forKey: "selectedTheme"),
-		   Theme.theme(for: saved) != nil {
-			currentThemeId = saved
+		   let theme = Theme.theme(for: saved) {
+			currentThemeId = theme.id
 		}
 	}
 
-	func setTheme(_ id: String) {
-		currentThemeId = id
-		UserDefaults.standard.set(id, forKey: "selectedTheme")
+	public func setTheme(_ id: String) {
+		if let theme = Theme.theme(for: id) {
+			currentThemeId = theme.id
+			UserDefaults.standard.set(theme.id, forKey: "selectedTheme")
+		} else {
+			currentThemeId = id
+			UserDefaults.standard.set(id, forKey: "selectedTheme")
+		}
 	}
 
-	func cycleTheme() {
+	public func cycleTheme() {
 		let currentIndex = Theme.allThemes.firstIndex { $0.id == currentThemeId } ?? 0
 		let nextIndex = (currentIndex + 1) % Theme.allThemes.count
 		setTheme(Theme.allThemes[nextIndex].id)
 	}
 
-	func transitionToTheme(_ id: String, animated: Bool = true) {
+	public func transitionToTheme(_ id: String, animated: Bool = true) {
 		guard animated else {
 			setTheme(id)
 			return
@@ -318,7 +753,7 @@ public final class ThemeStore: @unchecked Sendable {
 		}
 	}
 
-	var colorScheme: ColorScheme? {
+	public var colorScheme: ColorScheme? {
 		switch themeMode {
 		case .light: return .light
 		case .dark: return .dark
@@ -329,7 +764,7 @@ public final class ThemeStore: @unchecked Sendable {
 
 // MARK: - Theme Mode
 
-public enum ThemeMode: String, CaseIterable {
+public enum ThemeMode: String, CaseIterable, Sendable {
 	case system = "System"
 	case light = "Light"
 	case dark = "Dark"
@@ -341,7 +776,7 @@ public enum ThemeMode: String, CaseIterable {
 
 // MARK: - Color Helpers
 
-extension Color {
+public extension Color {
 	init(theme: Theme, token: ThemeToken) {
 		let rgb = theme.rgb(for: token)
 		self.init(red: rgb[0] / 255.0, green: rgb[1] / 255.0, blue: rgb[2] / 255.0)

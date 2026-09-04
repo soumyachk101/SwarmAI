@@ -80,6 +80,59 @@ public struct DeviceDetails: Sendable {
     }
 }
 
+// MARK: - Supporting Types
+
+public struct DeviceProfile: Identifiable, Hashable, Sendable {
+ public var id: String { rawValue }
+ public let rawValue: String
+ public let displayName: String
+ public let screenWidth: Int
+ public let screenHeight: Int
+ public let density: Int
+
+ public init(rawValue: String, displayName: String, screenWidth: Int, screenHeight: Int, density: Int) {
+ self.rawValue = rawValue
+ self.displayName = displayName
+ self.screenWidth = screenWidth
+ self.screenHeight = screenHeight
+ self.density = density
+ }
+
+ public static let pixel6 = DeviceProfile(rawValue: "pixel6", displayName: "Pixel 6", screenWidth: 1080, screenHeight: 2400, density: 420)
+ public static let pixel7 = DeviceProfile(rawValue: "pixel7", displayName: "Pixel 7", screenWidth: 1080, screenHeight: 2400, density: 420)
+ public static let pixel8 = DeviceProfile(rawValue: "pixel8", displayName: "Pixel 8", screenWidth: 1080, screenHeight: 2400, density: 420)
+ public static let pixelFold = DeviceProfile(rawValue: "pixel_fold", displayName: "Pixel Fold", screenWidth: 1848, screenHeight: 2208, density: 376)
+
+ public static let allCases: [DeviceProfile] = [.pixel6, .pixel7, .pixel8, .pixelFold]
+}
+
+public struct SystemImage: Identifiable, Hashable, Sendable {
+ public var id: String { "\(apiDir)/\(tagDir)/\(abi)" }
+ public let apiDir: String
+ public let tagDir: String
+ public let abi: String
+ public let playStore: Bool
+ public let label: String
+
+ public init(apiDir: String, tagDir: String, abi: String, playStore: Bool = false, label: String) {
+ self.apiDir = apiDir
+ self.tagDir = tagDir
+ self.abi = abi
+ self.playStore = playStore
+ self.label = label
+ }
+}
+
+public struct AvdSpec: Sendable {
+ public var name: String
+ public var displayName: String
+ public var device: DeviceProfile
+ public var image: SystemImage
+ public var ramMB: Int
+ public var storageGB: Int
+ public var cpuCores: Int
+}
+
 // MARK: - Android Emulator Service
 
 @Observable
@@ -150,13 +203,14 @@ public final class EmulatorService: @unchecked Sendable {
         }
 
         if self.adbPath == nil {
-            if let whichAdb = runSyncCommand(executable: "/usr/bin/which", args: ["adb"])?.trimmingCharacters(in: .whitespacesAndNewlines),
-               !whichAdb.isEmpty, fm.isExecutableFile(atPath: whichAdb) {
-                self.adbPath = whichAdb
+            if let pathAdb = findInPATH(name: "adb") {
+                self.adbPath = pathAdb
             } else if fm.isExecutableFile(atPath: "/opt/homebrew/bin/adb") {
                 self.adbPath = "/opt/homebrew/bin/adb"
             } else if fm.isExecutableFile(atPath: "/usr/local/bin/adb") {
                 self.adbPath = "/usr/local/bin/adb"
+            } else if fm.isExecutableFile(atPath: "/usr/bin/adb") {
+                self.adbPath = "/usr/bin/adb"
             }
         }
 
@@ -174,13 +228,26 @@ public final class EmulatorService: @unchecked Sendable {
         }
 
         if self.emulatorPath == nil {
-            if let whichEmu = runSyncCommand(executable: "/usr/bin/which", args: ["emulator"])?.trimmingCharacters(in: .whitespacesAndNewlines),
-               !whichEmu.isEmpty, fm.isExecutableFile(atPath: whichEmu) {
-                self.emulatorPath = whichEmu
+            if let pathEmu = findInPATH(name: "emulator") {
+                self.emulatorPath = pathEmu
             } else if fm.isExecutableFile(atPath: "/opt/homebrew/bin/emulator") {
                 self.emulatorPath = "/opt/homebrew/bin/emulator"
+            } else if fm.isExecutableFile(atPath: "/usr/local/bin/emulator") {
+                self.emulatorPath = "/usr/local/bin/emulator"
             }
         }
+    }
+
+    private func findInPATH(name: String) -> String? {
+        let fm = FileManager.default
+        let pathEnv = ProcessInfo.processInfo.environment["PATH"] ?? "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
+        for dir in pathEnv.split(separator: ":") {
+            let fullPath = (String(dir) as NSString).appendingPathComponent(name)
+            if fm.isExecutableFile(atPath: fullPath) {
+                return fullPath
+            }
+        }
+        return nil
     }
 
     // MARK: - Actions
@@ -506,24 +573,6 @@ public final class EmulatorService: @unchecked Sendable {
                     continuation.resume(throwing: error)
                 }
             }
-        }
-    }
-
-    private func runSyncCommand(executable: String, args: [String]) -> String? {
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: executable)
-        process.arguments = args
-        let pipe = Pipe()
-        process.standardOutput = pipe
-        process.standardError = Pipe()
-
-        do {
-            try process.run()
-            let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            process.waitUntilExit()
-            return String(data: data, encoding: .utf8)
-        } catch {
-            return nil
         }
     }
 }

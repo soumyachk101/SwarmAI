@@ -30,12 +30,22 @@ struct SettingsView: View {
 
 		ZStack {
 			// Backdrop
-			Color.black.opacity(isPresented ? 0.5 : 0)
+			Color.swarmBackground.opacity(isPresented ? 0.5 : 0)
 				.ignoresSafeArea()
+				.allowsHitTesting(isPresented)
 				.onTapGesture {
 					dismissSettings()
 				}
 				.animation(.spring(response: 0.4, dampingFraction: 0.85), value: isPresented)
+
+			// Hidden Escape Button for macOS keyboard shortcut routing
+			Button("") {
+				dismissSettings()
+			}
+			.keyboardShortcut(.cancelAction)
+			.keyboardShortcut(.escape, modifiers: [])
+			.opacity(0)
+			.frame(width: 0, height: 0)
 
 			VStack(spacing: 0) {
 				// Title bar
@@ -115,20 +125,31 @@ struct SettingsView: View {
 				RoundedRectangle(cornerRadius: 16)
 					.stroke(Color.swarmBorderSubtle, lineWidth: 1)
 			)
-			.shadow(color: .black.opacity(0.4), radius: 30, x: 0, y: 10)
+			.shadow(color: Color.swarmCanvas.opacity(0.4), radius: 30, x: 0, y: 10)
 			.scaleEffect(isPresented ? 1.0 : 0.85)
 			.opacity(isPresented ? 1 : 0)
 			.animation(.spring(response: 0.4, dampingFraction: 0.85), value: isPresented)
 		}
+		.onKeyPress(.escape) {
+			dismissSettings()
+			return .handled
+		}
 		.onAppear {
-			isPresented = true
+			withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+				isPresented = true
+			}
 			ensureDefaultProviders()
 		}
 	}
 
 	private func dismissSettings() {
-		appState.isSettingsOpen = false
-		dismiss()
+		withAnimation(.spring(response: 0.25, dampingFraction: 0.85)) {
+			isPresented = false
+		}
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+			appState.isSettingsOpen = false
+			dismiss()
+		}
 	}
 
 	// MARK: - Sections

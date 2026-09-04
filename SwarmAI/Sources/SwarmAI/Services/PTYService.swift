@@ -9,30 +9,110 @@ public final class PathDiscovery: @unchecked Sendable {
     public static let shared = PathDiscovery()
     
     private let lock = NSLock()
-    private var cachedPath: String?
+    private var cachedPath: String
+    private var isProbing: Bool = false
     
-    private init() {}
+    // Standard developer binary locations on macOS
+    private static let standardCandidatePaths: [String] = {
+        let homeDir = NSHomeDirectory()
+        return [
+            "/opt/homebrew/bin",
+            "/opt/homebrew/sbin",
+            "/usr/local/bin",
+            "/usr/local/sbin",
+            "\(homeDir)/.cargo/bin",
+            "\(homeDir)/.local/bin",
+            "\(homeDir)/.bun/bin",
+            "\(homeDir)/.npm-global/bin",
+            "\(homeDir)/.yarn/bin",
+            "/Library/Apple/usr/bin",
+            "/usr/bin",
+            "/bin",
+            "/usr/sbin",
+            "/sbin"
+        ]
+    }()
     
-    /// Resolve the full interactive login shell PATH.
-    public func resolveUserPath() -> String {
-        lock.lock()
-        if let cached = cachedPath {
-            lock.unlock()
-            return cached
-        }
-        lock.unlock()
-        
-        let path = probeLoginShellPath()
-        
-        lock.lock()
-        cachedPath = path
-        lock.unlock()
-        return path
+    private init() {
+        // Compute fast immediate path synchronously without blocking subprocesses
+        self.cachedPath = Self.buildFastPath()
+        // Trigger background shell probe for any extra shell environment variables
+        triggerBackgroundShellProbe()
     }
     
-    /// Probe user's default login shell for the full exported PATH.
+    /// Build fast initial PATH using process environment, standard directories, and nvm.
+    private static func buildFastPath() -> String {
+        let homeDir = NSHomeDirectory()
+        let discoveredPath = ProcessInfo.processInfo.environment["PATH"] ?? ""
+        var components = discoveredPath.components(separatedBy: ":").filter { !$0.isEmpty }
+        
+        // Scan nvm node versions if present
+        let nvmDir = "\(homeDir)/.nvm/versions/node"
+        if let versions = try? FileManager.default.contentsOfDirectory(atPath: nvmDir) {
+            for v in versions.sorted().reversed() {
+                let binDir = "\(nvmDir)/\(v)/bin"
+                if FileManager.default.fileExists(atPath: binDir) && !components.contains(binDir) {
+                    components.insert(binDir, at: 0)
+                }
+            }
+        }
+        
+        // Append missing standard paths
+        for candidate in standardCandidatePaths {
+            if FileManager.default.fileExists(atPath: candidate) && !components.contains(candidate) {
+                components.append(candidate)
+            }
+        }
+        
+        return components.joined(separator: ":")
+    }
+    
+    private func triggerBackgroundShellProbe() {
+        lock.lock()
+        guard !isProbing else {
+            lock.unlock()
+            return
+        }
+        isProbing = true
+        lock.unlock()
+        
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            guard let self = self else { return }
+            let probed = self.probeLoginShellPath()
+            if !probed.isEmpty {
+                self.lock.lock()
+                self.cachedPath = probed
+                self.isProbing = false
+                self.lock.unlock()
+            } else {
+                self.lock.lock()
+                self.isProbing = false
+                self.lock.unlock()
+            }
+        }
+    }
+    
+    /// Resolve the full interactive login shell PATH (instant & non-blocking).
+    public func resolveUserPath() -> String {
+        lock.lock()
+        defer { lock.unlock() }
+        return cachedPath
+    }
+    
+    /// Probe user's default login shell for the full exported PATH in the background.
     private func probeLoginShellPath() -> String {
-        let userShell = ProcessInfo.processInfo.environment["SHELL"] ?? "/bin/zsh"
+        var userShell = ProcessInfo.processInfo.environment["SHELL"] ?? "/bin/zsh"
+        if !FileManager.default.isExecutableFile(atPath: userShell) {
+            userShell = "/bin/zsh"
+            if !FileManager.default.isExecutableFile(atPath: userShell) {
+                userShell = "/bin/sh"
+            }
+        }
+        
+        guard FileManager.default.isExecutableFile(atPath: userShell) else {
+            return Self.buildFastPath()
+        }
+        
         let pipe = Pipe()
         let process = Process()
         process.executableURL = URL(fileURLWithPath: userShell)
@@ -50,29 +130,10 @@ public final class PathDiscovery: @unchecked Sendable {
                 discoveredPath = output.trimmingCharacters(in: .whitespacesAndNewlines)
             }
         } catch {
-            // Fallback to system environment PATH
             discoveredPath = ProcessInfo.processInfo.environment["PATH"] ?? ""
         }
         
-        // Standard developer binary locations on macOS
         let homeDir = NSHomeDirectory()
-        let standardCandidatePaths = [
-            "/opt/homebrew/bin",
-            "/opt/homebrew/sbin",
-            "/usr/local/bin",
-            "/usr/local/sbin",
-            "\(homeDir)/.cargo/bin",
-            "\(homeDir)/.local/bin",
-            "\(homeDir)/.bun/bin",
-            "\(homeDir)/.npm-global/bin",
-            "\(homeDir)/.yarn/bin",
-            "/Library/Apple/usr/bin",
-            "/usr/bin",
-            "/bin",
-            "/usr/sbin",
-            "/sbin"
-        ]
-        
         var components = discoveredPath.components(separatedBy: ":").filter { !$0.isEmpty }
         
         // Scan nvm node versions if present
@@ -87,7 +148,7 @@ public final class PathDiscovery: @unchecked Sendable {
         }
         
         // Append missing standard paths
-        for candidate in standardCandidatePaths {
+        for candidate in Self.standardCandidatePaths {
             if FileManager.default.fileExists(atPath: candidate) && !components.contains(candidate) {
                 components.append(candidate)
             }
@@ -114,6 +175,15 @@ public final class PathDiscovery: @unchecked Sendable {
                 return fullPath
             }
         }
+        
+        // Fallback candidate search
+        for dir in Self.standardCandidatePaths {
+            let fullPath = (dir as NSString).appendingPathComponent(name)
+            if fm.isExecutableFile(atPath: fullPath) {
+                return fullPath
+            }
+        }
+        
         return nil
     }
     
@@ -241,20 +311,28 @@ public final class PTYSession: Identifiable, @unchecked Sendable {
         let resolvedCommand: String
         let resolvedArgs: [String]
         
+        let shellPath = PathDiscovery.shared.findExecutable("zsh")
+            ?? PathDiscovery.shared.findExecutable("bash")
+            ?? PathDiscovery.shared.findExecutable("sh")
+            ?? "/bin/zsh"
+        
+        let isShell = ["zsh", "bash", "sh", "/bin/zsh", "/bin/bash", "/bin/sh"].contains(command)
+        
         if let fullPath = PathDiscovery.shared.findExecutable(command) {
             resolvedCommand = fullPath
             resolvedArgs = arguments
-        } else if let zshPath = PathDiscovery.shared.findExecutable("zsh") {
-            // Fallback: spawn login shell and run requested command
-            resolvedCommand = zshPath
+        } else if !isShell {
+            // Fallback: spawn interactive login shell and execute requested command
+            resolvedCommand = shellPath
             if arguments.isEmpty {
-                resolvedArgs = ["-l"]
+                resolvedArgs = ["-lc", "exec \(command)"]
             } else {
-                resolvedArgs = ["-lc", "\(command) \(arguments.joined(separator: " "))"]
+                let escapedArgs = arguments.map { "\"\($0.replacingOccurrences(of: "\"", with: "\\\""))\"" }.joined(separator: " ")
+                resolvedArgs = ["-lc", "exec \(command) \(escapedArgs)"]
             }
         } else {
-            resolvedCommand = "/bin/zsh"
-            resolvedArgs = ["-l"]
+            resolvedCommand = shellPath
+            resolvedArgs = arguments.isEmpty ? ["-l"] : arguments
         }
         
         // 4. Configure Process
@@ -439,6 +517,9 @@ public final class PTYSession: Identifiable, @unchecked Sendable {
     }
     
     private func cleanup() {
+        lock.lock()
+        defer { lock.unlock() }
+        
         readSource?.cancel()
         readSource = nil
         

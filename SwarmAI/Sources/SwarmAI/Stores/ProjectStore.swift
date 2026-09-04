@@ -1,9 +1,12 @@
 import SwiftUI
 
 @Observable
-final class ProjectStore {
- var openFiles: [String: [OpenFile]] = [:] // workspaceId -> files
- var activeFileId: String?
+public final class ProjectStore: @unchecked Sendable {
+  public static let shared = ProjectStore()
+  public var openFiles: [String: [OpenFile]] = [:] // workspaceId -> files
+  public var activeFileId: String?
+
+  public init() {}
 
  struct OpenFile: Identifiable, Codable {
  let id: String

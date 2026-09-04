@@ -2,21 +2,22 @@ import SwiftUI
 
 @Observable
 public final class WorkspaceStore: @unchecked Sendable {
+  public static let shared = WorkspaceStore()
   public var workspaces: [Workspace] = []
   public var activeWorkspaceId: UUID?
 
- init() {
- loadFromStorage()
- if workspaces.isEmpty {
- let defaultWorkspace = Workspace(
- name: "Swarm Workspace",
- path: NSHomeDirectory(),
- color: .swarmGold
- )
- workspaces.append(defaultWorkspace)
- activeWorkspaceId = defaultWorkspace.id
- }
- }
+  public init() {
+    loadFromStorage()
+    if workspaces.isEmpty {
+      let defaultWorkspace = Workspace(
+        name: "Swarm Workspace",
+        path: NSHomeDirectory(),
+        color: .swarmGold
+      )
+      workspaces.append(defaultWorkspace)
+      activeWorkspaceId = defaultWorkspace.id
+    }
+  }
 
  func createWorkspace(name: String, path: String) -> Workspace {
  let workspace = Workspace(name: name, path: path, color: .swarmGold)

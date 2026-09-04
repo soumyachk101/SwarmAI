@@ -32,60 +32,185 @@ struct ReportsPanel: View {
  .background(.swarmBorderSubtle)
 
  ScrollView {
- VStack(spacing: 12) {
- // Execution metrics
- VStack(alignment: .leading, spacing: 8) {
+ VStack(spacing: 16) {
+ // Execution metrics — glass card
+ VStack(alignment: .leading, spacing: 6) {
  Text("Execution Metrics")
  .font(.swarm(.xs, weight: .semibold))
  .foregroundStyle(.swarmTextSecondary)
 
- MetricRow(label: "Total Sessions", value: "\(agentsStore.agents.count)", icon: "cpu.fill")
- MetricRow(label: "Tokens Used", value: "\(agentsStore.agents.reduce(0) { $0 + $1.tokenUsage.total })", icon: "text.alignleft")
- MetricRow(label: "Avg Duration", value: "2.4m", icon: "clock.fill")
- MetricRow(label: "Tasks Completed", value: "\(taskStore.tasks.filter { $0.status == .done }.count)", icon: "checkmark.circle.fill")
+ MetricRow(
+ label: "Total Sessions",
+ value: "\(agentsStore.agents.count)",
+ icon: "cpu.fill",
+ appeared: contentAppeared,
+ delay: 0.10
+ )
+ MetricRow(
+ label: "Tokens Used",
+ value: "\(agentsStore.agents.reduce(0) { $0 + $1.tokenUsage.total })",
+ icon: "text.alignleft",
+ appeared: contentAppeared,
+ delay: 0.15
+ )
+ MetricRow(
+ label: "Avg Duration",
+ value: "2.4m",
+ icon: "clock.fill",
+ appeared: contentAppeared,
+ delay: 0.20
+ )
+ MetricRow(
+ label: "Tasks Completed",
+ value: "\(taskStore.tasks.filter { $0.status == .done }.count)",
+ icon: "checkmark.circle.fill",
+ appeared: contentAppeared,
+ delay: 0.25
+ )
  }
  .padding(.horizontal, 12)
- .padding(.vertical, 8)
+ .padding(.vertical, 10)
+ .background {
+ RoundedRectangle(cornerRadius: 10)
+ .fill(.swarmSurface)
+ }
+ .overlay {
+ RoundedRectangle(cornerRadius: 10)
+ .stroke(.swarmBorderSubtle, lineWidth: 1)
+ }
 
  Divider()
  .background(.swarmBorderSubtle)
 
- // Cost breakdown
+ // Cost breakdown — glass card
  VStack(alignment: .leading, spacing: 8) {
  Text("Cost Breakdown")
  .font(.swarm(.xs, weight: .semibold))
  .foregroundStyle(.swarmTextSecondary)
 
+ if agentsStore.agents.isEmpty {
+ Text("No active agent sessions")
+ .font(.swarm(.micro))
+ .foregroundStyle(.swarmTextTertiary)
+ .padding(.vertical, 4)
+ } else {
  ForEach(Array(agentsStore.agents.enumerated()), id: \.element.id) { index, agent in
- CostBar(agent: agent)
+ CostBar(
+ agent: agent,
+ appeared: contentAppeared,
+ delay: 0.20 + Double(index) * 0.04
+ )
  }
+ }
+
+ // Action buttons with glassInteractive hover effects
+ HStack(spacing: 8) {
+ Button {
+ // Placeholder export action
+ } label: {
+ HStack(spacing: 4) {
+ Image(systemName: "arrow.down.to.line")
+ .font(.swarm(.micro))
+ Text("Export CSV")
+ .font(.swarm(.micro, weight: .medium))
+ }
+ .foregroundStyle(.swarmTextSecondary)
+ .padding(.horizontal, 10)
+ .padding(.vertical, 5)
+ .background {
+ RoundedRectangle(cornerRadius: 6)
+ .fill(.swarmSurface)
+ }
+ }
+ .buttonStyle(.plain)
+
+ Button {
+ // Placeholder refresh action
+ } label: {
+ HStack(spacing: 4) {
+ Image(systemName: "arrow.clockwise")
+ .font(.swarm(.micro))
+ Text("Refresh")
+ .font(.swarm(.micro, weight: .medium))
+ }
+ .foregroundStyle(.swarmTextSecondary)
+ .padding(.horizontal, 10)
+ .padding(.vertical, 5)
+ .background {
+ RoundedRectangle(cornerRadius: 6)
+ .fill(.swarmSurface)
+ }
+ }
+ .buttonStyle(.plain)
+ }
+ .padding(.top, 4)
  }
  .padding(.horizontal, 12)
- .padding(.vertical, 8)
+ .padding(.vertical, 10)
+ .background {
+ RoundedRectangle(cornerRadius: 10)
+ .fill(.swarmSurface)
+ }
+ .overlay {
+ RoundedRectangle(cornerRadius: 10)
+ .stroke(.swarmBorderSubtle, lineWidth: 1)
+ }
 
  Divider()
  .background(.swarmBorderSubtle)
 
- // Event stream
- VStack(alignment: .leading, spacing: 8) {
+ // Event stream — glass card
+ VStack(alignment: .leading, spacing: 6) {
  Text("Recent Events")
  .font(.swarm(.xs, weight: .semibold))
  .foregroundStyle(.swarmTextSecondary)
 
- EventRow(icon: "play.circle", text: "Worker-1 started", time: "2m ago")
- EventRow(icon: "checkmark.circle", text: "Task completed", time: "5m ago")
- EventRow(icon: "exclamationmark.triangle", text: "Worker-2 error", time: "8m ago")
- EventRow(icon: "arrow.triangle.branch", text: "Git push to main", time: "12m ago")
+ EventRow(
+ icon: "play.circle",
+ text: "Worker-1 started",
+ time: "2m ago",
+ appeared: contentAppeared,
+ delay: 0.28
+ )
+ EventRow(
+ icon: "checkmark.circle",
+ text: "Task completed",
+ time: "5m ago",
+ appeared: contentAppeared,
+ delay: 0.32
+ )
+ EventRow(
+ icon: "exclamationmark.triangle",
+ text: "Worker-2 error",
+ time: "8m ago",
+ appeared: contentAppeared,
+ delay: 0.36
+ )
+ EventRow(
+ icon: "arrow.triangle.branch",
+ text: "Git push to main",
+ time: "12m ago",
+ appeared: contentAppeared,
+ delay: 0.40
+ )
  }
  .padding(.horizontal, 12)
- .padding(.vertical, 8)
+ .padding(.vertical, 10)
+ .background {
+ RoundedRectangle(cornerRadius: 10)
+ .fill(.swarmSurface)
+ }
+ .overlay {
+ RoundedRectangle(cornerRadius: 10)
+ .stroke(.swarmBorderSubtle, lineWidth: 1)
+ }
  }
  }
  .padding(.horizontal, 12)
  .padding(.vertical, 8)
  .background(.swarmCanvas)
  }
- .modifier(PanelEntryModifier(appeared: contentAppeared))
+ .modifier(PanelEntryModifier(appeared: $contentAppeared))
  .onAppear {
  contentAppeared = false
  DispatchQueue.main.asyncAfter(deadline: .now() + 0.02) {
@@ -99,7 +224,8 @@ struct MetricRow: View {
  let label: String
  let value: String
  let icon: String
- @State private var rowAppeared = false
+ let appeared: Bool
+ let delay: Double
 
  var body: some View {
  HStack(spacing: 8) {
@@ -117,13 +243,14 @@ struct MetricRow: View {
  .font(.swarm(.sm, weight: .medium))
  .foregroundStyle(.swarmTextPrimary)
  }
- .modifier(RowEntryModifier(appeared: $rowAppeared, delay: 0.15))
+ .modifier(RowEntryModifier(appeared: appeared, delay: delay))
  }
 }
 
 struct CostBar: View {
  let agent: Agent
- @State private var barAppeared = false
+ let appeared: Bool
+ let delay: Double
 
  var body: some View {
  HStack(spacing: 8) {
@@ -157,7 +284,7 @@ struct CostBar: View {
  .frame(width: 40, alignment: .trailing)
  }
  .padding(.vertical, 2)
- .modifier(RowEntryModifier(appeared: $barAppeared, delay: 0.22))
+ .modifier(RowEntryModifier(appeared: appeared, delay: delay))
  }
 }
 
@@ -165,7 +292,8 @@ struct EventRow: View {
  let icon: String
  let text: String
  let time: String
- @State private var rowAppeared = false
+ let appeared: Bool
+ let delay: Double
 
  var body: some View {
  HStack(spacing: 8) {
@@ -184,6 +312,6 @@ struct EventRow: View {
  .foregroundStyle(.swarmTextTertiary)
  }
  .padding(.vertical, 2)
- .modifier(RowEntryModifier(appeared: $rowAppeared, delay: 0.28))
+ .modifier(RowEntryModifier(appeared: appeared, delay: delay))
  }
 }

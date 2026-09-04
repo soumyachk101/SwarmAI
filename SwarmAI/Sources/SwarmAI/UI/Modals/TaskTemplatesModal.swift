@@ -59,6 +59,7 @@ public struct TaskTemplatesModal: View {
     @Binding public var isOpen: Bool
     public var initialTab: ModalTab = .templates
 
+    @Environment(\.appState) private var appState
     @Environment(\.taskStore) private var taskStore
     @Environment(\.workspaceStore) private var workspaceStore
     @State private var selectedTab: ModalTab = .templates
@@ -84,9 +85,19 @@ public struct TaskTemplatesModal: View {
             // Backdrop
             Color.black.opacity(isPresented ? 0.65 : 0)
                 .ignoresSafeArea()
+                .allowsHitTesting(isPresented)
                 .onTapGesture {
                     closeModal()
                 }
+
+            // Hidden Escape Button for macOS keyboard shortcut routing
+            Button("") {
+                closeModal()
+            }
+            .keyboardShortcut(.cancelAction)
+            .keyboardShortcut(.escape, modifiers: [])
+            .opacity(0)
+            .frame(width: 0, height: 0)
 
             // Main Modal Window
             VStack(spacing: 0) {
@@ -116,6 +127,10 @@ public struct TaskTemplatesModal: View {
             .shadow(color: .black.opacity(0.55), radius: 35, x: 0, y: 15)
             .scaleEffect(isPresented ? 1.0 : 0.94)
             .opacity(isPresented ? 1.0 : 0)
+        }
+        .onKeyPress(.escape) {
+            closeModal()
+            return .handled
         }
         .onAppear {
             selectedTab = initialTab
@@ -758,6 +773,7 @@ public struct TaskTemplatesModal: View {
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             isOpen = false
+            appState.isTaskTemplatesPresented = false
         }
     }
 

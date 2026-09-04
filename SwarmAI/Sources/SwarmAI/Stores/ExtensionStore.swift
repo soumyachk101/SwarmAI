@@ -1,12 +1,13 @@
 import SwiftUI
 
 @Observable
-final class ExtensionStore {
- var installedExtensions: [Extension] = []
+public final class ExtensionStore: @unchecked Sendable {
+  public static let shared = ExtensionStore()
+  public var installedExtensions: [Extension] = []
 
- init() {
- loadFromStorage()
- }
+  public init() {
+    loadFromStorage()
+  }
 
  func installExtension(_ ext: Extension) {
  if !installedExtensions.contains(where: { $0.id == ext.id }) {

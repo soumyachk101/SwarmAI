@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - Font Scale
 
-enum SwarmFontSize: CGFloat, CaseIterable {
+public enum SwarmFontSize: CGFloat, CaseIterable, Sendable {
  case micro = 10
  case mini = 11
  case xs = 12
@@ -15,7 +15,7 @@ enum SwarmFontSize: CGFloat, CaseIterable {
 
 // MARK: - Font Extension
 
-extension Font {
+public extension Font {
  static func swarm(_ size: SwarmFontSize = .base, weight: Font.Weight = .regular) -> Font {
  .system(size: size.rawValue, weight: weight)
  }
@@ -27,7 +27,7 @@ extension Font {
 
 // MARK: - Line Height Helper
 
-extension View {
+public extension View {
  func swarmLineHeight(_ size: SwarmFontSize) -> some View {
  let lineHeight: CGFloat
  switch size {

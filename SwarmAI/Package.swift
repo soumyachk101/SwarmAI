@@ -16,6 +16,7 @@ let package = Package(
  path: "Sources/SwarmAI",
  exclude: [
  "App/Info.plist",
+ "UI/Environment.swift",
  ],
  resources: [
  .process("Resources"),

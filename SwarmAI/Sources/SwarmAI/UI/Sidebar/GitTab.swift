@@ -69,6 +69,9 @@ struct GitTab: View {
     .sheet(isPresented: $showingDiffModal) {
       diffSheetView
     }
+    .sheet(isPresented: $isCreatingBranch) {
+      createBranchSheetView
+    }
   }
 
   // MARK: - Subviews
@@ -424,6 +427,67 @@ struct GitTab: View {
       .background(.swarmCanvas)
     }
     .frame(minWidth: 500, minHeight: 400)
+  }
+
+  private var createBranchSheetView: some View {
+    VStack(alignment: .leading, spacing: 14) {
+      HStack(spacing: 8) {
+        Image(systemName: "arrow.triangle.branch")
+          .font(.swarm(.base))
+          .foregroundStyle(.swarmGold)
+
+        Text("Create New Branch")
+          .font(.swarm(.sm, weight: .bold))
+          .foregroundStyle(.swarmTextPrimary)
+      }
+
+      Text("Enter the name for the new branch to create and check out:")
+        .font(.swarm(.xs))
+        .foregroundStyle(.swarmTextSecondary)
+
+      TextField("Branch name (e.g. feat/login-screen)", text: $newBranchName)
+        .font(.swarmMono(.xs))
+        .textFieldStyle(.roundedBorder)
+        .onSubmit {
+          createBranchAction()
+        }
+
+      HStack {
+        Spacer()
+
+        Button("Cancel") {
+          isCreatingBranch = false
+          newBranchName = ""
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(.swarmTextSecondary)
+
+        Button("Create & Checkout") {
+          createBranchAction()
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(.swarmGold)
+        .disabled(newBranchName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+      }
+    }
+    .padding(20)
+    .frame(width: 360)
+    .background(.swarmCanvas)
+  }
+
+  private func createBranchAction() {
+    let branch = newBranchName.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !branch.isEmpty else { return }
+    isCreatingBranch = false
+    newBranchName = ""
+    _Concurrency.Task {
+      do {
+        try await GitService.shared.gitCheckout(at: repoPath, branch: branch, createNew: true)
+        await refreshGit()
+      } catch {
+        errorMessage = error.localizedDescription
+      }
+    }
   }
 
   // MARK: - Actions

@@ -1,39 +1,47 @@
 import SwiftUI
+import AppKit
 
 @Observable
 public final class AgentsStore: @unchecked Sendable {
+  public static let shared = AgentsStore()
   public var agents: [Agent] = []
   public var gridLayout: GridLayout = GridLayout(columns: 2, rows: 2, panePositions: [])
   public var maximizedPaneId: String?
   public var activePaneId: String?
 
- init() {
- loadFromStorage()
- if agents.isEmpty {
- // Seed with example data for preview
- agents = [
- Agent(name: "Claude Lead", agentType: .claudeCode, status: .idle, role: .lead, leadMode: .steward),
- Agent(name: "Worker-1", agentType: .codex, status: .idle),
- ]
- }
- }
+  public init() {
+    loadFromStorage()
+    if agents.isEmpty {
+      // Seed with example data for preview
+      agents = [
+        Agent(name: "Claude Lead", agentType: .claudeCode, status: .idle, role: .lead, leadMode: .steward),
+        Agent(name: "Worker-1", agentType: .codex, status: .idle),
+      ]
+    }
+  }
 
- func spawnAgent(_ type: AgentType = .claudeCode, name: String? = nil) -> Agent {
- let agent = Agent(
- name: name ?? "\(type.displayName)-\(agents.count + 1)",
- agentType: type,
- status: .launching
- )
- agents.append(agent)
- saveToStorage()
- return agent
- }
+  func spawnAgent(_ type: AgentType = .claudeCode, name: String? = nil) -> Agent {
+    let agent = Agent(
+      name: name ?? "\(type.displayName)-\(agents.count + 1)",
+      agentType: type,
+      status: .launching
+    )
+    agents.append(agent)
+    activePaneId = agent.id.uuidString
+    saveToStorage()
+    return agent
+  }
 
- func removeAgent(_ id: UUID) {
- agents.removeAll { $0.id == id }
- if maximizedPaneId == nil { maximizedPaneId = nil }
- saveToStorage()
- }
+  func removeAgent(_ id: UUID) {
+    agents.removeAll { $0.id == id }
+    if activePaneId == id.uuidString {
+      activePaneId = agents.first?.id.uuidString
+    }
+    if maximizedPaneId == id.uuidString {
+      maximizedPaneId = nil
+    }
+    saveToStorage()
+  }
 
  func updateAgentStatus(_ id: UUID, status: AgentStatus) {
  if let index = agents.firstIndex(where: { $0.id == id }) {
@@ -42,9 +50,17 @@ public final class AgentsStore: @unchecked Sendable {
  }
  }
 
- func maximizePane(_ agentId: UUID?) {
- maximizedPaneId = agentId?.uuidString
- }
+  func maximizePane(_ agentId: UUID?) {
+    if let id = agentId?.uuidString {
+      if maximizedPaneId == id {
+        maximizedPaneId = nil
+      } else {
+        maximizedPaneId = id
+      }
+    } else {
+      maximizedPaneId = nil
+    }
+  }
 
  func closePane(_ agentId: UUID) {
  removeAgent(agentId)

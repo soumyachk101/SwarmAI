@@ -7,6 +7,7 @@ struct AgentPaneView: View {
  let agent: Agent
  @Environment(\.agentsStore) private var agentsStore
  @Environment(\.accessibilityReduceMotion) private var reduceMotion
+ @Environment(\.themeStore) private var themeStore
 
  @State private var inputText: String = ""
  @State private var materializeProgress: CGFloat = 0
@@ -19,10 +20,6 @@ struct AgentPaneView: View {
  @State private var autoScroll: Bool = true
  @State private var commandHistory: [String] = []
  @State private var historyIndex: Int = -1
-
- private var ptySession: PTYSession {
- PTYService.shared.getOrCreateSession(for: agent)
- }
 
  var body: some View {
  VStack(spacing: 0) {
@@ -97,7 +94,7 @@ struct AgentPaneView: View {
  .foregroundStyle(.swarmTextTertiary)
  .padding(.horizontal, 4)
  .padding(.vertical, 2)
- .background(Color.white.opacity(0.04))
+ .background(Color.swarmSurfaceHover.opacity(0.08))
  .clipShape(RoundedRectangle(cornerRadius: 3))
  }
 
@@ -153,15 +150,22 @@ struct AgentPaneView: View {
  .help("Clear Terminal Output")
 
  // Maximize / Restore
+ let isMaximized = agentsStore.maximizedPaneId == agent.id.uuidString
  Button {
- agentsStore.maximizePane(UUID(uuidString: agent.id.uuidString))
+ withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+ if isMaximized {
+ agentsStore.maximizePane(nil)
+ } else {
+ agentsStore.maximizePane(agent.id)
+ }
+ }
  } label: {
- Image(systemName: "arrow.up.left.and.arrow.down.right")
+ Image(systemName: isMaximized ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
  .font(.swarm(.xs))
- .foregroundStyle(.swarmTextTertiary)
+ .foregroundStyle(isMaximized ? .swarmGold : .swarmTextTertiary)
  }
  .buttonStyle(.plain)
- .help("Maximize Pane")
+ .help(isMaximized ? "Restore Pane" : "Maximize Pane")
 
  // Close Agent
  Button {
@@ -208,7 +212,7 @@ struct AgentPaneView: View {
  private var terminalView: some View {
  ScrollViewReader { proxy in
  ScrollView {
- VStack(alignment: .leading, spacing: 0) {
+ LazyVStack(alignment: .leading, spacing: 0) {
  if agent.terminalOutput.isEmpty {
  Text("Session ready. Type commands or prompts below...")
  .font(.swarmMono(.xs))
@@ -217,7 +221,7 @@ struct AgentPaneView: View {
  .padding(.vertical, 8)
  } else {
  ForEach(Array(agent.terminalOutput.enumerated()), id: \.offset) { index, line in
- Text(ANSIParser.parseToAttributedString(line))
+ Text(ANSIParser.parseToAttributedString(line, standardColors: themeScheme.ansiStandard, brightColors: themeScheme.ansiBright))
  .font(.swarmMono(.xs))
  .padding(.horizontal, 10)
  .padding(.vertical, 0.5)
@@ -238,7 +242,7 @@ struct AgentPaneView: View {
  }
  }
  }
- .background(.swarmCanvas)
+ .background(Color.swarmTerminalBackground(for: themeStore.themeMode))
  }
  }
 
@@ -253,6 +257,14 @@ struct AgentPaneView: View {
  .textFieldStyle(.plain)
  .onSubmit {
  sendCommand()
+ }
+ .onKeyPress(.upArrow) {
+ navigateHistory(step: -1)
+ return .handled
+ }
+ .onKeyPress(.downArrow) {
+ navigateHistory(step: 1)
+ return .handled
  }
 
  if !inputText.isEmpty {
@@ -299,13 +311,17 @@ struct AgentPaneView: View {
  // MARK: - Actions
 
  private func ensureSessionStarted() {
+ _Concurrency.Task.detached(priority: .userInitiated) {
  let session = PTYService.shared.getOrCreateSession(for: agent)
  if !session.isRunning && agent.status != .done {
  do {
  try session.start()
  } catch {
+ await MainActor.run {
  agent.status = .error
  agent.appendOutput("[PTY start error: \(error.localizedDescription)]")
+ }
+ }
  }
  }
  }
@@ -339,22 +355,48 @@ struct AgentPaneView: View {
  guard cmd.isEmpty == false else { return }
 
  commandHistory.append(cmd)
- historyIndex = commandHistory.count
+ historyIndex = -1
 
  let session = PTYService.shared.getOrCreateSession(for: agent)
  if session.isRunning {
  session.write(cmd + "\n")
  } else {
+ _Concurrency.Task.detached(priority: .userInitiated) {
  do {
  try session.start()
  session.write(cmd + "\n")
  } catch {
+ await MainActor.run {
  agent.appendOutput("[Error starting session: \(error.localizedDescription)]")
+ }
+ }
  }
  }
 
  agent.lastActivity = Date()
  inputText = ""
+ }
+
+ private func navigateHistory(step: Int) {
+ guard !commandHistory.isEmpty else { return }
+ if step < 0 {
+ // Move backward in history
+ if historyIndex == -1 || historyIndex > commandHistory.count - 1 {
+ historyIndex = commandHistory.count - 1
+ } else if historyIndex > 0 {
+ historyIndex -= 1
+ }
+ inputText = commandHistory[historyIndex]
+ } else {
+ // Move forward in history
+ if historyIndex >= 0 && historyIndex < commandHistory.count - 1 {
+ historyIndex += 1
+ inputText = commandHistory[historyIndex]
+ } else {
+ historyIndex = -1
+ inputText = ""
+ }
+ }
  }
 
  private func sendInterrupt() {
@@ -379,35 +421,51 @@ struct ScanLineModifier: ViewModifier {
  let reduceMotion: Bool
 
  func body(content: Content) -> some View {
- GeometryReader { geo in
  content
- .overlay(alignment: .top) {
- if isEnabled && !reduceMotion && scanLinePosition >= 0 && scanLinePosition <= 1.5 {
- LinearGradient(
- gradient: Gradient(colors: [
- .clear,
- .white.opacity(0.04),
- .clear
- ]),
- startPoint: .top,
- endPoint: .bottom
- )
- .frame(height: max(1, geo.size.height * 0.06))
- .offset(y: scanLinePosition * geo.size.height)
- }
- }
  .overlay {
  if isEnabled && !reduceMotion {
- VStack(spacing: 2) {
- ForEach(0..<Int(max(1, geo.size.height / 3)), id: \.self) { _ in
- Color.black.opacity(0.02)
- .frame(height: 1)
- Color.clear
- .frame(height: 2)
- }
- }
+ CRTScanlineCanvasOverlay(scanLinePosition: scanLinePosition)
  .allowsHitTesting(false)
  }
+ }
+ }
+}
+
+// MARK: - CRT Scanline Canvas Overlay
+
+private struct CRTScanlineCanvasOverlay: View {
+ let scanLinePosition: CGFloat
+
+ var body: some View {
+ Canvas { context, size in
+ // 1. Static subtle CRT scanlines
+ var y: CGFloat = 0
+ let scanlineColor = Color.black.opacity(0.04)
+ while y < size.height {
+ let rect = CGRect(x: 0, y: y, width: size.width, height: 1)
+ context.fill(Path(rect), with: .color(scanlineColor))
+ y += 3
+ }
+
+ // 2. Animated beam sweep
+ if scanLinePosition >= 0 && scanLinePosition <= 1.5 {
+ let beamHeight = max(10, size.height * 0.08)
+ let beamY = scanLinePosition * size.height - beamHeight / 2
+ let beamRect = CGRect(x: 0, y: beamY, width: size.width, height: beamHeight)
+
+ let gradient = Gradient(colors: [
+ .clear,
+ Color.white.opacity(0.03),
+ .clear
+ ])
+ context.fill(
+ Path(beamRect),
+ with: .linearGradient(
+ gradient,
+ startPoint: CGPoint(x: 0, y: beamY),
+ endPoint: CGPoint(x: 0, y: beamY + beamHeight)
+ )
+ )
  }
  }
  }
@@ -416,10 +474,15 @@ struct ScanLineModifier: ViewModifier {
 // MARK: - Terminal Pane View
 
 struct TerminalPaneView: View {
+ @Environment(\.themeStore) private var themeStore
  @State private var inputText: String = ""
  @State private var session: PTYSession?
  @State private var outputLines: [String] = ["Welcome to SwarmAI Interactive Terminal\n"]
  @State private var autoScroll: Bool = true
+
+ private var themeScheme: ThemeScheme {
+ ThemeScheme.preset(for: themeStore.themeMode) ?? .dark
+ }
 
  var body: some View {
  VStack(spacing: 0) {
@@ -454,9 +517,9 @@ struct TerminalPaneView: View {
 
  ScrollViewReader { proxy in
  ScrollView {
- VStack(alignment: .leading, spacing: 0) {
+ LazyVStack(alignment: .leading, spacing: 0) {
  ForEach(Array(outputLines.enumerated()), id: \.offset) { _, line in
- Text(ANSIParser.parseToAttributedString(line))
+ Text(ANSIParser.parseToAttributedString(line, standardColors: themeScheme.ansiStandard, brightColors: themeScheme.ansiBright))
  .font(.swarmMono(.xs))
  .padding(.horizontal, 10)
  .padding(.vertical, 0.5)
@@ -476,7 +539,7 @@ struct TerminalPaneView: View {
  }
  }
  }
- .background(.swarmCanvas)
+ .background(Color.swarmTerminalBackground(for: themeStore.themeMode))
  }
 
  HStack(spacing: 8) {
@@ -502,6 +565,7 @@ struct TerminalPaneView: View {
 
  private func initTerminal() {
  guard session == nil else { return }
+ _Concurrency.Task.detached(priority: .userInitiated) {
  let terminalSession = PTYSession(
  agentId: UUID(),
  command: ProcessInfo.processInfo.environment["SHELL"] ?? "/bin/zsh",
@@ -509,15 +573,22 @@ struct TerminalPaneView: View {
  )
  terminalSession.onOutput = { chunk in
  let lines = chunk.components(separatedBy: "\n")
+ Task { @MainActor in
  for line in lines {
  outputLines.append(line)
  }
  }
+ }
  do {
  try terminalSession.start()
+ await MainActor.run {
  self.session = terminalSession
+ }
  } catch {
+ await MainActor.run {
  outputLines.append("[Failed to start terminal: \(error.localizedDescription)]")
+ }
+ }
  }
  }
 

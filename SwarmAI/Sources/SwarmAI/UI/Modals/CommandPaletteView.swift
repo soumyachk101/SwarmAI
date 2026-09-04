@@ -4,6 +4,9 @@ import SwiftUI
 
 struct CommandPaletteView: View {
  @Environment(\.dismiss) var dismiss
+ @Environment(\.appState) private var appState
+ @Environment(\.themeStore) private var themeStore
+ @Environment(\.agentsStore) private var agentsStore
  @State private var query: String = ""
  @State private var selectedIndex: Int = 0
  @State private var isPresented = false
@@ -32,8 +35,18 @@ struct CommandPaletteView: View {
  Color.clear
  .ignoresSafeArea()
  .background(.ultraThinMaterial.opacity(isPresented ? 0.7 : 0))
- .onTapGesture { dismiss() }
+ .allowsHitTesting(isPresented)
+ .onTapGesture { dismissPalette() }
  .animation(.easeOut(duration: 0.2), value: isPresented)
+
+ // Hidden Escape Button for macOS keyboard shortcut routing
+ Button("") {
+ dismissPalette()
+ }
+ .keyboardShortcut(.cancelAction)
+ .keyboardShortcut(.escape, modifiers: [])
+ .opacity(0)
+ .frame(width: 0, height: 0)
 
  VStack(spacing: 0) {
  // Search field — expands width from 0 to full
@@ -64,6 +77,19 @@ struct CommandPaletteView: View {
  }
  .buttonStyle(.plain)
  }
+
+ Button {
+ dismissPalette()
+ } label: {
+ Image(systemName: "xmark")
+ .font(.system(size: 11, weight: .bold))
+ .foregroundStyle(.swarmTextTertiary)
+ .frame(width: 22, height: 22)
+ .background(Color.swarmSurface)
+ .cornerRadius(4)
+ }
+ .buttonStyle(.plain)
+ .help("Close command palette (Esc)")
  }
  .padding(.horizontal, 16)
  .padding(.vertical, 12)
@@ -146,14 +172,32 @@ struct CommandPaletteView: View {
  .frame(width: 500)
  .background(.swarmSurface)
  .cornerRadius(20)
- .shadow(color: .black.opacity(0.4), radius: 30, x: 0, y: 10)
+ .shadow(color: themeStore.currentTheme.color(for: .shadowColor).opacity(0.4), radius: 30, x: 0, y: 10)
  .scaleEffect(isPresented ? 1.0 : 0.95)
  .opacity(isPresented ? 1 : 0)
  .animation(.easeOut(duration: 0.2).delay(0.05), value: isPresented)
  }
+ .onKeyPress(.escape) {
+ dismissPalette()
+ return .handled
+ }
+ .onKeyPress(.upArrow) {
+ if selectedIndex > 0 {
+ selectedIndex -= 1
+ }
+ return .handled
+ }
+ .onKeyPress(.downArrow) {
+ if selectedIndex < filteredCommands.count - 1 {
+ selectedIndex += 1
+ }
+ return .handled
+ }
  .onAppear {
+ withAnimation(.easeOut(duration: 0.2)) {
  isPresented = true
  searchWidth = 500
+ }
  }
  .onChange(of: query) { _, _ in
  selectedIndex = 0
@@ -167,7 +211,45 @@ struct CommandPaletteView: View {
  }
 
  private func executeCommand(_ cmd: CommandItem) {
+ switch cmd.action {
+ case .newAgent:
+ _ = agentsStore.spawnAgent(.claudeCode)
+ case .toggleSidebar:
+ appState.toggleLeftSidebar()
+ case .toggleDock:
+ appState.toggleRightDock()
+ case .switchBoard:
+ appState.setPlane(.board)
+ appState.setBoardView(.grid)
+ case .switchFlow:
+ appState.setPlane(.board)
+ appState.setBoardView(.flow)
+ case .dispatchLead:
+ appState.setRightTab(.lead)
+ if !appState.isRightDockOpen {
+ appState.toggleRightDock()
+ }
+ case .openGit:
+ appState.setLeftTab(.git)
+ if !appState.isLeftSidebarOpen {
+ appState.toggleLeftSidebar()
+ }
+ case .openSettings:
+ appState.isSettingsOpen = true
+ case .cycleTheme:
+ themeStore.cycleTheme()
+ }
+ dismissPalette()
+ }
+
+ private func dismissPalette() {
+ withAnimation(.easeOut(duration: 0.15)) {
+ isPresented = false
+ }
+ DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+ appState.isCommandPaletteOpen = false
  dismiss()
+ }
  }
 }
 

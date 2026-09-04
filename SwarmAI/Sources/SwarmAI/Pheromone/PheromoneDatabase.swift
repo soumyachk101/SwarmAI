@@ -127,13 +127,15 @@ public final class PheromoneDatabase: @unchecked Sendable {
     private let lock = NSRecursiveLock()
 
     public init(workspacePath: String) throws {
-        let pheromoneDir = (workspacePath as NSString).appendingPathComponent(".pheromone")
+        let cleanWorkspace = URL(fileURLWithPath: workspacePath).standardized.path
+        let pheromoneDir = (cleanWorkspace as NSString).appendingPathComponent(".pheromone")
         let dbFile = (pheromoneDir as NSString).appendingPathComponent("pheromone.db")
         self.dbPath = dbFile
 
         let fm = FileManager.default
-        if !fm.fileExists(atPath: pheromoneDir) {
-            try fm.createDirectory(atPath: pheromoneDir, withIntermediateDirectories: true)
+        var isDir: ObjCBool = false
+        if !fm.fileExists(atPath: pheromoneDir, isDirectory: &isDir) || !isDir.boolValue {
+            try fm.createDirectory(atPath: pheromoneDir, withIntermediateDirectories: true, attributes: nil)
         }
 
         try openDatabase()
@@ -141,11 +143,13 @@ public final class PheromoneDatabase: @unchecked Sendable {
     }
 
     public init(directDbPath: String) throws {
-        self.dbPath = directDbPath
-        let dir = (directDbPath as NSString).deletingLastPathComponent
+        let cleanDbPath = URL(fileURLWithPath: directDbPath).standardized.path
+        self.dbPath = cleanDbPath
+        let dir = (cleanDbPath as NSString).deletingLastPathComponent
         let fm = FileManager.default
-        if !fm.fileExists(atPath: dir) {
-            try fm.createDirectory(atPath: dir, withIntermediateDirectories: true)
+        var isDir: ObjCBool = false
+        if !fm.fileExists(atPath: dir, isDirectory: &isDir) || !isDir.boolValue {
+            try fm.createDirectory(atPath: dir, withIntermediateDirectories: true, attributes: nil)
         }
 
         try openDatabase()
@@ -168,6 +172,14 @@ public final class PheromoneDatabase: @unchecked Sendable {
     private func openDatabase() throws {
         lock.lock()
         defer { lock.unlock() }
+
+        // Ensure parent directory exists before opening SQLite database
+        let parentDir = (dbPath as NSString).deletingLastPathComponent
+        let fm = FileManager.default
+        var isDir: ObjCBool = false
+        if !fm.fileExists(atPath: parentDir, isDirectory: &isDir) || !isDir.boolValue {
+            try fm.createDirectory(atPath: parentDir, withIntermediateDirectories: true, attributes: nil)
+        }
 
         var handle: OpaquePointer?
         let flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX

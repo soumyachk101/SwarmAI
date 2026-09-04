@@ -1,9 +1,12 @@
 import SwiftUI
 
 @Observable
-final class DispatchStore {
- var dispatchedTasks: [DispatchedTask] = []
- var pendingApprovals: [ApprovalRequest] = []
+public final class DispatchStore: @unchecked Sendable {
+  public static let shared = DispatchStore()
+  public var dispatchedTasks: [DispatchedTask] = []
+  public var pendingApprovals: [ApprovalRequest] = []
+
+  public init() {}
 
  struct DispatchedTask: Identifiable, Codable {
  let id: UUID

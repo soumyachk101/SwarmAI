@@ -4,34 +4,24 @@ import SwiftUI
 
 struct BoardStrip: View {
 	@Environment(\.agentsStore) private var agentsStore
-	@State private var hasAppeared = false
 
 	var body: some View {
 		ScrollView(.horizontal, showsIndicators: false) {
 			HStack(spacing: 4) {
-				ForEach(Array(agentsStore.agents.enumerated()), id: \.element.id) { index, agent in
-					BoardStripTab(agent: agent, isActive: agentsStore.activePaneId == agent.id.uuidString)
-						.swarmStaggerItem(index: index, delay: 0.72, factor: 0.025, animation: .swarmTabSwitch)
+				ForEach(agentsStore.agents) { agent in
+					BoardStripTab(
+						agent: agent,
+						isActive: agentsStore.activePaneId == agent.id.uuidString
+					)
+					.switchTabAnimation(isActive: agentsStore.activePaneId == agent.id.uuidString)
 				}
 
 				AddPaneButton()
-					.swarmStaggerItem(index: max(0, agentsStore.agents.count), delay: 0.72, factor: 0.025, animation: .swarmTabSwitch)
 			}
 			.padding(.horizontal, 12)
 		}
 		.padding(.vertical, 4)
-		.background(Color.swarmSurface)
-		.overlay(alignment: .bottom) {
-			Divider()
-				.background(Color.swarmBorderSubtle)
-		}
-		.opacity(hasAppeared ? 1 : 0)
-		.offset(y: hasAppeared ? 0 : -20)
-		.animation(.swarmSlideUp.delay(0.72), value: hasAppeared)
-		.onAppear {
-			guard !hasAppeared else { return }
-			hasAppeared = true
-		}
+		.glassToolbar()
 	}
 }
 
@@ -42,12 +32,11 @@ struct BoardStripTab: View {
 	var isActive: Bool = false
 	@Environment(\.agentsStore) private var agentsStore
 	@State private var isHovered: Bool = false
+	@State private var showClose: Bool = false
 
 	var body: some View {
 		Button {
-			withAnimation(.swarmTabSwitch) {
-				agentsStore.activePaneId = agent.id.uuidString
-			}
+			agentsStore.activePaneId = agent.id.uuidString
 		} label: {
 			HStack(spacing: 6) {
 				Text(agent.agentType.icon)
@@ -57,48 +46,92 @@ struct BoardStripTab: View {
 					.font(.swarm(.xs, weight: isActive ? .medium : .regular))
 					.foregroundStyle(isActive ? Color.swarmGold : Color.swarmTextSecondary)
 					.lineLimit(1)
+					.truncationMode(.tail)
+					.frame(maxWidth: 100, alignment: .leading)
 
-				CloseButton {
-					agentsStore.closePane(agent.id)
+				// Close Pane Button
+				Button {
+					withAnimation(.swarmButtonPress) {
+						agentsStore.closePane(agent.id)
+					}
+				} label: {
+					Image(systemName: "xmark")
+						.font(.swarm(.micro))
+						.foregroundStyle(Color.swarmTextSecondary)
+						.frame(width: 14, height: 14)
+						.contentShape(Rectangle())
 				}
-				.opacity(isHovered ? 1 : 0)
-				.animation(.swarmQuick, value: isHovered)
+				.buttonStyle(.plain)
+				.opacity(showClose ? 1 : 0)
+				.allowsHitTesting(showClose)
+				.animation(.swarmQuick, value: showClose)
 			}
 			.padding(.horizontal, 10)
-			.padding(.vertical, 4)
+			.padding(.vertical, 5)
 			.background {
 				RoundedRectangle(cornerRadius: 6)
-					.fill(isActive ? Color.swarmGold.opacity(0.15) : (isHovered ? Color.swarmSurfaceHover.opacity(0.6) : Color.swarmSurface))
+					.fill(backgroundFill)
 					.overlay {
 						RoundedRectangle(cornerRadius: 6)
-							.stroke(isActive ? Color.swarmGold : Color.swarmBorderSubtle, lineWidth: 1)
+							.stroke(borderColor, lineWidth: 1)
 					}
 			}
 		}
 		.buttonStyle(.plain)
 		.onHover { hovering in
-			isHovered = hovering
+			withAnimation(.swarmQuick) {
+				isHovered = hovering
+				showClose = hovering
+			}
 		}
+	}
+
+	private var backgroundFill: AnyShapeStyle {
+		if isActive {
+			return AnyShapeStyle(Color.swarmGold.opacity(0.15))
+		}
+		if isHovered {
+			return AnyShapeStyle(Color.swarmSurfaceHover.opacity(0.6))
+		}
+		return AnyShapeStyle(Color.clear)
+	}
+
+	private var borderColor: Color {
+		if isActive {
+			return Color.swarmGold
+		}
+		if isHovered {
+			return Color.swarmBorderSubtle
+		}
+		return Color.clear
 	}
 }
 
-// MARK: - Close Button (mini)
+// MARK: - Smooth Tab Switch Animation
 
-struct CloseButton: View {
-	let action: () -> Void
-	@State private var isHovered: Bool = false
+struct SwitchTabAnimation: ViewModifier {
+	let isActive: Bool
+	@State private var animatedValue: CGFloat = 0
 
-	var body: some View {
-		Button(action: action) {
-			Image(systemName: "xmark")
-				.font(.swarm(.micro))
-				.foregroundStyle(isHovered ? Color.swarmTextPrimary : Color.swarmTextTertiary)
-				.scaleEffect(isHovered ? 1.1 : 1.0)
-		}
-		.buttonStyle(.plain)
-		.onHover { hovering in
-			isHovered = hovering
-		}
+	func body(content: Content) -> some View {
+		content
+			.overlay {
+				RoundedRectangle(cornerRadius: 6)
+					.fill(Color.swarmGold.opacity(0.08 * animatedValue))
+					.stroke(Color.swarmGold.opacity(0.5 * animatedValue), lineWidth: 1)
+					.allowsHitTesting(false)
+			}
+			.onChange(of: isActive) { _, newActive in
+				withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+					animatedValue = newActive ? 1 : 0
+				}
+			}
+	}
+}
+
+extension View {
+	func switchTabAnimation(isActive: Bool) -> some View {
+		self.modifier(SwitchTabAnimation(isActive: isActive))
 	}
 }
 
@@ -110,29 +143,28 @@ struct AddPaneButton: View {
 
 	var body: some View {
 		Button {
-			withAnimation(.spring(duration: 0.3)) {
-				_ = agentsStore.spawnAgent(.claudeCode)
-			}
+			agentsStore.spawnAgent(.claudeCode)
 		} label: {
-			HStack(spacing: 4) {
-				Image(systemName: "plus")
-					.font(.swarm(.micro))
-
-				Text("Add Pane")
-					.font(.swarm(.micro))
-			}
-			.foregroundStyle(Color.swarmTextTertiary)
-			.padding(.horizontal, 10)
-			.padding(.vertical, 4)
-			.background {
-				RoundedRectangle(cornerRadius: 6)
-					.stroke(isHovered ? Color.swarmBorder : Color.swarmBorderSubtle, lineWidth: 1)
-			}
-			.scaleEffect(isHovered ? 1.02 : 1.0)
+			Image(systemName: "plus")
+				.font(.swarm(.xs))
+				.foregroundStyle(isHovered ? Color.swarmGold : Color.swarmTextTertiary)
+				.frame(width: 28, height: 28)
+				.background {
+					RoundedRectangle(cornerRadius: 6)
+						.fill(isHovered ? Color.swarmGold.opacity(0.08) : Color.swarmSurfaceHover.opacity(0.3))
+						.overlay(
+							RoundedRectangle(cornerRadius: 6)
+								.stroke(isHovered ? Color.swarmGold.opacity(0.4) : Color.swarmBorderSubtle, style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
+						)
+				}
 		}
 		.buttonStyle(.plain)
 		.onHover { hovering in
-			isHovered = hovering
+			withAnimation(.swarmQuick) {
+				isHovered = hovering
+			}
 		}
+		.scaleEffect(isHovered ? 1.05 : 1.0)
+		.animation(.swarmQuick, value: isHovered)
 	}
 }

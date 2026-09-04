@@ -1,12 +1,13 @@
 import SwiftUI
 
 @Observable
-final class PlaneStore {
- var activePlane: Plane = .board
- var boardView: BoardView = .grid
- var isFullscreen: Bool = false
+public final class PlaneStore: @unchecked Sendable {
+  public static let shared = PlaneStore()
+  public var activePlane: Plane = .board
+  public var boardView: BoardView = .grid
+  public var isFullscreen: Bool = false
 
- init() {
+  public init() {
  if let saved = UserDefaults.standard.string(forKey: "activePlane"),
  let plane = Plane(rawValue: saved) {
  activePlane = plane

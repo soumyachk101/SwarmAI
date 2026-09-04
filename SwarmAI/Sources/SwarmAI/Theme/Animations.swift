@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - Premium Easing Curves
 
-extension Animation {
+public extension Animation {
  // Main window elements
  static let swarmEntrySpring = Animation.spring(response: 0.5, dampingFraction: 0.85)
 
@@ -77,11 +77,28 @@ extension Animation {
 
  // Splash exit transition
  static let swarmSplashExit = Animation.easeIn(duration: 0.5)
+
+ // MARK: - Theme Transition Animations
+
+ /// Smooth cross-fade used when switching between themes.
+ static let swarmThemeFade = Animation.easeInOut(duration: 0.45)
+
+ /// Slightly faster theme transition for modal/popover backgrounds.
+ static let swarmThemeQuickFade = Animation.easeInOut(duration: 0.25)
+
+ /// Slower, premium-feel transition for full-window theme changes.
+ static let swarmThemePremium = Animation.easeInOut(duration: 0.7)
+
+ /// Spring-based theme transition with subtle bounce.
+ static let swarmThemeSpring = Animation.spring(response: 0.5, dampingFraction: 0.82)
+
+ /// Slow ease-out for glass elevation color transitions.
+ static let swarmThemeGlass = Animation.easeOut(duration: 0.55)
 }
 
 // MARK: - Stagger Helper
 
-extension View {
+public extension View {
  /// Staggers child animations by applying a per-index delay.
  ///
  /// - Parameters:
@@ -116,93 +133,93 @@ struct StaggeredAnimationModifier: ViewModifier {
  }
 }
 
-extension View {
- /// Applies a staggered animation to this view based on its index.
- ///
- /// Use inside a `ForEach` to create cascading entrance effects:
- /// ```
- /// ForEach(items.indices, id: \.self) { index in
- /// items[index]
- /// .swarmStaggerItem(index: index, delay: 0.1, factor: 0.04)
- /// }
- /// ```
- func swarmStaggerItem(
- index: Int,
- delay: Double = 0,
- factor: Double = 0.03,
- animation: Animation = .swarmEntrySpring
- ) -> some View {
- self.modifier(
- StaggeredAnimationModifier(
- index: index,
- delay: delay,
- factor: factor,
- animation: animation
- )
- )
- }
+public extension View {
+	/// Applies a staggered animation to this view based on its index.
+	///
+	/// Use inside a `ForEach` to create cascading entrance effects:
+	/// ```
+	/// ForEach(items.indices, id: \.self) { index in
+	///     items[index]
+	///         .swarmStaggerItem(index: index, delay: 0.1, factor: 0.04)
+	/// }
+	/// ```
+	func swarmStaggerItem(
+		index: Int,
+		delay: Double = 0,
+		factor: Double = 0.03,
+		animation: Animation = .swarmEntrySpring
+	) -> some View {
+		self.modifier(
+			StaggeredAnimationModifier(
+				index: index,
+				delay: delay,
+				factor: factor,
+				animation: animation
+			)
+		)
+	}
 }
 
 // MARK: - Entrance Helpers
 
-extension View {
- /// Fades the view in from transparent to fully opaque.
- ///
- /// - Parameter delay: Delay in seconds before the animation begins.
- func swarmFadeIn(delay: Double = 0) -> some View {
- self.opacity(0)
- .animation(.swarmEntrySpring.delay(delay), value: UUID())
- }
+public extension View {
+	/// Fades the view in from transparent to fully opaque.
+	///
+	/// - Parameter delay: Delay in seconds before the animation begins.
+	func swarmFadeIn(delay: Double = 0) -> some View {
+		self.opacity(0)
+			.animation(.swarmEntrySpring.delay(delay), value: UUID())
+	}
 
- /// Slides the view in from the specified edge.
- ///
- /// - Parameters:
- /// - edge: The edge the view slides from (e.g. `.leading`, `.trailing`).
- /// - delay: Delay in seconds before the animation begins.
- func swarmSlideIn(from edge: Edge, delay: Double = 0) -> some View {
- let offset: CGSize
- switch edge {
- case .top: offset = CGSize(width: 0, height: -30)
- case .bottom: offset = CGSize(width: 0, height: 30)
- case .leading: offset = CGSize(width: -30, height: 0)
- case .trailing: offset = CGSize(width: 30, height: 0)
- }
+	/// Slides the view in from the specified edge.
+	///
+	/// - Parameters:
+	///   - edge: The edge the view slides from (e.g. `.leading`, `.trailing`).
+	///   - delay: Delay in seconds before the animation begins.
+	func swarmSlideIn(from edge: Edge, delay: Double = 0) -> some View {
+		let offset: CGSize
+		switch edge {
+		case .top: offset = CGSize(width: 0, height: -30)
+		case .bottom: offset = CGSize(width: 0, height: 30)
+		case .leading: offset = CGSize(width: -30, height: 0)
+		case .trailing: offset = CGSize(width: 30, height: 0)
+		}
 
- return self
- .offset(offset)
- .opacity(0)
- .animation(.swarmSidebarEntry.delay(delay), value: UUID())
- }
+		return self
+			.offset(offset)
+			.opacity(0)
+			.animation(.swarmSidebarEntry.delay(delay), value: UUID())
+	}
 
- /// Scales the view in from 0.9× to full size.
- ///
- /// - Parameter delay: Delay in seconds before the animation begins.
- func swarmScaleIn(delay: Double = 0) -> some View {
- self.scaleEffect(0.9)
- .opacity(0)
- .animation(.swarmPaneMaterialize.delay(delay), value: UUID())
- }
+	/// Scales the view in from 0.9× to full size.
+	///
+	/// - Parameter delay: Delay in seconds before the animation begins.
+	func swarmScaleIn(delay: Double = 0) -> some View {
+		self.scaleEffect(0.9)
+			.opacity(0)
+			.animation(.swarmPaneMaterialize.delay(delay), value: UUID())
+	}
 
- /// Materializes the view using a combined blur + opacity + scale animation.
- ///
- /// - Parameter delay: Delay in seconds before the animation begins.
- func swarmMaterialize(delay: Double = 0) -> some View {
- self
- .scaleEffect(0.92)
- .opacity(0)
- .blur(radius: 8)
- .animation(.swarmPaneMaterialize.delay(delay), value: UUID())
- }
+	/// Materializes the view using a combined blur + opacity + scale animation.
+	///
+	/// - Parameter delay: Delay in seconds before the animation begins.
+	func swarmMaterialize(delay: Double = 0) -> some View {
+		self
+			.scaleEffect(0.92)
+			.opacity(0)
+			.blur(radius: 8)
+			.animation(.swarmPaneMaterialize.delay(delay), value: UUID())
+	}
 }
 
 // MARK: - Orchestration Helpers
 
 /// A single step in a `swarmSequence` animation chain.
-public enum SwarmSequenceStep {
- case fade(delay: Double = 0)
- case slide(Edge, delay: Double = 0)
- case scale(delay: Double = 0)
- case materialize(delay: Double = 0)
+public enum SwarmSequenceStep: Sendable {
+	case fade(delay: Double = 0)
+	case slide(Edge, delay: Double = 0)
+	case scale(delay: Double = 0)
+	case materialize(delay: Double = 0)
 }
 
 /// Chains multiple entrance animations together, applying them to a view in
@@ -211,85 +228,106 @@ public enum SwarmSequenceStep {
 /// Example:
 /// ```
 /// Text("Hello")
-/// .swarmSequence([
-/// .fade(delay: 0.2),
-/// .slide(.leading, delay: 0.4),
-/// .scale(delay: 0.6)
-/// ])
+///     .swarmSequence([
+///         .fade(delay: 0.2),
+///         .slide(.leading, delay: 0.4),
+///         .scale(delay: 0.6)
+///     ])
 /// ```
 public extension View {
-  func swarmSequence(_ steps: [SwarmSequenceStep]) -> some View {
-    // Compute cumulative delays so each step starts after the previous one.
-    var cumulativeDelay: Double = 0
-    let animations: [Animation] = steps.map { step in
-      let stepDelay: Double
-      let anim: Animation
-      switch step {
-      case .fade(let delay):
-        stepDelay = delay
-        anim = .swarmEntrySpring.delay(cumulativeDelay + delay)
-      case .slide(let edge, let delay):
-        stepDelay = delay
-        anim = .swarmSidebarEntry.delay(cumulativeDelay + delay)
-      case .scale(let delay):
-        stepDelay = delay
-        anim = .swarmPaneMaterialize.delay(cumulativeDelay + delay)
-      case .materialize(let delay):
-        stepDelay = delay
-        anim = .swarmPaneMaterialize.delay(cumulativeDelay + delay)
-      }
-      cumulativeDelay += stepDelay
-      return anim
-    }
+	func swarmSequence(_ steps: [SwarmSequenceStep]) -> some View {
+		// Compute cumulative delays so each step starts after the previous one.
+		var cumulativeDelay: Double = 0
+		let animations: [Animation] = steps.map { step in
+			let stepDelay: Double
+			let anim: Animation
+			switch step {
+			case .fade(let delay):
+				stepDelay = delay
+				anim = .swarmEntrySpring.delay(cumulativeDelay + delay)
+			case .slide(let edge, let delay):
+				stepDelay = delay
+				anim = .swarmSidebarEntry.delay(cumulativeDelay + delay)
+			case .scale(let delay):
+				stepDelay = delay
+				anim = .swarmPaneMaterialize.delay(cumulativeDelay + delay)
+			case .materialize(let delay):
+				stepDelay = delay
+				anim = .swarmPaneMaterialize.delay(cumulativeDelay + delay)
+			}
+			cumulativeDelay += stepDelay
+			return anim
+		}
 
- // Apply the first animation; subsequent ones can be layered by the caller
- // on individual subviews. Here we apply the primary entrance animation.
- let primary = animations.first ?? .swarmEntrySpring
- return self
- .opacity(0)
- .scaleEffect(0.92)
- .blur(radius: 4)
- .animation(primary, value: UUID())
- }
+		// Apply the first animation; subsequent ones can be layered by the caller
+		// on individual subviews. Here we apply the primary entrance animation.
+		let primary = animations.first ?? .swarmEntrySpring
+		return self
+			.opacity(0)
+			.scaleEffect(0.92)
+			.blur(radius: 4)
+			.animation(primary, value: UUID())
+	}
 }
 
 // MARK: - Shimmer Effect
 
 /// A shimmer modifier that sweeps a gold-tinted gradient across the view's
 /// content, theme-aware via the accent color system.
-struct ShimmerModifier: ViewModifier {
- @State private var phase: CGFloat = -1
+public struct ShimmerModifier: ViewModifier {
+	@State private var phase: CGFloat = -1
 
- func body(content: Content) -> some View {
- content
- .overlay(
- LinearGradient(
- gradient: Gradient(colors: [
- .clear,
- Color.accentColor.opacity(0.25),
- .clear
- ]),
- startPoint: .topLeading,
- endPoint: .bottomTrailing
- )
- .rotationEffect(.degrees(30))
- .offset(x: phase * 300)
- .blendMode(.overlay)
- )
- .onAppear {
- withAnimation(.swarmShimmer.repeatForever(autoreverses: false)) {
- phase = 1.5
- }
- }
- }
+	public init() {}
+
+	public func body(content: Content) -> some View {
+		content
+			.overlay(
+				LinearGradient(
+					gradient: Gradient(colors: [
+						.clear,
+						Color.accentColor.opacity(0.25),
+						.clear
+					]),
+					startPoint: .topLeading,
+					endPoint: .bottomTrailing
+				)
+				.rotationEffect(.degrees(30))
+				.offset(x: phase * 300)
+				.blendMode(.overlay)
+			)
+			.onAppear {
+				withAnimation(.swarmShimmer.repeatForever(autoreverses: false)) {
+					phase = 1.5
+				}
+			}
+	}
 }
 
-extension View {
- /// Applies a shimmer loading effect to the view.
- ///
- /// The gradient sweeps across the view using the theme's accent color
- /// (gold in the SwarmAI theme).
- func shimmer() -> some View {
- self.modifier(ShimmerModifier())
- }
+public extension View {
+	/// Applies a shimmer loading effect to the view.
+	///
+	/// The gradient sweeps across the view using the theme's accent color
+	/// (gold in the SwarmAI theme).
+	func shimmer() -> some View {
+		self.modifier(ShimmerModifier())
+	}
+}
+
+// MARK: - Theme Transition Helpers
+
+/// Applies a theme-aware color transition animation to the view.
+/// Use when animating between theme color changes.
+public extension View {
+	func swarmThemeTransition(duration: Double = 0.45) -> some View {
+		self.animation(.easeInOut(duration: duration), value: ThemeStore.shared.currentThemeId)
+	}
+}
+
+/// Wraps a theme change with the standard cross-fade animation.
+/// Call inside a `withAnimation` block or use the theme store's
+/// `transitionToTheme(_:animated:)` method instead.
+public extension Animation {
+	static func swarmThemeChange(duration: Double = 0.45) -> Animation {
+		.easeInOut(duration: duration)
+	}
 }

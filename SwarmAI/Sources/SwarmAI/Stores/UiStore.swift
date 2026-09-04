@@ -1,15 +1,16 @@
 import SwiftUI
 
 @Observable
-final class UiStore {
- var isLeftSidebarOpen: Bool = true
- var isRightDockOpen: Bool = true
- var isCommandPaletteOpen: Bool = false
- var isSettingsOpen: Bool = false
- var activeLeftTab: SidebarTab = .projects
- var activeRightTab: DockTab = .lead
+public final class UiStore: @unchecked Sendable {
+  public static let shared = UiStore()
+  public var isLeftSidebarOpen: Bool = true
+  public var isRightDockOpen: Bool = true
+  public var isCommandPaletteOpen: Bool = false
+  public var isSettingsOpen: Bool = false
+  public var activeLeftTab: SidebarTab = .projects
+  public var activeRightTab: DockTab = .lead
 
- init() {
+  public init() {
  if let saved = UserDefaults.standard.object(forKey: "leftSidebarOpen") as? Bool {
  isLeftSidebarOpen = saved
  }

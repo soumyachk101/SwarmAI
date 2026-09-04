@@ -16,11 +16,11 @@ public struct WKWebViewRepresentable: NSViewRepresentable {
   public func makeNSView(context: Context) -> WKWebView {
     let configuration = WKWebViewConfiguration()
     configuration.allowsAirPlayForMediaPlayback = true
+    configuration.defaultWebpagePreferences.allowsContentJavaScript = true
+    configuration.websiteDataStore = WKWebsiteDataStore.default()
 
-    // Enable developer extras / inspector
     let preferences = WKPreferences()
     preferences.javaScriptCanOpenWindowsAutomatically = true
-    preferences.setValue(true, forKey: "developerExtrasEnabled")
     configuration.preferences = preferences
 
     let webView = WKWebView(frame: .zero, configuration: configuration)
@@ -42,8 +42,13 @@ public struct WKWebViewRepresentable: NSViewRepresentable {
     // Setup KVO observers
     context.coordinator.setupObservers(for: webView)
 
-    // Connect store to active webView
-    browserStore.activeWebView = webView
+    // Connect store to active webView on next runloop tick to avoid SwiftUI view-tree mutation warnings
+    let store = browserStore
+    DispatchQueue.main.async { [weak webView, weak store] in
+      if let view = webView, let bStore = store {
+        bStore.activeWebView = view
+      }
+    }
 
     // Initial navigation if URL exists
     if !browserStore.currentUrl.isEmpty,
@@ -66,9 +71,14 @@ public struct WKWebViewRepresentable: NSViewRepresentable {
       webView.customUserAgent = browserStore.customUserAgent
     }
 
-    // Keep active webView ref updated
+    // Keep active webView ref updated asynchronously if it changed
     if browserStore.activeWebView !== webView {
-      browserStore.activeWebView = webView
+      let store = browserStore
+      DispatchQueue.main.async { [weak webView, weak store] in
+        if let view = webView, let bStore = store {
+          bStore.activeWebView = view
+        }
+      }
     }
   }
 
@@ -201,6 +211,23 @@ public struct WKWebViewRepresentable: NSViewRepresentable {
       decisionHandler(.allow)
     }
 
+    @MainActor
+    public func webView(
+      _ webView: WKWebView,
+      didReceive challenge: URLAuthenticationChallenge,
+      completionHandler: @escaping @MainActor @Sendable (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+    ) {
+      // Support self-signed certificates for local development servers (localhost / 127.0.0.1 / .local)
+      if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
+         let serverTrust = challenge.protectionSpace.serverTrust,
+         let host = challenge.protectionSpace.host as String?,
+         (host == "localhost" || host == "127.0.0.1" || host.hasSuffix(".local")) {
+        completionHandler(.useCredential, URLCredential(trust: serverTrust))
+        return
+      }
+      completionHandler(.performDefaultHandling, nil)
+    }
+
     // MARK: - WKUIDelegate
 
     @MainActor
@@ -224,7 +251,7 @@ public struct WKWebViewRepresentable: NSViewRepresentable {
       completionHandler: @escaping @MainActor @Sendable () -> Void
     ) {
       let alert = NSAlert()
-      alert.messageText = "JavaScript Alert"
+      alert.messageText = "SwarmAI Browser"
       alert.informativeText = message
       alert.addButton(withTitle: "OK")
       alert.runModal()
@@ -239,7 +266,7 @@ public struct WKWebViewRepresentable: NSViewRepresentable {
       completionHandler: @escaping @MainActor @Sendable (Bool) -> Void
     ) {
       let alert = NSAlert()
-      alert.messageText = "JavaScript Confirmation"
+      alert.messageText = "SwarmAI Browser"
       alert.informativeText = message
       alert.addButton(withTitle: "OK")
       alert.addButton(withTitle: "Cancel")

@@ -37,6 +37,7 @@ public struct BrowserScreenshot: Identifiable, Sendable {
 @Observable
 @MainActor
 public final class BrowserStore {
+  public static let shared = BrowserStore()
   public var currentUrl: String = ""
   public var currentTitle: String = "Browser"
   public var canGoBack: Bool = false

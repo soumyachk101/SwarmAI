@@ -1,17 +1,18 @@
 import SwiftUI
 
 @Observable
-final class SettingsStore {
- var apiKeys: [Provider] = []
- var defaultAgent: AgentType = .claudeCode
- var terminalShell: String = "zsh"
- var themeMode: ThemeMode = .dark
- var enableNotifications: Bool = true
- var autoSaveInterval: Int = 30
+public final class SettingsStore: @unchecked Sendable {
+  public static let shared = SettingsStore()
+  public var apiKeys: [Provider] = []
+  public var defaultAgent: AgentType = .claudeCode
+  public var terminalShell: String = "zsh"
+  public var themeMode: ThemeMode = .dark
+  public var enableNotifications: Bool = true
+  public var autoSaveInterval: Int = 30
 
- init() {
- loadFromStorage()
- }
+  public init() {
+    loadFromStorage()
+  }
 
  func setApiKey(_ provider: String, key: String) {
  if let index = apiKeys.firstIndex(where: { $0.name == provider }) {
