@@ -1,5 +1,6 @@
 import SwiftUI
 
+ @MainActor
 @Observable
 public final class WorkspaceStore: @unchecked Sendable {
   public static let shared = WorkspaceStore()
@@ -12,27 +13,27 @@ public final class WorkspaceStore: @unchecked Sendable {
       let defaultWorkspace = Workspace(
         name: "Swarm Workspace",
         path: NSHomeDirectory(),
-        color: .swarmGold
+        color: Color.swarmGold
       )
       workspaces.append(defaultWorkspace)
       activeWorkspaceId = defaultWorkspace.id
     }
   }
 
- func createWorkspace(name: String, path: String) -> Workspace {
- let workspace = Workspace(name: name, path: path, color: .swarmGold)
+ public func createWorkspace(name: String, path: String) -> Workspace {
+ let workspace = Workspace(name: name, path: path, color: Color.swarmGold)
  workspaces.append(workspace)
  activeWorkspaceId = workspace.id
  saveToStorage()
  return workspace
  }
 
- func switchWorkspace(_ id: UUID) {
+ public func switchWorkspace(_ id: UUID) {
  activeWorkspaceId = id
  saveToStorage()
  }
 
- func removeWorkspace(_ id: UUID) {
+ public func removeWorkspace(_ id: UUID) {
  workspaces.removeAll { $0.id == id }
  if activeWorkspaceId == id {
  activeWorkspaceId = workspaces.first?.id
@@ -44,7 +45,7 @@ public final class WorkspaceStore: @unchecked Sendable {
  workspaces.first { $0.id == activeWorkspaceId }
  }
 
- func addWorktree(_ workspaceId: UUID, name: String, branch: String) -> Worktree {
+ public func addWorktree(_ workspaceId: UUID, name: String, branch: String) -> Worktree {
  guard let workspace = workspaces.first(where: { $0.id == workspaceId }) else {
  fatalError("Workspace not found")
  }
@@ -54,7 +55,7 @@ public final class WorkspaceStore: @unchecked Sendable {
  return worktree
  }
 
- func removeWorktree(_ workspaceId: UUID, worktreeId: UUID) {
+ public func removeWorktree(_ workspaceId: UUID, worktreeId: UUID) {
  guard let workspace = workspaces.first(where: { $0.id == workspaceId }) else { return }
  workspace.worktrees.removeAll { $0.id == worktreeId }
  saveToStorage()

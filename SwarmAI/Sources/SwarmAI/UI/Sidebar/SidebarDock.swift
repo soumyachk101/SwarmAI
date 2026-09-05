@@ -1,232 +1,217 @@
 import SwiftUI
 import AppKit
 
-// MARK: - Left Sidebar View
+// MARK: - Left Sidebar View (Matching Tauri ADEWorktreeSidebar / WorkspacesSidebar)
 
-struct LeftSidebar: View {
- @Environment(\.appState) private var appState
- @Environment(\.agentsStore) private var agentsStore
- @State private var hoveredTab: SidebarTab? = nil
+public struct LeftSidebar: View {
+	@Environment(\.appState) private var appState
+	@Environment(\.agentsStore) private var agentsStore
+	@State private var hoveredTab: SidebarTab? = nil
+	@State private var isSettingsOpen: Bool = false
 
- var body: some View {
- HStack(spacing: 0) {
- // Tab bar rail — frosted glass background
- tabBar
+	public var body: some View {
+		VStack(spacing: 0) {
+			// ── 1. Full-Width App Top Header (40px height, aligned with BoardStrip) ──
+			appHeaderRow
 
- // Subtle vertical separator between rail and content
- Rectangle()
- .fill(.swarmBorderSubtle.opacity(0.3))
- .frame(width: 1)
+			// ── 2. Sidebar Body: 44px Activity Rail + Main Content Column ──────────
+			HStack(spacing: 0) {
+				activityBarRail
+					.frame(width: 44)
 
- // Content area
- contentArea
- }
- .frame(width: appState.isLeftSidebarOpen ? 300 : 0)
- .clipped()
- .offset(x: appState.isLeftSidebarOpen ? 0 : -300)
- .opacity(appState.isLeftSidebarOpen ? 1 : 0)
- .animation(.swarmSidebarEntry, value: appState.isLeftSidebarOpen)
- .overlay(alignment: .trailing) {
- Divider()
- .background(.swarmBorderSubtle)
- }
- }
+				Rectangle()
+					.fill(Color.white.opacity(0.06))
+					.frame(width: 1)
 
- // MARK: - Tab Bar
+				contentArea
+					.frame(maxWidth: .infinity, maxHeight: .infinity)
+					.background(Color(red: 9/255, green: 11/255, blue: 16/255))
+			}
+		}
+		.frame(width: appState.isLeftSidebarOpen ? 295 : 0)
+		.clipped()
+		.background(Color(red: 7/255, green: 8/255, blue: 12/255))
+		.overlay(alignment: .trailing) {
+			Rectangle()
+				.fill(Color.white.opacity(0.08))
+				.frame(width: 1)
+		}
+		.animation(.swarmSidebarEntry, value: appState.isLeftSidebarOpen)
+	}
 
- private var tabBar: some View {
- VStack(spacing: 1) {
- Spacer(minLength: 8)
+	// MARK: - App Header Row
+	/// Height 40px to align with BoardStrip; leading padding for native macOS traffic lights
+	private var appHeaderRow: some View {
+		HStack(spacing: 8) {
+			// Window drag spacer for traffic lights
+			Color.clear
+				.frame(width: 72, height: 40)
 
- ForEach(SidebarTab.allCases) { tab in
- let isSelected = appState.activeLeftTab == tab
- let isHovered = hoveredTab == tab
+			Text(appState.activeLeftTab.title.uppercased())
+				.font(.system(size: 11, weight: .bold))
+				.tracking(0.8)
+				.foregroundStyle(Color.zinc300)
 
- Button {
- withAnimation(.spring(response: 0.4, dampingFraction: 0.82)) {
- appState.setLeftTab(tab)
- }
- } label: {
- HStack(spacing: 8) {
- Image(systemName: tab.icon)
- .font(.system(size: 16, weight: isSelected ? .semibold : .regular))
- .frame(width: 20, alignment: .center)
- .foregroundStyle(tabColor(isSelected: isSelected, isHovered: isHovered))
+			Spacer()
 
- Text(tab.title)
- .font(.swarm(.mini, weight: isSelected ? .semibold : .regular))
- .foregroundStyle(tabColor(isSelected: isSelected, isHovered: isHovered))
- .opacity(labelOpacity(isSelected: isSelected, isHovered: isHovered))
- }
- .padding(.horizontal, 10)
- .padding(.vertical, 8)
- .frame(height: 44)
- .frame(maxWidth: .infinity, alignment: .leading)
- .contentShape(Rectangle())
- .background {
- if isHovered && !isSelected {
- RoundedRectangle(cornerRadius: 8)
- .fill(.swarmSurfaceHover.opacity(0.5))
- }
- }
- .overlay(alignment: .leading) {
- if isSelected {
- RoundedRectangle(cornerRadius: 1.5)
- .fill(.swarmGold)
- .frame(width: 3)
- .padding(.vertical, 6)
- }
- }
- }
- .buttonStyle(.plain)
- .onHover { hovering in
- withAnimation(.swarmQuick) {
- hoveredTab = hovering ? tab : nil
- }
- }
- }
+			// Toggle Tasks Panel
+			Button {
+				withAnimation(.swarmQuick) {
+					appState.boardOpen.toggle()
+				}
+			} label: {
+				Image(systemName: "square.grid.2x2")
+					.font(.system(size: 11.5))
+					.foregroundStyle(appState.boardOpen ? Color.swarmGold : Color.zinc400)
+					.frame(width: 26, height: 26)
+					.background {
+						RoundedRectangle(cornerRadius: 6)
+							.fill(appState.boardOpen ? Color.swarmGold.opacity(0.18) : Color.white.opacity(0.04))
+							.overlay {
+								if appState.boardOpen {
+									RoundedRectangle(cornerRadius: 6)
+										.stroke(Color.swarmGold.opacity(0.4), lineWidth: 1)
+								}
+							}
+					}
+			}
+			.buttonStyle(.plain)
+			.help("Toggle Tasks Panel")
 
- Spacer(minLength: 8)
- }
- .frame(width: 56)
- .background(.ultraThinMaterial)
- }
+			// Collapse Sidebar Button
+			Button {
+				withAnimation(.swarmQuick) {
+					appState.isLeftSidebarOpen.toggle()
+				}
+			} label: {
+				Image(systemName: "sidebar.leading")
+					.font(.system(size: 11.5))
+					.foregroundStyle(Color.zinc400)
+					.frame(width: 26, height: 26)
+					.background {
+						RoundedRectangle(cornerRadius: 6)
+							.fill(Color.white.opacity(0.04))
+					}
+			}
+			.buttonStyle(.plain)
+			.help("Collapse sidebar")
+		}
+		.padding(.trailing, 8)
+		.frame(height: 40)
+		.background {
+			Color(red: 12/255, green: 14/255, blue: 22/255).opacity(0.95)
+				.overlay(
+					Rectangle()
+						.fill(Color.white.opacity(0.08))
+						.frame(height: 1),
+					alignment: .bottom
+				)
+		}
+	}
 
- // MARK: - Content Area
+	// MARK: - 44px Activity Bar Rail (Far Left, Full Height)
+	private var activityBarRail: some View {
+		VStack(spacing: 6) {
+			// Top Activity Tabs
+			VStack(spacing: 5) {
+				ForEach(SidebarTab.allCases) { tab in
+					let isSelected = appState.activeLeftTab == tab
+					let isHovered = hoveredTab == tab
 
- private var contentArea: some View {
- Group {
- switch appState.activeLeftTab {
- case .projects: ProjectsTab()
- case .explorer: ExplorerTab()
- case .git: GitTab()
- case .search: SearchTab()
- case .devTools: DevToolsTab()
- case .agents: AgentsTab()
- case .fleet: FleetTab()
- }
- }
- .frame(width: 244)
- .background(.swarmCanvas)
- }
+					Button {
+						withAnimation(.swarmQuick) {
+							appState.setLeftTab(tab)
+						}
+					} label: {
+						ZStack {
+							if isSelected {
+								RoundedRectangle(cornerRadius: 10)
+									.fill(Color.swarmGold.opacity(0.15))
+									.overlay(
+										RoundedRectangle(cornerRadius: 10)
+											.stroke(Color.swarmGold.opacity(0.3), lineWidth: 1)
+									)
+									.shadow(color: Color.swarmGold.opacity(0.15), radius: 6)
+							} else if isHovered {
+								RoundedRectangle(cornerRadius: 10)
+									.fill(Color.white.opacity(0.06))
+							}
 
- // MARK: - Helpers
+							Image(systemName: tab.icon)
+								.font(.system(size: 14, weight: isSelected ? .semibold : .regular))
+								.foregroundStyle(isSelected ? Color.swarmGold : (isHovered ? Color.white : Color.zinc400))
+						}
+						.frame(width: 32, height: 32)
+					}
+					.buttonStyle(.plain)
+					.help(tab.title)
+					.onHover { hovering in
+						withAnimation(.swarmQuick) {
+							hoveredTab = hovering ? tab : nil
+						}
+					}
+				}
+			}
 
- private func tabColor(isSelected: Bool, isHovered: Bool) -> Color {
- if isSelected { return .swarmGold }
- if isHovered { return .swarmTextPrimary }
- return .swarmTextTertiary
- }
+			Spacer()
 
- private func labelOpacity(isSelected: Bool, isHovered: Bool) -> CGFloat {
- if isSelected { return 1.0 }
- if isHovered { return 1.0 }
- return 0.0
- }
-}
+			// Bottom Section: Theme Picker, Settings Gear, Collapse
+			VStack(spacing: 4) {
+				// Settings & Tools Button
+				Button {
+					appState.isSettingsOpen = true
+				} label: {
+					Image(systemName: "gearshape")
+						.font(.system(size: 14))
+						.foregroundStyle(Color.zinc400)
+						.frame(width: 30, height: 30)
+						.background(Color.clear)
+						.contentShape(Rectangle())
+				}
+				.buttonStyle(.plain)
+				.help("Settings & Tools")
 
-// MARK: - Right Dock View
+				// Collapse Sidebar Button
+				Button {
+					withAnimation(.swarmQuick) {
+						appState.isLeftSidebarOpen.toggle()
+					}
+				} label: {
+					Image(systemName: "xmark")
+						.font(.system(size: 12))
+						.foregroundStyle(Color.zinc500)
+						.frame(width: 30, height: 30)
+				}
+				.buttonStyle(.plain)
+				.help("Close sidebar")
+			}
+			.padding(.top, 6)
+			.overlay(alignment: .top) {
+				Rectangle()
+					.fill(Color.white.opacity(0.06))
+					.frame(height: 1)
+			}
+			.padding(.bottom, 8)
+		}
+		.background(Color(red: 7/255, green: 8/255, blue: 12/255))
+	}
 
-struct RightDock: View {
- @Environment(\.appState) private var appState
- @Environment(\.agentsStore) private var agentsStore
- @Environment(\.taskStore) private var taskStore
- @Environment(\.canvasStore) private var canvasStore
- @State private var isHoveringTabBar = false
-
- private let tabBarWidth: CGFloat = 60
- private let contentWidth: CGFloat = 320
-
- var body: some View {
- HStack(spacing: 0) {
- // Tab Content Panel
- Group {
- switch appState.activeRightTab {
- case .lead: LeadPanel()
- case .devChat: DevChatPanel()
- case .gitPanel: GitPanelView()
- case .snippets: SnippetsPanel()
- case .reports: ReportsPanel()
- }
- }
- .frame(width: appState.isRightDockOpen ? contentWidth : 0)
- .clipped()
- .glassInset()
-
- // Tab Bar with glass rail background
- VStack(spacing: 0) {
- ForEach(DockTab.allCases) { tab in
- let isSelected = appState.activeRightTab == tab
-
- Button {
- withAnimation(.swarmTabSwitch) {
- appState.setRightTab(tab)
- }
- } label: {
- VStack(spacing: 5) {
- Image(systemName: tab.icon)
- .font(.system(size: 17, weight: isSelected ? .semibold : .regular))
- .frame(height: 18)
-
- Text(tab.title)
- .font(.swarm(.micro))
- }
- .foregroundStyle(isSelected ? .swarmGold : .swarmTextTertiary)
- .frame(maxWidth: .infinity, minHeight: 52)
- .background {
- // Gold indicator bar on the right edge for active tab
- if isSelected {
- VStack {
- Spacer()
- Rectangle()
- .fill(.swarmGold)
- .frame(width: 3)
- }
- }
-
- // Hover highlight for non-selected tabs
- if !isSelected && isHoveringTabBar {
- RoundedRectangle(cornerRadius: 10)
- .fill(.swarmSurfaceHover.opacity(0.5))
- .padding(.horizontal, 6)
- }
- }
- }
- .buttonStyle(.plain)
- .onHover { hovering in
- withAnimation(.swarmQuick) {
- isHoveringTabBar = hovering
- }
- }
- }
-
- Spacer(minLength: 0)
- }
- .frame(width: tabBarWidth)
- .glassRail()
- .overlay(alignment: .leading) {
- // Subtle vertical border on the left edge of the rail
- Rectangle()
- .fill(.swarmBorderSubtle.opacity(0.4))
- .frame(width: 0.5)
- }
- }
- .frame(width: appState.isRightDockOpen ? (contentWidth + tabBarWidth) : tabBarWidth)
- .clipped()
- .offset(x: appState.isRightDockOpen ? 0 : contentWidth)
- .opacity(appState.isRightDockOpen ? 1 : 0)
- .animation(.swarmDockEntry, value: appState.isRightDockOpen)
- .overlay(alignment: .leading) {
- Divider()
- .background(.swarmBorderSubtle)
- }
- }
-}
-
-// MARK: - Safe Array Access
-
-extension Collection {
- subscript(safe index: Index) -> Element? {
- indices.contains(index) ? self[index] : nil
- }
+	// MARK: - Content Area
+	@ViewBuilder
+	private var contentArea: some View {
+		switch appState.activeLeftTab {
+		case .projects:
+			ProjectsTab()
+		case .git:
+			GitTab()
+		case .search:
+			SearchTab()
+		case .devtools:
+			DevToolsTab()
+		case .agents:
+			AgentsTab()
+		case .fleet:
+			FleetTab()
+		}
+	}
 }

@@ -8,7 +8,7 @@ public final class UiStore: @unchecked Sendable {
   public var isCommandPaletteOpen: Bool = false
   public var isSettingsOpen: Bool = false
   public var activeLeftTab: SidebarTab = .projects
-  public var activeRightTab: DockTab = .lead
+  public var activeRightTab: DockTab = .chat
 
   public init() {
  if let saved = UserDefaults.standard.object(forKey: "leftSidebarOpen") as? Bool {

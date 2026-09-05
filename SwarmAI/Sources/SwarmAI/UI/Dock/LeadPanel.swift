@@ -756,8 +756,9 @@ struct LeadCard: View {
         .fill(agent.status.color)
         .frame(width: 8, height: 8)
 
-      Text(agent.agentType.icon)
-        .font(.swarm(.xs))
+      Image(systemName: agent.agentType.icon)
+        .font(.system(size: 12))
+        .foregroundStyle(agent.agentType.color)
 
       VStack(alignment: .leading, spacing: 1) {
         Text(agent.name)

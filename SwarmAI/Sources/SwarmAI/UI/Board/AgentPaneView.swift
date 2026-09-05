@@ -21,6 +21,11 @@ struct AgentPaneView: View {
  @State private var commandHistory: [String] = []
  @State private var historyIndex: Int = -1
 
+ private var themeScheme: ThemeScheme {
+ let kind = ThemeKind(rawValue: themeStore.themeMode.rawValue.lowercased()) ?? .dark
+ return ThemeScheme.preset(for: kind) ?? .dark
+ }
+
  var body: some View {
  VStack(spacing: 0) {
  // Pane header
@@ -78,13 +83,21 @@ struct AgentPaneView: View {
  private var headerView: some View {
  HStack(spacing: 8) {
  // Agent Icon & Name
- HStack(spacing: 6) {
- Text(agent.agentType.icon)
- .font(.system(size: 12))
+ HStack(spacing: 7) {
+ Image(systemName: agent.agentType.icon)
+ .font(.system(size: 12, weight: .semibold))
+ .foregroundStyle(agent.agentType.color)
+ .frame(width: 22, height: 22)
+ .background(agent.agentType.color.opacity(0.15))
+ .clipShape(RoundedRectangle(cornerRadius: 6))
+ .overlay(
+ RoundedRectangle(cornerRadius: 6)
+ .stroke(agent.agentType.color.opacity(0.3), lineWidth: 1)
+ )
 
  Text(agent.name)
- .font(.swarm(.sm, weight: .medium))
- .foregroundStyle(.swarmTextPrimary)
+ .font(.system(size: 12, weight: .semibold))
+ .foregroundStyle(Color.white)
  .lineLimit(1)
  }
 
@@ -209,83 +222,89 @@ struct AgentPaneView: View {
  return agent.status.displayName
  }
 
- private var terminalView: some View {
- ScrollViewReader { proxy in
- ScrollView {
- LazyVStack(alignment: .leading, spacing: 0) {
- if agent.terminalOutput.isEmpty {
- Text("Session ready. Type commands or prompts below...")
- .font(.swarmMono(.xs))
- .foregroundStyle(.swarmTextTertiary)
- .padding(.horizontal, 10)
- .padding(.vertical, 8)
- } else {
- ForEach(Array(agent.terminalOutput.enumerated()), id: \.offset) { index, line in
- Text(ANSIParser.parseToAttributedString(line, standardColors: themeScheme.ansiStandard, brightColors: themeScheme.ansiBright))
- .font(.swarmMono(.xs))
- .padding(.horizontal, 10)
- .padding(.vertical, 0.5)
- .textSelection(.enabled)
- .frame(maxWidth: .infinity, alignment: .leading)
- }
- }
+  private var terminalView: some View {
+    Group {
+      if agent.terminalOutput.isEmpty {
+        VStack {
+          Spacer()
+          Text("Session ready. Type commands or prompts below...")
+            .font(.swarmMono(.xs))
+            .foregroundStyle(.swarmTextTertiary)
+          Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.swarmTerminalBackground)
+      } else {
+        NativeTerminalView(
+          lines: agent.terminalOutput,
+          ansiStandard: themeScheme.ansiStandard,
+          ansiBright: themeScheme.ansiBright,
+          autoScroll: autoScroll
+        )
+      }
+    }
+  }
 
- Color.clear
- .frame(height: 1)
- .id("bottom")
- }
- }
- .onChange(of: agent.terminalOutput.count) { _, _ in
- if autoScroll {
- withAnimation(.easeOut(duration: 0.15)) {
- proxy.scrollTo("bottom", anchor: .bottom)
- }
- }
- }
- .background(Color.swarmTerminalBackground(for: themeStore.themeMode))
- }
- }
+	private var inputBarView: some View {
+		HStack(spacing: 8) {
+			// Brand / Agent Pill
+			HStack(spacing: 4) {
+				Circle()
+					.fill(agent.agentType.color)
+					.frame(width: 6, height: 6)
+				Text(agent.model.isEmpty ? agent.agentType.displayName : agent.model)
+					.font(.system(size: 10, weight: .medium, design: .monospaced))
+					.foregroundStyle(Color.zinc400)
+			}
+			.padding(.horizontal, 6)
+			.padding(.vertical, 3)
+			.background(Color.white.opacity(0.04))
+			.clipShape(RoundedRectangle(cornerRadius: 5))
+			.overlay(
+				RoundedRectangle(cornerRadius: 5)
+					.stroke(Color.white.opacity(0.08), lineWidth: 1)
+			)
 
- private var inputBarView: some View {
- HStack(spacing: 8) {
- Text("$")
- .font(.swarmMono(.xs))
- .foregroundStyle(.swarmGold)
+			TextField("Type a prompt or /command...", text: $inputText)
+				.font(.system(size: 12, design: .default))
+				.textFieldStyle(.plain)
+				.foregroundStyle(Color.white)
+				.onSubmit {
+					sendCommand()
+				}
+				.onKeyPress(.upArrow) {
+					navigateHistory(step: -1)
+					return .handled
+				}
+				.onKeyPress(.downArrow) {
+					navigateHistory(step: 1)
+					return .handled
+				}
 
- TextField("Enter command or prompt...", text: $inputText)
- .font(.swarmMono(.xs))
- .textFieldStyle(.plain)
- .onSubmit {
- sendCommand()
- }
- .onKeyPress(.upArrow) {
- navigateHistory(step: -1)
- return .handled
- }
- .onKeyPress(.downArrow) {
- navigateHistory(step: 1)
- return .handled
- }
-
- if !inputText.isEmpty {
- Button {
- sendCommand()
- } label: {
- Image(systemName: "return")
- .font(.swarm(.xs))
- .foregroundStyle(.swarmGold)
- }
- .buttonStyle(.plain)
- }
- }
- .padding(.horizontal, 10)
- .padding(.vertical, 8)
- .background(.swarmSurface)
- .overlay(alignment: .top) {
- Divider()
- .background(.swarmBorderSubtle)
- }
- }
+			Button {
+				sendCommand()
+			} label: {
+				Image(systemName: "arrow.up")
+					.font(.system(size: 11, weight: .bold))
+					.foregroundStyle(inputText.isEmpty ? Color.zinc500 : Color.black)
+					.frame(width: 24, height: 24)
+					.background {
+						RoundedRectangle(cornerRadius: 6)
+							.fill(inputText.isEmpty ? Color.white.opacity(0.06) : Color.swarmGold)
+					}
+			}
+			.buttonStyle(.plain)
+			.disabled(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+		}
+		.padding(.horizontal, 10)
+		.padding(.vertical, 6)
+		.background(Color(red: 14/255, green: 16/255, blue: 24/255))
+		.overlay(alignment: .top) {
+			Rectangle()
+				.fill(Color.white.opacity(0.06))
+				.frame(height: 1)
+		}
+	}
 
  // MARK: - Hover
 
@@ -481,7 +500,8 @@ struct TerminalPaneView: View {
  @State private var autoScroll: Bool = true
 
  private var themeScheme: ThemeScheme {
- ThemeScheme.preset(for: themeStore.themeMode) ?? .dark
+ let kind = ThemeKind(rawValue: themeStore.themeMode.rawValue.lowercased()) ?? .dark
+ return ThemeScheme.preset(for: kind) ?? .dark
  }
 
  var body: some View {
@@ -539,7 +559,7 @@ struct TerminalPaneView: View {
  }
  }
  }
- .background(Color.swarmTerminalBackground(for: themeStore.themeMode))
+ .background(Color.swarmTerminalBackground)
  }
 
  HStack(spacing: 8) {
@@ -573,7 +593,7 @@ struct TerminalPaneView: View {
  )
  terminalSession.onOutput = { chunk in
  let lines = chunk.components(separatedBy: "\n")
- Task { @MainActor in
+ 				_ = _Concurrency.Task { @MainActor in
  for line in lines {
  outputLines.append(line)
  }

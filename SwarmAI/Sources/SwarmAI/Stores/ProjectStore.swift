@@ -8,12 +8,12 @@ public final class ProjectStore: @unchecked Sendable {
 
   public init() {}
 
- struct OpenFile: Identifiable, Codable {
- let id: String
- let path: String
- let name: String
- let language: String
- let isModified: Bool
+ public struct OpenFile: Identifiable, Codable, Sendable {
+ public let id: String
+ public let path: String
+ public let name: String
+ public let language: String
+ public let isModified: Bool
  }
 
  func openFile(_ path: String, workspaceId: UUID) {

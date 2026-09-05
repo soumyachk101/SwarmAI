@@ -22,17 +22,6 @@ public struct GridBoardView: View {
 
 	public var body: some View {
 		VStack(spacing: 0) {
-			// Grid preset picker bar
-			GridPresetBar()
-				.offset(y: hasAppeared ? 0 : presetBarOffset)
-				.opacity(hasAppeared ? 1 : 0)
-				.animation(
-					hasAppeared
-						? .easeOut(duration: 0.4).delay(0.25)
-						: .none,
-					value: hasAppeared
-				)
-
 			// Agent Layout Panes Container
 			Group {
 				if agentsStore.agents.isEmpty {
@@ -305,33 +294,15 @@ public struct GridBoardView: View {
 						ScrollView(.horizontal, showsIndicators: false) {
 							HStack(spacing: 4) {
 								ForEach(agents) { agent in
-									Button {
-										withAnimation(.swarmQuick) {
-											agentsStore.activePaneId = agent.id.uuidString
+									AgentGridChip(
+										agent: agent,
+										isActive: agent.id == active.id,
+										onSelect: {
+											withAnimation(.swarmQuick) {
+												agentsStore.activePaneId = agent.id.uuidString
+											}
 										}
-									} label: {
-										HStack(spacing: 5) {
-											Text(agent.agentType.icon)
-											Text(agent.name)
-												.font(.swarm(.xs, weight: agent.id == active.id ? .semibold : .regular))
-												.foregroundStyle(agent.id == active.id ? Color.swarmGold : Color.swarmTextSecondary)
-
-											Circle()
-												.fill(agent.status == .running ? Color.swarmSuccess : Color.swarmTextTertiary)
-												.frame(width: 5, height: 5)
-										}
-										.padding(.horizontal, 10)
-										.padding(.vertical, 5)
-										.background {
-											RoundedRectangle(cornerRadius: 6)
-												.fill(agent.id == active.id ? Color.swarmGold.opacity(0.18) : Color.swarmSurface)
-												.overlay {
-													RoundedRectangle(cornerRadius: 6)
-														.stroke(agent.id == active.id ? Color.swarmGold : Color.swarmBorderSubtle, lineWidth: 1)
-												}
-										}
-									}
-									.buttonStyle(.plain)
+									)
 								}
 								Spacer()
 							}
@@ -651,5 +622,41 @@ public struct GridPresetBar: View {
 		case .columns: return "▥"
 		case .rows: return "▤"
 		}
+	}
+}
+
+// MARK: - Agent Grid Chip
+
+struct AgentGridChip: View {
+	let agent: Agent
+	let isActive: Bool
+	let onSelect: () -> Void
+
+	var body: some View {
+		Button(action: onSelect) {
+			HStack(spacing: 5) {
+				Image(systemName: agent.agentType.icon)
+					.font(.system(size: 11))
+					.foregroundStyle(agent.agentType.color)
+				Text(agent.name)
+					.font(.swarm(.xs, weight: isActive ? .semibold : .regular))
+					.foregroundStyle(isActive ? Color.swarmGold : Color.swarmTextSecondary)
+
+				Circle()
+					.fill(agent.status == .running ? Color.swarmSuccess : Color.swarmTextTertiary)
+					.frame(width: 5, height: 5)
+			}
+			.padding(.horizontal, 10)
+			.padding(.vertical, 5)
+			.background {
+				RoundedRectangle(cornerRadius: 6)
+					.fill(isActive ? Color.swarmGold.opacity(0.18) : Color.swarmSurface)
+					.overlay {
+						RoundedRectangle(cornerRadius: 6)
+							.stroke(isActive ? Color.swarmGold : Color.swarmBorderSubtle, lineWidth: 1)
+					}
+			}
+		}
+		.buttonStyle(.plain)
 	}
 }

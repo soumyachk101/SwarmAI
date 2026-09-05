@@ -1,5 +1,6 @@
 import SwiftUI
 
+ @MainActor
 @Observable
 public final class PlaneStore: @unchecked Sendable {
   public static let shared = PlaneStore()
@@ -19,21 +20,21 @@ public final class PlaneStore: @unchecked Sendable {
  isFullscreen = UserDefaults.standard.object(forKey: "isFullscreen") as? Bool ?? false
  }
 
- func setPlane(_ plane: Plane) {
+ public func setPlane(_ plane: Plane) {
  withAnimation(.swarmTabSwitch) {
  activePlane = plane
  UserDefaults.standard.set(plane.rawValue, forKey: "activePlane")
  }
  }
 
- func setBoardView(_ view: BoardView) {
+ public func setBoardView(_ view: BoardView) {
  withAnimation(.swarmTabSwitch) {
  boardView = view
  UserDefaults.standard.set(view.rawValue, forKey: "boardView")
  }
  }
 
- func toggleFullscreen() {
+ public func toggleFullscreen() {
  withAnimation(.spring(duration: 0.3)) {
  isFullscreen.toggle()
  UserDefaults.standard.set(isFullscreen, forKey: "isFullscreen")

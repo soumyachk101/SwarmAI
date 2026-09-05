@@ -19,7 +19,7 @@ let package = Package(
  "UI/Environment.swift",
  ],
  resources: [
- .process("Resources"),
+ .process("Resources")
  ]
  ),
  ]

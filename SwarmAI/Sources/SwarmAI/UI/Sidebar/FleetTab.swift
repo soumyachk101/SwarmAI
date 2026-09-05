@@ -111,8 +111,9 @@ struct AgentCard: View {
           RoundedRectangle(cornerRadius: 6)
             .fill(agent.agentType.brandColor.opacity(0.15))
 
-          Text(agent.agentType.icon)
-            .font(.system(size: 20))
+          Image(systemName: agent.agentType.icon)
+            .font(.system(size: 16))
+            .foregroundStyle(agent.agentType.brandColor)
         }
         .frame(height: 36)
 

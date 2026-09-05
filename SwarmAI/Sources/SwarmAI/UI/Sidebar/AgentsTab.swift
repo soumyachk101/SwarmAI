@@ -112,8 +112,9 @@ struct AgentListRow: View {
           .frame(width: 8, height: 8)
 
         // Agent type icon
-        Text(agent.agentType.icon)
-          .font(.swarm(.xs))
+        Image(systemName: agent.agentType.icon)
+          .font(.system(size: 12))
+          .foregroundStyle(agent.agentType.color)
 
         // Name and info
         VStack(alignment: .leading, spacing: 1) {

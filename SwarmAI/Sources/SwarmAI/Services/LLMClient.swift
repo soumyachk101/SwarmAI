@@ -145,7 +145,7 @@ extension Provider {
  "openai/gpt-4.1",
  "meta-llama/llama-4-maverick",
  "deepseek/deepseek-r1",
- "google/gemini-2.5-pro"
+ "google/gemini-2.5-pro",
       "google/gemini-2.5-flash"
     ],
  defaultModel: "anthropic/claude-sonnet-4-20250514",

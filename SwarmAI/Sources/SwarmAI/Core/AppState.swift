@@ -1,7 +1,5 @@
 import SwiftUI
 
-import SwiftUI
-
 // EntryPhase is defined in Core/EntryPhase.swift
 
 /// Defines the timing for each phase in the entry animation sequence.
@@ -51,6 +49,7 @@ public struct EntryAnimationTimings: Sendable {
 
 // MARK: - App State
 
+@MainActor
 @Observable
 public final class AppState: @unchecked Sendable {
 	public static let shared = AppState()
@@ -62,15 +61,18 @@ public final class AppState: @unchecked Sendable {
 	public var isSettingsOpen: Bool = false
 	public var isDashboardPresented: Bool = false
 	public var isDiffPreviewPresented: Bool = false
+	public var isGitModalPresented: Bool = false
 	public var isTaskTemplatesPresented: Bool = false
 	public var isUserGuidePresented: Bool = false
 	public var isUpdateCheckerPresented: Bool = false
 	public var isTaskTemplatesOpen: Bool = false
 	public var isUpdateCheckerOpen: Bool = false
+	public var boardOpen: Bool = false
+	public var isOnboardingSeen: Bool = false
 
 	// --- Active Selections ---
 	public var activeLeftTab: SidebarTab = .projects
-	public var activeRightTab: DockTab = .lead
+	public var activeRightTab: DockTab = .chat
 	public var activePlane: Plane = .board
 	public var boardView: BoardView = .grid
 
@@ -79,7 +81,10 @@ public final class AppState: @unchecked Sendable {
 	public var workspaceName: String = "Swarm Workspace"
 	public var isVoiceActive: Bool = false
 	public var activeAgentsCount: Int = 0
+	public var totalAgentsCount: Int = 0
+	public var erroredAgentsCount: Int = 0
 	public var gitBranch: String = "main"
+	public var gitBranchCount: Int = 0
 	public var engineStatus: String = "Idle"
 
 	// --- Entry Phase System ---
@@ -97,7 +102,7 @@ public final class AppState: @unchecked Sendable {
 
 	/// Cancellable handles for entry sequence timers so they can be
 	/// invalidated on completion, preventing stale callbacks.
-	private var entryTasks: [Task<Void, Never>?] = []
+	private var entryTasks: [Swift.Task<Void, Never>?] = []
 
 	/// Animation timings for the entry sequence. Override for testing
 	/// or different launch speeds.
@@ -108,7 +113,7 @@ public final class AppState: @unchecked Sendable {
 		isLeftSidebarOpen = UserDefaults.standard.object(forKey: "leftSidebarOpen") as? Bool ?? true
 		isRightDockOpen = UserDefaults.standard.object(forKey: "rightDockOpen") as? Bool ?? true
 		activeLeftTab = SidebarTab.allCases.first ?? .projects
-		activeRightTab = DockTab.allCases.first ?? .lead
+		activeRightTab = DockTab.allCases.first ?? .chat
 	}
 
 	// MARK: - Entry Sequence Orchestration
@@ -119,7 +124,6 @@ public final class AppState: @unchecked Sendable {
 	/// phase transitions from splash through content materialization.
 	///
 	/// If `reduceMotion` is true, jumps straight to `.complete`.
-	@MainActor
 	public func startEntrySequence(reduceMotion: Bool) {
 		guard !hasEntrySequenceStarted else { return }
 		hasEntrySequenceStarted = true
@@ -135,8 +139,8 @@ public final class AppState: @unchecked Sendable {
 		let t = entryTimings
 
 		// Safety timeout — guarantees we never stall mid-animation
-		let safetyTask = Task { @MainActor in
-			try? await Task.sleep(nanoseconds: UInt64(t.safetyTimeout * 1_000_000_000))
+		let safetyTask = Swift.Task<Void, Never> { @MainActor in
+			try? await Swift.Task.sleep(nanoseconds: UInt64(t.safetyTimeout * 1_000_000_000))
 			self.completeEntryNow()
 		}
 		entryTasks.append(safetyTask)
@@ -168,18 +172,16 @@ public final class AppState: @unchecked Sendable {
 	}
 
 	/// Transitions to a given entry phase at the specified delay.
-	@MainActor
 	private func schedulePhase(_ phase: EntryPhase, at delay: TimeInterval) {
-		let task = Task { @MainActor in
-			try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
-			guard let self = self, self.entryPhase < phase else { return }
+		let task = Swift.Task { @MainActor in
+			try? await Swift.Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+			guard entryPhase < phase else { return }
 			self.transitionToPhase(phase)
 		}
 		entryTasks.append(task)
 	}
 
 	/// Animates a single phase transition.
-	@MainActor
 	private func transitionToPhase(_ phase: EntryPhase) {
 		guard entryPhase < phase else { return }
 
@@ -224,14 +226,10 @@ public final class AppState: @unchecked Sendable {
 	}
 
 	/// Instantly marks the entry sequence as complete and cleans up.
-	@MainActor
 	public func completeEntryNow() {
 		guard !isEntryComplete else { return }
 
-		// Cancel all pending tasks
-		for task in entryTasks {
-			task?.cancel()
-		}
+		// Discard all pending tasks
 		entryTasks.removeAll()
 
 		withAnimation(.swarmQuick) {
@@ -242,11 +240,7 @@ public final class AppState: @unchecked Sendable {
 
 	/// Resets the entry state so the sequence can be replayed.
 	/// Call this when re-showing the splash screen (e.g. after logout).
-	@MainActor
 	public func resetEntryState() {
-		for task in entryTasks {
-			task?.cancel()
-		}
 		entryTasks.removeAll()
 
 		entryPhase = .idle

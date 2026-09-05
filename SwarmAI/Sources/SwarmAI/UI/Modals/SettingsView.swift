@@ -180,6 +180,13 @@ struct SettingsView: View {
 					.frame(width: 80)
 			}
 		}
+
+		// Theme Picker in General section
+		VStack(alignment: .leading, spacing: 12) {
+			SettingsSectionHeader(title: "Quick Theme Selector")
+
+			ThemePicker()
+		}
 	}
 
 	@ViewBuilder

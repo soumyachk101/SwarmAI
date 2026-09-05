@@ -124,7 +124,7 @@ public enum PheromoneDatabaseError: LocalizedError {
 public final class PheromoneDatabase: @unchecked Sendable {
     public let dbPath: String
     private var db: OpaquePointer?
-    private let lock = NSRecursiveLock()
+    nonisolated private let lock = NSRecursiveLock()
 
     public init(workspacePath: String) throws {
         let cleanWorkspace = URL(fileURLWithPath: workspacePath).standardized.path

@@ -1,170 +1,182 @@
 import SwiftUI
-import Combine
 
-// MARK: - Task Store
+@Observable
+public final class TaskStore: @unchecked Sendable {
+ public static let shared = TaskStore()
+ public var tasks: [Task] = []
+ public var selectedTaskId: UUID?
+ public var isTaskPanelOpen: Bool = false
+ public var isTaskLauncherOpen: Bool = false
+ public var activeFilter: TaskFilter = .all
+ public var searchQuery: String = ""
 
-final class TaskStore: ObservableObject {
-	static let shared = TaskStore()
+ public init() {
+ loadSampleTasks()
+ }
 
-	@Published var tasks: [Task] = []
-	@Published var selectedTaskId: String?
-	@Published var isTaskPanelOpen: Bool = false
-	@Published var isTaskLauncherOpen: Bool = false
-	@Published var activeFilter: TaskFilter = .all
-	@Published var searchQuery: String = ""
+ func createTask(name: String, agent: AgentType, priority: TaskPriority, template: TaskTemplate? = nil) -> Task {
+ let task = Task(title: name, priority: priority, agent: agent, template: template)
+ tasks.append(task)
+ return task
+ }
 
-	private init() {
-		loadSampleTasks()
-	}
+ func createTask(title: String, description: String = "", agent: AgentType = .claudeCode, priority: TaskPriority = .medium, template: TaskTemplate? = nil) -> Task {
+ let task = Task(title: title, description: description, priority: priority, agent: agent, template: template)
+ tasks.append(task)
+ return task
+ }
 
-	// MARK: - CRUD
+ func updateTask(_ task: Task) {
+ guard let index = tasks.firstIndex(where: { $0.id == task.id }) else { return }
+ tasks[index] = task
+ }
 
-	func createTask(name: String, agent: AgentType, priority: TaskPriority, template: TaskTemplate? = nil) -> Task {
-		let task = Task(name: name, agent: agent, priority: priority, template: template)
-		tasks.append(task)
-		return task
-	}
+ func deleteTask(_ task: Task) {
+ tasks.removeAll { $0.id == task.id }
+ if selectedTaskId == task.id {
+ selectedTaskId = nil
+ }
+ }
 
-	func updateTask(_ task: Task) {
+ func duplicateTask(_ task: Task) -> Task {
+ 		let newTask = Task(
+			title: "\(task.title) (copy)",
+			description: task.description,
+			status: task.status,
+			priority: task.priority,
+			tags: task.tags,
+			agent: task.agent,
+ assigneeId: task.assigneeId,
+ dueDate: task.dueDate,
+ parentId: task.parentId,
+ prompt: task.prompt,
+ files: task.files,
+ estimatedDuration: task.estimatedDuration,
+ autoApprove: task.autoApprove,
+ allowedTools: task.allowedTools,
+ isFavorite: task.isFavorite,
+ startedAt: task.startedAt,
+ completedAt: task.completedAt,
+ errorMessage: task.errorMessage,
+ template: task.template
+ )
+ newTask.isFavorite = task.isFavorite
+ tasks.append(newTask)
+ return newTask
+ }
+
+ func startTask(_ task: Task) {
+ guard let index = tasks.firstIndex(where: { $0.id == task.id }) else { return }
+ tasks[index].status = .inProgress
+ tasks[index].startedAt = Date()
+ }
+
+ func completeTask(_ task: Task) {
+ guard let index = tasks.firstIndex(where: { $0.id == task.id }) else { return }
+ tasks[index].status = .done
+ tasks[index].completedAt = Date()
+ }
+
+ func failTask(_ task: Task, error: String? = nil) {
+ guard let index = tasks.firstIndex(where: { $0.id == task.id }) else { return }
+ tasks[index].status = .done
+ tasks[index].errorMessage = error
+ }
+
+ 	func cancelTask(_ task: Task) {
 		guard let index = tasks.firstIndex(where: { $0.id == task.id }) else { return }
-		tasks[index] = task
+		tasks[index].status = .done
 	}
 
-	func deleteTask(_ task: Task) {
-		tasks.removeAll { $0.id == task.id }
-		if selectedTaskId == task.id {
-			selectedTaskId = nil
+	func moveTask(_ id: UUID, to status: TaskStatus) {
+		guard let index = tasks.firstIndex(where: { $0.id == id }) else { return }
+		tasks[index].status = status
+		tasks[index].updatedAt = Date()
+		if status == .inProgress && tasks[index].startedAt == nil {
+			tasks[index].startedAt = Date()
+		} else if status == .done {
+			tasks[index].completedAt = Date()
 		}
 	}
 
-	func duplicateTask(_ task: Task) -> Task {
-		let newTask = Task(name: "\(task.name) (copy)", agent: task.agent, priority: task.priority, template: task.template)
-		newTask.prompt = task.prompt
-		newTask.files = task.files
-		newTask.estimatedDuration = task.estimatedDuration
-		newTask.autoApprove = task.autoApprove
-		newTask.allowedTools = task.allowedTools
-		tasks.append(newTask)
-		return newTask
-	}
+ func selectTask(_ task: Task?) {
+ selectedTaskId = task?.id
+ }
 
-	// MARK: - Actions
+ func toggleTaskPanel() {
+ isTaskPanelOpen.toggle()
+ }
 
-	func startTask(_ task: Task) {
-		guard let index = tasks.firstIndex(where: { $0.id == task.id }) else { return }
-		tasks[index].status = .running
-		tasks[index].startedAt = Date()
-	}
+ func openTaskLauncher() {
+ isTaskLauncherOpen = true
+ }
 
-	func completeTask(_ task: Task) {
-		guard let index = tasks.firstIndex(where: { $0.id == task.id }) else { return }
-		tasks[index].status = .completed
-		tasks[index].completedAt = Date()
-	}
+ func closeTaskLauncher() {
+ isTaskLauncherOpen = false
+ }
 
-	func failTask(_ task: Task, error: String? = nil) {
-		guard let index = tasks.firstIndex(where: { $0.id == task.id }) else { return }
-		tasks[index].status = .failed
-		tasks[index].errorMessage = error
-	}
+ func setFilter(_ filter: TaskFilter) {
+ activeFilter = filter
+ }
 
-	func cancelTask(_ task: Task) {
-		guard let index = tasks.firstIndex(where: { $0.id == task.id }) else { return }
-		tasks[index].status = .cancelled
-	}
+ func updateSearchQuery(_ query: String) {
+ searchQuery = query
+ }
 
-	func selectTask(_ task: Task?) {
-		selectedTaskId = task?.id
-	}
+ var filteredTasks: [Task] {
+ var result = tasks
 
-	func toggleTaskPanel() {
-		isTaskPanelOpen.toggle()
-	}
+ switch activeFilter {
+ case .all:
+ break
+ case .active:
+ result = result.filter { $0.status == .inProgress || $0.status == .todo }
+ case .completed:
+ result = result.filter { $0.status == .done }
+ case .failed:
+ result = result.filter { $0.status == .done }
+ case .favorites:
+ result = result.filter { $0.isFavorite }
+ }
 
-	func openTaskLauncher() {
-		isTaskLauncherOpen = true
-	}
+ if !searchQuery.isEmpty {
+ result = result.filter { task in
+ task.title.localizedCaseInsensitiveContains(searchQuery) ||
+ task.agent.displayName.localizedCaseInsensitiveContains(searchQuery)
+ }
+ }
 
-	func closeTaskLauncher() {
-		isTaskLauncherOpen = false
-	}
+ return result.sorted { $0.createdAt > $1.createdAt }
+ }
 
-	func setFilter(_ filter: TaskFilter) {
-		activeFilter = filter
-	}
+ var selectedTask: Task? {
+ guard let id = selectedTaskId else { return nil }
+ return tasks.first(where: { $0.id == id })
+ }
 
-	func updateSearchQuery(_ query: String) {
-		searchQuery = query
-	}
+ var activeTasks: [Task] {
+ tasks.filter { $0.status == .inProgress || $0.status == .todo }
+ }
 
-	// MARK: - Computed
+ var completedTasks: [Task] {
+ tasks.filter { $0.status == .done }
+ }
 
-	var filteredTasks: [Task] {
-		var result = tasks
+ var failedTasks: [Task] {
+ tasks.filter { $0.status == .done }
+ }
 
-		switch activeFilter {
-		case .all:
-			break
-		case .active:
-			result = result.filter { $0.status == .running || $0.status == .pending }
-		case .completed:
-			result = result.filter { $0.status == .completed }
-		case .failed:
-			result = result.filter { $0.status == .failed || $0.status == .cancelled }
-		case .favorites:
-			result = result.filter { $0.isFavorite }
-		}
+ var favoriteTasks: [Task] {
+ tasks.filter { $0.isFavorite }
+ }
 
-		if !searchQuery.isEmpty {
-			result = result.filter { task in
-				task.name.localizedCaseInsensitiveContains(searchQuery) ||
-				task.agent.displayName.localizedCaseInsensitiveContains(searchQuery)
-			}
-		}
-
-		return result.sorted { $0.createdAt > $1.createdAt }
-	}
-
-	var selectedTask: Task? {
-		guard let id = selectedTaskId else { return nil }
-		return tasks.first(where: { $0.id == id })
-	}
-
-	var activeTasks: [Task] {
-		tasks.filter { $0.status == .running || $0.status == .pending }
-	}
-
-	var completedTasks: [Task] {
-		tasks.filter { $0.status == .completed }
-	}
-
-	var failedTasks: [Task] {
-		tasks.filter { $0.status == .failed || $0.status == .cancelled }
-	}
-
-	var favoriteTasks: [Task] {
-		tasks.filter { $0.isFavorite }
-	}
-
-	// MARK: - Persistence
-
-	func save() {
-		// TODO: Implement persistence
-	}
-
-	func load() {
-		// TODO: Implement persistence
-	}
-
-	// MARK: - Private
-
-	private func loadSampleTasks() {
-		tasks = [
-			Task(name: "Implement user authentication", agent: .claudeCode, priority: .high, template: nil),
-			Task(name: "Refactor API endpoints", agent: .codex, priority: .medium, template: nil),
-			Task(name: "Fix login flow bugs", agent: .claudeCode, priority: .high, template: nil),
-			Task(name: "Write unit tests", agent: .custom, priority: .medium, template: nil),
-			Task(name: "Update dependencies", agent: .codex, priority: .low, template: nil)
+ private func loadSampleTasks() {
+ 		tasks = [
+			Task(title: "Implement user authentication", priority: .high, agent: .claudeCode),
+			Task(title: "Refactor API endpoints", priority: .medium, agent: .codex),
+			Task(title: "Fix login flow bugs", priority: .high, agent: .claudeCode),
+			Task(title: "Write unit tests", priority: .medium, agent: .custom),
+			Task(title: "Update dependencies", priority: .low, agent: .codex)
 		]
-	}
+ }
 }

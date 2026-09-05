@@ -6,7 +6,7 @@ import AppKit
 public struct EmulatorPaneView: View {
  @Environment(\.themeStore) private var themeStore
  @Environment(\.accessibilityReduceMotion) private var reduceMotion
- @State private var emulatorService = EmulatorService.shared
+ private let emulatorService = EmulatorService.shared
  @State private var selectedTab: EmulatorTab = .devices
  @State private var statusToast: String?
  @State private var toastWorkItem: DispatchWorkItem?
@@ -86,7 +86,7 @@ public struct EmulatorPaneView: View {
  materializeProgress = 1
  }
  startStatusPulse()
- Task {
+ Swift.Task {
  await emulatorService.refresh()
  }
  }
@@ -98,7 +98,7 @@ public struct EmulatorPaneView: View {
  onDismiss: { showCreateAvdSheet = false },
  onCreated: { name in
  showCreateAvdSheet = false
- Task {
+ Swift.Task {
  await emulatorService.refresh()
  showToast("AVD '\(name)' created")
  }
@@ -132,7 +132,7 @@ public struct EmulatorPaneView: View {
  HStack(spacing: 6) {
  // Refresh
  Button {
- Task {
+ Swift.Task {
  isRefreshing = true
  await emulatorService.refresh()
  isRefreshing = false
@@ -151,7 +151,7 @@ public struct EmulatorPaneView: View {
 
  // Restart ADB
  Button {
- Task {
+ Swift.Task {
  try? await emulatorService.restartAdbServer()
  showToast("ADB Server Restarted")
  }
@@ -351,13 +351,13 @@ public struct EmulatorPaneView: View {
  captureScreenshot(for: device.serial)
  },
  onReboot: {
- Task {
+ Swift.Task {
  try? await emulatorService.rebootDevice(serial: device.serial)
  showToast("Rebooting \(device.serial)...")
  }
  },
  onStop: {
- Task {
+ Swift.Task {
  try? await emulatorService.stopDevice(serial: device.serial)
  showToast("Stopped \(device.serial)")
  }
@@ -464,7 +464,7 @@ public struct EmulatorPaneView: View {
  AdbShellView(
  emulatorService: emulatorService,
  onRunCommand: { cmd, serial in
- Task {
+ Swift.Task {
  do {
  let output = try await emulatorService.executeShell(serial: serial, command: cmd)
  showToast("Command executed")
@@ -474,7 +474,7 @@ public struct EmulatorPaneView: View {
  }
  },
  onInstallApk: { path, serial in
- Task {
+ Swift.Task {
  do {
  _ = try await emulatorService.installApk(serial: serial, apkPath: path)
  showToast("APK installed successfully")
@@ -485,7 +485,7 @@ public struct EmulatorPaneView: View {
  },
  onSendKey: { keycode in
  if let serial = emulatorService.selectedDeviceSerial {
- Task {
+ Swift.Task {
  _ = try? await emulatorService.executeShell(serial: serial, command: "input keyevent \(keycode)")
  }
  }
@@ -532,7 +532,7 @@ public struct EmulatorPaneView: View {
  .frame(maxWidth: 420)
 
  Button {
- Task {
+ Swift.Task {
  await emulatorService.refresh()
  }
  } label: {
@@ -556,7 +556,7 @@ public struct EmulatorPaneView: View {
  // MARK: - Actions
 
  private func captureScreenshot(for serial: String) {
- Task {
+ Swift.Task {
  do {
  _ = try await emulatorService.takeScreenshot(serial: serial)
  showToast("Screenshot captured")
@@ -567,7 +567,7 @@ public struct EmulatorPaneView: View {
  }
 
  private func launchAvd(_ name: String, coldBoot: Bool = false) {
- Task {
+ Swift.Task {
  do {
  try await emulatorService.launchAVD(name: name, coldBoot: coldBoot)
  showToast("Launching '\(name)'...")
@@ -586,7 +586,7 @@ public struct EmulatorPaneView: View {
  alert.alertStyle = .warning
 
  if alert.runModal() == .alertFirstButtonReturn {
- Task {
+ Swift.Task {
  do {
  try await emulatorService.deleteAvd(name: name)
  await emulatorService.refresh()
@@ -790,7 +790,7 @@ private struct AvdRow: View {
 
  // AVD info
  VStack(alignment: .leading, spacing: 2) {
- Text(avd.displayName)
+ Text(avd.name)
  .font(.swarm(.sm, weight: .semibold))
  .foregroundStyle(.swarmTextPrimary)
 
@@ -956,7 +956,7 @@ private struct AdbShellView: View {
  HStack(spacing: 8) {
  Button {
  if let serial = emulatorService.selectedDeviceSerial {
- Task {
+ Swift.Task {
  _ = try? await emulatorService.executeShell(
  serial: serial,
  command: "settings put system accelerometer_rotation 0 && settings put system user_rotation 1"
@@ -980,7 +980,7 @@ private struct AdbShellView: View {
 
  Button {
  if let serial = emulatorService.selectedDeviceSerial {
- Task {
+ Swift.Task {
  _ = try? await emulatorService.executeShell(
  serial: serial,
  command: "settings put system accelerometer_rotation 1"
@@ -1142,6 +1142,7 @@ private struct CreateAvdDialog: View {
  let avds: [AndroidAVD]
  var onDismiss: () -> Void
  var onCreated: (String) -> Void
+ private var emulatorService: EmulatorService { EmulatorService.shared }
 
  @State private var displayName: String = ""
  @State private var selectedDevice: DeviceProfile = .pixel6
@@ -1474,7 +1475,7 @@ private struct CreateAvdDialog: View {
  isBuilding = true
  buildError = nil
 
- Task {
+ Swift.Task {
  do {
  try await emulatorService.createAvd(
  name: name,
@@ -1500,70 +1501,6 @@ private struct CreateAvdDialog: View {
  .foregroundStyle(.swarmTextTertiary)
 
  content()
- }
- }
-}
-
-// MARK: - Device Profile
-
-private enum DeviceProfile: String, CaseIterable, Identifiable {
- case pixel6 = "pixel6"
- case pixel7 = "pixel7"
- case pixel8 = "pixel8"
- case pixelFold = "pixel_fold"
- case nexus5x = "nexus5x"
- case nexus6p = "nexus6p"
-
- var id: String { rawValue }
-
- var displayName: String {
- switch self {
- case .pixel6: return "Pixel 6"
- case .pixel7: return "Pixel 7"
- case .pixel8: return "Pixel 8"
- case .pixelFold: return "Pixel Fold"
- case .nexus5x: return "Nexus 5X"
- case .nexus6p: return "Nexus 6P"
- }
- }
-
- var icon: String {
- switch self {
- case .pixelFold: return "iphone.landscape"
- default: return "iphone"
- }
- }
-
- var screenWidth: Int {
- switch self {
- case .pixel6: return 1080
- case .pixel7: return 1080
- case .pixel8: return 1080
- case .pixelFold: return 1848
- case .nexus5x: return 1080
- case .nexus6p: return 1440
- }
- }
-
- var screenHeight: Int {
- switch self {
- case .pixel6: return 2400
- case .pixel7: return 2400
- case .pixel8: return 2400
- case .pixelFold: return 2208
- case .nexus5x: return 1920
- case .nexus6p: return 2560
- }
- }
-
- var density: Int {
- switch self {
- case .pixel6: return 420
- case .pixel7: return 420
- case .pixel8: return 420
- case .pixelFold: return 376
- case .nexus5x: return 423
- case .nexus6p: return 515
  }
  }
 }

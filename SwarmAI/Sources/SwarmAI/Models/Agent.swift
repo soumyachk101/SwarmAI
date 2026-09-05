@@ -55,6 +55,9 @@ public final class Agent: Codable, Identifiable, Hashable, @unchecked Sendable {
  /// Ring buffer of terminal output lines, capped at `maxOutputLines`.
  public var terminalOutput: [String]
 
+ /// High-fidelity screen buffer managing terminal cursor, line redraws and mojibake cleaning
+ private let screenBuffer = TerminalScreenBuffer(maxLines: 1000)
+
  /// Maximum number of lines to retain in the terminal output buffer.
  public static let maxOutputLines: Int = 10_000
 
@@ -185,19 +188,18 @@ public final class Agent: Codable, Identifiable, Hashable, @unchecked Sendable {
 
  // MARK: - Terminal Output
 
- /// Append a new line to the terminal output ring buffer.
- public func appendOutput(_ line: String) {
- terminalOutput.append(line)
- if terminalOutput.count > Self.maxOutputLines {
- terminalOutput.removeFirst(terminalOutput.count - Self.maxOutputLines)
- }
- lastActivity = Date()
- }
+	/// Append a stream chunk to the terminal output buffer with real-time in-place screen updates.
+	public func appendOutput(_ chunk: String) {
+		screenBuffer.ingestChunk(chunk)
+		self.terminalOutput = screenBuffer.renderedLines
+		lastActivity = Date()
+	}
 
- /// Clear the terminal output buffer.
- public func clearOutput() {
- terminalOutput.removeAll(keepingCapacity: true)
- }
+	/// Clear the terminal output buffer.
+	public func clearOutput() {
+		screenBuffer.clear()
+		terminalOutput.removeAll(keepingCapacity: true)
+	}
 
  /// Update token usage incrementally.
  public func updateTokenUsage(input: Int, output: Int) {

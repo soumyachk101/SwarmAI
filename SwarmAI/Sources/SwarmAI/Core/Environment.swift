@@ -116,6 +116,11 @@ public extension EnvironmentValues {
     set { self[ProjectStoreKey.self] = newValue }
   }
 
+  var projectsStore: ProjectStore {
+    get { self[ProjectStoreKey.self] }
+    set { self[ProjectStoreKey.self] = newValue }
+  }
+
   var appState: AppState {
     get { self[AppStateKey.self] }
     set { self[AppStateKey.self] = newValue }

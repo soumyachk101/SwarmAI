@@ -171,6 +171,11 @@ public extension View {
 			.animation(.swarmEntrySpring.delay(delay), value: UUID())
 	}
 
+	/// Applies a spring entry animation with an optional delay.
+	func swarmEntrySpring(delay: Double = 0) -> some View {
+		self.animation(.swarmEntrySpring.delay(delay), value: UUID())
+	}
+
 	/// Slides the view in from the specified edge.
 	///
 	/// - Parameters:

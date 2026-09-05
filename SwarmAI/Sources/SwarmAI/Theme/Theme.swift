@@ -21,7 +21,7 @@ public struct Theme: Identifiable, Codable, Hashable, CaseIterable, Sendable {
 		public let goldHover: [Double]
 		public let textPrimary: [Double]
 		public let textSecondary: [Double]
-		let textTertiary: [Double]
+		public let textTertiary: [Double]
 		public let textInverse: [Double]
 		public let border: [Double]
 		public let borderSubtle: [Double]
@@ -97,6 +97,7 @@ public struct Theme: Identifiable, Codable, Hashable, CaseIterable, Sendable {
 	public func rgb(for token: ThemeToken) -> [Double] {
 		switch token {
 		case .canvas: return colors.canvas
+		case .background: return colors.canvas
 		case .surface: return colors.surface
 		case .surfaceHover: return colors.surfaceHover
 		case .surfaceActive: return colors.surfaceActive
@@ -104,6 +105,7 @@ public struct Theme: Identifiable, Codable, Hashable, CaseIterable, Sendable {
 		case .surfaceOverlay: return colors.surfaceOverlay
 		case .gold: return colors.gold
 		case .goldHover: return colors.goldHover
+		case .primary: return colors.gold
 		case .textPrimary: return colors.textPrimary
 		case .textSecondary: return colors.textSecondary
 		case .textTertiary: return colors.textTertiary
@@ -364,7 +366,7 @@ public enum ThemeKind: String, Codable, Hashable, Sendable, CaseIterable {
 
 // MARK: - Theme Data Model
 
-public struct ThemeScheme: Identifiable, Codable, Hashable, Sendable {
+public struct ThemeScheme: Identifiable, Hashable, Sendable {
 	public let id: String
 	public let name: String
 	public let kind: ThemeKind
@@ -687,6 +689,7 @@ public extension ThemeScheme {
 
 public enum ThemeToken: String, CaseIterable, Sendable {
 	case canvas
+	case background
 	case surface
 	case surfaceHover
 	case surfaceActive
@@ -694,6 +697,7 @@ public enum ThemeToken: String, CaseIterable, Sendable {
 	case surfaceOverlay
 	case gold
 	case goldHover
+	case primary
 	case textPrimary
 	case textSecondary
 	case textTertiary
@@ -717,7 +721,12 @@ public final class ThemeStore: @unchecked Sendable {
 	public var themeMode: ThemeMode = .dark
 
 	public var currentTheme: Theme {
-		Theme.theme(for: currentThemeId) ?? Theme.allThemes[0]
+		get {
+			Theme.theme(for: currentThemeId) ?? Theme.allThemes[0]
+		}
+		set {
+			setTheme(newValue.id)
+		}
 	}
 
 	public init() {
@@ -782,8 +791,8 @@ public extension Color {
 		self.init(red: rgb[0] / 255.0, green: rgb[1] / 255.0, blue: rgb[2] / 255.0)
 	}
 
-	static func from(theme: Theme, token: ThemeToken) -> Color {
-		Color(theme: theme, token: token)
+	static func from(theme: Theme, themeToken: ThemeToken) -> Color {
+		Color(theme: theme, token: themeToken)
 	}
 
 	func toHex() -> String {

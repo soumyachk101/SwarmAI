@@ -269,6 +269,7 @@ public actor LeadReasoningEngine {
 // MARK: - Lead Bridge
 
 /// Autonomous Lead Agent Tool Calling Engine and Multi-Agent Coordinator.
+@MainActor
 @Observable
 public final class LeadBridge: @unchecked Sendable {
   public static let shared = LeadBridge()

@@ -243,10 +243,28 @@ public final class PTYSession: Identifiable, @unchecked Sendable {
     private var process: Process?
     private var readSource: (any DispatchSourceRead)?
     private let readQueue = DispatchQueue(label: "com.swarmai.pty.read", qos: .userInteractive)
+    private var utf8Remainder = Data()
     private let lock = NSLock()
     
     public var onOutput: ((String) -> Void)?
     public var onTerminated: ((Int32) -> Void)?
+    
+    private func decodeValidUtf8(_ data: Data) -> (String, Data) {
+        guard !data.isEmpty else { return ("", Data()) }
+        if let str = String(data: data, encoding: .utf8) {
+            return (str, Data())
+        }
+        let maxDrop = min(3, data.count - 1)
+        if maxDrop >= 1 {
+            for drop in 1...maxDrop {
+                let prefix = data.prefix(data.count - drop)
+                if let str = String(data: prefix, encoding: .utf8) {
+                    return (str, Data(data.suffix(drop)))
+                }
+            }
+        }
+        return (String(decoding: data, as: UTF8.self), Data())
+    }
     
     public init(
         id: UUID = UUID(),
@@ -363,8 +381,10 @@ public final class PTYSession: Identifiable, @unchecked Sendable {
             var buffer = [UInt8](repeating: 0, count: 4096)
             let bytesRead = Darwin.read(master, &buffer, buffer.count)
             if bytesRead > 0 {
-                let data = Data(buffer[0..<bytesRead])
-                let text = String(data: data, encoding: .utf8) ?? String(data: data, encoding: .isoLatin1) ?? ""
+                var chunkData = self.utf8Remainder
+                chunkData.append(buffer, count: bytesRead)
+                let (text, remainder) = self.decodeValidUtf8(chunkData)
+                self.utf8Remainder = remainder
                 if !text.isEmpty {
                     _Concurrency.Task { @MainActor in
                         self.appendOutputText(text)
@@ -668,6 +688,8 @@ public final class PTYService: @unchecked Sendable {
             case .plainTerminal:
                 cmd = ProcessInfo.processInfo.environment["SHELL"] ?? "/bin/zsh"
                 args = ["-l"]
+            case .custom:
+                cmd = ProcessInfo.processInfo.environment["SHELL"] ?? "/bin/zsh"
             }
         }
         

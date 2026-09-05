@@ -1,5 +1,6 @@
 import SwiftUI
 
+ @MainActor
 @Observable
 public final class ExtensionStore: @unchecked Sendable {
   public static let shared = ExtensionStore()
@@ -9,7 +10,7 @@ public final class ExtensionStore: @unchecked Sendable {
     loadFromStorage()
   }
 
- func installExtension(_ ext: Extension) {
+ public func installExtension(_ ext: Extension) {
  if !installedExtensions.contains(where: { $0.id == ext.id }) {
  var installed = ext
  installed.installed = true
@@ -18,16 +19,16 @@ public final class ExtensionStore: @unchecked Sendable {
  }
  }
 
- func uninstallExtension(_ id: String) {
+ public func uninstallExtension(_ id: String) {
  installedExtensions.removeAll { $0.id == id }
  saveToStorage()
  }
 
- func isInstalled(_ id: String) -> Bool {
+ public func isInstalled(_ id: String) -> Bool {
  installedExtensions.contains { $0.id == id }
  }
 
- func installedExtension(_ id: String) -> Extension? {
+ public func installedExtension(_ id: String) -> Extension? {
  installedExtensions.first { $0.id == id }
  }
 

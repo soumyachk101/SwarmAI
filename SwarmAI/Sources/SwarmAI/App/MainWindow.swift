@@ -3,25 +3,25 @@ import SwiftUI
 // MARK: - Main Window
 
 struct MainWindow: View {
+	@Environment(\.appState) private var appState
+	@Environment(\.agentsStore) private var agentsStore
+	@Environment(\.workspaceStore) private var workspaceStore
+	@Environment(\.taskStore) private var taskStore
+	@Environment(\.settingsStore) private var settingsStore
+	@Environment(\.uiStore) private var uiStore
+	@Environment(\.planeStore) private var planeStore
+	@Environment(\.canvasStore) private var canvasStore
+	@Environment(\.browserStore) private var browserStore
+	@Environment(\.extensionStore) private var extensionStore
+	@Environment(\.dispatchStore) private var dispatchStore
+	@Environment(\.projectStore) private var projectStore
 	@Environment(\.themeStore) private var themeStore
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
-	@State private var appState = AppState()
-	@State private var agentsStore = AgentsStore()
-	@State private var workspaceStore = WorkspaceStore()
-	@State private var taskStore = TaskStore()
-	@State private var settingsStore = SettingsStore()
-	@State private var uiStore = UiStore()
-	@State private var planeStore = PlaneStore()
-	@State private var canvasStore = CanvasStore()
-	@State private var browserStore = BrowserStore()
-	@State private var extensionStore = ExtensionStore()
-	@State private var dispatchStore = DispatchStore()
-	@State private var projectStore = ProjectStore()
 
-	@State private var entryPhase: EntryPhase = .idle
 	@State private var isSplashDismissed: Bool = false
 
 	var body: some View {
+		@Bindable var appState = appState
 		ZStack {
 			// Background canvas with subtle vignette
 			Color.swarmCanvas
@@ -31,24 +31,21 @@ struct MainWindow: View {
 						.allowsHitTesting(false)
 				}
 
-			// Main layout
+			// Main layout: 3 full-height columns starting from the top
 			HStack(spacing: 0) {
 				// Left Sidebar
 				if appState.isLeftSidebarOpen {
 					LeftSidebar()
-						.opacity(entryPhase >= .sidebarIn ? 1 : 0)
-						.offset(x: entryPhase >= .sidebarIn ? 0 : -30)
-						.animation(.swarmSidebarEntry, value: entryPhase)
+						.opacity(appState.entryPhase >= .sidebarIn ? 1 : 0)
+						.offset(x: appState.entryPhase >= .sidebarIn ? 0 : -30)
+						.animation(.swarmSidebarEntry, value: appState.entryPhase)
 				}
 
 				// Center content
 				VStack(spacing: 0) {
-					SwarmTitleBar(entryPhase: $entryPhase)
-
 					BoardStrip()
-						.opacity(entryPhase >= .boardStripIn ? 1 : 0)
-						.offset(y: entryPhase >= .boardStripIn ? 0 : -20)
-						.animation(.swarmSlideUp.delay(0.11), value: entryPhase)
+						.opacity(appState.entryPhase >= .boardStripIn ? 1 : 0)
+						.animation(.swarmSlideUp.delay(0.11), value: appState.entryPhase)
 
 					// Board / Browser / Emulator
 					Group {
@@ -63,34 +60,41 @@ struct MainWindow: View {
 						}
 					}
 					.ignoresSafeArea()
-					.opacity(entryPhase >= .contentIn ? 1 : 0)
-					.offset(y: entryPhase >= .contentIn ? 0 : 20)
-					.scaleEffect(entryPhase >= .contentIn ? 1 : 0.98)
-					.animation(.swarmContentEntry.delay(0.15), value: entryPhase)
+					.opacity(appState.entryPhase >= .contentIn ? 1 : 0)
+					.scaleEffect(appState.entryPhase >= .contentIn ? 1 : 0.98)
+					.animation(.swarmContentEntry.delay(0.15), value: appState.entryPhase)
 
 					StatusBar()
-						.opacity(entryPhase >= .statusBarIn ? 1 : 0)
-						.offset(y: entryPhase >= .statusBarIn ? 0 : 20)
-						.animation(.swarmStatusEntry.delay(0.21), value: entryPhase)
+						.opacity(appState.entryPhase >= .statusBarIn ? 1 : 0)
+						.animation(.swarmStatusEntry.delay(0.21), value: appState.entryPhase)
 				}
 
 				// Right Dock
 				if appState.isRightDockOpen {
 					RightDock()
-						.opacity(entryPhase >= .dockIn ? 1 : 0)
-						.offset(x: entryPhase >= .dockIn ? 0 : 30)
-						.animation(.swarmDockEntry, value: entryPhase)
+						.padding(.top, 40)
+						.opacity(appState.entryPhase >= .dockIn ? 1 : 0)
+						.offset(x: appState.entryPhase >= .dockIn ? 0 : 30)
+						.animation(.swarmDockEntry, value: appState.entryPhase)
 				}
 			}
-			.opacity(entryPhase >= .frameIn ? 1 : 0)
-			.scaleEffect(entryPhase >= .frameIn ? 1 : 0.97)
-			.animation(.swarmEntrySpring.delay(0.08), value: entryPhase)
+			.opacity(appState.entryPhase >= .frameIn ? 1 : 0)
+			.scaleEffect(appState.entryPhase >= .frameIn ? 1 : 0.97)
+			.animation(.swarmEntrySpring.delay(0.08), value: appState.entryPhase)
+			.overlay(alignment: .topTrailing) {
+				FloatingTopRightIsland()
+					.padding(.trailing, 8)
+					.padding(.top, 5)
+					.opacity(appState.entryPhase >= .frameIn ? 1 : 0)
+					.zIndex(60)
+			}
 
 			// Splash screen overlay
-			if !isSplashDismissed && (entryPhase == .splashActive || entryPhase == .splashExiting) {
+			if !isSplashDismissed && (appState.entryPhase < .frameIn || appState.entryPhase == .splashExiting) {
 				SplashScreenView(isLaunching: Binding(
-					get: { !isSplashDismissed && entryPhase == .splashActive },
+					get: { !isSplashDismissed && appState.entryPhase <= .splashActive },
 					set: { if !$0 {
+						isSplashDismissed = true
 						// Let splash's own burst animation finish before completing
 						DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
 							appState.completeEntryNow()
@@ -99,7 +103,7 @@ struct MainWindow: View {
 				))
 				.transition(.opacity)
 				.zIndex(999)
-				.allowsHitTesting(entryPhase == .splashActive)
+				.allowsHitTesting(appState.entryPhase <= .splashActive)
 			}
 
 			// Modals overlay
@@ -175,6 +179,7 @@ struct MainWindow: View {
 
 			appState.startEntrySequence(reduceMotion: reduceMotion)
 		}
+	}
 }
 
 // MARK: - Subtle Vignette

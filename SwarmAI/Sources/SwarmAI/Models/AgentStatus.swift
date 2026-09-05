@@ -43,6 +43,7 @@ public enum AgentStatus: String, Codable, Sendable {
 public enum AgentRole: String, Codable, Sendable {
  case follower
  case lead
+ case builder
 
  /// Human-readable display name for the role.
  public var displayName: String {
@@ -95,6 +96,7 @@ public enum AgentType: String, Codable, Sendable, CaseIterable, Identifiable {
  case deepSeek = "deep_seek"
  case grok
  case droid
+ case custom
 
  /// Human-readable display name.
  public var displayName: String {
@@ -106,7 +108,7 @@ public enum AgentType: String, Codable, Sendable, CaseIterable, Identifiable {
  case .openCode: "OpenCode"
  case .cline: "Cline"
  case .kilo: "Kilo"
- case .kimiCode: " Code"
+ case .kimiCode: "Kimi Code"
  case .kiro: "Kiro"
  case .antigravity: "Antigravity"
  case .plainTerminal: "Terminal"
@@ -114,6 +116,7 @@ public enum AgentType: String, Codable, Sendable, CaseIterable, Identifiable {
  case .deepSeek: "DeepSeek"
  case .grok: "Grok"
  case .droid: "Droid"
+ case .custom: "Custom"
  }
  }
 
@@ -135,6 +138,7 @@ public enum AgentType: String, Codable, Sendable, CaseIterable, Identifiable {
  case .deepSeek: "magnifyingglass"
  case .grok: "waveform.path"
  case .droid: "iphone"
+ case .custom: "gearshape.2"
  }
  }
 
@@ -156,7 +160,12 @@ public enum AgentType: String, Codable, Sendable, CaseIterable, Identifiable {
    case .deepSeek: Color(hex: "#0066FF") ?? .blue // DeepSeek blue
    case .grok: Color(hex: "#1DA1F2") ?? .blue // Grok/X blue
    case .droid: Color(hex: "#00FF88") ?? .green // Droid green
+   case .custom: Color.swarmGold
    }
+ }
+
+ public var color: Color {
+   brandColor
  }
 
  /// Brand colors dictionary for all agent types.

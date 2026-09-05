@@ -17,6 +17,10 @@ public struct AndroidAVD: Identifiable, Hashable, Sendable {
         self.target = target
         self.path = path
     }
+
+    public var displayName: String {
+        name.replacingOccurrences(of: "_", with: " ")
+    }
 }
 
 public struct ConnectedDevice: Identifiable, Hashable, Sendable {
@@ -98,12 +102,21 @@ public struct DeviceProfile: Identifiable, Hashable, Sendable {
  self.density = density
  }
 
- public static let pixel6 = DeviceProfile(rawValue: "pixel6", displayName: "Pixel 6", screenWidth: 1080, screenHeight: 2400, density: 420)
- public static let pixel7 = DeviceProfile(rawValue: "pixel7", displayName: "Pixel 7", screenWidth: 1080, screenHeight: 2400, density: 420)
- public static let pixel8 = DeviceProfile(rawValue: "pixel8", displayName: "Pixel 8", screenWidth: 1080, screenHeight: 2400, density: 420)
- public static let pixelFold = DeviceProfile(rawValue: "pixel_fold", displayName: "Pixel Fold", screenWidth: 1848, screenHeight: 2208, density: 376)
+  public var icon: String {
+    switch rawValue {
+    case "pixel_fold": return "iphone.landscape"
+    default: return "iphone"
+    }
+  }
 
- public static let allCases: [DeviceProfile] = [.pixel6, .pixel7, .pixel8, .pixelFold]
+  public static let pixel6 = DeviceProfile(rawValue: "pixel6", displayName: "Pixel 6", screenWidth: 1080, screenHeight: 2400, density: 420)
+  public static let pixel7 = DeviceProfile(rawValue: "pixel7", displayName: "Pixel 7", screenWidth: 1080, screenHeight: 2400, density: 420)
+  public static let pixel8 = DeviceProfile(rawValue: "pixel8", displayName: "Pixel 8", screenWidth: 1080, screenHeight: 2400, density: 420)
+  public static let pixelFold = DeviceProfile(rawValue: "pixel_fold", displayName: "Pixel Fold", screenWidth: 1848, screenHeight: 2208, density: 376)
+  public static let nexus5x = DeviceProfile(rawValue: "nexus_5x", displayName: "Nexus 5X", screenWidth: 1080, screenHeight: 1920, density: 423)
+  public static let nexus6p = DeviceProfile(rawValue: "nexus_6p", displayName: "Nexus 6P", screenWidth: 1440, screenHeight: 2560, density: 515)
+
+  public static let allCases: [DeviceProfile] = [.pixel6, .pixel7, .pixel8, .pixelFold, .nexus5x, .nexus6p]
 }
 
 public struct SystemImage: Identifiable, Hashable, Sendable {
@@ -573,6 +586,37 @@ public final class EmulatorService: @unchecked Sendable {
                     continuation.resume(throwing: error)
                 }
             }
+        }
+    }
+
+    public func deleteAvd(name: String) async throws {
+        let home = FileManager.default.homeDirectoryForCurrentUser.path
+        let avdDir = (home as NSString).appendingPathComponent(".android/avd/\(name).avd")
+        let avdIni = (home as NSString).appendingPathComponent(".android/avd/\(name).ini")
+        try? FileManager.default.removeItem(atPath: avdDir)
+        try? FileManager.default.removeItem(atPath: avdIni)
+    }
+
+    public func createAvd(
+        name: String,
+        deviceProfile: DeviceProfile,
+        systemImage: SystemImage,
+        ramMB: Int = 2048,
+        storageGB: Int = 8,
+        cpuCores: Int = 4
+    ) async throws {
+        guard let sdk = sdkPath else {
+            throw NSError(domain: "EmulatorService", code: 1, userInfo: [NSLocalizedDescriptionKey: "Android SDK not found."])
+        }
+        let avdmanager = (sdk as NSString).appendingPathComponent("cmdline-tools/latest/bin/avdmanager")
+        if FileManager.default.isExecutableFile(atPath: avdmanager) {
+            _ = try await runProcessAsync(executable: avdmanager, args: [
+                "create", "avd",
+                "-n", name,
+                "-k", systemImage.id,
+                "-d", deviceProfile.displayName,
+                "--force"
+            ])
         }
     }
 }

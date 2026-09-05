@@ -33,8 +33,6 @@ public enum TaskStatus: String, Codable, Sendable, CaseIterable {
  }
 }
 
-/// Priority level for a task.
-@frozen
 public enum TaskPriority: String, Codable, Sendable, CaseIterable {
  case low
  case medium
@@ -65,6 +63,44 @@ public enum TaskPriority: String, Codable, Sendable, CaseIterable {
  case .critical: 4
  }
  }
+}
+
+// MARK: - Task Filter
+
+public enum TaskFilter: String, Codable, Sendable, CaseIterable {
+	case all
+	case active
+	case completed
+	case failed
+	case favorites
+}
+
+// MARK: - Task Template
+
+public struct TaskTemplate: Identifiable, Codable, Sendable, Hashable {
+	public let id: UUID
+	public let name: String
+	public let agent: AgentType
+	public let priority: TaskPriority
+	public let prompt: String = ""
+	public let files: [String] = []
+	public let estimatedDuration: TimeInterval?
+	public let autoApprove: Bool = false
+	public let allowedTools: [String] = []
+
+	public init(
+		id: UUID = UUID(),
+		name: String,
+		agent: AgentType,
+		priority: TaskPriority,
+		estimatedDuration: TimeInterval? = nil
+	) {
+		self.id = id
+		self.name = name
+		self.agent = agent
+		self.priority = priority
+		self.estimatedDuration = estimatedDuration
+	}
 }
 
 /// A task in the kanban board, representing work to be done.
@@ -103,6 +139,24 @@ public final class Task: Codable, Identifiable, Hashable, @unchecked Sendable {
  /// Parent task ID, if this is a subtask. Nil for top-level tasks.
  public var parentId: UUID?
 
+ public var agent: AgentType = .claudeCode
+
+ public var name: String {
+	get { title }
+	set { title = newValue }
+ }
+
+ public var prompt: String = ""
+ public var files: [String] = []
+ public var estimatedDuration: TimeInterval?
+ public var autoApprove: Bool = false
+ public var allowedTools: [String] = []
+ public var isFavorite: Bool = false
+ public var startedAt: Date?
+ public var completedAt: Date?
+ public var errorMessage: String?
+ public var template: TaskTemplate?
+
  // MARK: - Codable
 
  private enum CodingKeys: String, CodingKey {
@@ -112,11 +166,22 @@ public final class Task: Codable, Identifiable, Hashable, @unchecked Sendable {
  case status
  case priority
  case tags
+ case agent
  case assigneeId
  case createdAt
  case updatedAt
  case dueDate
  case parentId
+ case prompt
+ case files
+ case estimatedDuration
+ case autoApprove
+ case allowedTools
+ case isFavorite
+ case startedAt
+ case completedAt
+ case errorMessage
+ case template
  }
 
  public init(from decoder: Decoder) throws {
@@ -127,11 +192,22 @@ public final class Task: Codable, Identifiable, Hashable, @unchecked Sendable {
  status = try container.decode(TaskStatus.self, forKey: .status)
  priority = try container.decode(TaskPriority.self, forKey: .priority)
  tags = try container.decode([String].self, forKey: .tags)
+ agent = try container.decodeIfPresent(AgentType.self, forKey: .agent) ?? .claudeCode
  assigneeId = try container.decodeIfPresent(UUID.self, forKey: .assigneeId)
  createdAt = try container.decode(Date.self, forKey: .createdAt)
  updatedAt = try container.decode(Date.self, forKey: .updatedAt)
  dueDate = try container.decodeIfPresent(Date.self, forKey: .dueDate)
  parentId = try container.decodeIfPresent(UUID.self, forKey: .parentId)
+ prompt = try container.decodeIfPresent(String.self, forKey: .prompt) ?? ""
+ files = try container.decodeIfPresent([String].self, forKey: .files) ?? []
+ estimatedDuration = try container.decodeIfPresent(TimeInterval.self, forKey: .estimatedDuration)
+ autoApprove = try container.decodeIfPresent(Bool.self, forKey: .autoApprove) ?? false
+ allowedTools = try container.decodeIfPresent([String].self, forKey: .allowedTools) ?? []
+ isFavorite = try container.decodeIfPresent(Bool.self, forKey: .isFavorite) ?? false
+ startedAt = try container.decodeIfPresent(Date.self, forKey: .startedAt)
+ completedAt = try container.decodeIfPresent(Date.self, forKey: .completedAt)
+ errorMessage = try container.decodeIfPresent(String.self, forKey: .errorMessage)
+ template = try container.decodeIfPresent(TaskTemplate.self, forKey: .template)
  }
 
  public func encode(to encoder: Encoder) throws {
@@ -142,11 +218,22 @@ public final class Task: Codable, Identifiable, Hashable, @unchecked Sendable {
  try container.encode(status, forKey: .status)
  try container.encode(priority, forKey: .priority)
  try container.encode(tags, forKey: .tags)
+ try container.encodeIfPresent(agent, forKey: .agent)
  try container.encodeIfPresent(assigneeId, forKey: .assigneeId)
  try container.encode(createdAt, forKey: .createdAt)
  try container.encode(updatedAt, forKey: .updatedAt)
  try container.encodeIfPresent(dueDate, forKey: .dueDate)
  try container.encodeIfPresent(parentId, forKey: .parentId)
+ try container.encode(prompt, forKey: .prompt)
+ try container.encode(files, forKey: .files)
+ try container.encodeIfPresent(estimatedDuration, forKey: .estimatedDuration)
+ try container.encode(autoApprove, forKey: .autoApprove)
+ try container.encode(allowedTools, forKey: .allowedTools)
+ try container.encode(isFavorite, forKey: .isFavorite)
+ try container.encodeIfPresent(startedAt, forKey: .startedAt)
+ try container.encodeIfPresent(completedAt, forKey: .completedAt)
+ try container.encodeIfPresent(errorMessage, forKey: .errorMessage)
+ try container.encodeIfPresent(template, forKey: .template)
  }
 
  // MARK: - Init
@@ -159,11 +246,22 @@ public final class Task: Codable, Identifiable, Hashable, @unchecked Sendable {
  status: TaskStatus = .todo,
  priority: TaskPriority = .medium,
  tags: [String] = [],
+ agent: AgentType = .claudeCode,
  assigneeId: UUID? = nil,
  createdAt: Date = Date(),
  updatedAt: Date = Date(),
  dueDate: Date? = nil,
- parentId: UUID? = nil
+ parentId: UUID? = nil,
+ prompt: String = "",
+ files: [String] = [],
+ estimatedDuration: TimeInterval? = nil,
+ autoApprove: Bool = false,
+ allowedTools: [String] = [],
+ isFavorite: Bool = false,
+ startedAt: Date? = nil,
+ completedAt: Date? = nil,
+ errorMessage: String? = nil,
+ template: TaskTemplate? = nil
  ) {
  self.id = id
  self.title = title
@@ -171,11 +269,22 @@ public final class Task: Codable, Identifiable, Hashable, @unchecked Sendable {
  self.status = status
  self.priority = priority
  self.tags = tags
+ self.agent = agent
  self.assigneeId = assigneeId
  self.createdAt = createdAt
  self.updatedAt = updatedAt
  self.dueDate = dueDate
  self.parentId = parentId
+ self.prompt = prompt
+ self.files = files
+ self.estimatedDuration = estimatedDuration
+ self.autoApprove = autoApprove
+ self.allowedTools = allowedTools
+ self.isFavorite = isFavorite
+ self.startedAt = startedAt
+ self.completedAt = completedAt
+ self.errorMessage = errorMessage
+ self.template = template
  }
 
  // MARK: - Helpers

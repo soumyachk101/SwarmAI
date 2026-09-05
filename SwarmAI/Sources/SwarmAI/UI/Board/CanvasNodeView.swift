@@ -19,14 +19,65 @@ public struct CanvasNodeView: View {
  @State private var ghostPosition: CGPoint? = nil
 
  public var body: some View {
- let currentX = (node.position.x + camera.x) * scale + dragOffset.width
- let currentY = (node.position.y + camera.y) * scale + dragOffset.height
+ nodeCard
+ }
 
+ // MARK: - Computed Position
+
+ private var currentX: CGFloat {
+ (node.position.x + camera.x) * scale + dragOffset.width
+ }
+
+ private var currentY: CGFloat {
+ (node.position.y + camera.y) * scale + dragOffset.height
+ }
+
+ // MARK: - Shadow Helpers
+
+ private var shadowColorOpacity: CGFloat {
+ isDragging ? 0.45 : (isSelected ? 0.3 : 0.15)
+ }
+
+ private var shadowRadius: CGFloat {
+ isDragging ? 16 : (isSelected ? 8 : 4)
+ }
+
+ private var shadowY: CGFloat {
+ isDragging ? 8 : 2
+ }
+
+ private var cardScale: CGFloat {
+ isDragging ? 1.03 : 1.0
+ }
+
+ // MARK: - Card Assembly
+
+ private var nodeCard: some View {
+ nodeContent
+ .padding(10)
+ .frame(width: node.width * scale, height: node.height * scale)
+ .background(nodeCardBackground)
+ .shadow(
+ color: .black.opacity(shadowColorOpacity),
+ radius: shadowRadius,
+ x: 0,
+ y: shadowY
+ )
+ .scaleEffect(cardScale)
+ .position(x: currentX + (node.width * scale) / 2, y: currentY + (node.height * scale) / 2)
+ .onTapGesture { onSelect() }
+ .gesture(dragGesture)
+ .contextMenu { contextMenuContent }
+ .overlay(ghostOverlay)
+ }
+
+ private var nodeContent: some View {
  VStack(alignment: .leading, spacing: 6) {
  // Node Header
  HStack(spacing: 8) {
- Text(node.agentType.icon)
- .font(.system(size: 14))
+ Image(systemName: node.agentType.icon)
+ .font(.system(size: 13, weight: .semibold))
+ .foregroundStyle(node.agentType.color)
 
  VStack(alignment: .leading, spacing: 1) {
  Text(node.title)
@@ -42,7 +93,7 @@ public struct CanvasNodeView: View {
 
  Spacer(minLength: 4)
 
- // Agent Status Indicator (Issue #8)
+ // Agent Status Indicator
  HStack(spacing: 3) {
  Circle()
  .fill(node.status.color)
@@ -94,104 +145,62 @@ public struct CanvasNodeView: View {
  }
  }
  }
- .padding(10)
- .frame(width: node.width * scale, height: node.height * scale)
- .background(
+ }
+
+ private var nodeCardBackground: some View {
  RoundedRectangle(cornerRadius: 10)
- .fill(Color.swarmSurface)
+ .fill(Color.swarmSurface.opacity(isSelected ? 0.8 : 0.6))
  .overlay(
  RoundedRectangle(cornerRadius: 10)
  .stroke(
- isConnectingSource ? Color.swarmWarning : (isSelected ? Color.swarmGold : Color.swarmBorderSubtle),
- lineWidth: (isSelected || isConnectingSource) ? 2 : 1
+ isSelected ? Color.swarmGold.opacity(0.6) : Color.swarmBorderSubtle.opacity(0.5),
+ lineWidth: isSelected ? 1.5 : 1
  )
  )
- )
- .shadow(
- color: .black.opacity(isDragging ? 0.45 : (isSelected ? 0.3 : 0.15)),
- radius: isDragging ? 16 : (isSelected ? 8 : 4),
- x: 0,
- y: isDragging ? 8 : 2
- )
- .scaleEffect(isDragging ? 1.03 : 1.0)
- .position(x: currentX + (node.width * scale) / 2, y: currentY + (node.height * scale) / 2)
- .onTapGesture {
- onSelect()
  }
- .gesture(
- // Node drag gesture — needs higher priority than canvas drag
- DragGesture(minimumDistance: 2)
- .onChanged { val in
+
+ private var dragGesture: some Gesture {
+ DragGesture(minimumDistance: 3)
+ .onChanged { value in
  isDragging = true
- dragOffset = val.translation
- // Show ghost preview (Issue #9)
- showGhost = true
- ghostPosition = CGPoint(
- x: (node.position.x + camera.x) * scale + val.translation.width + (node.width * scale) / 2,
- y: (node.position.y + camera.y) * scale + val.translation.height + (node.height * scale) / 2
- )
+ dragOffset = value.translation
+ onDragChanged(CGPoint(x: value.translation.width / scale, y: value.translation.height / scale))
  }
- .onEnded { val in
+ .onEnded { value in
  isDragging = false
- showGhost = false
- ghostPosition = nil
- let finalX = node.position.x + val.translation.width / scale
- let finalY = node.position.y + val.translation.height / scale
  dragOffset = .zero
- onDragChanged(CGPoint(x: finalX, y: finalY))
  }
- )
- .contextMenu {
- Button("Connect to Another Node") {
+ }
+
+ private var contextMenuContent: some View {
+ VStack(alignment: .leading, spacing: 6) {
+ Button("Connect") {
  onStartConnect()
  }
- Button("Delete Node", role: .destructive) {
+
+ Button("Delete") {
  onDelete()
  }
  }
- // Ghost node preview while dragging (Issue #9)
- .overlay(
+ }
+
+ private var ghostOverlay: some View {
  Group {
- if showGhost, let ghostPos = ghostPosition {
- ghostNodeView(at: ghostPos)
+ 		if showGhost, let pos = ghostPosition {
+			GhostNodePreview(
+				icon: node.agentType.icon,
+				title: node.title,
+				displayWidth: node.width * scale * 0.9,
+				displayHeight: node.height * scale * 0.85
+			)
+			.position(x: pos.x, y: pos.y)
+		}
  }
- }
- )
  }
 
- // Ghost/drag preview node (Issue #9)
- @ViewBuilder
- private func ghostNodeView(at position: CGPoint) -> some View {
- VStack(alignment: .leading, spacing: 4) {
- HStack(spacing: 6) {
- Text(node.agentType.icon)
- .font(.system(size: 12))
+ // MARK: - Ghost Node Preview Helper
 
- VStack(alignment: .leading, spacing: 0) {
- Text(node.title)
- .font(.swarm(.micro, weight: .semibold))
- .foregroundStyle(Color.swarmTextPrimary)
- .lineLimit(1)
- }
- }
- }
- .padding(6)
- .frame(width: node.width * scale * 0.9, height: node.height * scale * 0.85)
- .background(
- RoundedRectangle(cornerRadius: 8)
- .fill(Color.swarmSurface.opacity(0.6))
- .overlay(
- RoundedRectangle(cornerRadius: 8)
- .stroke(Color.swarmGold.opacity(0.5), lineWidth: 1)
- )
- )
- .position(x: position.x, y: position.y)
- }
-}
-
-// MARK: - Ghost Node Preview Helper
-
-fileprivate struct GhostNodePreview: View {
+ fileprivate struct GhostNodePreview: View {
  let icon: String
  let title: String
  let displayWidth: CGFloat
@@ -210,7 +219,6 @@ fileprivate struct GhostNodePreview: View {
  .lineLimit(1)
  }
  }
- }
  .padding(6)
  .frame(width: displayWidth, height: displayHeight)
  .background(
@@ -221,5 +229,7 @@ fileprivate struct GhostNodePreview: View {
  .stroke(Color.swarmGold.opacity(0.5), lineWidth: 1)
  )
  )
+ }
+ }
  }
 }

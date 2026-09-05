@@ -225,7 +225,7 @@ struct CommandPaletteView: View {
  appState.setPlane(.board)
  appState.setBoardView(.flow)
  case .dispatchLead:
- appState.setRightTab(.lead)
+ appState.setRightTab(.chat)
  if !appState.isRightDockOpen {
  appState.toggleRightDock()
  }

@@ -2,7 +2,8 @@ import SwiftUI
 
 // MARK: - Git Tab (Sidebar)
 
-struct GitTab: View {
+@MainActor
+public struct GitTab: View {
   @Environment(\.appState) private var appState
   @Environment(\.workspaceStore) private var workspaceStore
 
@@ -22,7 +23,7 @@ struct GitTab: View {
     workspaceStore.activeWorkspace?.path ?? NSHomeDirectory()
   }
 
-  var body: some View {
+  public var body: some View {
     VStack(alignment: .leading, spacing: 0) {
       // Branch & Sync bar
       branchHeaderView
@@ -591,11 +592,11 @@ struct GitTab: View {
 
 // MARK: - Reusable Section Components
 
-struct SectionHeader: View {
+public struct SectionHeader: View {
   let title: String
   let count: Int
 
-  var body: some View {
+  public var body: some View {
     HStack(spacing: 6) {
       Text(title)
         .font(.swarm(.xs, weight: .semibold))
@@ -616,12 +617,12 @@ struct SectionHeader: View {
   }
 }
 
-struct SectionRow: View {
+public struct SectionRow: View {
   let icon: String
   let color: Color
   let text: String
 
-  var body: some View {
+  public var body: some View {
     HStack(spacing: 8) {
       Image(systemName: icon)
         .font(.swarm(.xs))

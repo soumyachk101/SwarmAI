@@ -40,7 +40,7 @@ public struct ToolboxPaneView: View {
  private var headerView: some View {
  HStack {
  Text("Toolbox")
- .font(.swarm(.md, weight: .bold))
+ .font(.swarm(.lg, weight: .bold))
  .foregroundStyle(.swarmTextPrimary)
 
  Spacer()
@@ -166,12 +166,16 @@ public struct ToolboxPaneView: View {
 
 // MARK: - Tool Card
 
-struct ToolCard: View {
- let tool: ToolItem
+public struct ToolCard: View {
+ public let tool: ToolItem
  @State private var isEnabled: Bool = true
  @State private var isHovered: Bool = false
 
- var body: some View {
+ public init(tool: ToolItem) {
+ self.tool = tool
+ }
+
+ public var body: some View {
  VStack(spacing: 8) {
  Image(systemName: tool.icon)
  .font(.system(size: 24))
@@ -217,15 +221,23 @@ struct ToolCard: View {
 
 // MARK: - Tool Models
 
-struct ToolItem: Identifiable, Equatable {
- let id: String
- let name: String
- let category: ToolCategory
- let icon: String
- let description: String
+public struct ToolItem: Identifiable, Equatable {
+ public let id: String
+ public let name: String
+ public let category: ToolCategory
+ public let icon: String
+ public let description: String
+
+ public init(id: String, name: String, category: ToolCategory, icon: String, description: String) {
+ self.id = id
+ self.name = name
+ self.category = category
+ self.icon = icon
+ self.description = description
+ }
 }
 
-enum ToolCategory: String, CaseIterable, Identifiable {
+public enum ToolCategory: String, CaseIterable, Identifiable {
  case all = "all"
  case versionControl = "versionControl"
  case packageManager = "packageManager"
@@ -236,9 +248,9 @@ enum ToolCategory: String, CaseIterable, Identifiable {
  case testing = "testing"
  case monitoring = "monitoring"
 
- var id: String { rawValue }
+ public var id: String { rawValue }
 
- var label: String {
+ public var label: String {
  switch self {
  case .all: return "All"
  case .versionControl: return "VCS"

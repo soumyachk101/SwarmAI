@@ -1,137 +1,148 @@
 import SwiftUI
 
-// MARK: - Board Strip (Tab Bar for open panes)
+// MARK: - Board Strip (Tab Bar matching Tauri @swarm/board BoardStrip)
 
 struct BoardStrip: View {
 	@Environment(\.agentsStore) private var agentsStore
+	@Environment(\.appState) private var appState
 
 	var body: some View {
-		ScrollView(.horizontal, showsIndicators: false) {
-			HStack(spacing: 4) {
-				ForEach(agentsStore.agents) { agent in
-					BoardStripTab(
-						agent: agent,
-						isActive: agentsStore.activePaneId == agent.id.uuidString
-					)
-					.switchTabAnimation(isActive: agentsStore.activePaneId == agent.id.uuidString)
-				}
+		HStack(spacing: 8) {
+			// Leading: If sidebar is closed, provide space for traffic lights + expand sidebar button
+			if !appState.isLeftSidebarOpen {
+				HStack(spacing: 6) {
+					Button {
+						withAnimation(.swarmQuick) {
+							appState.isLeftSidebarOpen.toggle()
+						}
+					} label: {
+						Image(systemName: "sidebar.leading")
+							.font(.system(size: 12))
+							.foregroundStyle(Color.zinc400)
+							.frame(width: 26, height: 26)
+							.background {
+								RoundedRectangle(cornerRadius: 6)
+									.fill(Color.white.opacity(0.04))
+							}
+					}
+					.buttonStyle(.plain)
+					.help("Show sidebar")
 
-				AddPaneButton()
+					Rectangle()
+						.fill(Color.white.opacity(0.12))
+						.frame(width: 1, height: 16)
+				}
+				.padding(.leading, 70)
 			}
-			.padding(.horizontal, 12)
+
+			// View Toggle: Grid | Flow
+			BoardViewToggle()
+
+			Rectangle()
+				.fill(Color.white.opacity(0.12))
+				.frame(width: 1, height: 16)
+
+			// Horizontal scrollable chips for open panes
+			ScrollView(.horizontal, showsIndicators: false) {
+				HStack(spacing: 6) {
+					ForEach(agentsStore.agents) { agent in
+						BoardStripTab(
+							agent: agent,
+							isActive: agentsStore.activePaneId == agent.id.uuidString
+						)
+					}
+
+					AddPaneButton()
+				}
+				.padding(.vertical, 2)
+			}
+
+			Spacer(minLength: 0)
 		}
-		.padding(.vertical, 4)
-		.glassToolbar()
+		.padding(.horizontal, 10)
+		.padding(.trailing, appState.isRightDockOpen ? 12 : 95)
+		.frame(height: 40)
+		.background {
+			Color(red: 12/255, green: 14/255, blue: 22/255).opacity(0.95)
+				.overlay(
+					Rectangle()
+						.fill(Color.white.opacity(0.08))
+						.frame(height: 1),
+					alignment: .bottom
+				)
+		}
 	}
 }
 
-// MARK: - Board Strip Tab
+// MARK: - Board Strip Tab Chip
 
 struct BoardStripTab: View {
 	let agent: Agent
 	var isActive: Bool = false
 	@Environment(\.agentsStore) private var agentsStore
 	@State private var isHovered: Bool = false
-	@State private var showClose: Bool = false
 
 	var body: some View {
-		Button {
-			agentsStore.activePaneId = agent.id.uuidString
-		} label: {
-			HStack(spacing: 6) {
-				Text(agent.agentType.icon)
-					.font(.swarm(.xs))
+		HStack(spacing: 6) {
+			// Status glowing dot
+			Circle()
+				.fill(statusColor)
+				.frame(width: 7, height: 7)
+				.shadow(color: statusColor.opacity(isActive ? 0.8 : 0.3), radius: isActive ? 4 : 2)
 
-				Text(agent.name)
-					.font(.swarm(.xs, weight: isActive ? .medium : .regular))
-					.foregroundStyle(isActive ? Color.swarmGold : Color.swarmTextSecondary)
-					.lineLimit(1)
-					.truncationMode(.tail)
-					.frame(maxWidth: 100, alignment: .leading)
+			// Agent name
+			Text(agent.name)
+				.font(.system(size: 12, weight: isActive ? .semibold : .regular))
+				.foregroundStyle(isActive ? Color.white : Color.zinc400)
+				.lineLimit(1)
+				.frame(maxWidth: 150, alignment: .leading)
 
-				// Close Pane Button
-				Button {
-					withAnimation(.swarmButtonPress) {
-						agentsStore.closePane(agent.id)
-					}
-				} label: {
-					Image(systemName: "xmark")
-						.font(.swarm(.micro))
-						.foregroundStyle(Color.swarmTextSecondary)
-						.frame(width: 14, height: 14)
-						.contentShape(Rectangle())
+			// Close button on hover
+			Button {
+				withAnimation(.swarmQuick) {
+					agentsStore.closePane(agent.id)
 				}
-				.buttonStyle(.plain)
-				.opacity(showClose ? 1 : 0)
-				.allowsHitTesting(showClose)
-				.animation(.swarmQuick, value: showClose)
-			}
-			.padding(.horizontal, 10)
-			.padding(.vertical, 5)
-			.background {
-				RoundedRectangle(cornerRadius: 6)
-					.fill(backgroundFill)
-					.overlay {
-						RoundedRectangle(cornerRadius: 6)
-							.stroke(borderColor, lineWidth: 1)
+			} label: {
+				Image(systemName: "xmark")
+					.font(.system(size: 8, weight: .bold))
+					.foregroundStyle(Color.zinc400)
+					.frame(width: 14, height: 14)
+					.background {
+						RoundedRectangle(cornerRadius: 3)
+							.fill(isHovered ? Color.white.opacity(0.12) : Color.clear)
 					}
 			}
+			.buttonStyle(.plain)
+			.opacity(isHovered || isActive ? 1 : 0.4)
 		}
-		.buttonStyle(.plain)
+		.padding(.horizontal, 8)
+		.frame(height: 28)
+		.background {
+			RoundedRectangle(cornerRadius: 8)
+				.fill(isActive ? Color(red: 22/255, green: 26/255, blue: 38/255) : (isHovered ? Color.white.opacity(0.04) : Color.clear))
+				.overlay(
+					RoundedRectangle(cornerRadius: 8)
+						.stroke(isActive ? Color.white.opacity(0.16) : Color.clear, lineWidth: 1)
+				)
+		}
+		.contentShape(Rectangle())
+		.onTapGesture {
+			agentsStore.activePaneId = agent.id.uuidString
+		}
 		.onHover { hovering in
 			withAnimation(.swarmQuick) {
 				isHovered = hovering
-				showClose = hovering
 			}
 		}
 	}
 
-	private var backgroundFill: AnyShapeStyle {
-		if isActive {
-			return AnyShapeStyle(Color.swarmGold.opacity(0.15))
+	private var statusColor: Color {
+		switch agent.status {
+		case .running: return Color.swarmOk
+		case .launching: return Color.swarmWarn
+		case .error: return Color.swarmErr
+		default: return Color.swarmGold
 		}
-		if isHovered {
-			return AnyShapeStyle(Color.swarmSurfaceHover.opacity(0.6))
-		}
-		return AnyShapeStyle(Color.clear)
-	}
-
-	private var borderColor: Color {
-		if isActive {
-			return Color.swarmGold
-		}
-		if isHovered {
-			return Color.swarmBorderSubtle
-		}
-		return Color.clear
-	}
-}
-
-// MARK: - Smooth Tab Switch Animation
-
-struct SwitchTabAnimation: ViewModifier {
-	let isActive: Bool
-	@State private var animatedValue: CGFloat = 0
-
-	func body(content: Content) -> some View {
-		content
-			.overlay {
-				RoundedRectangle(cornerRadius: 6)
-					.fill(Color.swarmGold.opacity(0.08 * animatedValue))
-					.stroke(Color.swarmGold.opacity(0.5 * animatedValue), lineWidth: 1)
-					.allowsHitTesting(false)
-			}
-			.onChange(of: isActive) { _, newActive in
-				withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-					animatedValue = newActive ? 1 : 0
-				}
-			}
-	}
-}
-
-extension View {
-	func switchTabAnimation(isActive: Bool) -> some View {
-		self.modifier(SwitchTabAnimation(isActive: isActive))
 	}
 }
 
@@ -143,28 +154,27 @@ struct AddPaneButton: View {
 
 	var body: some View {
 		Button {
-			agentsStore.spawnAgent(.claudeCode)
+			_ = agentsStore.spawnAgent(.claudeCode)
 		} label: {
 			Image(systemName: "plus")
-				.font(.swarm(.xs))
-				.foregroundStyle(isHovered ? Color.swarmGold : Color.swarmTextTertiary)
-				.frame(width: 28, height: 28)
+				.font(.system(size: 11, weight: .semibold))
+				.foregroundStyle(isHovered ? Color.swarmGoldHi : Color.zinc300)
+				.frame(width: 26, height: 26)
 				.background {
-					RoundedRectangle(cornerRadius: 6)
-						.fill(isHovered ? Color.swarmGold.opacity(0.08) : Color.swarmSurfaceHover.opacity(0.3))
+					RoundedRectangle(cornerRadius: 7)
+						.fill(Color.white.opacity(0.04))
 						.overlay(
-							RoundedRectangle(cornerRadius: 6)
-								.stroke(isHovered ? Color.swarmGold.opacity(0.4) : Color.swarmBorderSubtle, style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
+							RoundedRectangle(cornerRadius: 7)
+								.stroke(isHovered ? Color.swarmGold.opacity(0.4) : Color.white.opacity(0.1), lineWidth: 1)
 						)
 				}
 		}
 		.buttonStyle(.plain)
+		.help("Add Agent")
 		.onHover { hovering in
 			withAnimation(.swarmQuick) {
 				isHovered = hovering
 			}
 		}
-		.scaleEffect(isHovered ? 1.05 : 1.0)
-		.animation(.swarmQuick, value: isHovered)
 	}
 }

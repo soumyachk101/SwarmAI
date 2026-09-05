@@ -11,8 +11,8 @@ public struct FlowBoardView: View {
 
 	@State private var camera: CGPoint = .zero
 	@State private var scale: CGFloat = 1.0
-	@State private var selectedNode: String?
-	@State private var draggingNode: String?
+	@State private var selectedNode: UUID?
+	@State private var draggingNode: UUID?
 	@State private var dragOffset: CGSize = .zero
 
 	@GestureState private var pinchScale: CGFloat = 1.0
@@ -43,8 +43,8 @@ public struct FlowBoardView: View {
 		.gesture(panGesture)
 		.gesture(pinchGesture)
 		.onAppear {
-			Task { @MainActor in
-				canvasStore.seedDemoData()
+			Swift.Task { @MainActor in
+				canvasStore.seedDemoNodes()
 			}
 		}
 	}
@@ -145,7 +145,6 @@ public struct FlowBoardView: View {
 	private func arrowHead(from: CGPoint, to: CGPoint) -> Path {
 		let angle = atan2(to.y - from.y, to.x - from.x)
 		let length: CGFloat = 10
-		let arrowSize: CGFloat = 6
 
 		let tip = to
 		let left = CGPoint(

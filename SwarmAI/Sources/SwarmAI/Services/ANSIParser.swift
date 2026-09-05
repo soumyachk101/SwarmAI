@@ -87,23 +87,35 @@ public enum ANSIParser {
  Color(hex: "#FFFFFF") ?? .white // 15 Bright White
  ]
 
- // MARK: - Theme-Aware Palette
+ // MARK: - Thread-Safe Theme Palette Store
+
+ nonisolated(unsafe) private static var _themeStandardColors: [Color] = standardColors
+ nonisolated(unsafe) private static var _themeBrightColors: [Color] = brightColors
 
  /// Set the ANSI color palette from a ThemeScheme. Call this when the theme changes.
+ @MainActor
  public static func setThemePalette(_ theme: ThemeScheme) {
- themeStandardColors = theme.ansiStandard
- themeBrightColors = theme.ansiBright
+ _themeStandardColors = theme.ansiStandard
+ _themeBrightColors = theme.ansiBright
  }
 
  /// Reset to the default hardcoded palette.
+ @MainActor
  public static func resetThemePalette() {
- themeStandardColors = standardColors
- themeBrightColors = brightColors
+ _themeStandardColors = standardColors
+ _themeBrightColors = brightColors
  }
 
  /// Current palette used for theme-aware parsing (defaults to the standard palette).
- public static var themeStandardColors: [Color] = standardColors
- public static var themeBrightColors: [Color] = brightColors
+ public static var themeStandardColors: [Color] {
+ get { _themeStandardColors }
+ set { _themeStandardColors = newValue }
+ }
+
+ public static var themeBrightColors: [Color] {
+ get { _themeBrightColors }
+ set { _themeBrightColors = newValue }
+ }
 
  // MARK: - Parse with Default Palette (backward compatible)
 

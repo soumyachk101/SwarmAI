@@ -5,19 +5,19 @@ import SwiftUI
 struct SwarmAIApp: App {
 	@NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
-	@Environment(\.appState) private var appState
-	@Environment(\.themeStore) private var themeStore
-	@Environment(\.agentsStore) private var agentsStore
-	@Environment(\.workspaceStore) private var workspaceStore
-	@Environment(\.taskStore) private var taskStore
-	@Environment(\.settingsStore) private var settingsStore
-	@Environment(\.uiStore) private var uiStore
-	@Environment(\.planeStore) private var planeStore
-	@Environment(\.canvasStore) private var canvasStore
-	@Environment(\.browserStore) private var browserStore
-	@Environment(\.extensionStore) private var extensionStore
-	@Environment(\.dispatchStore) private var dispatchStore
-	@Environment(\.projectStore) private var projectStore
+	private let appState = AppState.shared
+	private let themeStore = ThemeStore.shared
+	private let agentsStore = AgentsStore.shared
+	private let workspaceStore = WorkspaceStore.shared
+	private let taskStore = TaskStore.shared
+	private let settingsStore = SettingsStore.shared
+	private let uiStore = UiStore.shared
+	private let planeStore = PlaneStore.shared
+	private let canvasStore = CanvasStore.shared
+	private let browserStore = BrowserStore.shared
+	private let extensionStore = ExtensionStore.shared
+	private let dispatchStore = DispatchStore.shared
+	private let projectStore = ProjectStore.shared
 
 	var body: some Scene {
 		WindowGroup {

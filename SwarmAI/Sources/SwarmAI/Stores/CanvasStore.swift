@@ -32,23 +32,23 @@ public enum LayoutAlgorithm: String, Codable, Sendable, CaseIterable, Identifiab
 
 // MARK: - Canvas Supporting Types
 
-struct CanvasNode: Identifiable, Codable, Equatable {
- let id: UUID
- var position: CGPoint
- var title: String
- var subtitle: String
- var agentType: AgentType
- var width: CGFloat
- var height: CGFloat
- var color: Color = .swarmGold
- var status: AgentStatus = .idle
- var isHighlighted: Bool = false
+public struct CanvasNode: Identifiable, Codable, Equatable {
+ public let id: UUID
+ public var position: CGPoint
+ public var title: String
+ public var subtitle: String
+ public var agentType: AgentType
+ public var width: CGFloat
+ public var height: CGFloat
+ public var color: Color = .swarmGold
+ public var status: AgentStatus = .idle
+ public var isHighlighted: Bool = false
 
  enum CodingKeys: String, CodingKey {
  case id, position, title, subtitle, agentType, width, height
  }
 
- init(from decoder: Decoder) throws {
+ public init(from decoder: Decoder) throws {
  let container = try decoder.container(keyedBy: CodingKeys.self)
  id = try container.decode(UUID.self, forKey: .id)
  let posArray = try container.decode([Double].self, forKey: .position)
@@ -62,7 +62,7 @@ struct CanvasNode: Identifiable, Codable, Equatable {
  status = .idle
  }
 
- init(id: UUID = UUID(), position: CGPoint, title: String, subtitle: String, agentType: AgentType, width: CGFloat = 200, height: CGFloat = 100, color: Color = .swarmGold, status: AgentStatus = .idle) {
+ public init(id: UUID = UUID(), position: CGPoint, title: String, subtitle: String, agentType: AgentType, width: CGFloat = 200, height: CGFloat = 100, color: Color = .swarmGold, status: AgentStatus = .idle) {
  self.id = id
  self.position = position
  self.title = title
@@ -74,7 +74,7 @@ struct CanvasNode: Identifiable, Codable, Equatable {
  self.status = status
  }
 
- func encode(to encoder: Encoder) throws {
+ public func encode(to encoder: Encoder) throws {
  var container = encoder.container(keyedBy: CodingKeys.self)
  try container.encode(id, forKey: .id)
  try container.encode([position.x, position.y], forKey: .position)
@@ -90,14 +90,14 @@ struct CanvasNode: Identifiable, Codable, Equatable {
  }
 }
 
-struct CanvasEdge: Identifiable, Codable, Equatable {
- let id: UUID
- var from: UUID
- var to: UUID
- var label: String?
- var flowOffset: CGFloat = 0
+public struct CanvasEdge: Identifiable, Codable, Equatable, Sendable {
+ public let id: UUID
+ public var from: UUID
+ public var to: UUID
+ public var label: String?
+ public var flowOffset: CGFloat = 0
 
- init(id: UUID = UUID(), from: UUID, to: UUID, label: String? = nil) {
+ public init(id: UUID = UUID(), from: UUID, to: UUID, label: String? = nil) {
  self.id = id
  self.from = from
  self.to = to
@@ -105,17 +105,17 @@ struct CanvasEdge: Identifiable, Codable, Equatable {
  }
 }
 
-struct CanvasCamera: Codable {
- var x: CGFloat
- var y: CGFloat
- var zoom: Double
+public struct CanvasCamera: Codable, Sendable {
+ public var x: CGFloat
+ public var y: CGFloat
+ public var zoom: Double
 
- static let `default` = CanvasCamera(x: 0, y: 0, zoom: 1.0)
+ public static let defaultCamera = CanvasCamera(x: 0, y: 0, zoom: 1.0)
 }
 
 // MARK: - Undoable Action
 
-enum CanvasAction: Equatable {
+public enum CanvasAction {
  case addNode(CanvasNode)
  case removeNode(CanvasNode, edges: [CanvasEdge])
  case moveNode(UUID, from: CGPoint, to: CGPoint)
@@ -137,12 +137,13 @@ enum CanvasAction: Equatable {
 
 // MARK: - Canvas Store
 
+@MainActor
 @Observable
 public final class CanvasStore: @unchecked Sendable {
  public static let shared = CanvasStore()
  public var nodes: [CanvasNode] = []
  public var edges: [CanvasEdge] = []
- public var camera: CanvasCamera = .default
+ public var camera: CanvasCamera = .defaultCamera
  public var selectedNodeId: UUID?
 
  public var selectedNode: CanvasNode? {
@@ -310,7 +311,7 @@ public final class CanvasStore: @unchecked Sendable {
  // MARK: - Camera
 
  func resetCamera() {
- camera = .default
+ camera = .defaultCamera
  }
 
  // MARK: - Layout
@@ -508,7 +509,7 @@ public final class CanvasStore: @unchecked Sendable {
 
  // MARK: - Demo Data
 
- private func seedDemoNodes() {
+ func seedDemoNodes() {
  let leadId = UUID()
  let builder1Id = UUID()
  let builder2Id = UUID()
