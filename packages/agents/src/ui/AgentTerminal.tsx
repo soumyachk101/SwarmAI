@@ -582,9 +582,33 @@ const resetLoopsStarted = () => { loopsStarted = false; };
  }, spawned ? 40 : 150);
  };
 
- onDataDisposable = terminal.onData((data) => {
- writeToProcess(data);
- });
+ let inputLineBuffer = "";
+  onDataDisposable = terminal.onData((data) => {
+    writeToProcess(data);
+    if (data === "\r" || data === "\n") {
+      const text = inputLineBuffer.trim();
+      inputLineBuffer = "";
+      if (text && text.length > 2) {
+        const currentName = agent.customName?.trim() || "";
+        const isDefault =
+          !currentName ||
+          currentName.toLowerCase() === "new session" ||
+          currentName.toLowerCase() === "agent session" ||
+          currentName.toLowerCase() === (agent.cliName || "").toLowerCase();
+        if (isDefault) {
+          let clean = text.replace(/^\/[a-zA-Z0-9_-]+\s*/, "").replace(/[\r\n]+/g, " ").trim();
+          if (clean.length > 40) clean = clean.slice(0, 37).trim() + "…";
+          if (clean && !["clear", "ls", "pwd", "exit", "help", "cd"].includes(clean.toLowerCase())) {
+            useAgentsStore.getState().updateAgent(agent.id, { customName: clean, initialPrompt: text });
+          }
+        }
+      }
+    } else if (data === "\x7f" || data === "\b") {
+      inputLineBuffer = inputLineBuffer.slice(0, -1);
+    } else if (data.length === 1 && data >= " ") {
+      inputLineBuffer += data;
+    }
+  });
 
  unsubscribeResize = onWindowResize(fitAndSync);
 

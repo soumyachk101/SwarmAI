@@ -1005,6 +1005,26 @@ export function DevChatStudio({
       updateCurrentMessages((prev) => [...prev, userMsg]);
       setInput("");
 
+      // Auto-update session title if generic
+      let cleanTitle = q.replace(/^[\/\s]+/, "").replace(/[\r\n]+/g, " ").trim();
+      if (cleanTitle.length > 40) cleanTitle = cleanTitle.slice(0, 37).trim() + "…";
+      if (cleanTitle) {
+        setSessions((prevSessions) =>
+          prevSessions.map((s) => {
+            if (
+              s.id === activeSessionId &&
+              (!s.title ||
+                s.title === "Main Copilot Session" ||
+                s.title.toLowerCase() === "new session" ||
+                s.title.toLowerCase() === "agent session")
+            ) {
+              return { ...s, title: cleanTitle };
+            }
+            return s;
+          })
+        );
+      }
+
       if (execMode === "cli") {
         runLiveCliTask(q, selectedCli, selectedModel);
         return;

@@ -35,12 +35,14 @@ export function launchPresetSession({
   for (let s = 0; s < sessionCount; s++) {
     const sessionPrefix = sessionCount > 1 ? `[S${s + 1}] ` : "";
 
+    const promptTitle = basePrompt.length > 35 ? basePrompt.slice(0, 32).trim() + "…" : basePrompt;
+
     if (preset === "solo") {
       const agent: Agent = {
         id: `agent-solo-${timestamp}-${s}`,
         cli: cliCommand,
         cliName: isTerminal ? "Terminal" : cliName,
-        customName: isTerminal ? `${sessionPrefix}Terminal` : `${sessionPrefix}${cliName}`,
+        customName: basePrompt ? `${sessionPrefix}${promptTitle}` : (isTerminal ? `${sessionPrefix}Terminal` : `${sessionPrefix}${cliName}`),
         kind: isTerminal ? "shell" : "agent",
         plane: "board",
         workspaceId: activeWorkspaceId,

@@ -6,6 +6,7 @@
 // they carried the second density language (big padded cards) that made this
 // package look inconsistent with the rest of the UI.
 export { default as WorkspacesSidebar } from './WorkspacesSidebar.js';
+export { default as CodexClaudeWorkspacesView } from './CodexClaudeWorkspacesView.js';
 export { default as WorkspaceCreateDialog } from './WorkspaceCreateDialog.js';
 export { default as WorktreeSelect } from './WorktreeSelect.js';
 export { default as ToolboxPane } from './ToolboxPane.js';

@@ -253,6 +253,7 @@ function AgentPane({
 
  // Store selectors
  const setAgentStatus = useAgentsStore((s) => s.setAgentStatus);
+ const updateAgent = useAgentsStore((s) => s.updateAgent);
  const refitCount = useAgentsStore((s) => s.refitCount);
  const promoteToLead = useAgentsStore((s) => s.promoteToLead);
  const demoteLead = useAgentsStore((s) => s.demoteLead);
@@ -414,16 +415,41 @@ function AgentPane({
  }
  };
 
- const handleSendPrompt = () => {
- if (!promptInput.trim()) return;
- const text = promptInput;
- setPromptInput("");
- setCommandSuggestionsOpen(false);
- if (promptTextareaRef.current) {
- promptTextareaRef.current.style.height = "auto";
- }
- sendTerminal(text + "\r");
- };
+  const handleSendPrompt = () => {
+    if (!promptInput.trim()) return;
+    const text = promptInput;
+    setPromptInput("");
+    setCommandSuggestionsOpen(false);
+    if (promptTextareaRef.current) {
+      promptTextareaRef.current.style.height = "auto";
+    }
+
+    // Auto-update session title if it's currently a default/generic title
+    const trimmed = text.trim();
+    const currentName = agent.customName?.trim() || "";
+    const isGeneric =
+      !currentName ||
+      currentName.toLowerCase() === "new session" ||
+      currentName.toLowerCase() === "agent session" ||
+      currentName.toLowerCase() === (agent.cliName || "").toLowerCase() ||
+      currentName.toLowerCase() === (agent.cli || "").toLowerCase();
+
+    if (isGeneric && trimmed) {
+      let cleanTitle = trimmed
+        .replace(/^\/[a-zA-Z0-9_-]+\s*/, "") // strip slash commands like /fix
+        .replace(/[\r\n]+/g, " ")
+        .trim();
+      if (!cleanTitle) cleanTitle = trimmed;
+      if (cleanTitle.length > 40) {
+        cleanTitle = cleanTitle.slice(0, 37).trim() + "…";
+      }
+      if (cleanTitle) {
+        updateAgent(agent.id, { customName: cleanTitle, initialPrompt: trimmed });
+      }
+    }
+
+    sendTerminal(text + "\r");
+  };
 
  const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
  const val = e.target.value;

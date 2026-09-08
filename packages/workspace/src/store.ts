@@ -29,6 +29,15 @@ export type { TaskCard } from '@swarm/tasks';
 export type { ColumnId, ColumnDefinition } from '@swarm/tasks';
 export { DEFAULT_COLUMNS } from '@swarm/tasks';
 
+export interface WorkspaceThread {
+  id: string;
+  title: string;
+  createdAt: number;
+  updatedAt?: number;
+  agentId?: string;
+  status?: 'active' | 'idle' | 'running' | 'done';
+}
+
 export interface Workspace {
   id: string;
   name: string;
@@ -48,6 +57,7 @@ export interface Workspace {
    *  up without any per-agent wiring. See toolbox.ts. */
   toolbox?: Toolbox;
   activeMissionId?: string;
+  threads?: WorkspaceThread[];
   isDeleting?: boolean;
   deletePhase?: 'queued' | 'deleting';
 }
@@ -59,6 +69,12 @@ interface WorkspaceState {
   activeWorkspaceId: string;
   boardOpen: boolean;
   renamingWorkspaceId: string | null;
+  activeThreadId: string | null;
+  setActiveThreadId: (id: string | null) => void;
+  addThread: (workspaceId: string, title?: string, agentId?: string) => WorkspaceThread;
+  removeThread: (workspaceId: string, threadId: string) => void;
+  renameThread: (workspaceId: string, threadId: string, title: string) => void;
+  duplicateThread: (workspaceId: string, threadId: string) => WorkspaceThread | undefined;
 
   addWorkspace: (agent: Workspace) => void;
   removeWorkspace: (id: string) => void;
@@ -119,6 +135,78 @@ export const useWorkspaceStore = create<WorkspaceState>()(persist((set, get) => 
   activeWorkspaceId: '',
   boardOpen: false,
   renamingWorkspaceId: null,
+  activeThreadId: null,
+  setActiveThreadId: (id) => set({ activeThreadId: id }),
+
+  addThread: (workspaceId, title = "New session", agentId) => {
+    const thread: WorkspaceThread = {
+      id: `thread-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      title,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      agentId,
+      status: "active",
+    };
+    set((state) => ({
+      activeThreadId: thread.id,
+      workspaces: state.workspaces.map((w) =>
+        w.id === workspaceId
+          ? { ...w, threads: [thread, ...(w.threads ?? [])] }
+          : w
+      ),
+    }));
+    return thread;
+  },
+
+  removeThread: (workspaceId, threadId) => {
+    set((state) => ({
+      activeThreadId: state.activeThreadId === threadId ? null : state.activeThreadId,
+      workspaces: state.workspaces.map((w) =>
+        w.id === workspaceId
+          ? { ...w, threads: (w.threads ?? []).filter((t) => t.id !== threadId) }
+          : w
+      ),
+    }));
+  },
+
+  renameThread: (workspaceId, threadId, title) => {
+    set((state) => ({
+      workspaces: state.workspaces.map((w) =>
+        w.id === workspaceId
+          ? {
+              ...w,
+              threads: (w.threads ?? []).map((t) =>
+                t.id === threadId || t.agentId === threadId
+                  ? { ...t, title, updatedAt: Date.now() }
+                  : t
+              ),
+            }
+          : w
+      ),
+    }));
+  },
+
+  duplicateThread: (workspaceId, threadId) => {
+    const ws = get().workspaces.find((w) => w.id === workspaceId);
+    const existing = ws?.threads?.find((t) => t.id === threadId);
+    if (!existing) return undefined;
+    const copy: WorkspaceThread = {
+      id: `thread-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      title: `${existing.title} (copy)`,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      status: "idle",
+    };
+    set((state) => ({
+      activeThreadId: copy.id,
+      workspaces: state.workspaces.map((w) =>
+        w.id === workspaceId
+          ? { ...w, threads: [copy, ...(w.threads ?? [])] }
+          : w
+      ),
+    }));
+    return copy;
+  },
 
   addWorkspace: (agent) =>
     set((state) => ({ workspaces: [...state.workspaces, agent], activeWorkspaceId: agent.id })),

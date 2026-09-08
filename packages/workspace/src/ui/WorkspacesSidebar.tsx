@@ -16,8 +16,7 @@ import {
   EyeOff,
   MoreHorizontal,
   Pin,
-  MessageSquare,
- PinOff,
+  PinOff,
   Folder,
   FolderOpen,
   File,
@@ -63,7 +62,8 @@ import { useAgentsStore, type AgentStatus } from "@swarm/agents/ui";
 import { useProjectStore } from "../openFiles.js";
 import WorkspaceCreateDialog from "./WorkspaceCreateDialog.js";
 import AgentPanel from "./AgentPanel.js";
-import SessionPopoverList from "./SessionPopoverList.js";
+import WorkspaceSessionDropdown from "./WorkspaceSessionDropdown.js";
+import CodexClaudeWorkspacesView from "./CodexClaudeWorkspacesView.js";
 
 const isTauriEnv = (): boolean =>
   typeof window !== "undefined" && ("__TAURI_INTERNALS__" in window || "__TAURI__" in window);
@@ -1127,6 +1127,8 @@ export default function ADEWorktreeSidebar({
   const [editValue, setEditValue] = useState("");
   const [contextMenu, setContextMenu] = useState<{ ws: Workspace; x: number; y: number } | null>(null);
   const [sessionPopover, setSessionPopover] = useState<{ workspaceId: string; workspaceName: string; projectPath: string | null; rect: DOMRect } | null>(null);
+ const [spawnCount, setSpawnCount] = useState(5);
+ const [spawning, setSpawning] = useState(false);
  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
 
@@ -1604,170 +1606,12 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
           ) : activeTab === "fleet" ? (
             <FleetPanel onSelectWorkspace={(wsId) => activateAndSync(wsId)} />
           ) : (
-            /* Workspaces Tab Content */
-            <>
-              {/* Ultra-Clean Linear Workspace Header */}
-              <div className="flex h-9 shrink-0 items-center justify-between px-3 border-b border-white/[0.06] bg-[#0c0e16]/90 backdrop-blur-md select-none">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-300">
-                    Workspaces
-                  </span>
-                  <span className="text-[10px] font-mono text-zinc-400 bg-white/[0.04] px-1.5 py-0.2 rounded border border-white/[0.06]">
-                    {visibleWorkspaces.length}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-1 shrink-0">
-                  <button
-                    onClick={() => setHideSleeping(!hideSleeping)}
-                    className={`size-6 flex items-center justify-center rounded-md transition-colors cursor-pointer ${
-                      hideSleeping
-                        ? "text-amber-400 bg-amber-400/15 border border-amber-400/30"
-                        : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06]"
-                    }`}
-                    title={hideSleeping ? "Show all workspaces" : "Hide sleeping workspaces"}
-                    aria-label="Toggle sleeping workspaces"
-                  >
-                    {hideSleeping ? <EyeOff size={11} /> : <Eye size={11} />}
-                  </button>
-
-                  <button
-                    onClick={handleAdd}
-                    className="size-6 flex items-center justify-center rounded-md border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] text-zinc-300 hover:text-white transition-colors cursor-pointer"
-                    title="Add Workspace Folder"
-                  >
-                    <Plus size={12} strokeWidth={2} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Minimal Search input */}
-              <div className="px-2.5 py-2 border-b border-white/[0.04]">
-                <div className="flex h-7.5 items-center gap-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06] px-2.5 focus-within:border-amber-400/40 focus-within:bg-white/[0.05] transition-colors">
-                  <Search size={11} className="text-zinc-500 shrink-0" />
-                  <input
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search workspaces..."
-                    aria-label="Filter workspaces"
-                    className="min-w-0 flex-1 bg-transparent text-[11.5px] text-zinc-200 outline-none placeholder:text-zinc-500 font-sans"
-                    spellCheck={false}
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery("")}
-                      title="Clear filter"
-                      className="text-zinc-500 hover:text-zinc-300"
-                    >
-                      <X size={10} />
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Workspaces List */}
-              <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#090b10]">
-                <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-sleek px-2 py-2 space-y-1">
-                  {visibleWorkspaces.length === 0 ? (
-                    searchQuery ? (
-                      <EmptyNote
-                        text="Nothing matches that filter"
-                        hint="Filters match a workspace name and its folder."
-                        actionLabel="Clear filter"
-                        onAction={() => setSearchQuery("")}
-                      />
-                    ) : hideSleeping ? (
-                      <EmptyNote
-                        text="Every workspace is asleep"
-                        hint="Sleeping means no agent is running in it."
-                        actionLabel="Show sleeping"
-                        onAction={() => setHideSleeping(false)}
-                      />
-                    ) : (
-                      <EmptyNote
-                        text="No workspaces yet"
-                        hint="A workspace is one folder."
-                        actionLabel="New Workspace"
-                        onAction={handleAdd}
-                      />
-                    )
-                  ) : (
-                    visibleWorkspaces.map((ws) => (
-                      <div key={ws.id} className="relative" onContextMenu={(e) => handleContextMenu(e, ws)}>
-                        <ProjectGroup
-                          ws={ws}
-                          isActive={ws.id === activeWorkspaceId}
-                          hasActive={hasActiveAgent(ws, agentStatuses)}
-                          onActivate={() => { if (!ws.isDeleting) activateAndSync(ws.id); }}
-                          onMenu={(e) => openMenu(ws, e.clientX, e.clientY)}
-                          onOpenSessions={(rect) =>
-                            setSessionPopover({
-                              workspaceId: ws.id,
-                              workspaceName: ws.name,
-                              projectPath: ws.boundProjectPath ?? null,
-                              rect,
-                            })
-                          }
-                          isRenaming={renamingWorkspaceId === ws.id}
-                          editValue={editValue}
-                          onEditChange={setEditValue}
-                          onCommitRename={commitRename}
-                          onCancelRename={() => { setRenamingWorkspaceId(null); setEditValue(""); }}
-                          onStartRename={() => startRename(ws.id, ws.name)}
-                        />
-
-                        {ws.isDeleting && (
-                          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/80 backdrop-blur-sm">
-                            <div className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-[#161822] border border-white/[0.12] px-2.5 py-1 text-mini font-medium text-zinc-200 shadow-xl">
-                              <LoaderCircle className="size-3 shrink-0 animate-spin text-zinc-400" />
-                              <span className="truncate">Deleting…</span>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); cancelDeleteWorkspace(ws.id); }}
-                                title="Cancel deletion"
-                                className="shrink-0 text-zinc-400 hover:text-zinc-200 transition-colors"
-                              >
-                                <X className="size-3" />
-                              </button>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); commitDeleteWorkspace(ws.id); }}
-                                className="shrink-0 font-semibold text-red-400 transition-colors hover:opacity-80"
-                              >
-                                Confirm
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
-
-                {/* Bottom Quick Navigation Links: Task Pipeline */}
-                <div className="px-2 py-1.5 border-t border-white/[0.06] shrink-0 bg-[#090b10]">
-                  <button
-                    onClick={() => setBoardOpen(!boardOpen)}
-                    className={`flex w-full h-7.5 items-center justify-between px-2.5 rounded-lg border text-xs font-medium transition-all cursor-pointer ${
-                      boardOpen
-                        ? "bg-amber-400/15 border-amber-400/30 text-amber-200 shadow-xs font-semibold"
-                        : "bg-white/[0.02] border-white/[0.06] text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.05] hover:border-white/[0.1]"
-                    }`}
-                    title="Toggle TaskComb Pipeline Board"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Network size={13} className={boardOpen ? "text-amber-400" : "text-zinc-400"} />
-                      <span className="text-[11.5px]">Task Pipeline</span>
-                    </div>
-                    {activeWorkspace?.taskCards && activeWorkspace.taskCards.length > 0 && (
-                      <span className="rounded-md bg-white/[0.06] border border-white/[0.08] text-zinc-300 px-1.5 py-0.2 text-[10px] font-mono font-semibold">
-                        {activeWorkspace.taskCards.length} tasks
-                      </span>
-                    )}
-                  </button>
-                </div>
-
-                <ActiveWorkspaceDetail ws={activeWorkspace} onOpenFile={setViewer} />
-              </div>
-            </>
+            /* Workspaces Tab Content - Codex & Claude Style */
+            <CodexClaudeWorkspacesView
+              projectPath={projectPath}
+              onOpenProject={onOpenProject}
+              onOpenCreateDialog={handleAdd}
+            />
           )}
         </div>
       </div>
@@ -1810,35 +1654,19 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
         document.body,
       )}
 
-      {sessionPopover && createPortal(
-        <>
-          <div className="fixed inset-0 z-[250]" onClick={() => setSessionPopover(null)} />
-          <div
-            className="fixed z-[251] w-80 max-h-96 rounded-xl border border-white/10 bg-[#14161d] shadow-2xl shadow-black/60 flex flex-col overflow-hidden"
-            style={{
-              top: Math.min(sessionPopover.rect.bottom + 6, window.innerHeight - 420),
-              left: Math.min(sessionPopover.rect.left, window.innerWidth - 330),
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between px-3 py-2 border-b border-white/[0.06]">
-              <span className="text-[11px] font-semibold text-zinc-200 truncate">{sessionPopover.workspaceName}</span>
-              <button
-                onClick={() => setSessionPopover(null)}
-                className="size-5 flex items-center justify-center rounded text-zinc-500 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer"
-              >
-                <X size={12} />
-              </button>
-            </div>
-            <SessionPopoverList
-              workspaceId={sessionPopover.workspaceId}
-              projectPath={sessionPopover.projectPath}
-              onClose={() => setSessionPopover(null)}
-            />
-          </div>
-        </>,
-        document.body,
-      )}
+ {sessionPopover && (
+ <WorkspaceSessionDropdown
+ workspaceId={sessionPopover.workspaceId}
+ workspaceName={sessionPopover.workspaceName}
+ projectPath={sessionPopover.projectPath}
+ anchorRect={sessionPopover.rect}
+ onClose={() => setSessionPopover(null)}
+ onSpawnSubagents={async (count) => {
+ setSpawnCount(count);
+ console.log("[Swarm] requesting", count, "subagents for", sessionPopover.workspaceId);
+ }}
+ />
+ )}
 
 
 
@@ -1988,7 +1816,11 @@ function ProjectGroup({
     }`}>
       {/* Top Header Row of the Card */}
       <div
-        onClick={() => { if (!isRenaming) onActivate(); }}
+        onClick={(e) => {
+ if (isRenaming) return;
+ onActivate();
+ onOpenSessions?.(e.currentTarget.getBoundingClientRect());
+ }}
         className="flex items-center gap-2.5 cursor-pointer"
       >
         {/* Monogram / Folder Icon Badge */}
@@ -2045,16 +1877,6 @@ function ProjectGroup({
 
         {/* Card Actions */}
         <div className="flex items-center gap-0.5 shrink-0 opacity-70 group-hover/item:opacity-100 transition-opacity">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpenSessions?.(e.currentTarget.getBoundingClientRect());
-            }}
-            className="size-6 flex items-center justify-center rounded-md text-zinc-400 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer"
-            title="Sessions"
-          >
-            <MessageSquare size={12} />
-          </button>
  <button
  onClick={(e) => { e.stopPropagation(); if (noRepo) { bindRepo(); return; } setAdding(!adding); setError(null); }}
             className="size-6 flex items-center justify-center rounded-md text-zinc-400 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer"

@@ -389,13 +389,14 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
      addAgentPane stamps the active agent on the pane and the store
      persists itself, so nothing extra to save here. */
   const addAgentPane = (cli: string, name: string) => {
-    const swarm: Agent = { id: `swarm-${Date.now()}`, cli, cliName: name };
+    const swarm: Agent = { id: `swarm-${Date.now()}`, cli, cliName: name, workspaceId: activeWorkspaceId };
     addAgent(swarm); setAgentStatus(swarm.id, "launching");
   };
   const addShell = (shell?: { label: string; command: string }) => {
     const swarm: Agent = {
       id: `terminal-${Date.now()}`, cli: shell?.command ?? "shell",
       cliName: shell?.label ?? "Terminal", kind: "shell",
+      workspaceId: activeWorkspaceId,
     };
     addAgent(swarm);
   };
@@ -404,12 +405,14 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
   const addBrowser = (plane: PlaneKind = "browser") => {
     const swarm: Agent = {
       id: `browser-${Date.now()}`, cli: "browser", cliName: "Browser", kind: "browser", plane,
+      workspaceId: activeWorkspaceId,
     };
     addAgent(swarm);
   };
   const addToolbox = () => {
     const swarm: Agent = {
       id: `toolbox-${Date.now()}`, cli: "toolbox", cliName: "Toolbox", kind: "toolbox", plane: "board",
+      workspaceId: activeWorkspaceId,
     };
     addAgent(swarm);
   };
@@ -417,6 +420,7 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
     const swarm: Agent = {
       id: `emulator-${Date.now()}`, cli: "emulator", cliName: "Emulator",
       kind: "emulator", plane: "board",
+      workspaceId: activeWorkspaceId,
     };
     addAgent(swarm);
   };
@@ -427,6 +431,7 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
       // Claude Code, Kilo Code and OpenChamber are agents: they join the swarm
       // like Agents and may be crowned. Tool extensions are just panes.
       agentExt: isAgentExtension(ext?.id),
+      workspaceId: activeWorkspaceId,
     };
     addAgent(swarm);
   };
@@ -437,6 +442,7 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
       cliName: "AI Copilot Chat",
       kind: "devchat",
       plane: "board",
+      workspaceId: activeWorkspaceId,
     };
     addAgent(swarm);
   };
