@@ -192,27 +192,30 @@ select:focus {
   box-shadow: none;
 }
 
-/* One keyboard focus ring for the whole app, in the active theme's accent.
-   Applies to every package's buttons too — they all render into this document. */
+/* One keyboard focus ring for the whole app, in the active theme accent.
+Applies to every package buttons too. The :is() selector targets focusable
+interactive elements specifically so form fields and icons get a clearly visible ring. */
 :focus-visible {
-  outline: 2px solid rgb(var(--swarm-gold));
-  outline-offset: 1px;
-  border-radius: inherit;
+ outline: 2px solid rgb(var(--swarm-gold));
+ outline-offset: 2px;
+ border-radius: 4px;
+}
+
+:focus-visible:is(button, [role="button"], a, input, select, textarea) {
+ outline: 2px solid rgb(var(--swarm-gold));
+ outline-offset: 2px;
+ box-shadow: 0 0 0 3px rgb(var(--swarm-gold) / 0.25);
+ border-radius: 4px;
 }
 
 /* xterm draws its own cursor; a ring around the canvas is noise. */
 .xterm-helper-textarea:focus-visible,
 .xterm textarea:focus-visible {
-  outline: none;
+ outline: none;
 }
 
 
 /* Accessibility: keyboard focus ring for all interactive elements. */
-*:focus-visible {
- outline: 2px solid #60a5fa;
- outline-offset: 2px;
-}
-
 *:focus:not(:focus-visible) {
  outline: none;
 }
@@ -286,7 +289,12 @@ select:focus {
   /* Elevation 1 — a pane or card frame, sitting on the floor. Opaque, so the
      1px border and the drop shadow are the whole separation; the top rim-light
      and bottom shade are what stop it reading as a flat rectangle. */
-  .glass {
+  
+ @media (max-width: 400px) {
+ .glass {
+ border-radius: 0.5rem;
+ }
+ }.glass {
     background-color: rgb(var(--swarm-canvas-hi));
     border: 1px solid rgb(var(--swarm-border));
     box-shadow:
@@ -441,16 +449,7 @@ select:focus {
     height: 5px;
   }
 
-  /* Hairline horizontal scrollbar / hidden for tab strips */
-  .scrollbar-hair {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  .scrollbar-hair::-webkit-scrollbar {
-    display: none;
-    width: 0px;
-    height: 0px;
-  }
+  
 }
 
 .scrollbar-none {
@@ -605,6 +604,14 @@ select:focus {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+ /* Cap scrollbar durations */
+ ::-webkit-scrollbar,
+ ::-webkit-scrollbar-thumb,
+ ::-webkit-scrollbar-track {
+ animation-duration: 300ms !important;
+ transition-duration: 300ms !important;
+ transition-timing-function: ease-out !important;
+ }
 }
 
 /* The ladder is already opaque, so .glass-hi is the only surface left to fix:
@@ -643,4 +650,11 @@ select:focus {
 @keyframes shimmer {
  0% { background-position: -200% 0; }
  100% { background-position: 200% 0; }
+}
+
+/* Keyboard drag target ring for pane grids */
+.grid[role="group"][tabindex="0"]:focus-visible {
+ outline: 2px solid rgba(var(--swarm-gold), 0.6);
+ outline-offset: -2px;
+ border-radius: 0.5rem;
 }

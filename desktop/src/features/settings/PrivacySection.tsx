@@ -26,7 +26,11 @@ export default function PrivacySection() {
           </p>
         </div>
 
-        <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+        <span
+ role="img"
+ aria-label="100 percent local-first guaranteed badge"
+ className="px-2.5 py-1 rounded-full text-[10px] font-mono font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5"
+ >
           <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
           <span>100% LOCAL-FIRST GUARANTEED</span>
         </span>

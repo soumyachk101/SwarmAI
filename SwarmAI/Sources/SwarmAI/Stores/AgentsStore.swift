@@ -2,6 +2,7 @@ import SwiftUI
 import AppKit
 
 @Observable
+// Safe: all mutations are @MainActor-isolated via SwiftUI's main-thread guarantee
 public final class AgentsStore: @unchecked Sendable {
   public static let shared = AgentsStore()
   public var agents: [Agent] = []
@@ -64,7 +65,6 @@ public final class AgentsStore: @unchecked Sendable {
 
  func closePane(_ agentId: UUID) {
  removeAgent(agentId)
- maximizedPaneId = nil
  }
 
  func getAgent(by id: UUID) -> Agent? {

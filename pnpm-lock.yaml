@@ -525,12 +525,12 @@ importers:
       '@swarm/board':
         specifier: workspace:*
         version: link:../board
+      '@swarm/pheromone':
+        specifier: workspace:*
+        version: link:../pheromone
       '@swarm/tasks':
         specifier: workspace:*
         version: link:../tasks
-      lucide-react:
-        specifier: ^0.400.0
-        version: 0.400.0(react@18.3.1)
       zustand:
         specifier: ^5.0.0
         version: 5.0.14(@types/react@18.3.31)(react@18.3.1)

@@ -646,8 +646,11 @@ public final class LeadBridge: @unchecked Sendable {
     case "launchAgent":
       let typeStr = args["type"] ?? "claude_code"
       let type = AgentType(rawValue: typeStr) ?? .claudeCode
-      let name = args["name"]
-      let agent = agentsStore?.spawnAgent(type, name: name)
+ var name = (args["name"] ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+ name = name.components(separatedBy: .controlCharacters).joined()
+ name = name.replacingOccurrences(of: /[`$;|&<>(){}[]~!*?'"#/, with: "", options: .regularExpression)
+ if name.count > 64 { name = String(name.prefix(64)) }
+ let agent = agentsStore?.spawnAgent(type, name: name.isEmpty ? "\(type.displayName)-\(agentsStore?.agents.count ?? 0 + 1)" : name)
       if let roleStr = args["role"], roleStr == "lead" {
         agent?.role = .lead
         agent?.leadMode = currentMode

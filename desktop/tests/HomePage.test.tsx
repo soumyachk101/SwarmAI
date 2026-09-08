@@ -255,10 +255,10 @@ describe("HomePage", () => {
  expect(screen.getByTitle("Collapse sidebar")).toBeDefined();
  });
 
- it("renders the voice dictation button", () => {
- render(<HomePage />);
- expect(screen.getByTitle("Voice Dictation (Click or Win+Alt / Ctrl+Win)")).toBeDefined();
- });
+  it("does not render the voice dictation button when disabled", () => {
+    render(<HomePage />);
+    expect(screen.queryByTitle(/Voice Dictation/i)).toBeNull();
+  });
 
  it("toggles right panel when button is clicked", () => {
  render(<HomePage />);

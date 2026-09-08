@@ -62,6 +62,7 @@ export interface AgentInfo {
  leadMode?: LeadMode;
  model?: string;
  effort?: string;
+ permissionMode?: string;
  initialPrompt?: string;
 }
 

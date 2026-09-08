@@ -2,6 +2,7 @@ import SwiftUI
 
  @MainActor
 @Observable
+// Safe: all mutations are @MainActor-isolated via SwiftUI's main-thread guarantee
 public final class WorkspaceStore: @unchecked Sendable {
   public static let shared = WorkspaceStore()
   public var workspaces: [Workspace] = []
@@ -45,9 +46,9 @@ public final class WorkspaceStore: @unchecked Sendable {
  workspaces.first { $0.id == activeWorkspaceId }
  }
 
- public func addWorktree(_ workspaceId: UUID, name: String, branch: String) -> Worktree {
+ public func addWorktree(_ workspaceId: UUID, name: String, branch: String) -> Worktree? {
  guard let workspace = workspaces.first(where: { $0.id == workspaceId }) else {
- fatalError("Workspace not found")
+ return nil
  }
  let worktree = Worktree(name: name, path: "\(workspace.path)/.worktrees/\(name)", branch: branch)
  workspace.worktrees.append(worktree)

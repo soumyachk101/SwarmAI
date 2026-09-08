@@ -45,6 +45,14 @@ export default function BrowserPane({
  // Mirrors urlInput so callbacks registered once don't read a stale URL.
  const urlRef = useRef(initialUrl);
  useEffect(() => { urlRef.current = urlInput; }, [urlInput]);
+ // Guard setState calls from CDP events that may fire after unmount
+ // (Page.screencastFrame, Page.frameNavigated, etc. are async and outlive
+ // the component if the pane is closed mid-frame).
+ const mountedRef = useRef(true);
+ useEffect(() => {
+ mountedRef.current = true;
+ return () => { mountedRef.current = false; };
+ }, []);
 
  /**
  * The emulated viewport in CSS pixels. Frames come back at this size times the
@@ -102,17 +110,19 @@ export default function BrowserPane({
  await client.send("Page.enable", {}, sessionId);
 
  client.on("Page.screencastFrame", (p: any) => {
+ if (!mountedRef.current) return;
  setFrame(p.data);
  const c = clientRef.current, s = sessionRef.current;
  if (!c) return;
  c.send("Page.screencastFrameAck", { sessionId: p.sessionId }, s ?? undefined).catch(() => {});
  });
  client.on("Page.frameNavigated", (p: any) => {
+ if (!mountedRef.current) return;
  if (p.frame?.parentId) return;
  if (p.frame?.url && p.frame.url !== "about:blank") setUrlInput(p.frame.url);
  });
- client.on("Page.frameStartedLoading", () => setLoading(true));
- client.on("Page.frameStoppedLoading", () => setLoading(false));
+ client.on("Page.frameStartedLoading", () => { if (mountedRef.current) setLoading(true); });
+ client.on("Page.frameStoppedLoading", () => { if (mountedRef.current) setLoading(false); });
 
  await applyMetrics(client, sessionId);
 
@@ -202,7 +212,7 @@ export default function BrowserPane({
  const r = img.getBoundingClientRect();
  const { width: vw, height: vh } = metricsRef.current;
  if (!r.width || !r.height || !vw || !vh) return null;
- const scale = Math.min(r.width / vw, r.height / vh);
+ const scale = Math.min(r.width / vw, r.height / vh) * window.devicePixelRatio;
  const offX = r.left + (r.width - vw * scale) / 2;
  const offY = r.top + (r.height - vh * scale) / 2;
  return {

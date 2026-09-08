@@ -16,7 +16,8 @@ import {
   EyeOff,
   MoreHorizontal,
   Pin,
-  PinOff,
+  MessageSquare,
+ PinOff,
   Folder,
   FolderOpen,
   File,
@@ -27,8 +28,10 @@ import {
   Hash,
   ChevronRight,
   ChevronDown,
+  MoreVertical,
   ArrowLeft,
   Check,
+ ExternalLink,
   FolderPlus,
   GitMerge,
   Terminal,
@@ -60,6 +63,7 @@ import { useAgentsStore, type AgentStatus } from "@swarm/agents/ui";
 import { useProjectStore } from "../openFiles.js";
 import WorkspaceCreateDialog from "./WorkspaceCreateDialog.js";
 import AgentPanel from "./AgentPanel.js";
+import SessionPopoverList from "./SessionPopoverList.js";
 
 const isTauriEnv = (): boolean =>
   typeof window !== "undefined" && ("__TAURI_INTERNALS__" in window || "__TAURI__" in window);
@@ -1122,7 +1126,8 @@ export default function ADEWorktreeSidebar({
   const [workspacesCollapsed, setWorkspacesCollapsed] = useState(false);
   const [editValue, setEditValue] = useState("");
   const [contextMenu, setContextMenu] = useState<{ ws: Workspace; x: number; y: number } | null>(null);
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [sessionPopover, setSessionPopover] = useState<{ workspaceId: string; workspaceName: string; projectPath: string | null; rect: DOMRect } | null>(null);
+ const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   const handleResizeStart = useCallback((e: React.MouseEvent) => {
@@ -1695,6 +1700,14 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
                           hasActive={hasActiveAgent(ws, agentStatuses)}
                           onActivate={() => { if (!ws.isDeleting) activateAndSync(ws.id); }}
                           onMenu={(e) => openMenu(ws, e.clientX, e.clientY)}
+                          onOpenSessions={(rect) =>
+                            setSessionPopover({
+                              workspaceId: ws.id,
+                              workspaceName: ws.name,
+                              projectPath: ws.boundProjectPath ?? null,
+                              rect,
+                            })
+                          }
                           isRenaming={renamingWorkspaceId === ws.id}
                           editValue={editValue}
                           onEditChange={setEditValue}
@@ -1797,6 +1810,36 @@ function GitSidebarPanel({ projectPath }: { projectPath: string | null }) {
         document.body,
       )}
 
+      {sessionPopover && createPortal(
+        <>
+          <div className="fixed inset-0 z-[250]" onClick={() => setSessionPopover(null)} />
+          <div
+            className="fixed z-[251] w-80 max-h-96 rounded-xl border border-white/10 bg-[#14161d] shadow-2xl shadow-black/60 flex flex-col overflow-hidden"
+            style={{
+              top: Math.min(sessionPopover.rect.bottom + 6, window.innerHeight - 420),
+              left: Math.min(sessionPopover.rect.left, window.innerWidth - 330),
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-3 py-2 border-b border-white/[0.06]">
+              <span className="text-[11px] font-semibold text-zinc-200 truncate">{sessionPopover.workspaceName}</span>
+              <button
+                onClick={() => setSessionPopover(null)}
+                className="size-5 flex items-center justify-center rounded text-zinc-500 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer"
+              >
+                <X size={12} />
+              </button>
+            </div>
+            <SessionPopoverList
+              workspaceId={sessionPopover.workspaceId}
+              projectPath={sessionPopover.projectPath}
+              onClose={() => setSessionPopover(null)}
+            />
+          </div>
+        </>,
+        document.body,
+      )}
+
 
 
       {/* Resize handle */}
@@ -1826,6 +1869,7 @@ function ProjectGroup({
   hasActive,
   onActivate,
   onMenu,
+  onOpenSessions,
   isRenaming,
   editValue,
   onEditChange,
@@ -1838,6 +1882,7 @@ function ProjectGroup({
   hasActive: boolean;
   onActivate: () => void;
   onMenu: (e: React.MouseEvent) => void;
+  onOpenSessions?: (rect: DOMRect) => void;
   isRenaming: boolean;
   editValue: string;
   onEditChange: (v: string) => void;
@@ -2001,7 +2046,17 @@ function ProjectGroup({
         {/* Card Actions */}
         <div className="flex items-center gap-0.5 shrink-0 opacity-70 group-hover/item:opacity-100 transition-opacity">
           <button
-            onClick={(e) => { e.stopPropagation(); if (noRepo) { bindRepo(); return; } setAdding(!adding); setError(null); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenSessions?.(e.currentTarget.getBoundingClientRect());
+            }}
+            className="size-6 flex items-center justify-center rounded-md text-zinc-400 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer"
+            title="Sessions"
+          >
+            <MessageSquare size={12} />
+          </button>
+ <button
+ onClick={(e) => { e.stopPropagation(); if (noRepo) { bindRepo(); return; } setAdding(!adding); setError(null); }}
             className="size-6 flex items-center justify-center rounded-md text-zinc-400 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer"
             title={noRepo ? "Bind folder" : "New worktree branch"}
           >
@@ -2350,5 +2405,4 @@ function ActiveWorkspaceDetail({
     </div>
   );
 }
-
 

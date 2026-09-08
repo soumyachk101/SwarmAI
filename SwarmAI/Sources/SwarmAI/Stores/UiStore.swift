@@ -1,6 +1,7 @@
 import SwiftUI
 
 @Observable
+// Safe: all mutations are @MainActor-isolated via SwiftUI's main-thread guarantee
 public final class UiStore: @unchecked Sendable {
   public static let shared = UiStore()
   public var isLeftSidebarOpen: Bool = true

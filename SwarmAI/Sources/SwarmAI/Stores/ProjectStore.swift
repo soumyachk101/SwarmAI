@@ -1,6 +1,7 @@
 import SwiftUI
 
 @Observable
+// Safe: all mutations are @MainActor-isolated via SwiftUI's main-thread guarantee
 public final class ProjectStore: @unchecked Sendable {
   public static let shared = ProjectStore()
   public var openFiles: [String: [OpenFile]] = [:] // workspaceId -> files

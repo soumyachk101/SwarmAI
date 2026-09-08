@@ -30,6 +30,7 @@ import {
 import { useAgentsStore, type Agent } from "@swarm/agents/ui";
 import { useWorkspaceStore } from "@swarm/workspace";
 import { invoke } from "@tauri-apps/api/core";
+import { useToast } from "../../shared/ToastProvider";
 
 interface Props {
  open: boolean;
@@ -101,12 +102,17 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
  const [activeTab, setActiveTab] = useState<"overview" | "logs">("overview");
  const [logFilter, setLogFilter] = useState("");
  const [selectedAgentId, setSelectedAgentId] = useState<string | "all">("all");
+ // TODO: Replace with real telemetry feed from backend / MCP
  const [mockLogs, setMockLogs] = useState<Array<{ id: string; agentName: string; text: string; time: string; level: "info" | "warn" | "error" }>>([]);
  const [now, setNow] = useState(new Date());
  const [isRefreshing, setIsRefreshing] = useState(false);
 
+ const { toast } = useToast();
+
  const agents = useAgentsStore((s) => s.agents);
  const agentStatuses = useAgentsStore((s) => s.agentStatuses);
+ const setAgentStatus = useAgentsStore((s) => s.setAgentStatus);
+ const removeAgent = useAgentsStore((s) => s.removeAgent);
  const workspaces = useWorkspaceStore((s) => s.workspaces);
  const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
  const activeWorkspace = workspaces.find((w) => w.id === activeWorkspaceId);
@@ -156,6 +162,20 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
  });
  }, [mockLogs, selectedAgentId, logFilter]);
 
+ const handleStopAgent = async (agent: Agent) => {
+ try {
+ // TODO: wire to actual stop-agent Tauri command / MCP tool
+ await invoke("remove_agent_pane", { agentId: agent.id });
+ setAgentStatus(agent.id, "idle");
+ // Delay removal so the UI can transition; in real code the backend
+ // should drive this once the process actually exits.
+ setTimeout(() => removeAgent(agent.id), 1500);
+ toast("success", `Stopped ${agent.customName || agent.cliName}`);
+ } catch (err) {
+ toast("error", `Failed to stop ${agent.customName || agent.cliName}`, String(err));
+ }
+ };
+
  const handleRefresh = () => {
  setIsRefreshing(true);
  setTimeout(() => setIsRefreshing(false), 800);
@@ -164,6 +184,11 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
  if (!open) return null;
 
  const timeStr = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
+ const tabOverviewId = "dashboard-tab-overview";
+ const tabLogsId = "dashboard-tab-logs";
+ const panelOverviewId = "dashboard-panel-overview";
+ const panelLogsId = "dashboard-panel-logs";
 
  return (
  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md animate-fade-in p-4">
@@ -196,9 +221,30 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
 
  <div className="flex items-center gap-2">
  {/* Tabs */}
- <div className="flex bg-swarm-surface/60 rounded-lg p-0.5 border border-swarm-border/40">
+ <div
+ role="tablist"
+ aria-label="Dashboard sections"
+ className="flex bg-swarm-surface/60 rounded-lg p-0.5 border border-swarm-border/40"
+ >
  <button
+ id={tabOverviewId}
+ role="tab"
+ aria-selected={activeTab === "overview"}
+ aria-controls={panelOverviewId}
+ tabIndex={activeTab === "overview" ? 0 : -1}
  onClick={() => setActiveTab("overview")}
+ onKeyDown={(e) => {
+ const tabs = [tabOverviewId, tabLogsId].filter(Boolean);
+ const idx = tabs.indexOf(activeTab === "overview" ? tabOverviewId : tabLogsId);
+ if (e.key === "ArrowRight" && idx < tabs.length - 1) {
+ (document.getElementById(tabs[idx + 1]) as HTMLButtonElement | null)?.focus();
+ setActiveTab(tabs[idx + 1] === tabOverviewId ? "overview" : "logs");
+ }
+ if (e.key === "ArrowLeft" && idx > 0) {
+ (document.getElementById(tabs[idx - 1]) as HTMLButtonElement | null)?.focus();
+ setActiveTab(tabs[idx - 1] === tabOverviewId ? "overview" : "logs");
+ }
+ }}
  className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
  activeTab === "overview"
  ? "bg-swarm-gold/20 text-swarm-goldHi shadow-sm border border-swarm-gold/30"
@@ -208,7 +254,24 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
  Swarm Grid
  </button>
  <button
+ id={tabLogsId}
+ role="tab"
+ aria-selected={activeTab === "logs"}
+ aria-controls={panelLogsId}
+ tabIndex={activeTab === "logs" ? 0 : -1}
  onClick={() => setActiveTab("logs")}
+ onKeyDown={(e) => {
+ const tabs = [tabOverviewId, tabLogsId].filter(Boolean);
+ const idx = tabs.indexOf(activeTab === "overview" ? tabOverviewId : tabLogsId);
+ if (e.key === "ArrowRight" && idx < tabs.length - 1) {
+ (document.getElementById(tabs[idx + 1]) as HTMLButtonElement | null)?.focus();
+ setActiveTab(tabs[idx + 1] === tabOverviewId ? "overview" : "logs");
+ }
+ if (e.key === "ArrowLeft" && idx > 0) {
+ (document.getElementById(tabs[idx - 1]) as HTMLButtonElement | null)?.focus();
+ setActiveTab(tabs[idx - 1] === tabOverviewId ? "overview" : "logs");
+ }
+ }}
  className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
  activeTab === "logs"
  ? "bg-swarm-gold/20 text-swarm-goldHi shadow-sm border border-swarm-gold/30"
@@ -221,6 +284,7 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
 
  <button
  onClick={handleRefresh}
+ aria-label="Refresh dashboard"
  className={`p-1.5 rounded-lg text-swarm-textMuted hover:text-swarm-text hover:bg-swarm-surface transition-all ${isRefreshing ? "animate-spin" : ""}`}
  title="Refresh dashboard"
  >
@@ -229,6 +293,7 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
 
  <button
  onClick={onClose}
+ aria-label="Close dashboard"
  className="p-1.5 rounded-lg text-swarm-textMuted hover:text-swarm-text hover:bg-swarm-surface transition-colors"
  >
  <X className="size-4" />
@@ -328,7 +393,7 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
  {/* Content Area */}
  <div className="flex-1 overflow-y-auto p-6 scrollbar-sleek min-h-[320px]">
  {activeTab === "overview" && (
- <div>
+ <div id={panelOverviewId} role="tabpanel" aria-labelledby={tabOverviewId}>
  {agents.length === 0 ? (
  <div className="text-center py-16 text-swarm-textMuted">
  <div className="size-16 mx-auto mb-4 rounded-2xl bg-swarm-surface/60 border border-swarm-border/40 flex items-center justify-center">
@@ -439,8 +504,8 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
  <div className="flex items-center gap-1">
  {isRunning && (
  <button
- onClick={onClose}
- className="inline-flex items-center gap-1 text-[11px] text-red-400 hover:text-red-300 font-medium px-2 py-1 rounded-md hover:bg-red-500/10 transition-colors"
+ onClick={() => handleStopAgent(agent)}
+ className="inline-flex items-center gap-1 text-[11px] text-red-400 hover:text-red-300 font-medium px-3 py-2 rounded-md hover:bg-red-500/10 transition-colors"
  title="Stop agent"
  >
  <Square className="size-3" /> Stop
@@ -448,7 +513,8 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
  )}
  <button
  onClick={onClose}
- className="inline-flex items-center gap-1 text-[11px] text-swarm-gold hover:text-swarm-goldHi font-medium px-2 py-1 rounded-md hover:bg-swarm-gold/10 transition-colors"
+ className="inline-flex items-center gap-1 text-[11px] text-swarm-gold hover:text-swarm-goldHi font-medium px-3 py-2 rounded-md hover:bg-swarm-gold/10 transition-colors"
+ aria-label={`Focus ${agent.customName || agent.cliName}`}
  >
  <Eye className="size-3" /> Focus <ChevronRight className="size-3" />
  </button>
@@ -463,7 +529,7 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
  )}
 
  {activeTab === "logs" && (
- <div className="flex flex-col h-full space-y-3">
+ <div id={panelLogsId} role="tabpanel" aria-labelledby={tabLogsId} className="flex flex-col h-full space-y-3">
  {/* Filter controls */}
  <div className="flex items-center gap-3">
  <div className="relative flex-1">
@@ -473,6 +539,7 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
  value={logFilter}
  onChange={(e) => setLogFilter(e.target.value)}
  placeholder="Search logs across all agents..."
+ aria-label="Filter logs"
  className="w-full bg-swarm-canvas/80 border border-swarm-border/60 rounded-lg px-8 py-2 text-xs text-swarm-text placeholder:text-swarm-textMuted focus:outline-none focus:border-swarm-gold transition-colors"
  />
  </div>
@@ -484,7 +551,7 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
  >
  <option value="all">All Agents</option>
  {agents.map((a) => (
- <option key={a.id} value={a.customName || a.cliName}>
+ <option key={a.id} value={a.id}>
  {a.customName || a.cliName}
  </option>
  ))}
@@ -511,7 +578,9 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
  {/* Log List */}
  <div className="flex-1 bg-swarm-canvas/90 border border-swarm-border/40 rounded-lg overflow-hidden">
  <div className="overflow-y-auto max-h-[400px] scrollbar-sleek">
- {filteredLogs.length === 0 ? (
+ {filteredLogs.length === 0 && mockLogs.length === 0 ? (
+ <div className="text-swarm-textMuted italic py-8 text-center text-xs">No logs yet</div>
+ ) : filteredLogs.length === 0 ? (
  <div className="text-swarm-textMuted italic py-8 text-center text-xs">No logs matching query</div>
  ) : (
  <div className="divide-y divide-swarm-border/20">

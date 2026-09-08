@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   AlertCircle,
   RefreshCw,
-  ExternalLink,
   Sparkles,
   Apple,
   Monitor,
@@ -14,29 +13,33 @@ import {
   ShieldCheck,
   ChevronDown,
   ChevronUp,
+  FolderOpen,
+  Zap,
 } from "lucide-react";
-import { useUpdateChecker, CURRENT_APP_VERSION } from "../updates/useUpdateChecker.js";
+import { useUpdateChecker } from "../updates/useUpdateChecker.js";
 
 export default function UpdatesSection() {
   const {
     isChecking,
-    isDownloading,
-    downloadProgress,
     hasUpdate,
     latestRelease,
     currentVersion,
     currentPlatform,
     error,
     lastChecked,
+    channel,
+    setChannel,
+    downloadStats,
     checkForUpdates,
     startDirectDownload,
-    openUrlFallback,
+    installAndRelaunch,
+    revealInFolder,
   } = useUpdateChecker();
 
   const [showAllPlatforms, setShowAllPlatforms] = useState(false);
 
   useEffect(() => {
-    checkForUpdates();
+    checkForUpdates(true);
   }, [checkForUpdates]);
 
   const formatSize = (bytes: number) => {
@@ -72,17 +75,43 @@ export default function UpdatesSection() {
             <span>App Updates & Downloads</span>
           </h2>
           <p className="text-xs text-swarm-textMuted mt-0.5">
-            Auto-detects your system and downloads updates directly inside SwarmAI.
+            Auto-detects your system with high-speed streaming downloads and 1-click macOS DMG installation.
           </p>
         </div>
-        <button
-          onClick={checkForUpdates}
-          disabled={isChecking || isDownloading}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-swarm-gold/10 border border-swarm-gold/30 text-swarm-goldHi text-xs font-semibold hover:bg-swarm-gold/20 transition-all disabled:opacity-50"
-        >
-          <RefreshCw size={13} className={isChecking ? "animate-spin text-swarm-gold" : ""} />
-          <span>{isChecking ? "Checking…" : "Check for Updates"}</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Channel selector */}
+          <div className="flex items-center rounded-lg bg-zinc-900 border border-zinc-800 p-0.5 text-mini font-mono">
+            <button
+              onClick={() => setChannel("stable")}
+              className={`px-2 py-1 rounded-md transition-all ${
+                channel === "stable"
+                  ? "bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30"
+                  : "text-zinc-400 hover:text-zinc-200"
+              }`}
+            >
+              Stable
+            </button>
+            <button
+              onClick={() => setChannel("all")}
+              className={`px-2 py-1 rounded-md transition-all ${
+                channel === "all"
+                  ? "bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30"
+                  : "text-zinc-400 hover:text-zinc-200"
+              }`}
+            >
+              Pre-releases
+            </button>
+          </div>
+
+          <button
+            onClick={() => checkForUpdates(false)}
+            disabled={isChecking || downloadStats.status === "downloading"}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-swarm-gold/10 border border-swarm-gold/30 text-swarm-goldHi text-xs font-semibold hover:bg-swarm-gold/20 transition-all disabled:opacity-50 cursor-pointer"
+          >
+            <RefreshCw size={13} className={isChecking ? "animate-spin text-swarm-gold" : ""} />
+            <span>{isChecking ? "Checking…" : "Check for Updates"}</span>
+          </button>
+        </div>
       </div>
 
       {/* System & Version Status Card */}
@@ -107,7 +136,7 @@ export default function UpdatesSection() {
 
         {hasUpdate ? (
           <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-mini font-semibold font-mono animate-pulse">
-            New Version Available
+            New Version Available ({latestRelease?.version})
           </span>
         ) : (
           <span className="px-2.5 py-1 rounded-full bg-swarm-gold/10 border border-swarm-gold/20 text-swarm-goldHi text-mini font-semibold">
@@ -148,21 +177,81 @@ export default function UpdatesSection() {
               </div>
             </div>
 
-            <button
-              onClick={() => startDirectDownload(matchedAsset)}
-              disabled={isDownloading}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 text-zinc-950 font-bold text-xs hover:bg-amber-400 transition-all shadow-lg hover:scale-105 disabled:opacity-50 cursor-pointer"
-            >
-              <Download size={15} />
-              <span>{isDownloading ? "Downloading…" : hasUpdate ? "Update Now" : "Download Latest DMG"}</span>
-            </button>
+            {downloadStats.status === "completed" ? (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={revealInFolder}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold transition-colors cursor-pointer"
+                  title="Show in Finder"
+                >
+                  <FolderOpen size={14} />
+                  <span>Reveal</span>
+                </button>
+                <button
+                  onClick={installAndRelaunch}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-400 text-zinc-950 font-bold text-xs hover:from-emerald-400 hover:to-emerald-300 transition-all shadow-lg hover:scale-105 cursor-pointer"
+                >
+                  <Zap size={14} className="fill-zinc-950" />
+                  <span>Install & Restart</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => startDirectDownload(matchedAsset)}
+                disabled={downloadStats.status === "downloading" || downloadStats.status === "installing"}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 text-zinc-950 font-bold text-xs hover:bg-amber-400 transition-all shadow-lg hover:scale-105 disabled:opacity-50 cursor-pointer"
+              >
+                {downloadStats.status === "downloading" ? (
+                  <>
+                    <RefreshCw size={14} className="animate-spin" />
+                    <span>Downloading ({downloadStats.percentage}%)</span>
+                  </>
+                ) : (
+                  <>
+                    <Download size={15} />
+                    <span>{hasUpdate ? "Update Now" : "Download Latest"}</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
 
-          {/* Download progress bar */}
-          {downloadProgress && (
-            <div className="p-3 rounded-xl bg-zinc-900/80 border border-zinc-700/60 text-xs text-amber-300 flex items-center gap-2.5 animate-pulse">
-              <RefreshCw size={14} className="animate-spin text-amber-400 shrink-0" />
-              <span>{downloadProgress}</span>
+          {/* Live Streaming Progress Bar */}
+          {downloadStats.status === "downloading" && (
+            <div className="space-y-2 p-3.5 rounded-xl bg-zinc-950/70 border border-zinc-800">
+              <div className="flex items-center justify-between text-mini font-mono">
+                <span className="text-amber-400 font-semibold">Streaming Download: {downloadStats.percentage}%</span>
+                <span className="text-zinc-400">
+                  {downloadStats.downloadedFormatted} / {downloadStats.totalFormatted} · {downloadStats.speedFormatted}
+                </span>
+              </div>
+              <div className="w-full h-2 rounded-full bg-zinc-800 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-amber-500 via-yellow-400 to-emerald-400 transition-all duration-200"
+                  style={{ width: `${downloadStats.percentage}%` }}
+                />
+              </div>
+              <div className="text-[11px] text-zinc-500 font-mono text-right">{downloadStats.etaFormatted}</div>
+            </div>
+          )}
+
+          {/* Download Complete Notice */}
+          {downloadStats.status === "completed" && (
+            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-300 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
+                <span className="font-semibold">Download complete and verified!</span>
+              </div>
+              <span className="text-[11px] text-emerald-400/80 font-mono">
+                Ready to mount DMG and install to /Applications
+              </span>
+            </div>
+          )}
+
+          {downloadStats.status === "installing" && (
+            <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/30 text-xs text-blue-300 flex items-center gap-2.5 animate-pulse">
+              <RefreshCw size={14} className="animate-spin text-blue-400 shrink-0" />
+              <span>Mounting DMG and updating SwarmAI.app...</span>
             </div>
           )}
         </div>
@@ -185,7 +274,7 @@ export default function UpdatesSection() {
         <div className="border-t border-swarm-border/40 pt-4 space-y-3">
           <button
             onClick={() => setShowAllPlatforms(!showAllPlatforms)}
-            className="flex items-center justify-between w-full text-xs text-swarm-textMuted hover:text-swarm-text transition-colors"
+            className="flex items-center justify-between w-full text-xs text-swarm-textMuted hover:text-swarm-text transition-colors cursor-pointer"
           >
             <span>Other Operating Systems & Architecture Packages ({otherAssets.length})</span>
             {showAllPlatforms ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -207,7 +296,7 @@ export default function UpdatesSection() {
                   </div>
                   <button
                     onClick={() => startDirectDownload(asset)}
-                    className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-swarm-gold/10 border border-swarm-gold/25 text-swarm-goldHi hover:bg-swarm-gold/20 text-mini font-semibold transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-swarm-gold/10 border border-swarm-gold/25 text-swarm-goldHi hover:bg-swarm-gold/20 text-mini font-semibold transition-colors cursor-pointer"
                   >
                     <Download size={12} />
                     <span>Download</span>

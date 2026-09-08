@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Sparkles, MessageSquare, GitBranch, X, Plus, Minus, Check, ArrowDownToLine, ArrowUpFromLine, Terminal, Copy, GitPullRequest, FileText } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 import { LeadPanel, LeadModeSelect } from "@swarm/lead/ui";
@@ -68,7 +68,7 @@ function FileViewer({ target, onBack }: { target: ViewerTarget; onBack: () => vo
  }, [loading, target.line]);
 
  const name = target.path.split(/[\\/]/).pop();
- const lines = content.split("\n");
+ const lines = useMemo(() => content.split("\n"), [content]);
 
  return (
  <div className="flex h-full flex-col">
@@ -187,28 +187,31 @@ function GitPanel({
    }
  };
 
+ // Refs keep the polling interval from closing over the initial projectPath.
+ const projectPathRef = useRef(projectPath);
+ projectPathRef.current = projectPath;
  const refresh = useCallback(async () => {
- if (!projectPath) return;
+ const path = projectPathRef.current;
+ if (!path) return;
  try {
- const status = await invoke<{ branch: string; changed: number }>("git_status", { projectPath });
+ const status = await invoke<{ branch: string; changed: number }>("git_status", { projectPath: path });
  setBranch(status.branch);
  const raw = await invoke<string>("run_command", {
  command: "git",
- args: ["-C", projectPath, "status", "--porcelain"],
+ args: ["-C", path, "status", "--porcelain"],
  });
  setEntries(parsePorcelain(raw));
- } catch {} finally {
+ } catch { /* silent poll failure */ } finally {
  setLoaded(true);
  }
- }, [projectPath]);
-
+ }, []);
  useEffect(() => {
  if (!projectPath) return;
  setLoaded(false);
  refresh();
  const interval = setInterval(refresh, 5000);
  return () => clearInterval(interval);
- }, [projectPath, refresh]);
+ }, [projectPath]);
 
  const git = async (args: string[], okNote?: string) => {
  if (!projectPath || busy) return;
@@ -263,6 +266,9 @@ function GitPanel({
  <div className="flex flex-col items-center justify-center h-full px-4 text-center text-swarm-textMuted">
  <GitBranch className="size-6 mb-2 opacity-50 text-swarm-gold" />
  <p className="text-xs font-medium">No project open</p>
+ <p className="mt-1 text-[10px] text-swarm-textMuted/70 max-w-[200px]">
+ Open a folder from the sidebar to view git changes here.
+ </p>
  </div>
  );
  }
@@ -354,7 +360,7 @@ function GitPanel({
  <Check className="size-3" />
  </button>
  </div>
- {note && <div className="mt-1 truncate text-micro text-swarm-textMuted">{note}</div>}
+ {note && <div role="status" aria-live="polite" className="mt-1 truncate text-micro text-swarm-textMuted">{note}</div>}
  </div>
 
  <div className="flex-1 overflow-y-auto scrollbar-sleek py-1">
@@ -364,6 +370,9 @@ function GitPanel({
  <div className="flex h-full flex-col items-center justify-center px-4 text-center text-swarm-textMuted">
  <GitBranch className="mb-2 size-6 opacity-50 text-swarm-gold" />
  <p className="text-xs font-medium">No changes</p>
+ <p className="mt-1 text-[10px] text-swarm-textMuted/70">
+ Your working tree is clean. Make some edits and they will appear here.
+ </p>
  </div>
  ) : (
  <>
@@ -587,12 +596,12 @@ export default function ADERightDock({ projectPath, onClose }: Props) {
  const leadId = useAgentsStore((s) => s.agents.find((b) => b.isLead)?.id ?? null);
  useEffect(() => {
  if (leadId) {
- setActiveTab("chat");
+ setActiveTab((prev) => (collapsed || prev === "chat" ? "chat" : prev));
  setCollapsed(false);
  return;
  }
  setCollapsed((c) => c || activeTab === "chat");
- }, [leadId]);
+ }, [leadId, collapsed]);
  const [viewer, setViewer] = useState<ViewerTarget | null>(null);
  useEffect(() => setViewer(null), [projectPath]);
  const [dockWidth, setDockWidth] = useState(() => {
@@ -673,7 +682,7 @@ export default function ADERightDock({ projectPath, onClose }: Props) {
                 title={collapsed ? `${tab.label} — expand panel` : tab.label}
                 aria-label={tab.label}
                 aria-expanded={!collapsed && active}
-                className={`relative flex items-center justify-center transition-all duration-150 cursor-pointer ${
+                className={`relative flex items-center justify-center transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-blue-500 ${
                   collapsed
                     ? `size-9 rounded-xl ${
                         active
@@ -699,7 +708,7 @@ export default function ADERightDock({ projectPath, onClose }: Props) {
           <div className={collapsed ? "mt-auto pt-2 border-t border-swarm-border/30 w-full flex justify-center" : "ml-auto shrink-0 pl-1"}>
             <button
               onClick={onClose}
-              className="size-7 flex items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.08] transition-colors cursor-pointer"
+              className="size-7 flex items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.08] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-blue-500"
               title="Close panel"
               aria-label="Close panel"
             >

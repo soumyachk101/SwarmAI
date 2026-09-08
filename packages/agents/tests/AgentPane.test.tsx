@@ -285,14 +285,14 @@ describe("AgentPane", () => {
  expect(screen.getByTitle("CLI Shortcuts & Tools")).toBeDefined();
  });
 
- it("renders the model selector", () => {
- render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
- expect(screen.getByTitle(/Claude Code Models/)).toBeDefined();
- });
+ 	it("renders the model selector", () => {
+		render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
+		expect(screen.getByTitle(/^Claude Code:/)).toBeDefined();
+	});
 
   it("renders the effort selector for Claude", () => {
     render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
-    expect(screen.getByTitle("Reasoning Effort")).toBeDefined();
+    expect(screen.getByTitle(/Reasoning Effort/)).toBeDefined();
   });
 
   it("renders the lead crown button", () => {
@@ -383,25 +383,25 @@ describe("AgentPane", () => {
  expect(document.body).toBeDefined();
  });
 
- it("shows the model label in the selector", () => {
- render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
- // Should show the default model label from the mock
- expect(screen.getByTitle(/Claude Code Models/)).toBeDefined();
- });
+ 	it("shows the model label in the selector", () => {
+		render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
+		// Should show the default model label from the mock
+		expect(screen.getByTitle(/^Claude Code:/)).toBeDefined();
+	});
 
- it("renders the Gauge icon for usage check", () => {
- render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
- const gaugeButton = screen.getByTitle("Check Model & Token Usage (/status)");
- const svg = gaugeButton.querySelector("svg");
- expect(svg).toBeDefined();
- });
+	it("renders the Gauge icon for usage check", () => {
+		render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
+		const gaugeButton = screen.getByTitle("Check Model & Token Usage (/status)");
+		const svg = gaugeButton.querySelector("svg");
+		expect(svg).toBeDefined();
+	});
 
- it("renders the ChevronDown icon for model selector", () => {
- render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
- const modelButton = screen.getByTitle(/Claude Code Models/);
- const svgs = modelButton.querySelectorAll("svg");
- expect(svgs.length).toBeGreaterThanOrEqual(1);
- });
+	it("renders the ChevronDown icon for model selector", () => {
+		render(<AgentPane paneId="agent-1" agent={defaultAgent} />);
+		const modelButton = screen.getByTitle(/^Claude Code:/);
+		const svgs = modelButton.querySelectorAll("svg");
+		expect(svgs.length).toBeGreaterThanOrEqual(1);
+	});
 
  it("supports custom agent name", () => {
  render(<AgentPane paneId="agent-1" agent={{ ...defaultAgent, customName: "My Custom Agent" }} />);

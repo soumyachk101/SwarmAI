@@ -71,31 +71,92 @@ const STALL_HINT_MS = 8000;
 // CLI Brand Meta
 // ---------------------------------------------------------------------------
 
+interface PermissionOption {
+ id: string;
+ label: string;
+ desc: string;
+ icon: string;
+ color: string;
+}
+
 interface EffortOption {
  id: string;
  label: string;
  isHighlight?: boolean;
 }
 
-const CLI_BRAND_META: Record<string, { brandName: string; brandColor: string; supportsEffort: boolean; effortLevels?: EffortOption[]; defaultEffort?: string }> = {
- claude: { brandName: "Claude Code Models", brandColor: "#D97757", supportsEffort: true, defaultEffort: "UltraCode", effortLevels: [
+const CLI_BRAND_META: Record<string, {
+ brandName: string;
+ brandColor: string;
+ supportsEffort: boolean;
+ effortLevels?: EffortOption[];
+ defaultEffort?: string;
+ supportsPermissions?: boolean;
+ permissionLevels?: PermissionOption[];
+}> = {
+ claude: {
+ brandName: "Claude Code",
+ brandColor: "#D97757",
+ supportsEffort: true,
+ defaultEffort: "UltraCode",
+ effortLevels: [
  { id: "ultracode", label: "UltraCode", isHighlight: true },
  { id: "max", label: "Max" },
+ { id: "xhigh", label: "Extra High" },
  { id: "high", label: "High" },
  { id: "medium", label: "Medium" },
  { id: "low", label: "Low" },
- ]},
- codex: { brandName: "Codex Models", brandColor: "#10A37F", supportsEffort: true, defaultEffort: "High", effortLevels: [
+ ],
+ supportsPermissions: true,
+ permissionLevels: [
+ { id: "default", label: "Default", desc: "Ask before every action", icon: "Shield", color: "text-emerald-400" },
+ { id: "acceptEdits", label: "Accept Edits", desc: "Auto-approve edits, ask for bash", icon: "ShieldCheck", color: "text-sky-400" },
+ { id: "bypass", label: "Bypass (YOLO)", desc: "Auto-approve everything", icon: "ShieldAlert", color: "text-amber-400" },
+ ],
+ },
+ codex: {
+ brandName: "Codex",
+ brandColor: "#10A37F",
+ supportsEffort: true,
+ defaultEffort: "High",
+ effortLevels: [
  { id: "xhigh", label: "Extra High", isHighlight: true },
  { id: "high", label: "High" },
  { id: "medium", label: "Medium" },
  { id: "low", label: "Low" },
- ]},
- opencode: { brandName: "OpenCode Models", brandColor: "#A855F7", supportsEffort: false },
- agy: { brandName: "AGY Models", brandColor: "#4285F4", supportsEffort: false },
- aider: { brandName: "Aider Models", brandColor: "#14B8A6", supportsEffort: false },
- cline: { brandName: "Cline Models", brandColor: "#6C5CE7", supportsEffort: false },
- kilo: { brandName: "Kilo Models", brandColor: "#F59E0B", supportsEffort: false },
+ ],
+ supportsPermissions: false,
+ },
+ opencode: {
+ brandName: "OpenCode",
+ brandColor: "#A855F7",
+ supportsEffort: false,
+ supportsPermissions: false,
+ },
+ agy: {
+ brandName: "AGY",
+ brandColor: "#4285F4",
+ supportsEffort: false,
+ supportsPermissions: false,
+ },
+ aider: {
+ brandName: "Aider",
+ brandColor: "#14B8A6",
+ supportsEffort: false,
+ supportsPermissions: false,
+ },
+ cline: {
+ brandName: "Cline",
+ brandColor: "#6C5CE7",
+ supportsEffort: false,
+ supportsPermissions: false,
+ },
+ kilo: {
+ brandName: "Kilo",
+ brandColor: "#F59E0B",
+ supportsEffort: false,
+ supportsPermissions: false,
+ },
 };
 
 function getCliBrandMeta(cli: string) {
@@ -116,7 +177,8 @@ export interface CommandSuggestion {
 
 const COMMAND_SUGGESTIONS: CommandSuggestion[] = [
  { name: "/model", description: "Switch AI model (Opus 1M, Sonnet 1M, etc.)", syntax: "/model <name>", category: "Model" },
- { name: "/effort", description: "Set reasoning effort (UltraCode, Max, High...)", syntax: "/effort <level>", category: "Reasoning" },
+ { name: "/effort", description: "Set reasoning effort (UltraCode, Max, Extra High, High...)", syntax: "/effort <level>", category: "Reasoning" },
+ { name: "/permissions", description: "Set tool permissions (bypass, accept-edits, default)", syntax: "/permissions <mode>", category: "Security" },
  { name: "/status", description: "Check model, 1M context memory & session details", category: "Diagnostics" },
  { name: "/cost", description: "Check current session tokens and cost breakdown", category: "Diagnostics" },
  { name: "/compact", description: "Compact context window to save tokens", category: "Context" },
@@ -319,6 +381,17 @@ function AgentPane({
  useAgentsStore.getState().updateAgent(paneId, { effort: label });
  const cleanCmd = normaliseEffort(effortId) || effortId.toLowerCase().split(" ")[0];
  sendTerminal(`\x15/effort ${cleanCmd}\r`);
+ };
+
+ const handleSelectPermission = (mode: string) => {
+   useAgentsStore.getState().updateAgent(paneId, { permissionMode: mode });
+   if (mode === "bypass") {
+     sendTerminal("\x15/permissions bypass\r");
+   } else if (mode === "acceptEdits") {
+     sendTerminal("\x15/permissions accept-edits\r");
+   } else {
+     sendTerminal("\x15/permissions default\r");
+   }
  };
 
  const handleCheckUsage = () => sendTerminal(`\x15/status\r`);
@@ -625,6 +698,8 @@ function AgentPane({
  brandName={brandMeta.brandName}
  supportsEffort={brandMeta.supportsEffort}
  effortLevels={brandMeta.effortLevels}
+ supportsPermissions={brandMeta.supportsPermissions}
+ permissionLevels={brandMeta.permissionLevels}
  currentModel={currentModel}
  currentEffort={currentEffort}
  promptInput={promptInput}
@@ -641,6 +716,8 @@ function AgentPane({
  onSendPrompt={handleSendPrompt}
  onSelectModel={handleSelectModel}
  onSelectEffort={handleSelectEffort}
+ permissionMode={agent.permissionMode || "default"}
+ onSelectPermission={handleSelectPermission}
  onCheckUsage={handleCheckUsage}
  setModelMenuOpen={setModelMenuOpen}
  setEffortMenuOpen={setEffortMenuOpen}

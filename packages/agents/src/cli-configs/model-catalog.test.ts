@@ -168,8 +168,8 @@ describe("model-catalog", () => {
  it("all cliFlags used by modelArgs are present in catalog", () => {
  // Verify that the static catalog covers the flag mappings in model-args.ts
  const claudeFlags = MODEL_CATALOG["claude"]?.map(m => m.cliFlag.toLowerCase()) ?? [];
- // These are the flags model-args normalizes to
- const requiredClaudeFlags = ["opus[1m]", "sonnet", "haiku", "fable", "sonnet[1m]", "fable[1m]"];
+ // These are the flags model-args normalizes
+ const requiredClaudeFlags = ["opus[1m]", "sonnet", "haiku", "sonnet[1m]", "claude-fable-5.1", "claude-fable-5.1[1m]"];
  for (const flag of requiredClaudeFlags) {
  expect(claudeFlags).toContain(flag);
  }

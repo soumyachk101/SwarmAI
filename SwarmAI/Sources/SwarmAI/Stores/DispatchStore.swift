@@ -2,6 +2,7 @@ import SwiftUI
 
  @MainActor
 @Observable
+// Safe: all mutations are @MainActor-isolated via SwiftUI's main-thread guarantee
 public final class DispatchStore: @unchecked Sendable {
   public static let shared = DispatchStore()
   public var dispatchedTasks: [DispatchedTask] = []

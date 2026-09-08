@@ -44,6 +44,8 @@ export interface Agent {
  * Kept for display and so a respawn reuses the same configuration. */
  model?: string;
  effort?: string;
+ /** Permission mode for tool and file operations (bypass, acceptEdits, default) */
+ permissionMode?: "bypass" | "acceptEdits" | "default" | string;
  /** Initial task prompt to auto-feed when dispatched by Lead */
  initialPrompt?: string;
 }

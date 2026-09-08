@@ -1287,8 +1287,8 @@ async fn run_cli_probe(cli: String, _timeout_ms: u64) -> Result<Vec<String>, Str
 				"opus[1m]".to_string(),
 				"sonnet".to_string(),
 				"sonnet[1m]".to_string(),
-				"fable".to_string(),
-				"fable[1m]".to_string(),
+				"claude-fable-5.1".to_string(),
+				"claude-fable-5.1[1m]".to_string(),
 				"haiku".to_string(),
 			]);
 		}
@@ -1544,8 +1544,8 @@ fn extract_claude_flags(desc: &str) -> Vec<String> {
 	if flags.iter().any(|f| f.starts_with("sonnet")) && !flags.contains(&"sonnet[1m]".to_string()) {
 		flags.push("sonnet[1m]".to_string());
 	}
-	if flags.iter().any(|f| f.starts_with("fable")) && !flags.contains(&"fable[1m]".to_string()) {
-		flags.push("fable[1m]".to_string());
+	if flags.iter().any(|f| f.starts_with("fable") || f.starts_with("claude-fable")) && !flags.contains(&"claude-fable-5.1[1m]".to_string()) {
+		flags.push("claude-fable-5.1[1m]".to_string());
 	}
 	flags
 }
@@ -2172,12 +2172,19 @@ async fn ensure_pheromone_structure(project_path: String) -> Result<(), String> 
 async fn pheromone_read_memory_file(
     req: PheromoneReadMemoryFileRequest,
 ) -> Result<PheromoneReadMemoryFileResponse, String> {
-    let full_path = std::path::Path::new(&req.project_path)
-        .join(".pheromone")
-        .join(&req.relative_path);
-
-    let content = fs::read_to_string(&full_path)
-        .map_err(|e| format!("Failed to read file: {}", e))?;
+  let pheromone_base = std::path::Path::new(&req.project_path).join(".pheromone");
+  let full_path = pheromone_base.join(&req.relative_path);
+ // Path traversal guard: resolve and verify the path stays within .pheromone/
+ std::fs::create_dir_all(&pheromone_base)
+ .map_err(|e| format!("Failed to init .pheromone dir: {}", e))?;
+ let pheromone_base_canon = pheromone_base
+ .canonicalize()
+ .map_err(|e| format!("path traversal guard failed: {}", e))?;
+ if !full_path.starts_with(&pheromone_base_canon) {
+ return Err("path traversal detected: relative_path escapes .pheromone".into());
+ }
+ let content = fs::read_to_string(&full_path)
+ .map_err(|e| format!("Failed to read file: {}", e))?;
 
     // Simple frontmatter parsing - look for YAML between --- markers
     let frontmatter = if content.starts_with("---") {
@@ -2215,9 +2222,16 @@ async fn pheromone_read_memory_file(
 async fn pheromone_write_memory_file(
     req: PheromoneWriteMemoryFileRequest,
 ) -> Result<PheromoneWriteMemoryFileResponse, String> {
-    let full_path = std::path::Path::new(&req.project_path)
-        .join(".pheromone")
-        .join(&req.relative_path);
+ let pheromone_base = std::path::Path::new(&req.project_path).join(".pheromone");
+ let full_path = pheromone_base.join(&req.relative_path);
+ std::fs::create_dir_all(&pheromone_base)
+ .map_err(|e| format!("Failed to init .pheromone dir: {}", e))?;
+ let pheromone_base_canon = pheromone_base
+ .canonicalize()
+ .map_err(|e| format!("path traversal guard failed: {}", e))?;
+ if !full_path.starts_with(&pheromone_base_canon) {
+ return Err("path traversal detected: relative_path escapes .pheromone".into());
+ }
 
     // Create parent directory if it doesn't exist
     if let Some(parent) = full_path.parent() {
@@ -3411,16 +3425,12 @@ async fn android_sdk_status() -> Result<AndroidSdkStatus, String> {
 /// frontend so the format stays testable without a filesystem.
 #[tauri::command]
 async fn create_avd(name: String, avd_ini: String, config_ini: String) -> Result<String, String> {
-    if name.is_empty() || name.contains(['/', '\\', '.', ':']) && !name.contains('.') {
-        // Defence in depth: the UI sanitizes, but this writes to disk by name.
-        return Err("invalid AVD name".into());
-    }
-    if !name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-' || c == '.') {
-        return Err("AVD name may only contain letters, numbers, dot, dash, underscore".into());
-    }
-
-    let home = avd_home();
-    let dir = home.join(format!("{name}.avd"));
+ if name.is_empty() || !name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-')
+ {
+ return Err("invalid AVD name: only letters, numbers, dash, underscore".into());
+ }
+   	let home = avd_home();
+ let dir = home.join(format!("{name}.avd"));
     if dir.exists() {
         return Err(format!("An emulator named \"{name}\" already exists."));
     }
@@ -4350,60 +4360,292 @@ async fn cli_usage(clis: Vec<String>) -> Result<Vec<CliUsage>, String> {
     Ok(report)
 }
 
+#[derive(serde::Serialize, Clone)]
+struct DownloadProgressPayload {
+    downloaded_bytes: u64,
+    total_bytes: u64,
+    percentage: f64,
+    speed_bytes_sec: u64,
+    eta_seconds: u64,
+    status: String,
+    file_path: Option<String>,
+    error: Option<String>,
+}
+
 #[tauri::command]
 async fn download_and_install_update(
+    app: tauri::AppHandle,
     download_url: String,
     file_name: String,
 ) -> Result<String, String> {
     use std::path::PathBuf;
+    use std::io::Write;
+    use futures_util::StreamExt;
+    use tauri::Emitter;
 
     let home = std::env::var("HOME")
         .or_else(|_| std::env::var("USERPROFILE"))
         .unwrap_or_else(|_| "/tmp".to_string());
-    let downloads_dir = PathBuf::from(home).join("Downloads");
-    let _ = std::fs::create_dir_all(&downloads_dir);
-    let target_path = downloads_dir.join(&file_name);
+    let updates_dir = PathBuf::from(home).join("Downloads").join("SwarmAI_Updates");
+    let _ = std::fs::create_dir_all(&updates_dir);
+    let target_path = updates_dir.join(&file_name);
 
-    // Download using curl with redirect follow
-    let status = std::process::Command::new("curl")
-        .arg("-L")
-        .arg("-o")
-        .arg(&target_path)
-        .arg(&download_url)
-        .status()
-        .map_err(|e| format!("Failed to download update: {}", e))?;
+    let client = reqwest::Client::builder()
+        .user_agent("SwarmAI-Desktop-Updater")
+        .build()
+        .map_err(|e| format!("Failed to create HTTP client: {}", e))?;
 
-    if !status.success() {
-        return Err("Download failed via curl".to_string());
+    let res = client
+        .get(&download_url)
+        .send()
+        .await
+        .map_err(|e| format!("Network request failed: {}", e))?;
+
+    if !res.status().is_success() {
+        return Err(format!("Download failed with HTTP status: {}", res.status()));
     }
 
-    // On macOS: Open the DMG so macOS mounts it automatically
-    #[cfg(target_os = "macos")]
-    {
-        if file_name.ends_with(".dmg") {
-            let _ = std::process::Command::new("open")
-                .arg(&target_path)
-                .spawn();
+    let total_bytes = res.content_length().unwrap_or(0);
+    let mut file = std::fs::File::create(&target_path)
+        .map_err(|e| format!("Failed to create destination file: {}", e))?;
+    let mut stream = res.bytes_stream();
+
+    let mut downloaded_bytes: u64 = 0;
+    let mut last_emit = std::time::Instant::now();
+    let mut last_downloaded: u64 = 0;
+    let mut current_speed: u64 = 0;
+
+    while let Some(chunk_result) = stream.next().await {
+        let chunk = chunk_result.map_err(|e| format!("Download stream error: {}", e))?;
+        file.write_all(&chunk)
+            .map_err(|e| format!("Failed to write chunk: {}", e))?;
+        downloaded_bytes += chunk.len() as u64;
+
+        let now = std::time::Instant::now();
+        if now.duration_since(last_emit).as_millis() >= 120 || (total_bytes > 0 && downloaded_bytes >= total_bytes) {
+            let elapsed_sec = now.duration_since(last_emit).as_secs_f64();
+            if elapsed_sec > 0.0 {
+                let diff = downloaded_bytes.saturating_sub(last_downloaded);
+                current_speed = (diff as f64 / elapsed_sec) as u64;
+            }
+            last_downloaded = downloaded_bytes;
+            last_emit = now;
+
+            let percentage = if total_bytes > 0 {
+                ((downloaded_bytes as f64 / total_bytes as f64) * 100.0).min(100.0)
+            } else {
+                0.0
+            };
+
+            let remaining_bytes = total_bytes.saturating_sub(downloaded_bytes);
+            let eta_seconds = if current_speed > 0 {
+                remaining_bytes / current_speed
+            } else {
+                0
+            };
+
+            let _ = app.emit(
+                "update-download-progress",
+                DownloadProgressPayload {
+                    downloaded_bytes,
+                    total_bytes,
+                    percentage,
+                    speed_bytes_sec: current_speed,
+                    eta_seconds,
+                    status: "downloading".to_string(),
+                    file_path: None,
+                    error: None,
+                },
+            );
         }
     }
 
-    // On Windows: Open installer
+    let _ = file.flush();
+    let final_path = target_path.to_string_lossy().to_string();
+
+    let _ = app.emit(
+        "update-download-progress",
+        DownloadProgressPayload {
+            downloaded_bytes,
+            total_bytes: downloaded_bytes,
+            percentage: 100.0,
+            speed_bytes_sec: 0,
+            eta_seconds: 0,
+            status: "completed".to_string(),
+            file_path: Some(final_path.clone()),
+            error: None,
+        },
+    );
+
+    Ok(final_path)
+}
+
+#[tauri::command]
+async fn install_and_relaunch_update(
+	file_path: String,
+) -> Result<String, String> {
+	use std::path::{Path, PathBuf};
+
+	let path = Path::new(&file_path);
+	if !path.exists() {
+		return Err("Update installer file not found on disk".to_string());
+	}
+
+	// Validate the path to prevent shell injection and arbitrary file access.
+	let canonical = path
+		.canonicalize()
+		.map_err(|e| format!("Cannot resolve update path: {e}"))?;
+	let home_dir = std::env::var_os("HOME")
+		.or_else(|| std::env::var_os("USERPROFILE"))
+		.map(PathBuf::from);
+	let expected_dir: PathBuf = home_dir
+		.map(|h| h.join("Downloads").join("SwarmAI_Updates"))
+		.unwrap_or_else(|| PathBuf::from("/tmp"));
+	let expected_canonical = expected_dir
+		.canonicalize()
+		.unwrap_or(expected_dir.clone());
+	if !canonical.starts_with(&expected_canonical) {
+		return Err(format!(
+			"Update file must be inside {:?}",
+			expected_dir
+		));
+	}
+
+	#[cfg(target_os = "macos")]
+	{
+		if file_path.ends_with(".dmg") {
+			let mount_dir_tpl =
+				std::env::temp_dir().join("swarmai_mount.XXXXXX");
+			let mktemp_out = std::process::Command::new("mktemp")
+				.args(["-d", &format!("{}", mount_dir_tpl.display())])
+				.output()
+				.map_err(|e| format!("mktemp failed: {e}"))?;
+			let mount_dir =
+				String::from_utf8_lossy(&mktemp_out.stdout).trim().to_string();
+
+			let attach_status = std::process::Command::new("hdiutil")
+				.args([
+					"attach",
+					canonical.to_str().unwrap_or(&file_path),
+					"-nobrowse",
+					"-mountpoint",
+					&mount_dir,
+					"-quiet",
+				])
+				.status()
+				.map_err(|e| format!("hdiutil attach failed: {e}"))?;
+
+			if attach_status.success() {
+				let find_out = std::process::Command::new("find")
+					.args([&mount_dir, "-maxdepth", "2", "-name", "*.app"])
+					.output()
+					.map_err(|e| format!("find failed: {e}"))?;
+				let find_stdout =
+					String::from_utf8_lossy(&find_out.stdout);
+				let first_app =
+					find_stdout.lines().find(|l| !l.is_empty());
+
+				if let Some(app_path) = first_app {
+					let app_name = Path::new(app_path)
+						.file_name()
+						.and_then(|n| n.to_str())
+						.unwrap_or("SwarmAI.app");
+					let dest = format!("/Applications/{}", app_name);
+
+					let _ = std::process::Command::new("rm")
+						.args(["-rf", &dest])
+						.status();
+					let cp_status = std::process::Command::new("cp")
+						.args(["-R", app_path, "/Applications/"])
+						.status()
+						.map_err(|e| format!("cp failed: {e}"))?;
+
+					let _ = std::process::Command::new("hdiutil")
+						.args(["detach", &mount_dir, "-quiet"])
+						.status();
+					let _ = std::fs::remove_dir_all(&mount_dir);
+
+					if cp_status.success() {
+						std::process::Command::new("open")
+							.arg(&dest)
+							.spawn()
+							.ok();
+						std::process::exit(0);
+					}
+				}
+
+				let _ = std::process::Command::new("hdiutil")
+					.args(["detach", &mount_dir, "-quiet"])
+					.status();
+				let _ = std::fs::remove_dir_all(&mount_dir);
+			}
+
+			std::process::Command::new("open")
+				.arg(canonical.as_os_str())
+				.spawn()
+				.ok();
+			return Ok("Opened DMG in Finder".to_string());
+		} else {
+			std::process::Command::new("open")
+				.arg(&file_path)
+				.spawn()
+				.ok();
+			return Ok("Opened installer".to_string());
+		}
+	}
+
+	#[cfg(target_os = "windows")]
+	{
+		let _ = std::process::Command::new("cmd")
+			.args(["/C", "start", "", &file_path])
+			.spawn();
+		std::process::exit(0);
+	}
+
+	#[cfg(target_os = "linux")]
+	{
+		if file_path.ends_with(".AppImage") {
+			let _ = std::process::Command::new("chmod")
+				.args(["+x", &file_path])
+				.status();
+			let _ = std::process::Command::new(&file_path).spawn();
+			std::process::exit(0);
+		} else {
+			let _ = std::process::Command::new("xdg-open")
+				.arg(&file_path)
+				.spawn();
+		}
+	}
+
+	#[allow(unreachable_code)]
+	Ok("Update launched".to_string())
+}
+
+#[tauri::command]
+fn reveal_in_finder(file_path: String) -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    {
+        let _ = std::process::Command::new("open")
+            .arg("-R")
+            .arg(&file_path)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+    }
     #[cfg(target_os = "windows")]
     {
-        let _ = std::process::Command::new("cmd")
-            .args(["/C", "start", "", target_path.to_str().unwrap_or_default()])
-            .spawn();
+        let _ = std::process::Command::new("explorer")
+            .args(["/select,", &file_path])
+            .spawn()
+            .map_err(|e| e.to_string())?;
     }
-
-    // On Linux: Open/run
     #[cfg(target_os = "linux")]
     {
         let _ = std::process::Command::new("xdg-open")
-            .arg(&target_path)
-            .spawn();
+            .arg(&file_path)
+            .spawn()
+            .map_err(|e| e.to_string())?;
     }
-
-    Ok(target_path.to_string_lossy().to_string())
+    Ok(())
 }
 
 #[tauri::command]
@@ -4443,6 +4685,8 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
             download_and_install_update,
+            install_and_relaunch_update,
+            reveal_in_finder,
             open_external_url,
             spawn_terminal,
             write_to_terminal,

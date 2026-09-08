@@ -11,6 +11,7 @@ export interface DetectedModel {
 	provider?: string;
 	is1M?: boolean;
 	pricing?: string;
+	description?: string;
 	/** true when the model was found by runtime probing (not in static catalog) */
 	probed?: boolean;
 }
@@ -65,6 +66,7 @@ export function useAutoModelDetection(
 					provider: m.provider || undefined,
 					is1M: m.is1M,
 					pricing: m.pricing,
+					description: m.description,
 					probed: false,
 				}),
 			);
@@ -164,6 +166,12 @@ export function useAutoModelDetection(
 				const newModels: DetectedModel[] = probedIds
 					.filter((id: string) => {
 						const key = id.toLowerCase();
+						if (key.includes("fable") && existing.some(m => m.id.includes("fable") || m.label.toLowerCase().includes("fable") || m.cliFlag?.includes("fable"))) {
+							return false;
+						}
+						if (existing.some(m => m.cliFlag?.toLowerCase() === key || m.id.toLowerCase() === key || m.label.toLowerCase() === key)) {
+							return false;
+						}
 						return (
 							!existingById.has(key) &&
 							!existingByCliFlag.has(key) &&

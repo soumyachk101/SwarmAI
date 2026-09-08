@@ -135,9 +135,9 @@ const INSTALLED_CLIS: InstalledCliOption[] = [
 
 const DEV_MODELS = [
   { id: "opus[1m]", name: "Opus 5 (1M Context)", badge: "Ultra SOTA 1M", icon: Cpu, cli: "claude", brandColor: "#D97757" },
-  { id: "fable[1m]", name: "Fable 5 (1M Context)", badge: "Ultra Reasoning 1M", icon: BrainCircuit, cli: "claude", brandColor: "#D97757" },
+  { id: "fable[1m]", name: "Fable 5.1 (1M Context)", badge: "Ultra Reasoning 1M", icon: BrainCircuit, cli: "claude", brandColor: "#D97757" },
   { id: "sonnet[1m]", name: "Sonnet 5 (1M Context)", badge: "Next-Gen 1M", icon: Cpu, cli: "claude", brandColor: "#D97757" },
-  { id: "fable", name: "Fable 5", badge: "CoT Agent", icon: BrainCircuit, cli: "claude", brandColor: "#D97757" },
+  { id: "fable", name: "Fable 5.1", badge: "CoT Agent", icon: BrainCircuit, cli: "claude", brandColor: "#D97757" },
   { id: "opus", name: "Opus 5 (Default)", badge: "Ultra SOTA", icon: Cpu, cli: "claude", brandColor: "#D97757" },
   { id: "sonnet", name: "Sonnet 5", badge: "Routine", icon: Cpu, cli: "claude", brandColor: "#D97757" },
   { id: "haiku", name: "Haiku 4.5", badge: "Fast", icon: Cpu, cli: "claude", brandColor: "#D97757" },

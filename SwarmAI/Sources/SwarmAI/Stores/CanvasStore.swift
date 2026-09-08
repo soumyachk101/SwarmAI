@@ -139,6 +139,7 @@ public enum CanvasAction {
 
 @MainActor
 @Observable
+// Safe: all mutations are @MainActor-isolated via SwiftUI's main-thread guarantee
 public final class CanvasStore: @unchecked Sendable {
  public static let shared = CanvasStore()
  public var nodes: [CanvasNode] = []

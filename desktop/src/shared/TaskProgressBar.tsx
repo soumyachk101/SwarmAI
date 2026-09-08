@@ -13,10 +13,8 @@ export interface TaskProgressItem {
 
 export default function TaskProgressBar({
  tasks,
- workspaceId,
 }: {
  tasks: TaskProgressItem[];
- workspaceId: string;
 }) {
  const stats = useMemo(() => {
  const total = tasks.length;

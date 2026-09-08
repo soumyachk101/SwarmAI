@@ -136,6 +136,9 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
   const [focusedPane, setFocusedPane] = useState<string | null>(null);
   const [appMode, setAppMode] = useState<"agent" | "code" | "chat">("agent");
 
+ // Keyboard drag state: Space picks a pane, arrows move it, Enter drops, Escape cancels.
+ const [kbdDrag, setKbdDrag] = useState<{ id: string; name: string } | null>(null);
+
   // When switching workspace or folder, always return to the active agent board
   useEffect(() => {
     setAppMode("agent");
@@ -285,6 +288,66 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
     window.addEventListener("mouseup", up);
     window.addEventListener("keydown", key);
   };
+
+  /* ── keyboard drag ─────────────────────────────────────────
+  Space picks the focused pane, arrows move between panes, Enter drops
+  (swap), Escape cancels. Runs on the grid container so it works without
+  the pane having to be the active element first. */
+  const kbdDragIndex = () => {
+  if (!kbdDrag) return -1;
+  return items.findIndex((b) => b.id === kbdDrag.id);
+  };
+  const handleKbdDragKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
+  if (!kbdDrag) {
+  if (e.key === " " && e.target instanceof HTMLElement && e.target.closest("[data-pane-id]")) {
+  e.preventDefault();
+  const paneEl = e.target.closest("[data-pane-id]");
+  const id = paneEl?.getAttribute("data-pane-id");
+  if (!id) return;
+  const swarm = items.find((b) => b.id === id);
+  if (!swarm) return;
+  setFocusedPane(id);
+  setKbdDrag({ id, name: swarm.customName || swarm.cliName });
+  }
+  return;
+  }
+  const idx = kbdDragIndex();
+  if (e.key === "Escape") {
+  e.preventDefault();
+  setKbdDrag(null);
+  setOver(null);
+   return;
+  }
+  if (e.key === "Enter") {
+  e.preventDefault();
+   const toIdx = items.findIndex((b) => b.id === focusedPane);
+  const fromIdx = idx;
+  setKbdDrag(null);
+  setOver(null);
+  if (toIdx >= 0 && fromIdx >= 0 && toIdx !== fromIdx) swapAgents(fromIdx, toIdx);
+  return;
+  }
+  if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+  e.preventDefault();
+  const cur = items.findIndex((b) => b.id === focusedPane);
+  const next = Math.min(cur + 1, items.length - 1);
+  setFocusedPane(items[next].id);
+  const el = rootRef.current?.querySelector("[data-pane-id=" + items[next].id + "]") as HTMLElement | null;
+  el?.focus({ preventScroll: false });
+   const rect = el?.getBoundingClientRect();
+  if (rect) setOver(hitTest(rect.left + rect.width / 2, rect.top + rect.height / 2));
+  } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+   e.preventDefault();
+  const cur = items.findIndex((b) => b.id === focusedPane);
+  const prev = Math.max(cur - 1, 0);
+  setFocusedPane(items[prev].id);
+  const el = rootRef.current?.querySelector("[data-pane-id=" + items[prev].id + "]") as HTMLElement | null;
+  el?.focus({ preventScroll: false });
+  const rect = el?.getBoundingClientRect();
+  if (rect) setOver(hitTest(rect.left + rect.width / 2, rect.top + rect.height / 2));
+  }
+  };
+
 
   /* ── agent sync ─────────────────────────────────────────────
      None needed: every agent's panes live in the pane store at once and
@@ -694,7 +757,7 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
           relative z-30: the panes below are positioned and come later in the
           DOM, so without this the add dropdown paints *behind* them. */}
       {active === "board" ? (
-        <div className="relative z-30 shrink-0">
+        <div className="relative z-40 shrink-0">
           <BoardStrip
             items={stripItems}
             activeId={focusedPane}
@@ -713,8 +776,12 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
             reserveRight={fullscreen ? 0 : reserveRight}
           />
           {showAdd && (
-            <div className="absolute left-2 top-full z-50">
+            <div
+              className="absolute top-full z-[70]"
+              style={{ right: Math.max(8, (fullscreen ? 0 : (reserveRight ?? 0)) + 8) }}
+            >
               <PlaneAddMenu
+                align="right"
                 plane={plane}
                 shells={shells}
                 onChat={() => { addChatPane(); setShowAdd(false); }}
@@ -855,7 +922,14 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
         ) : count === 0 ? (
           <PlaneEmpty plane={plane} onAdd={() => setShowAdd(true)} onAddChat={addChatPane} onAddCode={addOpenVsx} />
         ) : (
-          <div className="grid gap-2" style={gridStyle}>
+          <div
+  role="group"
+  aria-label={plane.label + " panes"}
+  tabIndex={0}
+  className="grid gap-2 outline-none"
+  style={gridStyle}
+  onKeyDown={handleKbdDragKey}
+ >
             {items.map((swarm) => {
               const isThisMax = maximizedPane === swarm.id;
               const shouldHide = maximizedPane !== null && !isThisMax;
@@ -863,6 +937,8 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
                 <div
                   key={swarm.id}
                   data-pane-id={swarm.id}
+ aria-roledescription="draggable pane"
+ aria-grabbed={drag?.id === swarm.id || kbdDrag?.id === swarm.id ? true : undefined}
                   onMouseDown={(e) => onPaneMouseDown(e, swarm)}
                   // Focus marks the active pane and it stays marked. Clearing on
                   // blur meant the accent vanished the moment you touched the
@@ -887,13 +963,17 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
                      blurry, with box-drawing borders landing off the pixel
                      grid so their corners never meet. Anything added here must
                      leave geometry alone. */
-                  className={`flex flex-col overflow-hidden font-sans antialiased ${
-                    shouldHide
-                      ? "hidden"
-                      : "relative h-full rounded-2xl border border-swarm-border/70 bg-swarm-canvasHi/95 shadow-lg shadow-black/40 transition-[box-shadow,border-color,opacity] duration-200"
-                  } ${drag?.id === swarm.id ? "opacity-30" : ""} ${
-                    over?.kind === "pane" && over.id === swarm.id ? "ring-2 ring-swarm-gold/70" : ""
-                  } ${focusedPane === swarm.id && !isThisMax ? "ring-1 ring-swarm-gold/50 border-swarm-gold/60 shadow-xl shadow-swarm-gold/10" : ""}`}
+ className={`flex flex-col overflow-hidden font-sans antialiased ${
+  shouldHide
+ ? "hidden"
+ : "relative h-full rounded-2xl border border-swarm-border/70 bg-swarm-canvasHi/95 shadow-lg shadow-black/40 transition-[box-shadow,border-color,opacity] duration-200"
+ } ${drag?.id === swarm.id ? "opacity-30" : ""} ${
+ over?.kind === "pane" && over.id === swarm.id ? "ring-2 ring-swarm-gold/70" : ""
+ } ${
+  kbdDrag?.id === swarm.id && kbdDrag.id !== drag?.id ? "ring-2 ring-swarm-gold/70" : ""
+ } ${
+ focusedPane === swarm.id && !isThisMax ? "ring-1 ring-swarm-gold/50 border-swarm-gold/60 shadow-xl shadow-swarm-gold/10" : ""
+ }`}
                   style={
                     shouldHide
                       ? undefined
@@ -966,7 +1046,7 @@ export default function PlaneHost({ workingDir, leading, reserveRight }: Props) 
 
 /* ── add menu ─────────────────────────────────────────────────── */
 function PlaneAddMenu({
-  plane, shells, onChat, onAgent, onShell, onBrowser, onToolbox, onEmulator, onOpenVsx, onClose,
+  plane, shells, onChat, onAgent, onShell, onBrowser, onToolbox, onEmulator, onOpenVsx, onClose, align = "left",
 }: {
   plane: PlaneDef;
   shells: { id: string; label: string; command: string }[];
@@ -978,6 +1058,7 @@ function PlaneAddMenu({
   onEmulator: () => void;
   onOpenVsx: (ext: { id: string; name: string; icon?: string }) => void;
   onClose: () => void;
+  align?: "left" | "right";
 }) {
   const [q, setQ] = useState("");
   const extensions = useExtensionStore((s) => s.installed);
@@ -999,8 +1080,8 @@ function PlaneAddMenu({
     return (
       <>
         <div className="fixed inset-0 z-40" onClick={onClose} />
-        <div className="absolute left-0 top-full z-50 mt-1 w-72 overflow-hidden rounded-xl glass-hi p-1.5 animate-fade-in">
-          <div className="mb-1 flex h-7 items-center gap-1.5 rounded-md border border-swarm-border/60 glass-inset px-2 focus-within:border-swarm-gold/50">
+        <div className={`absolute ${align === "right" ? "right-0 top-1" : "left-0 top-full mt-1"} z-50 w-72 overflow-hidden rounded-xl border border-white/[0.14] bg-[#0c0e18]/98 backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.9)] p-1.5 animate-fade-in`}>
+          <div className="mb-1.5 flex h-7 items-center gap-1.5 rounded-lg border border-white/[0.12] bg-white/[0.04] px-2 focus-within:border-swarm-gold/50 focus-within:bg-white/[0.06] transition-all">
             <Search className="size-3 text-swarm-textMuted" />
             <input
               autoFocus value={q} onChange={(e) => setQ(e.target.value)}
@@ -1045,7 +1126,7 @@ function PlaneAddMenu({
   return (
     <>
       <div className="fixed inset-0 z-40" onClick={onClose} />
-      <div className="absolute left-0 top-full z-50 mt-1 max-h-[70vh] min-w-52 overflow-y-auto scrollbar-sleek rounded-xl glass-hi p-1 animate-fade-in">
+      <div className={`absolute ${align === "right" ? "right-0 top-1" : "left-0 top-full mt-1"} z-50 max-h-[70vh] min-w-52 overflow-y-auto scrollbar-sleek rounded-xl border border-white/[0.14] bg-[#0c0e18]/98 backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.9)] p-1 animate-fade-in`}>
         {plane.kind === "browser" && (
           <MenuItem onClick={onBrowser} icon={Globe} title="New browser pane" subtitle="localhost preview" />
         )}
@@ -1225,4 +1306,4 @@ function FullscreenWidgets({ tasks, statuses }: { tasks: TaskCard[]; statuses: R
     </>,
     document.body,
   );
-}
+} 

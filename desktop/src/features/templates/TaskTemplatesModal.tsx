@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useId } from "react";
 import {
  X,
  Layers,
@@ -44,55 +44,27 @@ interface TemplateItem {
 }
 
 const TEMPLATES: TemplateItem[] = [
- {
- id: "bugfix",
- title: "Bug Fix & Verification Workflow",
- category: "Maintenance",
- icon: Bug,
- description: "Multi-agent loop: scout locates root cause, builder implements fix, reviewer verifies tests.",
- tasks: [
+ { id: "bugfix", title: "Bug Fix & Verification Workflow", category: "Maintenance", icon: Bug, description: "Multi-agent loop: scout locates root cause, builder implements fix, reviewer verifies tests.", tasks: [
  { title: "Investigate and isolate bug root cause", role: "scout", description: "Search logs, inspect stack trace and identify faulty module." },
  { title: "Implement bug fix and regression test", role: "builder", description: "Apply code changes and ensure regression test case passes." },
  { title: "Code review & edge case audit", role: "reviewer", description: "Check edge cases, type safety and security impacts." },
- ],
- },
- {
- id: "feature",
- title: "Full-Stack Feature Implementation",
- category: "Development",
- icon: Sparkles,
- description: "End-to-end flow: lead coordinates, builder drafts UI & API, reviewer runs quality checks.",
- tasks: [
+ ] },
+ { id: "feature", title: "Full-Stack Feature Implementation", category: "Development", icon: Sparkles, description: "End-to-end flow: lead coordinates, builder drafts UI & API, reviewer runs quality checks.", tasks: [
  { title: "Architecture breakdown & interface design", role: "coordinator", description: "Define data schemas, component contracts and subtasks." },
  { title: "Implement frontend components and styling", role: "builder", description: "Build interactive React UI matching design specs." },
  { title: "Implement backend logic and API endpoints", role: "builder", description: "Connect database and backend handlers." },
  { title: "End-to-end integration and UX audit", role: "reviewer", description: "Test the user flow end to end." },
- ],
- },
- {
- id: "security",
- title: "Security & Vulnerability Audit",
- category: "Safety",
- icon: ShieldCheck,
- description: "Deep audit of dependencies, inputs, auth tokens and file system access points.",
- tasks: [
+ ] },
+ { id: "security", title: "Security & Vulnerability Audit", category: "Safety", icon: ShieldCheck, description: "Deep audit of dependencies, inputs, auth tokens and file system access points.", tasks: [
  { title: "Scan dependencies and package configs", role: "scout", description: "Identify outdated or vulnerable packages." },
  { title: "Review auth flows and input sanitization", role: "reviewer", description: "Check SQL injection, XSS and path traversal vectors." },
  { title: "Generate audit report and remediation patch", role: "builder", description: "Draft report with security patch recommendations." },
- ],
- },
- {
- id: "refactor",
- title: "Codebase Exploration & Refactoring",
- category: "Architecture",
- icon: Compass,
- description: "Discover legacy patterns, decouple modules, and optimize bundle/build speed.",
- tasks: [
+ ] },
+ { id: "refactor", title: "Codebase Exploration & Refactoring", category: "Architecture", icon: Compass, description: "Discover legacy patterns, decouple modules, and optimize bundle/build speed.", tasks: [
  { title: "Analyze dependency graph and circular imports", role: "scout", description: "Map out module interdependencies." },
  { title: "Refactor core modules to clean abstractions", role: "builder", description: "Extract reusable utilities and improve typing." },
  { title: "Verify backwards compatibility and benchmarks", role: "reviewer", description: "Confirm existing features and tests run without regression." },
- ],
- },
+ ] },
 ];
 
 const GUIDE_TOPICS: { id: GuideTopic; label: string; icon: typeof Zap }[] = [
@@ -109,7 +81,7 @@ const PRIVACY_TOPICS: { id: PrivacyTopic; label: string; icon: typeof Lock }[] =
  { id: "scrubbing", label: "Secret & Token Scrubbing", icon: EyeOff },
 ];
 
-const TABS: { id: ModalTab; label: string; icon: typeof Layers }[] = [
+const TABS: Array<{ id: ModalTab; label: string; icon: typeof Layers }> = [
  { id: "templates", label: "Templates", icon: Layers },
  { id: "guide", label: "User Guide", icon: BookOpen },
  { id: "privacy", label: "Privacy & Security", icon: ShieldCheck },
@@ -130,9 +102,55 @@ export default function TaskTemplatesModal({ open, onClose, initialTab = "templa
  const [selectedGuideTopic, setSelectedGuideTopic] = useState<GuideTopic>("quickstart");
  const [selectedPrivacyTopic, setSelectedPrivacyTopic] = useState<PrivacyTopic>("local-first");
 
+ const modalContainerRef = useRef<HTMLDivElement | null>(null);
+ const tablistRef = useRef<HTMLDivElement | null>(null);
+ const statusId = useId();
+
  const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
  const workspaces = useWorkspaceStore((s) => s.workspaces);
  const activeWorkspace = workspaces.find((w) => w.id === activeWorkspaceId);
+
+ // Focus trap: move focus into the modal when it opens
+ useEffect(() => {
+ if (!open) return;
+ const container = modalContainerRef.current;
+ if (!container) return;
+ const focusable = container.querySelector<HTMLElement>(
+ 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+ );
+ focusable?.focus();
+ }, [open]);
+
+ // Esc + arrow-key tab navigation
+ useEffect(() => {
+ const handleKeyDown = (e: KeyboardEvent) => {
+ if (!open) return;
+ if (e.key === "Escape") {
+ onClose();
+ return;
+ }
+ if (
+ (e.key === "ArrowLeft" || e.key === "ArrowRight") &&
+ tablistRef.current?.contains(document.activeElement)
+ ) {
+ e.preventDefault();
+ const currentIndex = TABS.findIndex((t) => t.id === activeTab);
+ const nextIndex =
+ e.key === "ArrowRight"
+ ? (currentIndex + 1) % TABS.length
+ : (currentIndex - 1 + TABS.length) % TABS.length;
+ const nextTab = TABS[nextIndex];
+ setActiveTab(nextTab.id);
+ requestAnimationFrame(() => {
+ const buttons =
+ tablistRef.current?.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+ buttons?.[nextIndex]?.focus();
+ });
+ }
+ };
+ window.addEventListener("keydown", handleKeyDown);
+ return () => window.removeEventListener("keydown", handleKeyDown);
+ }, [open, onClose, activeTab]);
 
  const handleApply = () => {
  if (!activeWorkspace) return;
@@ -184,6 +202,7 @@ export default function TaskTemplatesModal({ open, onClose, initialTab = "templa
  <button
  key={tmpl.id}
  onClick={() => setSelectedTemplate(tmpl)}
+ aria-pressed={isSel}
  className={`flex items-start gap-2.5 p-3 rounded-lg text-left transition-all cursor-pointer ${
  isSel
  ? "bg-swarm-gold/20 text-swarm-goldHi border border-swarm-gold/40 shadow-sm"
@@ -239,6 +258,7 @@ export default function TaskTemplatesModal({ open, onClose, initialTab = "templa
 
  {/* Apply Button */}
  <div className="pt-4 border-t border-swarm-border/30 flex justify-end">
+ <div role="status" aria-live="polite" aria-atomic="true" id={statusId} className="inline-flex items-center gap-2">
  <button
  onClick={handleApply}
  disabled={applied}
@@ -256,6 +276,7 @@ export default function TaskTemplatesModal({ open, onClose, initialTab = "templa
  </>
  )}
  </button>
+ </div>
  </div>
  </div>
  </div>
@@ -277,6 +298,7 @@ export default function TaskTemplatesModal({ open, onClose, initialTab = "templa
  <button
  key={topic.id}
  onClick={() => setSelectedGuideTopic(topic.id)}
+ aria-current={isSel ? "page" : undefined}
  className={`flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs transition-colors text-left cursor-pointer ${
  isSel
  ? "bg-swarm-surfaceHi text-swarm-text font-semibold border border-swarm-borderHi/40"
@@ -304,7 +326,7 @@ export default function TaskTemplatesModal({ open, onClose, initialTab = "templa
  <span>3-Step Quick Launch</span>
  </span>
  <ol className="list-decimal list-inside flex flex-col gap-1.5 pl-1">
- <li><strong>Open a Project:</strong> Click the top-left logo menu or <code>⌘O</code> to bind a project directory. Swarm AI will auto-initialize <code>.pheromone/</code> for shared vector memory.</li>
+ <li><strong>Open a Project:</strong> Click the top-left logo menu or <code>&#8984;O</code> to bind a project directory. Swarm AI will auto-initialize <code>.pheromone/</code> for shared vector memory.</li>
  <li><strong>Spawn Worker Agents:</strong> Click <strong>+ Agent</strong> in the Top Tab Strip to launch your installed CLIs (Claude, Codex, OpenCode).</li>
  <li><strong>Dispatch Mission:</strong> Switch to the <strong>Lead tab</strong> or use the <strong>Flow Hub</strong> at the top of the canvas to send tasks in parallel.</li>
  </ol>
@@ -376,19 +398,20 @@ export default function TaskTemplatesModal({ open, onClose, initialTab = "templa
  <h3 className="text-sm font-bold text-swarm-text">5. Keyboard Shortcuts Cheatsheet</h3>
  <div className="border border-swarm-border/60 rounded-xl overflow-hidden">
  <table className="w-full text-left font-mono text-[11px]">
+ <caption className="sr-only">Keyboard shortcuts reference</caption>
  <thead className="bg-swarm-surfaceHi/80 border-b border-swarm-border/40 text-swarm-text">
  <tr>
- <th className="p-2.5 font-semibold">Shortcut</th>
- <th className="p-2.5 font-semibold">Action</th>
+ <th scope="col" className="p-2.5 font-semibold">Shortcut</th>
+ <th scope="col" className="p-2.5 font-semibold">Action</th>
  </tr>
  </thead>
  <tbody className="divide-y divide-swarm-border/30">
  <tr>
- <td className="p-2.5 font-bold text-swarm-gold">⌘K / Ctrl+K</td>
+ <td className="p-2.5 font-bold text-swarm-gold">&#8984;K / Ctrl+K</td>
  <td className="p-2.5 text-swarm-textDim">Open Unified Command Palette</td>
  </tr>
  <tr>
- <td className="p-2.5 font-bold text-swarm-gold">⌘Enter</td>
+ <td className="p-2.5 font-bold text-swarm-gold">&#8984;Enter</td>
  <td className="p-2.5 text-swarm-textDim">Dispatch Parallel Mission to Active Swarm</td>
  </tr>
  <tr>
@@ -396,11 +419,11 @@ export default function TaskTemplatesModal({ open, onClose, initialTab = "templa
  <td className="p-2.5 text-swarm-textDim">Smoothly Pan Flow Canvas</td>
  </tr>
  <tr>
- <td className="p-2.5 font-bold text-swarm-gold">⌘1 .. ⌘9</td>
+ <td className="p-2.5 font-bold text-swarm-gold">&#8984;1 .. &#8984;9</td>
  <td className="p-2.5 text-swarm-textDim">Focus specific Agent Terminal Pane</td>
  </tr>
  <tr>
- <td className="p-2.5 font-bold text-swarm-gold">⌘0</td>
+ <td className="p-2.5 font-bold text-swarm-gold">&#8984;0</td>
  <td className="p-2.5 text-swarm-textDim">Reset Canvas Camera to 100% Zoom</td>
  </tr>
  </tbody>
@@ -428,6 +451,7 @@ export default function TaskTemplatesModal({ open, onClose, initialTab = "templa
  <button
  key={topic.id}
  onClick={() => setSelectedPrivacyTopic(topic.id)}
+ aria-current={isSel ? "page" : undefined}
  className={`flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs transition-colors text-left cursor-pointer ${
  isSel
  ? "bg-swarm-surfaceHi text-swarm-text font-semibold border border-swarm-borderHi/40"
@@ -498,9 +522,11 @@ export default function TaskTemplatesModal({ open, onClose, initialTab = "templa
  return (
  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md animate-fade-in p-4">
  <div
+ ref={modalContainerRef}
  className="w-full max-w-4xl max-h-[85vh] flex flex-col rounded-xl glass-rail border border-swarm-gold/30 shadow-2xl overflow-hidden bg-swarm-canvas/95"
  role="dialog"
  aria-modal="true"
+ aria-label="Task templates and guides"
  >
  {/* Header */}
  <div className="flex items-center justify-between px-5 py-3.5 border-b border-swarm-border/50 bg-swarm-surface/40 shrink-0">
@@ -520,13 +546,22 @@ export default function TaskTemplatesModal({ open, onClose, initialTab = "templa
 
  <div className="flex items-center gap-2">
  {/* Tab Switcher */}
- <div className="flex items-center rounded-lg bg-swarm-canvas/60 p-0.5 border border-swarm-border/80">
+ <div
+ ref={tablistRef}
+ role="tablist"
+ aria-label="Modal sections"
+ className="flex items-center rounded-lg bg-swarm-canvas/60 p-0.5 border border-swarm-border/80"
+ >
  {TABS.map((tab) => {
  const Icon = tab.icon;
  const isActive = activeTab === tab.id;
  return (
  <button
  key={tab.id}
+ role="tab"
+ aria-selected={isActive}
+ aria-controls={`${tab.id}-panel`}
+ tabIndex={isActive ? 0 : -1}
  onClick={() => setActiveTab(tab.id)}
  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all cursor-pointer text-xs font-medium ${
  isActive
@@ -545,6 +580,7 @@ export default function TaskTemplatesModal({ open, onClose, initialTab = "templa
  onClick={onClose}
  className="size-7 flex items-center justify-center rounded-lg bg-swarm-surfaceHi/60 border border-swarm-borderHi/30 text-swarm-textDim hover:text-swarm-text hover:bg-swarm-surfaceHi transition-colors cursor-pointer"
  title="Close"
+ aria-label="Close template modal"
  >
  <X size={14} />
  </button>

@@ -12,6 +12,7 @@
 export interface AvailableModel {
   id: string;
   label: string;
+  description?: string;
   contextWindow: number;
   cliFlag: string;
   provider: "anthropic" | "openai" | "google" | "" | "deepseek" | "local" | "qwen" | "moonshot";
@@ -23,70 +24,135 @@ export interface AvailableModel {
 
 export const MODEL_CATALOG: Record<string, AvailableModel[]> = {
   "claude": [
-    { id: "claude-opus-5-1m", label: "Opus 5 (1M Context)", contextWindow: 1_000_000, cliFlag: "opus[1m]", provider: "anthropic", supportsExtendedThinking: true, supportsEffortControl: true, is1M: true, pricing: "$5/$25 Mtok" },
-    { id: "claude-sonnet-5", label: "Sonnet 5 (Routine)", contextWindow: 200_000, cliFlag: "sonnet", provider: "anthropic", supportsExtendedThinking: true, supportsEffortControl: true, is1M: false, pricing: "$3/$15 Mtok" },
-    { id: "claude-sonnet-5-1m", label: "Sonnet 5 (1M Context)", contextWindow: 1_000_000, cliFlag: "sonnet[1m]", provider: "anthropic", supportsExtendedThinking: true, supportsEffortControl: true, is1M: true, pricing: "$3/$15 Mtok" },
-    { id: "claude-fable-5", label: "Fable 5 (Reasoning)", contextWindow: 200_000, cliFlag: "fable", provider: "anthropic", supportsExtendedThinking: true, supportsEffortControl: true, is1M: true, pricing: "$4/$20 Mtok" },
-    { id: "claude-fable-5-1m", label: "Fable 5 (1M Context)", contextWindow: 1_000_000, cliFlag: "fable[1m]", provider: "anthropic", supportsExtendedThinking: true, supportsEffortControl: true, is1M: true, pricing: "$4/$20 Mtok" },
-    { id: "claude-haiku-4-5", label: "Haiku 4.5 (Fast)", contextWindow: 200_000, cliFlag: "haiku", provider: "anthropic", supportsEffortControl: true, is1M: false, pricing: "$1/$5 Mtok" },
+    {
+      id: "claude-opus-5-1m",
+      label: "Opus 5 (1M Context)",
+      description: "Opus 5 with 1M context · Best for everyday, complex tasks",
+      contextWindow: 1_000_000,
+      cliFlag: "opus[1m]",
+      provider: "anthropic",
+      supportsExtendedThinking: true,
+      supportsEffortControl: true,
+      is1M: true,
+      pricing: "$5/$25 per Mtok",
+    },
+    {
+      id: "claude-sonnet-5",
+      label: "Sonnet 5",
+      description: "Sonnet 5 · Efficient for routine tasks",
+      contextWindow: 200_000,
+      cliFlag: "sonnet",
+      provider: "anthropic",
+      supportsExtendedThinking: true,
+      supportsEffortControl: true,
+      is1M: false,
+      pricing: "$2/$10 per Mtok",
+    },
+    {
+      id: "claude-sonnet-5-1m",
+      label: "Sonnet 5 (1M Context)",
+      description: "Sonnet 5 for long sessions",
+      contextWindow: 1_000_000,
+      cliFlag: "sonnet[1m]",
+      provider: "anthropic",
+      supportsExtendedThinking: true,
+      supportsEffortControl: true,
+      is1M: true,
+      pricing: "$2/$10 per Mtok",
+    },
+    {
+      id: "claude-haiku-4-5",
+      label: "Haiku 4.5",
+      description: "Haiku 4.5 · Fastest for quick answers",
+      contextWindow: 200_000,
+      cliFlag: "haiku",
+      provider: "anthropic",
+      supportsEffortControl: true,
+      is1M: false,
+      pricing: "$1/$5 per Mtok",
+    },
+    {
+      id: "claude-fable-5-1-1m",
+      label: "Claude Fable 5.1 (1M Context)",
+      description: "Fable 5.1 with 1M context window",
+      contextWindow: 1_000_000,
+      cliFlag: "claude-fable-5.1[1m]",
+      provider: "anthropic",
+      supportsExtendedThinking: true,
+      supportsEffortControl: true,
+      is1M: true,
+      pricing: "$4/$20 per Mtok",
+    },
+    {
+      id: "claude-fable-5-1",
+      label: "Claude Fable 5.1",
+      description: "Fable 5.1 (Reasoning)",
+      contextWindow: 200_000,
+      cliFlag: "claude-fable-5.1",
+      provider: "anthropic",
+      supportsExtendedThinking: true,
+      supportsEffortControl: true,
+      is1M: false,
+      pricing: "$4/$20 per Mtok",
+    },
   ],
 
   "codex": [
-    { id: "codex-5-6-terra", label: "5.6 Terra (Default)", contextWindow: 400_000, cliFlag: "5.6-terra", provider: "openai", supportsEffortControl: true, is1M: true },
-    { id: "codex-5-6-sol", label: "5.6 Sol (Flagship)", contextWindow: 400_000, cliFlag: "5.6-sol", provider: "openai", supportsEffortControl: true, is1M: true },
-    { id: "codex-5-6-luna", label: "5.6 Luna", contextWindow: 400_000, cliFlag: "5.6-luna", provider: "openai", supportsEffortControl: true, is1M: true },
-    { id: "codex-5-5", label: "5.5", contextWindow: 400_000, cliFlag: "5.5", provider: "openai", is1M: false },
-    { id: "codex-5-4", label: "5.4", contextWindow: 400_000, cliFlag: "5.4", provider: "openai", is1M: false },
-    { id: "codex-o3", label: "o3 Reasoning", contextWindow: 200_000, cliFlag: "o3", provider: "openai", supportsEffortControl: true, is1M: false },
-    { id: "codex-o3-mini", label: "o3-mini", contextWindow: 200_000, cliFlag: "o3-mini", provider: "openai", supportsEffortControl: true, is1M: false },
-    { id: "codex-o4-mini", label: "o4-mini", contextWindow: 200_000, cliFlag: "o4-mini", provider: "openai", supportsEffortControl: true, is1M: false },
-    { id: "codex-o1-pro", label: "o1 Pro", contextWindow: 200_000, cliFlag: "o1-pro", provider: "openai", supportsEffortControl: true, is1M: false },
-    { id: "codex-gpt-5-1", label: "GPT-5.1", contextWindow: 256_000, cliFlag: "gpt-5.1", provider: "openai", is1M: false },
-    { id: "codex-gpt-5-1-codex", label: "GPT-5.1 Codex", contextWindow: 256_000, cliFlag: "gpt-5.1-codex", provider: "openai", is1M: false },
-    { id: "codex-gpt-5", label: "GPT-5 Preview", contextWindow: 256_000, cliFlag: "gpt-5", provider: "openai", is1M: false },
+    { id: "codex-5-6-terra", label: "5.6 Terra (Default)", description: "Balanced general-purpose coding & agent execution", contextWindow: 400_000, cliFlag: "5.6-terra", provider: "openai", supportsEffortControl: true, is1M: true },
+    { id: "codex-5-6-sol", label: "5.6 Sol (Flagship)", description: "Deepest reasoning & multi-step architectural planning", contextWindow: 400_000, cliFlag: "5.6-sol", provider: "openai", supportsEffortControl: true, is1M: true },
+    { id: "codex-5-6-luna", label: "5.6 Luna", description: "Low-latency streaming for rapid iterations", contextWindow: 400_000, cliFlag: "5.6-luna", provider: "openai", supportsEffortControl: true, is1M: true },
+    { id: "codex-5-5", label: "5.5", description: "Stable generation engine", contextWindow: 400_000, cliFlag: "5.5", provider: "openai", is1M: false },
+    { id: "codex-5-4", label: "5.4", description: "Fast legacy model", contextWindow: 400_000, cliFlag: "5.4", provider: "openai", is1M: false },
+    { id: "codex-o3", label: "o3 Reasoning", description: "OpenAI o3 high-reasoning math & logic model", contextWindow: 200_000, cliFlag: "o3", provider: "openai", supportsEffortControl: true, is1M: false },
+    { id: "codex-o3-mini", label: "o3-mini", description: "Compact reasoning engine", contextWindow: 200_000, cliFlag: "o3-mini", provider: "openai", supportsEffortControl: true, is1M: false },
+    { id: "codex-o4-mini", label: "o4-mini", description: "Lightweight fast coding", contextWindow: 200_000, cliFlag: "o4-mini", provider: "openai", supportsEffortControl: true, is1M: false },
+    { id: "codex-o1-pro", label: "o1 Pro", description: "Exhaustive reasoning for hard problems", contextWindow: 200_000, cliFlag: "o1-pro", provider: "openai", supportsEffortControl: true, is1M: false },
+    { id: "codex-gpt-5-1", label: "GPT-5.1", description: "Next-gen foundation model", contextWindow: 256_000, cliFlag: "gpt-5.1", provider: "openai", is1M: false },
+    { id: "codex-gpt-5-1-codex", label: "GPT-5.1 Codex", description: "Tuned for code generation", contextWindow: 256_000, cliFlag: "gpt-5.1-codex", provider: "openai", is1M: false },
+    { id: "codex-gpt-5", label: "GPT-5 Preview", description: "Developer preview build", contextWindow: 256_000, cliFlag: "gpt-5", provider: "openai", is1M: false },
   ],
 
   "opencode": [
-    { id: "opencode-claude-opus-5", label: "Claude Opus 5", contextWindow: 200_000, cliFlag: "opencode/claude-opus-5", provider: "anthropic", is1M: true },
-    { id: "opencode-claude-sonnet-5", label: "Claude Sonnet 5", contextWindow: 200_000, cliFlag: "opencode/claude-sonnet-5", provider: "anthropic", is1M: false },
-    { id: "opencode-claude-fable-5", label: "Claude Fable 5", contextWindow: 200_000, cliFlag: "opencode/claude-fable-5", provider: "anthropic", is1M: true },
-    { id: "opencode-claude-haiku-4-5", label: "Claude Haiku 4.5", contextWindow: 200_000, cliFlag: "opencode/claude-haiku-4-5", provider: "anthropic", is1M: false },
-    { id: "opencode-deepseek-v4-flash", label: "DeepSeek V4 Flash", contextWindow: 128_000, cliFlag: "opencode/deepseek-v4-flash", provider: "deepseek", pricing: "Free" },
-    { id: "opencode-deepseek-v4-pro", label: "DeepSeek V4 Pro", contextWindow: 128_000, cliFlag: "opencode/deepseek-v4-pro", provider: "deepseek", pricing: "Fast" },
-    { id: "opencode-gemini-3-7-flash", label: "Gemini 3.7 Flash", contextWindow: 1_000_000, cliFlag: "opencode/gemini-3.7-flash", provider: "google", is1M: true },
-    { id: "opencode-gemini-3-6-flash", label: "Gemini 3.6 Flash", contextWindow: 1_000_000, cliFlag: "opencode/gemini-3.6-flash", provider: "google", is1M: true },
-    { id: "opencode-gemini-3-5-flash", label: "Gemini 3.5 Flash", contextWindow: 1_000_000, cliFlag: "opencode/gemini-3.5-flash", provider: "google", is1M: true },
-    { id: "opencode-gemini-3-1-pro", label: "Gemini 3.1 Pro", contextWindow: 2_000_000, cliFlag: "opencode/gemini-3.1-pro", provider: "google", is1M: true },
-    { id: "opencode-gpt-5-1-codex", label: "GPT-5.1 Codex", contextWindow: 256_000, cliFlag: "opencode/gpt-5.1-codex", provider: "openai" },
-    { id: "opencode-gpt-5-1", label: "GPT-5.1", contextWindow: 256_000, cliFlag: "opencode/gpt-5.1", provider: "openai" },
-    { id: "opencode-gpt-5", label: "GPT-5", contextWindow: 256_000, cliFlag: "opencode/gpt-5", provider: "openai" },
-    { id: "opencode-glm-5-2", label: "GLM 5.2", contextWindow: 128_000, cliFlag: "opencode/glm-5.2", provider: "", pricing: "Fast" },
+    { id: "opencode-claude-opus-5", label: "Claude Opus 5", description: "Claude Opus 5 (1M Context) via OpenCode", contextWindow: 200_000, cliFlag: "opencode/claude-opus-5", provider: "anthropic", is1M: true, pricing: "$5/$25 per Mtok" },
+    { id: "opencode-claude-sonnet-5", label: "Claude Sonnet 5", description: "Claude Sonnet 5 via OpenCode", contextWindow: 200_000, cliFlag: "opencode/claude-sonnet-5", provider: "anthropic", is1M: false, pricing: "$2/$10 per Mtok" },
+    { id: "opencode-claude-fable-5-1", label: "Claude Fable 5.1", description: "Claude Fable 5.1 Reasoning via OpenCode", contextWindow: 200_000, cliFlag: "opencode/claude-fable-5.1", provider: "anthropic", is1M: true, pricing: "$4/$20 per Mtok" },
+    { id: "opencode-claude-haiku-4-5", label: "Claude Haiku 4.5", description: "Claude Haiku 4.5 via OpenCode", contextWindow: 200_000, cliFlag: "opencode/claude-haiku-4-5", provider: "anthropic", is1M: false, pricing: "$1/$5 per Mtok" },
+    { id: "opencode-deepseek-v4-flash", label: "DeepSeek V4 Flash", description: "DeepSeek V4 Flash free tier", contextWindow: 128_000, cliFlag: "opencode/deepseek-v4-flash", provider: "deepseek", pricing: "Free" },
+    { id: "opencode-deepseek-v4-pro", label: "DeepSeek V4 Pro", description: "DeepSeek V4 Pro high-throughput tier", contextWindow: 128_000, cliFlag: "opencode/deepseek-v4-pro", provider: "deepseek", pricing: "Fast" },
+    { id: "opencode-gemini-3-7-flash", label: "Gemini 3.7 Flash", description: "Gemini 3.7 Flash with 1M context", contextWindow: 1_000_000, cliFlag: "opencode/gemini-3.7-flash", provider: "google", is1M: true, pricing: "$0.10/$0.40 per Mtok" },
+    { id: "opencode-gemini-3-6-flash", label: "Gemini 3.6 Flash", description: "Gemini 3.6 Flash with 1M context", contextWindow: 1_000_000, cliFlag: "opencode/gemini-3.6-flash", provider: "google", is1M: true, pricing: "$0.10/$0.40 per Mtok" },
+    { id: "opencode-gemini-3-5-flash", label: "Gemini 3.5 Flash", description: "Gemini 3.5 Flash with 1M context", contextWindow: 1_000_000, cliFlag: "opencode/gemini-3.5-flash", provider: "google", is1M: true, pricing: "$0.10/$0.40 per Mtok" },
+    { id: "opencode-gemini-3-1-pro", label: "Gemini 3.1 Pro", description: "Gemini 3.1 Pro with 2M massive context", contextWindow: 2_000_000, cliFlag: "opencode/gemini-3.1-pro", provider: "google", is1M: true, pricing: "$1.25/$5 per Mtok" },
+    { id: "opencode-gpt-5-1-codex", label: "GPT-5.1 Codex", description: "GPT-5.1 Codex code generation engine", contextWindow: 256_000, cliFlag: "opencode/gpt-5.1-codex", provider: "openai", pricing: "$2/$8 per Mtok" },
+    { id: "opencode-gpt-5-1", label: "GPT-5.1", description: "GPT-5.1 foundation model", contextWindow: 256_000, cliFlag: "opencode/gpt-5.1", provider: "openai", pricing: "$2/$8 per Mtok" },
+    { id: "opencode-gpt-5", label: "GPT-5", description: "GPT-5 preview model", contextWindow: 256_000, cliFlag: "opencode/gpt-5", provider: "openai", pricing: "$2/$8 per Mtok" },
+    { id: "opencode-glm-5-2", label: "GLM 5.2", description: "GLM 5.2 bilingual reasoning model", contextWindow: 128_000, cliFlag: "opencode/glm-5.2", provider: "", pricing: "Fast" },
   ],
 
   "agy": [
-    { id: "agy-gemini-3-7-flash", label: "Gemini 3.7 Flash (Ultra Realtime)", contextWindow: 1_000_000, cliFlag: "gemini-3.7-flash", provider: "google", is1M: true },
-    { id: "agy-gemini-3-7-pro", label: "Gemini 3.7 Pro (CoT Reasoning)", contextWindow: 2_000_000, cliFlag: "gemini-3.7-pro", provider: "google", is1M: true },
-    { id: "agy-gemini-3-6-flash", label: "Gemini 3.6 Flash (1M Context)", contextWindow: 1_000_000, cliFlag: "gemini-3.6-flash", provider: "google", is1M: true },
-    { id: "agy-gemini-3-5-flash", label: "Gemini 3.5 Flash", contextWindow: 1_000_000, cliFlag: "gemini-3.5-flash", provider: "google", is1M: true },
-    { id: "agy-gemini-3-1-pro", label: "Gemini 3.1 Pro (2M Context)", contextWindow: 2_000_000, cliFlag: "gemini-3.1-pro", provider: "google", is1M: true },
-    { id: "agy-gemini-3-0-pro", label: "Gemini 3.0 Pro (1M Context)", contextWindow: 1_000_000, cliFlag: "gemini-3.0-pro", provider: "google", is1M: true },
+    { id: "agy-gemini-3-7-flash", label: "Gemini 3.7 Flash (Ultra Realtime)", description: "Ultra realtime low latency agentic execution", contextWindow: 1_000_000, cliFlag: "gemini-3.7-flash", provider: "google", is1M: true, pricing: "$0.10/$0.40 per Mtok" },
+    { id: "agy-gemini-3-7-pro", label: "Gemini 3.7 Pro (CoT Reasoning)", description: "Advanced Chain-of-Thought reasoning & planning", contextWindow: 2_000_000, cliFlag: "gemini-3.7-pro", provider: "google", is1M: true, pricing: "$1.25/$5 per Mtok" },
+    { id: "agy-gemini-3-6-flash", label: "Gemini 3.6 Flash (1M Context)", description: "Balanced fast reasoning with 1M context", contextWindow: 1_000_000, cliFlag: "gemini-3.6-flash", provider: "google", is1M: true, pricing: "$0.10/$0.40 per Mtok" },
+    { id: "agy-gemini-3-5-flash", label: "Gemini 3.5 Flash", description: "High-efficiency coding assistant", contextWindow: 1_000_000, cliFlag: "gemini-3.5-flash", provider: "google", is1M: true, pricing: "$0.10/$0.40 per Mtok" },
+    { id: "agy-gemini-3-1-pro", label: "Gemini 3.1 Pro (2M Context)", description: "Massive 2M context window deep comprehension", contextWindow: 2_000_000, cliFlag: "gemini-3.1-pro", provider: "google", is1M: true, pricing: "$1.25/$5 per Mtok" },
+    { id: "agy-gemini-3-0-pro", label: "Gemini 3.0 Pro (1M Context)", description: "Flagship legacy multi-turn reasoning", contextWindow: 1_000_000, cliFlag: "gemini-3.0-pro", provider: "google", is1M: true, pricing: "$1.25/$5 per Mtok" },
   ],
 
   "aider": [
-    { id: "aider-sonnet", label: "Claude Sonnet", contextWindow: 200_000, cliFlag: "sonnet", provider: "anthropic" },
-    { id: "aider-opus", label: "Claude Opus", contextWindow: 200_000, cliFlag: "opus", provider: "anthropic" },
-    { id: "aider-o3-mini", label: "OpenAI o3-mini", contextWindow: 200_000, cliFlag: "o3-mini", provider: "openai" },
-    { id: "aider-gpt-4o", label: "GPT-4o", contextWindow: 128_000, cliFlag: "gpt-4o", provider: "openai" },
-    { id: "aider-deepseek-reasoner", label: "DeepSeek R1", contextWindow: 64_000, cliFlag: "deepseek/deepseek-reasoner", provider: "deepseek" },
-    { id: "aider-deepseek-chat", label: "DeepSeek V3", contextWindow: 64_000, cliFlag: "deepseek/deepseek-chat", provider: "deepseek" },
-    { id: "aider-gemini-2-5-pro", label: "Gemini 2.5 Pro", contextWindow: 1_000_000, cliFlag: "gemini/gemini-2.5-pro", provider: "google" },
+    { id: "aider-sonnet", label: "Claude Sonnet", description: "Anthropic Claude Sonnet for pair programming", contextWindow: 200_000, cliFlag: "sonnet", provider: "anthropic", pricing: "$2/$10 per Mtok" },
+    { id: "aider-opus", label: "Claude Opus", description: "Anthropic Claude Opus for complex refactors", contextWindow: 200_000, cliFlag: "opus", provider: "anthropic", pricing: "$5/$25 per Mtok" },
+    { id: "aider-o3-mini", label: "OpenAI o3-mini", description: "OpenAI o3-mini fast reasoning", contextWindow: 200_000, cliFlag: "o3-mini", provider: "openai", pricing: "$1.10/$4.40 per Mtok" },
+    { id: "aider-gpt-4o", label: "GPT-4o", description: "OpenAI GPT-4o multimodal coding", contextWindow: 128_000, cliFlag: "gpt-4o", provider: "openai", pricing: "$2.50/$10 per Mtok" },
+    { id: "aider-deepseek-reasoner", label: "DeepSeek R1", description: "DeepSeek R1 open reasoning engine", contextWindow: 64_000, cliFlag: "deepseek/deepseek-reasoner", provider: "deepseek", pricing: "$0.55/$2.19 per Mtok" },
+    { id: "aider-deepseek-chat", label: "DeepSeek V3", description: "DeepSeek V3 rapid chat and code", contextWindow: 64_000, cliFlag: "deepseek/deepseek-chat", provider: "deepseek", pricing: "$0.27/$1.10 per Mtok" },
+    { id: "aider-gemini-2-5-pro", label: "Gemini 2.5 Pro", description: "Google Gemini 2.5 Pro with 1M context", contextWindow: 1_000_000, cliFlag: "gemini/gemini-2.5-pro", provider: "google", pricing: "$1.25/$5 per Mtok" },
   ],
 
   "cline": [
-    { id: "cline-claude-sonnet", label: "Claude Sonnet", contextWindow: 200_000, cliFlag: "sonnet", provider: "anthropic" },
-    { id: "cline-claude-opus", label: "Claude Opus", contextWindow: 200_000, cliFlag: "opus", provider: "anthropic" },
-    { id: "cline-gpt-4o", label: "GPT-4o", contextWindow: 128_000, cliFlag: "gpt-4o", provider: "openai" },
-    { id: "cline-o3-mini", label: "o3-mini", contextWindow: 200_000, cliFlag: "o3-mini", provider: "openai" },
+    { id: "cline-claude-sonnet", label: "Claude Sonnet", description: "Anthropic Claude Sonnet", contextWindow: 200_000, cliFlag: "sonnet", provider: "anthropic", pricing: "$2/$10 per Mtok" },
+    { id: "cline-claude-opus", label: "Claude Opus", description: "Anthropic Claude Opus", contextWindow: 200_000, cliFlag: "opus", provider: "anthropic", pricing: "$5/$25 per Mtok" },
+    { id: "cline-gpt-4o", label: "GPT-4o", description: "OpenAI GPT-4o", contextWindow: 128_000, cliFlag: "gpt-4o", provider: "openai", pricing: "$2.50/$10 per Mtok" },
+    { id: "cline-o3-mini", label: "o3-mini", description: "OpenAI o3-mini", contextWindow: 200_000, cliFlag: "o3-mini", provider: "openai", pricing: "$1.10/$4.40 per Mtok" },
   ],
 
   "kilo": [
@@ -146,7 +212,20 @@ export function getDefaultModelForCli(cliId: string): AvailableModel | undefined
 export function getModelById(cliId: string, modelId: string): AvailableModel | undefined {
   const norm = normalizeCliId(cliId);
   const list = MODEL_CATALOG[norm] ?? MODEL_CATALOG[cliId] ?? [];
-  return list.find((m) => m.id === modelId || m.cliFlag === modelId || m.label === modelId);
+  const cleanId = (modelId || "").trim();
+  const lower = cleanId.toLowerCase();
+
+  const exact = list.find((m) => m.id === cleanId || m.cliFlag === cleanId || m.label === cleanId);
+  if (exact) return exact;
+
+  if (lower.includes("fable")) {
+    const is1m = lower.includes("1m") || lower.includes("[1m]");
+    return list.find((m) => is1m ? m.id === "claude-fable-5-1-1m" : m.id === "claude-fable-5-1");
+  }
+
+  return list.find((m) =>
+    (cleanId === "opencode-claude-fable-5" && m.id === "opencode-claude-fable-5-1")
+  );
 }
 
 export function cliSupportsModels(cliId: string): boolean {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback, memo } from "react";
 import {
   Search,
   Sparkles,
@@ -80,8 +80,26 @@ export default function CommandPalette({
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const restoreRef = useRef<HTMLElement | null>(null);
+ const paletteRef = useRef<HTMLDivElement>(null);
+ const [focusedChild, setFocusedChild] = useState<string | null>(null);
 
-  const activeWsId = useWorkspaceStore((s) => s.activeWorkspaceId);
+  useEffect(() => {
+ if (!paletteRef.current) return;
+ const handler = () => {
+ const active = document.activeElement;
+ if (!active) { setFocusedChild(null); return; }
+ const id = active.getAttribute("data-palette-item-id") || (active === inputRef.current ? "input" : null);
+ setFocusedChild(id);
+ };
+ paletteRef.current.addEventListener("focusin", handler);
+ paletteRef.current.addEventListener("focusout", handler);
+ return () => {
+ paletteRef.current?.removeEventListener("focusin", handler);
+ paletteRef.current?.removeEventListener("focusout", handler);
+ };
+ }, []);
+
+ const activeWsId = useWorkspaceStore((s) => s.activeWorkspaceId);
   const addAgent = useAgentsStore((s) => s.addAgent);
   const setGridLayout = useAgentsStore((s) => s.setGridLayout);
   const toggleLeft = useUiStore((s) => s.toggleLeft);
@@ -552,7 +570,7 @@ export default function CommandPalette({
         cmd.label.toLowerCase().includes(cleanQ) ||
         cmd.hint?.toLowerCase().includes(q) ||
         cmd.hint?.toLowerCase().includes(cleanQ) ||
-        cmd.category.toLowerCase().includes(q)
+        cmd.category.toLowerCase().includes(cleanQ)
     );
   }, [commands, query]);
 
@@ -569,7 +587,7 @@ export default function CommandPalette({
   }, [isOpen]);
 
   useEffect(() => {
-    setSelectedIndex(0);
+    setSelectedIndex((prev) => Math.min(prev, Math.max(0, filteredCommands.length - 1)));
   }, [query]);
 
   // Keyboard navigation
@@ -590,7 +608,48 @@ export default function CommandPalette({
     }
   };
 
-  if (!isOpen) return null;
+  const PaletteCommandRow = memo(function PaletteCommandRow({
+ cmd, isSelected, onSelect,
+}: {
+ cmd: PaletteCommand;
+ isSelected: boolean;
+ onSelect: () => void;
+}) {
+ return (
+ <button
+ data-palette-item-id={cmd.id}
+ onClick={cmd.action}
+ onMouseEnter={onSelect}
+ className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left text-xs transition-all ${
+ isSelected
+ ? "bg-amber-500/15 text-amber-200 shadow-sm border border-amber-500/30"
+ : "text-zinc-300 hover:bg-zinc-800/50 border border-transparent"
+ } ${focusedChild === cmd.id ? "ring-2 ring-amber-400/70 ring-offset-1 ring-offset-zinc-950" : ""}`}
+ >
+ <div className="flex items-center gap-3 min-w-0">
+ <div className="flex size-7 items-center justify-center rounded-lg bg-zinc-900 border border-zinc-800 shrink-0">
+ {cmd.icon}
+ </div>
+ <div className="min-w-0">
+ <div className="font-semibold text-zinc-100 truncate font-mono">{cmd.label}</div>
+ {cmd.hint && (
+ <div className="text-[11px] text-zinc-400 truncate">{cmd.hint}</div>
+ )}
+ </div>
+ </div>
+ <div className="flex items-center gap-2 shrink-0">
+ {cmd.shortcut && (
+ <span className="font-mono text-[10px] text-zinc-400 bg-zinc-900/80 px-1.5 py-0.5 rounded border border-zinc-800">
+ {cmd.shortcut}
+ </span>
+ )}
+ <span className="text-[10px] text-zinc-400 font-sans">{cmd.category}</span>
+ </div>
+ </button>
+ );
+});
+
+if (!isOpen) return null;
 
   return (
     <div
@@ -611,7 +670,7 @@ export default function CommandPalette({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Type / for real CLI commands, + to summon agents, or search..."
-            className="w-full bg-transparent text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none font-mono"
+            className="w-full bg-transparent text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none font-mono focus-visible:ring-2 focus-visible:ring-amber-400/70 focus-visible:ring-offset-1 focus-visible:ring-offset-zinc-950"
           />
           <span className="text-[10px] font-mono text-zinc-400 bg-zinc-800/80 px-2 py-0.5 rounded">
             ESC
@@ -628,42 +687,14 @@ export default function CommandPalette({
               No matching commands found for &ldquo;{query}&rdquo;
             </div>
           ) : (
-            filteredCommands.map((cmd, idx) => {
-              const isSelected = idx === selectedIndex;
-              return (
-                <button
-                  key={cmd.id}
-                  onClick={cmd.action}
-                  onMouseEnter={() => setSelectedIndex(idx)}
-                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left text-xs transition-all ${
-                    isSelected
-                      ? "bg-amber-500/15 text-amber-200 shadow-sm border border-amber-500/30"
-                      : "text-zinc-300 hover:bg-zinc-800/50 border border-transparent"
-                  }`}
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex size-7 items-center justify-center rounded-lg bg-zinc-900 border border-zinc-800 shrink-0">
-                      {cmd.icon}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="font-semibold text-zinc-100 truncate font-mono">{cmd.label}</div>
-                      {cmd.hint && (
-                        <div className="text-[11px] text-zinc-400 truncate">{cmd.hint}</div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 shrink-0">
-                    {cmd.shortcut && (
-                      <span className="font-mono text-[10px] text-zinc-400 bg-zinc-900/80 px-1.5 py-0.5 rounded border border-zinc-800">
-                        {cmd.shortcut}
-                      </span>
-                    )}
-                    <span className="text-[10px] text-zinc-400 font-sans">{cmd.category}</span>
-                  </div>
-                </button>
-              );
-            })
+ filteredCommands.map((cmd, idx) => (
+ <PaletteCommandRow
+ key={cmd.id}
+ cmd={cmd}
+ isSelected={idx === selectedIndex}
+ onSelect={() => setSelectedIndex(idx)}
+ />
+ ))
           )}
         </div>
 

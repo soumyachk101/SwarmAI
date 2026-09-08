@@ -51,6 +51,7 @@ public struct EntryAnimationTimings: Sendable {
 
 @MainActor
 @Observable
+// Safe: all mutations are @MainActor-isolated via SwiftUI's main-thread guarantee
 public final class AppState: @unchecked Sendable {
 	public static let shared = AppState()
 

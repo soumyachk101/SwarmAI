@@ -59,14 +59,16 @@ export default function ThemePicker({ compact = false }: { compact?: boolean }) 
     el?.focus({ preventScroll: true });
   }, [open]);
 
-  // The panel is placed from a rect measured at open time; a window resize
-  // leaves it floating away from its button, so close rather than mis-place it.
-  useEffect(() => {
-    if (!open) return;
-    const close = () => setOpen(false);
-    window.addEventListener("resize", close);
-    return () => window.removeEventListener("resize", close);
-  }, [open]);
+ // The panel is placed from a rect measured at open time; a ResizeObserver
+ // on the trigger button repositions the panel instead of closing on resize.
+ useEffect(() => {
+ if (!open || !btnRef.current) return;
+ const ro = new ResizeObserver(() => {
+ setRect(btnRef.current?.getBoundingClientRect() ?? null);
+ });
+ ro.observe(btnRef.current);
+ return () => ro.disconnect();
+ }, [open]);
 
   const current = THEMES.find((t) => t.id === themeId) ?? THEMES[0];
 

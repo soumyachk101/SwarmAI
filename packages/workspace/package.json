@@ -23,7 +23,7 @@
     "@swarm/tasks": "workspace:*",
     "@swarm/board": "workspace:*",
     "@swarm/agents": "workspace:*",
-    "lucide-react": "^0.400.0",
+    "@swarm/pheromone": "workspace:*",
     "zustand": "^5.0.0"
   },
   "peerDependencies": {

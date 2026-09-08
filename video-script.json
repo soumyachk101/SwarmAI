@@ -1,0 +1,1907 @@
+{
+ "title": "Swarm AI — The Future of Parallel AI Development",
+ "subtitle": "Product Film",
+ "duration": 90,
+ "fps": 60,
+ "resolution": [1920, 1080],
+ "backgroundColor": "#05070A",
+ "accentColors": {
+ "primary": "#00E5FF",
+ "secondary": "#7C4DFF",
+ "tertiary": "#FF6D3A",
+ "success": "#00E676",
+ "text": "#E8EAED",
+ "textMuted": "#8B92A5",
+ "surface": "#0D1117",
+ "surfaceLight": "#161B22",
+ "border": "#21262D"
+ },
+ "font": {
+ "display": "Inter",
+ "mono": "JetBrains Mono",
+ "fallback": "system-ui, -apple-system, sans-serif"
+ },
+ "audio": {
+ "bgm": "Dark cinematic synth, low intensity pulse",
+ "sfx": {
+ "whoosh": "Smooth sweep",
+ "click": "Soft digital click",
+ "pop": "Clean UI pop",
+ "glitch": "Digital artifact",
+ "chime": "Ascending success chime",
+ "hum": "Subtle ambient hum",
+ "pulse": "Deep bass pulse"
+ }
+ },
+ "globalEffects": {
+ "grain": {
+ "enabled": true,
+ "opacity": 0.03,
+ "size": 1.5
+ },
+ "vignette": {
+ "enabled": true,
+ "radius": 0.4,
+ "softness": 0.6,
+ "opacity": 0.7
+ },
+ "bloom": {
+ "enabled": true,
+ "threshold": 0.6,
+ "intensity": 0.8,
+ "radius": 1.5
+ },
+ "filmStripLines": {
+ "enabled": true,
+ "opacity": 0.02,
+ "gap": 3
+ }
+ },
+ "scenes": [
+ {
+ "id": 0,
+ "name": "Hook — The Invisible War",
+ "duration": 12,
+ "background": {
+ "type": "gradient",
+ "colors": ["#05070A", "#0A0E17", "#05070A"],
+ "direction": "radial",
+ "center": [0.5, 0.5]
+ },
+ "elements": [
+ {
+ "type": "text",
+ "id": "hook_overlay",
+ "content": "THE INVISIBLE WAR",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 900,
+ "fontSize": "7vw",
+ "color": "accentColors.text",
+ "letterSpacing": "0.15em",
+ "textTransform": "uppercase",
+ "textAlign": "center"
+ },
+ "position": { "x": "50%", "y": "30%", "anchor": "center-middle" },
+ "animation": {
+ "type": "revealTypewriter",
+ "duration": 2000,
+ "delay": 500,
+ "easing": "easeOutCubic",
+ "cursorBlink": true,
+ "cursorColor": "accentColors.primary",
+ "cursorWidth": 3,
+ "charDelay": 35,
+ "glitchEffect": {
+ "enabled": true,
+ "intensity": 0.15,
+ "frequency": 0.03,
+ "colorShift": "accentColors.secondary"
+ }
+ }
+ },
+ {
+ "type": "text",
+ "id": "hook_subtitle",
+ "content": "Every line of code you write is a battle for time.",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 300,
+ "fontSize": "2.2vw",
+ "color": "accentColors.textMuted",
+ "fontStyle": "italic",
+ "textAlign": "center"
+ },
+ "position": { "x": "50%", "y": "50%", "anchor": "center-middle" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 1200,
+ "delay": 2800,
+ "easing": "easeOutCubic",
+ "fromOpacity": 0,
+ "toOpacity": 1,
+ "fromY": 20,
+ "toY": 0
+ }
+ },
+ {
+ "type": "visual",
+ "id": "particle_background",
+ "description": "Dark canvas with sparse floating code characters and micro-particles drifting upward. Very sparse — 3-4 particles visible at any time. Slow drift velocity. Occasional flicker.",
+ "layers": [
+ {
+ "layer": "particles",
+ "count": 40,
+ "type": "codeGlyphs",
+ "glyphs": ["{", "}", "<", ">", "/", "=", "&&", "||", "fn", "=>", "()", "[]"],
+ "font": "font.mono",
+ "fontSizeRange": [10, 18],
+ "color": "accentColors.textMuted",
+ "opacityRange": [0.05, 0.2],
+ "drift": { "x": 0, "y": -15 },
+ "speedRange": [0.3, 1.2],
+ "spawnRate": 2,
+ "despawnY": "-5%"
+ },
+ {
+ "layer": "gridOverlay",
+ "type": "subtleGrid",
+ "gridSize": 80,
+ "lineColor": "accentColors.primary",
+ "lineOpacity": 0.015,
+ "fadeFromCenter": true,
+ "pulseSpeed": 0.002
+ }
+ ]
+ },
+ {
+ "type": "text",
+ "id": "dev_silhouette",
+ "content": "[Visual: A lone developer silhouette sits at a desk, surrounded by 3 glowing monitor windows. Each window shows a different AI tool — faces of effort, single-threaded struggle. Blue-tinted, moody lighting. Slow subtle breathing animation.]",
+ "style": {
+ "display": "specificationOnly"
+ },
+ "position": { "x": "50%", "y": "72%", "anchor": "center-bottom" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 2000,
+ "delay": 3500,
+ "easing": "easeOutCubic",
+ "fromOpacity": 0,
+ "toOpacity": 0.7,
+ "scaleFrom": 0.98,
+ "scaleTo": 1,
+ "breathing": { "enabled": true, "amplitude": 0.01, "period": 4000 }
+ }
+ }
+ ],
+ "transitions": {
+ "out": {
+ "type": "fadeToBlack",
+ "duration": 600,
+ "easing": "easeInCubic"
+ }
+ },
+ "audio": {
+ "bgmVolume": 0.15,
+ "sfx": [
+ { "event": "fadeIn", "time": 0, "sound": "sfx.hum", "volume": 0.05 }
+ ]
+ }
+ },
+ {
+ "id": 1,
+ "name": "The Problem — One Thread",
+ "duration": 12,
+ "background": {
+ "type": "solid",
+ "color": "#05070A"
+ },
+ "elements": [
+ {
+ "type": "text",
+ "id": "problem_label",
+ "content": "THE PROBLEM",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 700,
+ "fontSize": "1.5vw",
+ "color": "accentColors.textMuted",
+ "letterSpacing": "0.4em",
+ "textTransform": "uppercase"
+ },
+ "position": { "x": "50%", "y": "10%", "anchor": "center-top" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 600,
+ "delay": 0,
+ "easing": "easeOutCubic"
+ }
+ },
+ {
+ "type": "visual",
+ "id": "single_thread_visual",
+ "description": "Left side of screen (40% width). A single vertical glowing thread in accentColors.primary extends from top to bottom, pulsing softly. Labeled 'ONE AGENT'. Small code blocks scroll along it slowly, occasionally halting as if thinking. A subtle red glow pulses around the thread during 'blocked' moments.",
+ "layers": [
+ {
+ "layer": "thread",
+ "x": "20%",
+ "y": { "from": "15%", "to": "85%" },
+ "width": 2,
+ "color": "accentColors.primary",
+ "glow": { "color": "accentColors.primary", "blur": 20, "opacity": 0.4 },
+ "pulse": { "enabled": true, "speed": 0.003, "amplitude": 0.3 }
+ },
+ {
+ "layer": "codeFragments",
+ "spawnOnThread": true,
+ "direction": "down",
+ "speed": 30,
+ "pauseProbability": 0.02,
+ "pauseDuration": 1500,
+ "pauseGlowColor": "#FF3D00"
+ },
+ {
+ "layer": "label",
+ "text": "YOU",
+ "font": "font.mono",
+ "fontSize": 14,
+ "color": "accentColors.textMuted",
+ "position": { "x": "20%", "y": "10%" }
+ }
+ ],
+ "animation": {
+ "type": "drawIn",
+ "duration": 2000,
+ "delay": 600,
+ "easing": "easeOutCubic",
+ "fromY": "-10%",
+ "toY": "85%"
+ }
+ },
+ {
+ "type": "visual",
+ "id": "problem_statement_left",
+ "description": "Right side of screen (55% width). Bold problem text appears with staggered fade-in. Each line replaces the previous after a beat.",
+ "layers": [
+ {
+ "layer": "line1",
+ "content": "One AI at a time.",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 700,
+ "fontSize": "3.5vw",
+ "color": "accentColors.text",
+ "textAlign": "left"
+ },
+ "position": { "x": "58%", "y": "30%" },
+ "animation": {
+ "type": "slideIn",
+ "duration": 800,
+ "delay": 1500,
+ "easing": "easeOutCubic",
+ "fromX": 60,
+ "toX": 0
+ }
+ },
+ {
+ "layer": "line2",
+ "content": "One task at a time.",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 700,
+ "fontSize": "3.5vw",
+ "color": "accentColors.text",
+ "textAlign": "left"
+ },
+ "position": { "x": "58%", "y": "44%" },
+ "animation": {
+ "type": "slideIn",
+ "duration": 800,
+ "delay": 2500,
+ "easing": "easeOutCubic",
+ "fromX": 60,
+ "toX": 0
+ }
+ },
+ {
+ "layer": "line3",
+ "content": "One bottleneck at a time.",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 700,
+ "fontSize": "3.5vw",
+ "color": "accentColors.tertiary",
+ "textAlign": "left"
+ },
+ "position": { "x": "58%", "y": "58%" },
+ "animation": {
+ "type": "slideIn",
+ "duration": 800,
+ "delay": 3500,
+ "easing": "easeOutCubic",
+ "fromX": 60,
+ "toX": 0
+ }
+ }
+ ]
+ },
+ {
+ "type": "visual",
+ "id": "clock_ticker",
+ "description": "Bottom right corner. A minimal analog-style clock icon. Second hand ticks visibly, slightly faster than real time. At 6000ms, the clock stops and turns red briefly. Then resumes.",
+ "animation": {
+ "type": "continuous",
+ "startDelay": 2000,
+ "tickInterval": 833,
+ "redFlash": { "time": 6000, "duration": 500 }
+ }
+ }
+ ],
+ "transitions": {
+ "out": {
+ "type": "glitchTransition",
+ "duration": 400,
+ "intensity": 0.3
+ }
+ },
+ "audio": {
+ "bgmVolume": 0.2,
+ "sfx": [
+ { "event": "tick", "time": 2000, "sound": "sfx.click", "volume": 0.1 },
+ { "event": "tick", "time": 6000, "sound": "sfx.glitch", "volume": 0.2 }
+ ]
+ }
+ },
+ {
+ "id": 2,
+ "name": "The Breakthrough — Swarm AI",
+ "duration": 12,
+ "background": {
+ "type": "animated",
+ "description": "Background transitions from deep dark to a subtle blue-purple radial gradient. Energy particles begin multiplying."
+ },
+ "elements": [
+ {
+ "type": "text",
+ "id": "breakthrough_label",
+ "content": "BREAKTHROUGH",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 700,
+ "fontSize": "1.5vw",
+ "color": "accentColors.primary",
+ "letterSpacing": "0.4em",
+ "textTransform": "uppercase"
+ },
+ "position": { "x": "50%", "y": "10%", "anchor": "center-top" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 600,
+ "delay": 0,
+ "easing": "easeOutCubic"
+ }
+ },
+ {
+ "type": "visual",
+ "id": "swarm_logo_reveal",
+ "description": "Center of screen. The Swarm AI logo — a stylized geometric swarm shape (hexagonal cluster of nodes connected by lines) — assembles from scattered particles. Particles converge from all directions into the hexagonal formation. The formation glows with accentColors.primary upon completion. A subtle pulse wave emanates outward.",
+ "animation": {
+ "type": "particleAssembly",
+ "duration": 3000,
+ "delay": 800,
+ "easing": "easeOutCubic",
+ "targetScale": 1,
+ "pulseOnComplete": { "enabled": true, "waveColor": "accentColors.primary", "waveOpacity": 0.3, "waveSpeed": 800 },
+ "particleCount": 200,
+ "targetShape": "hexagonCluster",
+ "nodeCount": 12,
+ "connectionLines": { "color": "accentColors.primary", "opacity": 0.6, "width": 1.5 }
+ }
+ },
+ {
+ "type": "text",
+ "id": "swarm_name",
+ "content": "Swarm AI",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 900,
+ "fontSize": "8vw",
+ "color": "accentColors.text",
+ "letterSpacing": "-0.02em",
+ "textAlign": "center",
+ "textShadow": {
+ "color": "accentColors.primary",
+ "blur": 40,
+ "opacity": 0.5,
+ "offsetX": 0,
+ "offsetY": 0
+ }
+ },
+ "position": { "x": "50%", "y": "55%", "anchor": "center-middle" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 1500,
+ "delay": 3000,
+ "easing": "easeOutCubic",
+ "fromOpacity": 0,
+ "toOpacity": 1,
+ "fromScale": 0.92,
+ "toScale": 1,
+ "springBounce": 0.15
+ }
+ },
+ {
+ "type": "text",
+ "id": "swarm_tagline",
+ "content": "10+ AI agents. One project. Zero conflicts.",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 300,
+ "fontSize": "2vw",
+ "color": "accentColors.textMuted",
+ "letterSpacing": "0.05em",
+ "textAlign": "center"
+ },
+ "position": { "x": "50%", "y": "68%", "anchor": "center-middle" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 1000,
+ "delay": 4200,
+ "easing": "easeOutCubic",
+ "fromOpacity": 0,
+ "toOpacity": 1,
+ "fromY": 15,
+ "toY": 0
+ }
+ },
+ {
+ "type": "visual",
+ "id": "energy_burst",
+ "description": "Multiple concentric circles of light pulse outward from the logo position in waves. Three distinct waves at 500ms intervals, each expanding and fading. Colors shift from primary to secondary to tertiary.",
+ "layers": [
+ {
+ "wave": 1,
+ "color": "accentColors.primary",
+ "startTime": 4000,
+ "duration": 1200,
+ "maxRadius": 400
+ },
+ {
+ "wave": 2,
+ "color": "accentColors.secondary",
+ "startTime": 4300,
+ "duration": 1200,
+ "maxRadius": 400
+ },
+ {
+ "wave": 3,
+ "color": "accentColors.tertiary",
+ "startTime": 4600,
+ "duration": 1200,
+ "maxRadius": 400
+ }
+ ]
+ }
+ ],
+ "transitions": {
+ "out": {
+ "type": "morphTransition",
+ "duration": 800,
+ "easing": "easeInOutCubic",
+ "morphTarget": "scene3_background"
+ }
+ },
+ "audio": {
+ "bgmVolume": 0.25,
+ "sfx": [
+ { "event": "assemble", "time": 800, "sound": "sfx.pulse", "volume": 0.15 },
+ { "event": "reveal", "time": 3000, "sound": "sfx.chime", "volume": 0.25 },
+ { "event": "wave1", "time": 4000, "sound": "sfx.whoosh", "volume": 0.1 }
+ ]
+ }
+ },
+ {
+ "id": 3,
+ "name": "How It Works — The Swarm",
+ "duration": 15,
+ "background": {
+ "type": "gradient",
+ "colors": ["#0A0E17", "#0D0A1A", "#0A0E17"],
+ "direction": "radial",
+ "center": [0.5, 0.5]
+ },
+ "elements": [
+ {
+ "type": "text",
+ "id": "howitworks_title",
+ "content": "HOW IT WORKS",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 700,
+ "fontSize": "1.5vw",
+ "color": "accentColors.primary",
+ "letterSpacing": "0.4em",
+ "textTransform": "uppercase"
+ },
+ "position": { "x": "50%", "y": "8%", "anchor": "center-top" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 600,
+ "delay": 0,
+ "easing": "easeOutCubic"
+ }
+ },
+ {
+ "type": "visual",
+ "id": "goal_input",
+ "description": "Top center of screen. A glowing terminal-like input field. The text 'Build a real-time collaborative whiteboard' types in character by character in JetBrains Mono. When complete, the text pulses green briefly.",
+ "animation": {
+ "type": "typewriter",
+ "duration": 4000,
+ "delay": 600,
+ "easing": "linear",
+ "text": "Build a real-time collaborative whiteboard",
+ "font": "font.mono",
+ "fontSize": 20,
+ "color": "accentColors.success",
+ "cursorBlink": true,
+ "fieldStyle": {
+ "bgColor": "accentColors.surface",
+ "borderColor": "accentColors.primary",
+ "borderWidth": 1,
+ "borderRadius": 6,
+ "padding": 16,
+ "width": "60%",
+ "glow": { "color": "accentColors.primary", "blur": 15, "opacity": 0.3 }
+ }
+ }
+ },
+ {
+ "type": "visual",
+ "id": "swarm_network",
+ "description": "Center of screen. A network visualization showing the Lead orchestrator at top center, with 10 nodes arranged in two rows below, connected by animated lines. Each node represents a different AI agent (labeled with names like 'Claude Code', 'Codex', 'Aider', 'Cursor', etc.). Lines pulse with data flow — small glowing dots travel from Lead to each agent.",
+ "layers": [
+ {
+ "layer": "orchestrator",
+ "label": "Lead",
+ "position": { "x": 0.5, "y": 0.28 },
+ "size": 50,
+ "shape": "hexagon",
+ "color": "accentColors.secondary",
+ "glow": { "color": "accentColors.secondary", "blur": 30, "opacity": 0.5 },
+ "pulse": { "enabled": true, "speed": 0.004, "amplitude": 0.1 },
+ "icon": "Crown or orchestration symbol"
+ },
+ {
+ "layer": "agents",
+ "count": 10,
+ "arrangement": {
+ "type": "twoRows",
+ "row1": { "count": 5, "y": 0.42, "spacing": 0.15 },
+ "row2": { "count": 5, "y": 0.56, "spacing": 0.15 }
+ },
+ "size": 36,
+ "shape": "circle",
+ "colors": [
+ "accentColors.primary",
+ "accentColors.secondary",
+ "accentColors.tertiary",
+ "accentColors.success",
+ "#FFD740",
+ "#40C4FF",
+ "#E040FB",
+ "#69F0AE",
+ "#FF6E40",
+ "#7C4DFF"
+ ],
+ "labels": ["Claude", "Codex", "Aider", "Cursor", "OpenCode", "Gemini", "Copilot", "Windsurf", "Cline", "Marvin"],
+ "glow": { "blur": 20, "opacity": 0.4, "perNode": true },
+ "staggerActivation": {
+ "enabled": true,
+ "interval": 200,
+ "startDelay": 5000
+ }
+ },
+ {
+ "layer": "connections",
+ "from": "orchestrator",
+ "to": "agents",
+ "type": "bezier",
+ "color": "accentColors.primary",
+ "width": 1.5,
+ "opacity": 0.3,
+ "dataFlow": {
+ "enabled": true,
+ "particleColor": "accentColors.primary",
+ "particleSize": 3,
+ "particleSpeed": 80,
+ "particleGlow": { "blur": 10, "opacity": 0.8 },
+ "startDelay": 6500
+ }
+ }
+ ],
+ "animation": {
+ "type": "staggeredReveal",
+ "duration": 4000,
+ "delay": 5000,
+ "easing": "easeOutCubic",
+ "orchestratorFirst": true,
+ "agentDelay": 200,
+ "connectionDelay": 500,
+ "particleStartDelay": 6500
+ }
+ },
+ {
+ "type": "visual",
+ "id": "task_bubbles",
+ "description": "Floating near each agent node, small translucent task cards appear with staggered timing. Cards show brief task descriptions like 'Auth module', 'UI components', 'API routes', 'Tests', 'Docs', etc. They float gently (sinusoidal motion).",
+ "animation": {
+ "type": "staggeredFadeIn",
+ "duration": 800,
+ "delay": 8000,
+ "easing": "easeOutBack",
+ "offsetRange": [-8, 8],
+ "floatAmplitude": 5,
+ "floatPeriod": 3000,
+ "cardStyle": {
+ "bgColor": "accentColors.surface",
+ "borderColor": "accentColors.textMuted",
+ "borderWidth": 1,
+ "borderRadius": 8,
+ "padding": 10,
+ "fontSize": 13,
+ "font": "font.mono",
+ "color": "accentColors.text",
+ "width": 120,
+ "opacity": 0.85,
+ "shadow": { "blur": 20, "opacity": 0.3, "color": "accentColors.primary" }
+ }
+ }
+ }
+ ],
+ "transitions": {
+ "out": {
+ "type": "panAndScale",
+ "duration": 700,
+ "easing": "easeInOutCubic",
+ "fromScale": 1,
+ "toScale": 1.1,
+ "fromY": 0,
+ "toY": -5,
+ "fadeToBlack": { "duration": 300, "easing": "easeInCubic" }
+ }
+ },
+ "audio": {
+ "bgmVolume": 0.3,
+ "sfx": [
+ { "event": "inputDone", "time": 4800, "sound": "sfx.pop", "volume": 0.2 },
+ { "event": "nodeSpawn", "time": 5000, "sound": "sfx.pop", "volume": 0.15, "repeat": 10, "interval": 200 },
+ { "event": "connections", "time": 6500, "sound": "sfx.whoosh", "volume": 0.1 }
+ ]
+ }
+ },
+ {
+ "id": 4,
+ "name": "Isolation — Git Worktrees",
+ "duration": 13,
+ "background": {
+ "type": "solid",
+ "color": "#080C14"
+ },
+ "elements": [
+ {
+ "type": "text",
+ "id": "isolation_title",
+ "content": "ZERO CONFLICTS",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 700,
+ "fontSize": "1.5vw",
+ "color": "accentColors.success",
+ "letterSpacing": "0.4em",
+ "textTransform": "uppercase"
+ },
+ "position": { "x": "50%", "y": "8%", "anchor": "center-top" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 600,
+ "delay": 0,
+ "easing": "easeOutCubic"
+ }
+ },
+ {
+ "type": "text",
+ "id": "isolation_concept",
+ "content": "Each agent gets its own isolated workspace.",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 400,
+ "fontSize": "2.5vw",
+ "color": "accentColors.text",
+ "textAlign": "center"
+ },
+ "position": { "x": "50%", "y": "15%", "anchor": "center-top" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 800,
+ "delay": 400,
+ "easing": "easeOutCubic"
+ }
+ },
+ {
+ "type": "visual",
+ "id": "worktree_diagram",
+ "description": "Horizontal scroll of 5 worktree panels across the screen. Each panel is a glass-morphism card representing a git worktree. Center panel is the main project, flanked by 4 branch panels. Arrows show branching flow. The diagram animates in from left to right, each panel sliding in sequentially. Inside each panel, a mini-file-tree and a code editor window show different file changes — no two panels edit the same file.",
+ "layers": [
+ {
+ "layer": "panels",
+ "count": 5,
+ "layout": {
+ "type": "horizontalRow",
+ "y": "38%",
+ "startX": "10%",
+ "endX": "90%",
+ "spacing": 0,
+ "overlap": 0.1
+ },
+ "panelStyle": {
+ "width": 280,
+ "height": 380,
+ "bgColor": "accentColors.surface",
+ "bgOpacity": 0.85,
+ "borderColor": "accentColors.primary",
+ "borderWidth": 1,
+ "borderRadius": 12,
+ "glassEffect": {
+ "blur": 20,
+ "opacity": 0.1,
+ "borderHighlight": true
+ },
+ "shadow": { "blur": 30, "opacity": 0.2, "color": "accentColors.primary" }
+ },
+ "content": [
+ {
+ "panelIndex": 0,
+ "label": "main",
+ "labelColor": "accentColors.textMuted",
+ "labelBg": "accentColors.surfaceLight",
+ "isMain": true,
+ "files": ["package.json", "README.md"],
+ "branchIndicator": null
+ },
+ {
+ "panelIndex": 1,
+ "label": "feat/auth",
+ "labelColor": "accentColors.primary",
+ "branchFrom": "main",
+ "files": ["auth/login.ts", "auth/middleware.ts"],
+ "editingIndicator": "● LIVE"
+ },
+ {
+ "panelIndex": 2,
+ "label": "feat/ui",
+ "labelColor": "accentColors.secondary",
+ "branchFrom": "main",
+ "files": ["components/Button.tsx", "styles/theme.css"],
+ "editingIndicator": "● LIVE"
+ },
+ {
+ "panelIndex": 3,
+ "label": "feat/api",
+ "labelColor": "accentColors.tertiary",
+ "branchFrom": "main",
+ "files": ["routes/users.ts", "routes/posts.ts"],
+ "editingIndicator": "● LIVE"
+ },
+ {
+ "panelIndex": 4,
+ "label": "fix/typing",
+ "labelColor": "accentColors.success",
+ "branchFrom": "main",
+ "files": ["types/index.ts", "utils/helpers.ts"],
+ "editingIndicator": "● LIVE"
+ }
+ ],
+ "animation": {
+ "type": "sequentialSlide",
+ "duration": 2000,
+ "delay": 600,
+ "easing": "easeOutCubic",
+ "stagger": 200,
+ "fromX": -100,
+ "toX": 0,
+ "settleBounce": 0.08
+ }
+ },
+ {
+ "layer": "branchArrows",
+ "drawIn": {
+ "duration": 1200,
+ "delay": 2200,
+ "easing": "easeOutCubic",
+ "fromPanel": 0,
+ "color": "accentColors.textMuted",
+ "width": 1.5,
+ "opacity": 0.4
+ }
+ },
+ {
+ "layer": "codeLines",
+ "perPanel": true,
+ "type": "lineByLineReveal",
+ "delay": 3000,
+ "lineDelay": 150,
+ "color": "accentColors.primary",
+ "font": "font.mono",
+ "fontSize": 11,
+ "opacity": 0.7
+ }
+ ]
+ },
+ {
+ "type": "text",
+ "id": "conflict_proof",
+ "content": "No merge conflicts. Ever.",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 800,
+ "fontSize": "2.8vw",
+ "color": "accentColors.success",
+ "textAlign": "center"
+ },
+ "position": { "x": "50%", "y": "88%", "anchor": "center-bottom" },
+ "animation": {
+ "type": "scaleIn",
+ "duration": 800,
+ "delay": 5500,
+ "easing": "easeOutBack",
+ "fromScale": 0,
+ "toScale": 1,
+ "springOvershoot": 0.15
+ }
+ },
+ {
+ "type": "visual",
+ "id": "checkmark_particles",
+ "description": "When 'No merge conflicts. Ever.' appears, small green particles burst from the text outward, then fade. Particles are checkmark-shaped or small dots.",
+ "animation": {
+ "type": "particleBurst",
+ "duration": 1000,
+ "delay": 5500,
+ "particleCount": 30,
+ "color": "accentColors.success",
+ "glow": { "color": "accentColors.success", "blur": 15, "opacity": 0.6 },
+ "velocityRange": [80, 200],
+ "lifetime": 800,
+ "gravity": 0
+ }
+ }
+ ],
+ "transitions": {
+ "out": {
+ "type": "slideTransition",
+ "duration": 600,
+ "direction": "left",
+ "easing": "easeInOutCubic"
+ }
+ },
+ "audio": {
+ "bgmVolume": 0.3,
+ "sfx": [
+ { "event": "panelSlide", "time": 600, "sound": "sfx.whoosh", "volume": 0.08, "repeat": 4, "interval": 200 },
+ { "event": "conflictText", "time": 5500, "sound": "sfx.chime", "volume": 0.2 }
+ ]
+ }
+ },
+ {
+ "id": 5,
+ "name": "Pheromone Memory",
+ "duration": 14,
+ "background": {
+ "type": "animated",
+ "description": "Deep indigo to dark purple gradient. Subtle organic pulse like a breathing network. Occasional data-stream lines traverse the background."
+ },
+ "elements": [
+ {
+ "type": "text",
+ "id": "memory_title",
+ "content": "SHARED INTELLIGENCE",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 700,
+ "fontSize": "1.5vw",
+ "color": "accentColors.secondary",
+ "letterSpacing": "0.4em",
+ "textTransform": "uppercase"
+ },
+ "position": { "x": "50%", "y": "8%", "anchor": "center-top" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 600,
+ "delay": 0,
+ "easing": "easeOutCubic"
+ }
+ },
+ {
+ "type": "text",
+ "id": "memory_subtitle",
+ "content": "Pheromone: Persistent memory for your entire project",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 400,
+ "fontSize": "2vw",
+ "color": "accentColors.text",
+ "textAlign": "center"
+ },
+ "position": { "x": "50%", "y": "15%", "anchor": "center-top" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 800,
+ "delay": 400,
+ "easing": "easeOutCubic"
+ }
+ },
+ {
+ "type": "visual",
+ "id": "pheromone_network",
+ "description": "Center of screen. A large, organic-looking network of interconnected nodes. Nodes represent memory entries — some are code snippets, some are decisions, some are file context. Connections are bi-directional and glow. As data flows between nodes, the connections brighten. A central database icon pulses at the hub. The network has an organic, bioluminescent quality — like a neural network under a microscope.",
+ "layers": [
+ {
+ "layer": "hub",
+ "position": { "x": 0.5, "y": 0.5 },
+ "shape": "databaseCylinder",
+ "size": 60,
+ "color": "accentColors.secondary",
+ "glow": { "color": "accentColors.secondary", "blur": 40, "opacity": 0.5 },
+ "label": "SQLite + Vectors",
+ "labelFont": "font.mono",
+ "labelSize": 14,
+ "labelColor": "accentColors.textMuted",
+ "pulse": { "enabled": true, "speed": 0.003, "amplitude": 0.12 }
+ },
+ {
+ "layer": "memoryNodes",
+ "count": 25,
+ "distribution": {
+ "type": "organicCluster",
+ "center": { "x": 0.5, "y": 0.5 },
+ "spreadRadius": 0.3,
+ "clusterCount": 4,
+ "separationStrength": 0.4
+ },
+ "nodeTypes": [
+ { "type": "codeSnippet", "icon": "</>", "color": "accentColors.primary" },
+ { "type": "decision", "icon": "◆", "color": "accentColors.tertiary" },
+ { "type": "fileContext", "icon": "📄", "color": "accentColors.success" },
+ { "type": "architecture", "icon": "⬡", "color": "accentColors.secondary" },
+ { "type": "test", "icon": "✓", "color": "#FFD740" }
+ ],
+ "nodeSizeRange": [8, 18],
+ "glow": { "blur": 15, "opacity": 0.4 },
+ "connections": {
+ "color": "accentColors.secondary",
+ "width": 1,
+ "opacity": 0.25,
+ "organicCurve": true
+ },
+ "dataPulse": {
+ "enabled": true,
+ "color": "accentColors.primary",
+ "particleSize": 2.5,
+ "speed": 60,
+ "randomDelay": true
+ }
+ }
+ ],
+ "animation": {
+ "type": "organicReveal",
+ "duration": 5000,
+ "delay": 800,
+ "easing": "easeOutCubic",
+ "nodeAppearOrder": "random",
+ "staggerDelay": 120,
+ "connectionDrawIn": true,
+ "dataFlowStartDelay": 4000
+ }
+ },
+ {
+ "type": "text",
+ "id": "memory_feature_list",
+ "description": "Bottom section. Four feature bullets fade in sequentially. Each has a small icon, a label, and a description.",
+ "layers": [
+ {
+ "item": 1,
+ "icon": "💾",
+ "label": "SQLite Storage",
+ "description": "Every memory stored locally in your project",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 600,
+ "fontSize": "1.5vw",
+ "color": "accentColors.text"
+ },
+ "position": { "x": "20%", "y": "82%" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 600,
+ "delay": 5000,
+ "easing": "easeOutCubic",
+ "fromX": -20
+ }
+ },
+ {
+ "item": 2,
+ "icon": "🔍",
+ "label": "Vector Search",
+ "description": "Semantic retrieval across all agent context",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 600,
+ "fontSize": "1.5vw",
+ "color": "accentColors.text"
+ },
+ "position": { "x": "50%", "y": "82%" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 600,
+ "delay": 5600,
+ "easing": "easeOutCubic",
+ "fromX": -20
+ }
+ },
+ {
+ "item": 3,
+ "icon": "🔗",
+ "label": "Cross-Agent",
+ "description": "All agents share the same knowledge base",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 600,
+ "fontSize": "1.5vw",
+ "color": "accentColors.text"
+ },
+ "position": { "x": "20%", "y": "90%" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 600,
+ "delay": 6200,
+ "easing": "easeOutCubic",
+ "fromX": -20
+ }
+ },
+ {
+ "item": 4,
+ "icon": "📁",
+ "label": "Project-Scoped",
+ "description": "Lives in your .swarm/ folder, version controlled",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 600,
+ "fontSize": "1.5vw",
+ "color": "accentColors.text"
+ },
+ "position": { "x": "50%", "y": "90%" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 600,
+ "delay": 6800,
+ "easing": "easeOutCubic",
+ "fromX": -20
+ }
+ }
+ ]
+ }
+ ],
+ "transitions": {
+ "out": {
+ "type": "fadeThrough",
+ "duration": 700,
+ "throughColor": "#0A0818",
+ "easing": "easeInOutCubic"
+ }
+ },
+ "audio": {
+ "bgmVolume": 0.35,
+ "sfx": [
+ { "event": "networkGrow", "time": 800, "sound": "sfx.whoosh", "volume": 0.1 },
+ { "event": "dataPulse", "time": 4000, "sound": "sfx.pulse", "volume": 0.08, "repeat": 5, "interval": 800 }
+ ]
+ }
+ },
+ {
+ "id": 6,
+ "name": "Orchestration — Lead Director",
+ "duration": 13,
+ "background": {
+ "type": "animated",
+ "description": "Dynamic background that shifts from dark to a focused spotlight effect on the center. Particles stream from the top center downward, representing task decomposition flow."
+ },
+ "elements": [
+ {
+ "type": "text",
+ "id": "orchestration_title",
+ "content": "ORCHESTRATION",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 700,
+ "fontSize": "1.5vw",
+ "color": "accentColors.tertiary",
+ "letterSpacing": "0.4em",
+ "textTransform": "uppercase"
+ },
+ "position": { "x": "50%", "y": "8%", "anchor": "center-top" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 600,
+ "delay": 0,
+ "easing": "easeOutCubic"
+ }
+ },
+ {
+ "type": "text",
+ "id": "orchestration_quote",
+ "content": "One goal. Ten perspectives. Infinite speed.",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 300,
+ "fontSize": "2.2vw",
+ "color": "accentColors.textMuted",
+ "fontStyle": "italic",
+ "textAlign": "center"
+ },
+ "position": { "x": "50%", "y": "15%", "anchor": "center-top" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 800,
+ "delay": 400,
+ "easing": "easeOutCubic"
+ }
+ },
+ {
+ "type": "visual",
+ "id": "goal_breakdown",
+ "description": "Top center. A large goal card appears: 'Build production SaaS app'. Below it, animated arrows point downward to 10 task cards that materialize one by one. Each task card has a colored accent and a brief description. The cards arrange themselves into two neat rows with a satisfying snap animation.",
+ "layers": [
+ {
+ "layer": "goalCard",
+ "position": { "x": 0.5, "y": 0.25 },
+ "width": 400,
+ "height": 60,
+ "style": {
+ "bgColor": "accentColors.surface",
+ "borderColor": "accentColors.tertiary",
+ "borderWidth": 2,
+ "borderRadius": 10,
+ "glow": { "color": "accentColors.tertiary", "blur": 25, "opacity": 0.4 },
+ "font": "font.display",
+ "fontSize": 18,
+ "fontWeight": 600,
+ "color": "accentColors.text",
+ "padding": 16,
+ "shadow": { "blur": 30, "opacity": 0.15 }
+ },
+ "content": "🎯 Build production SaaS app",
+ "animation": {
+ "type": "dropIn",
+ "duration": 700,
+ "delay": 600,
+ "easing": "easeOutBack",
+ "fromY": -50,
+ "bounceOvershoot": 0.1
+ }
+ },
+ {
+ "layer": "decompositionArrows",
+ "count": 10,
+ "style": {
+ "color": "accentColors.tertiary",
+ "width": 1.5,
+ "opacity": 0.3,
+ "dashArray": [4, 4]
+ },
+ "animation": {
+ "type": "drawIn",
+ "duration": 600,
+ "delay": 1400,
+ "stagger": 100,
+ "easing": "easeOutCubic",
+ "fromCard": "goalCard",
+ "toCards": "taskCards"
+ }
+ },
+ {
+ "layer": "taskCards",
+ "count": 10,
+ "arrangement: { "type": "twoRows", "row1Count": 5, "row2Count": 5, "yRow1": 0.5, "yRow2": 0.65, "startX": 0.08, "endX": 0.92 } }",
+ "cardStyle": {
+ "width": 320,
+ "height": 52,
+ "bgColor": "accentColors.surface",
+ "borderWidth": 1,
+ "borderRadius": 8,
+ "padding": 12,
+ "font": "font.mono",
+ "fontSize": 13,
+ "glow": true
+ },
+ "taskContent": [
+ { "label": "Setup auth + JWT", "color": "accentColors.primary" },
+ { "label": "Build REST API", "color": "accentColors.secondary" },
+ { "label": "Create React dashboard", "color": "accentColors.tertiary" },
+ { "label": "Implement WebSocket", "color": "accentColors.success" },
+ { "label": "Write integration tests", "color": "#FFD740" },
+ { "label": "Setup CI/CD pipeline", "color": "accentColors.primary" },
+ { "label": "Docker + deploy config", "color": "accentColors.secondary" },
+ { "label": "Database schema + migrations", "color": "accentColors.tertiary" },
+ { "label": "Rate limiting + security", "color": "accentColors.success" },
+ { "label": "API documentation", "color": "#FFD740" }
+ ],
+ "animation": {
+ "type": "staggeredDropIn",
+ "duration": 600,
+ "delay": 1500,
+ "stagger": 120,
+ "easing": "easeOutBack",
+ "fromY": -40,
+ "bounceOvershoot": 0.12
+ }
+ }
+ ]
+ },
+ {
+ "type": "visual",
+ "id": "dispatch_flash",
+ "description": "At 7000ms, a bright flash travels from the goal card down along the decomposition lines to each task card. Each card lights up brightly in its accent color as the flash reaches it, then settles to a steady glow. This creates a 'power-on' cascade effect.",
+ "animation": {
+ "type": "cascadeFlash",
+ "duration": 1500,
+ "delay": 7000,
+ "easing": "easeOutCubic",
+ "flashColor": "accentColors.tertiary",
+ "flashOpacity": 0.6,
+ "settleDuration": 500,
+ "settleOpacity": 0.4
+ }
+ }
+ ],
+ "transitions": {
+ "out": {
+ "type": "zoomOut",
+ "duration": 700,
+ "easing": "easeInOutCubic",
+ "fromScale": 1,
+ "toScale": 0.9,
+ "fadeToBlack": { "duration": 400, "delay": 300 }
+ }
+ },
+ "audio": {
+ "bgmVolume": 0.35,
+ "sfx": [
+ { "event": "goalAppear", "time": 600, "sound": "sfx.pop", "volume": 0.2 },
+ { "event": "taskCascade", "time": 1500, "sound": "sfx.click", "volume": 0.1, "repeat": 10, "interval": 120 },
+ { "event": "flashDispatch", "time": 7000, "sound": "sfx.whoosh", "volume": 0.15 }
+ ]
+ }
+ },
+ {
+ "id": 7,
+ "name": "The Result — Speed & Quality",
+ "duration": 13,
+ "background": {
+ "type": "gradient",
+ "colors": ["#0A0E17", "#0F0A14", "#0A0E17"],
+ "direction": "radial",
+ "center": [0.5, 0.45]
+ },
+ "elements": [
+ {
+ "type": "text",
+ "id": "results_title",
+ "content": "THE RESULT",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 700,
+ "fontSize": "1.5vw",
+ "color": "accentColors.success",
+ "letterSpacing": "0.4em",
+ "textTransform": "uppercase"
+ },
+ "position": { "x": "50%", "y": "8%", "anchor": "center-top" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 600,
+ "delay": 0,
+ "easing": "easeOutCubic"
+ }
+ },
+ {
+ "type": "visual",
+ "id": "stat_cards",
+ "description": "Three large stat cards appear in a row across the middle of the screen. Each card is a glass-morphism panel with a huge number, a label, and a subtle icon. They appear with a stagger, each sliding up from below. The numbers count up from 0 to their final values.",
+ "layers": [
+ {
+ "layer": "stat1",
+ "position": { "x": 0.17, "y": 0.42 },
+ "cardStyle": {
+ "width": 320,
+ "height": 280,
+ "bgColor": "accentColors.surface",
+ "bgOpacity": 0.9,
+ "borderColor": "accentColors.primary",
+ "borderWidth": 1,
+ "borderRadius": 16,
+ "glassEffect": {
+ "blur": 30,
+ "opacity": 0.08,
+ "borderHighlight": true
+ },
+ "shadow": { "blur": 40, "opacity": 0.2, "color": "accentColors.primary" }
+ },
+ "content": {
+ "icon": "⚡",
+ "number": "8.4x",
+ "numberColor": "accentColors.primary",
+ "numberFont": "font.display",
+ "numberSize": 72,
+ "numberWeight": 900,
+ "label": "Faster than\nsequential coding",
+ "labelColor": "accentColors.textMuted",
+ "labelFont": "font.display",
+ "labelSize": 18
+ },
+ "animation": {
+ "type": "slideUpWithCount",
+ "duration": 1200,
+ "delay": 500,
+ "easing": "easeOutCubic",
+ "fromY": 80,
+ "toY": 0,
+ "countFrom": 0,
+ "countTo": 8.4,
+ "countDuration": 1500,
+ "countDelay": 900,
+ "countEasing": "easeOutCubic"
+ }
+ },
+ {
+ "layer": "stat2",
+ "position": { "x": 0.5, "y": 0.42 },
+ "cardStyle": {
+ "width": 320,
+ "height": 280,
+ "bgColor": "accentColors.surface",
+ "bgOpacity": 0.9,
+ "borderColor": "accentColors.secondary",
+ "borderWidth": 1,
+ "borderRadius": 16,
+ "glassEffect": {
+ "blur": 30,
+ "opacity": 0.08,
+ "borderHighlight": true
+ },
+ "shadow": { "blur": 40, "opacity": 0.2, "color": "accentColors.secondary" }
+ },
+ "content": {
+ "icon": "🛡️",
+ "number": "0",
+ "numberColor": "accentColors.success",
+ "numberFont": "font.display",
+ "numberSize": 96,
+ "numberWeight": 900,
+ "label": "Merge conflicts\n(ever)",
+ "labelColor": "accentColors.textMuted",
+ "labelFont": "font.display",
+ "labelSize": 18
+ },
+ "animation": {
+ "type": "slideUpWithCount",
+ "duration": 1200,
+ "delay": 800,
+ "easing": "easeOutCubic",
+ "fromY": 80,
+ "toY": 0,
+ "countFrom": 999,
+ "countTo": 0,
+ "countDuration": 1500,
+ "countDelay": 1200,
+ "countEasing": "easeOutCubic"
+ }
+ },
+ {
+ "layer": "stat3",
+ "position": { "x": 0.83, "y": 0.42 },
+ "cardStyle": {
+ "width": 320,
+ "height": 280,
+ "bgColor": "accentColors.surface",
+ "bgOpacity": 0.9,
+ "borderColor": "accentColors.tertiary",
+ "borderWidth": 1,
+ "borderRadius": 16,
+ "glassEffect": {
+ "blur": 30,
+ "opacity": 0.08,
+ "borderHighlight": true
+ },
+ "shadow": { "blur": 40, "opacity": 0.2, "color": "accentColors.tertiary" }
+ },
+ "content": {
+ "icon": "🏠",
+ "number": "100%",
+ "numberColor": "accentColors.success",
+ "numberFont": "font.display",
+ "numberSize": 60,
+ "numberWeight": 900,
+ "label": "Runs locally.\nYour code never leaves.",
+ "labelColor": "accentColors.textMuted",
+ "labelFont": "font.display",
+ "labelSize": 18
+ },
+ "animation": {
+ "type": "slideUpWithCount",
+ "duration": 1200,
+ "delay": 1100,
+ "easing": "easeOutCubic",
+ "fromY": 80,
+ "toY": 0,
+ "countFrom": 0,
+ "countTo": 100,
+ "countSuffix": "%",
+ "countDuration": 1500,
+ "countDelay": 1500,
+ "countEasing": "easeOutCubic"
+ }
+ }
+ ]
+ },
+ {
+ "type": "visual",
+ "id": "speed_comparison_bar",
+ "description": "Below the stat cards. Two horizontal bars showing time comparison. 'Sequential' bar is long and red, fills slowly (0-5000ms). 'Swarm' bar is short and green, fills rapidly (5000-7000ms). The swarm bar finishes while the sequential bar is still going. Labels above each bar.",
+ "layers": [
+ {
+ "layer": "sequentialBar",
+ "label": "Sequential: 8 hours",
+ "labelPosition": { "x": "25%", "y": "76%" },
+ "barPosition": { "x": "20%", "y": "81%", "width": "30%", "height": 20 },
+ "barColor": "#FF3D00",
+ "barGlow": { "color": "#FF3D00", "blur": 15, "opacity": 0.3 },
+ "fillAnimation": {
+ "type": "fillFromLeft",
+ "duration": 5000,
+ "delay": 3000,
+ "easing": "linear",
+ "targetFill": 0.9
+ }
+ },
+ {
+ "layer": "swarmBar",
+ "label": "Swarm: ~57 minutes",
+ "labelPosition": { "x": "25%", "y": "88%" },
+ "barPosition": { "x": "20%", "y": "93%", "width": "30%", "height": 20 },
+ "barColor": "accentColors.success",
+ "barGlow": { "color": "accentColors.success", "blur": 15, "opacity": 0.4 },
+ "fillAnimation": {
+ "type": "fillFromLeft",
+ "duration": 2000,
+ "delay": 5000,
+ "easing": "easeOutCubic",
+ "targetFill": 0.95,
+ "completionFlash": true
+ }
+ }
+ ]
+ },
+ {
+ "type": "visual",
+ "id": "checkmark_overlay",
+ "description": "When the Swarm bar completes (at ~7000ms), a large green checkmark appears briefly over it with a pop animation and fades after 1500ms.",
+ "animation": {
+ "type": "popAndFade",
+ "duration": 1500,
+ "delay": 7000,
+ "easing": "easeOutBack",
+ "fromScale": 0,
+ "toScale": 1,
+ "holdDuration": 800,
+ "fadeOutDuration": 700
+ }
+ }
+ ],
+ "transitions": {
+ "out": {
+ "type": "fadeToColor",
+ "duration": 800,
+ "easing": "easeInOutCubic",
+ "targetColor": "#05070A"
+ }
+ },
+ "audio": {
+ "bgmVolume": 0.35,
+ "sfx": [
+ { "event": "statCardsIn", "time": 500, "sound": "sfx.pop", "volume": 0.15, "repeat": 3, "interval": 300 },
+ { "event": "countStart", "time": 900, "sound": "sfx.click", "volume": 0.08 },
+ { "event": "zeroReveal", "time": 1200, "sound": "sfx.chime", "volume": 0.2 },
+ { "event": "barComplete", "time": 7000, "sound": "sfx.chime", "volume": 0.25 }
+ ]
+ }
+ },
+ {
+ "id": 8,
+ "name": "Local-First — Trust",
+ "duration": 11,
+ "background": {
+ "type": "gradient",
+ "colors": ["#05070A", "#0A0E14"],
+ "direction": "vertical",
+ "opacity": 0.95
+ },
+ "elements": [
+ {
+ "type": "text",
+ "id": "local_title",
+ "content": "100% LOCAL",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 900,
+ "fontSize": "4vw",
+ "color": "accentColors.success",
+ "letterSpacing": "0.2em",
+ "textAlign": "center",
+ "textShadow": {
+ "color": "accentColors.success",
+ "blur": 30,
+ "opacity": 0.4,
+ "offsetX": 0,
+ "offsetY": 0
+ }
+ },
+ "position": { "x": "50%", "y": "22%", "anchor": "center-middle" },
+ "animation": {
+ "type": "scaleIn",
+ "duration": 1000,
+ "delay": 400,
+ "easing": "easeOutBack",
+ "fromScale": 0.5,
+ "toScale": 1,
+ "springOvershoot": 0.1
+ }
+ },
+ {
+ "type": "visual",
+ "id": "lock_visual",
+ "description": "Center of screen. A glowing shield/lock icon materializes. Around it, 6 cross-marks (X symbols) float outward and fade, representing what the user is NOT sending to the cloud: 'No API uploads', 'No cloud models', 'No telemetry by default', 'No account required', 'No internet needed', 'No data leaves machine'. Each X appears sequentially with a fade-out effect. The shield pulses with a green glow.",
+ "layers": [
+ {
+ "layer": "shield",
+ "shape": "hexagonShield",
+ "size": 100,
+ "color": "accentColors.success",
+ "glow: { "color": "accentColors.success", "blur": 50, "opacity": 0.4 }",
+ "icon": "Lock/Shield symbol",
+ "animation: { "type": "materialize", "duration": 1200, "delay": 800, "easing": "easeOutCubic" } } }',
+ "animation": {
+ "type": "materialize",
+ "duration": 1200,
+ "delay": 800,
+ "easing": "easeOutCubic",
+ "fromOpacity": 0,
+ "toOpacity": 1,
+ "fromScale": 0.6,
+ "toScale": 1,
+ "pulseOnComplete": { "enabled": true, "speed": 0.004, "amplitude": 0.08 }
+ }
+ },
+ {
+ "layer": "xMarks",
+ "count": 6,
+ "arrangement: { "type": "circle", "center": { "x": 0.5, "y": 0.5 }, "radius": 200 } }",
+ "appearance: { "type": "radialOut", "stagger": 200, "startDelay": 2200, "fadeDelay": 1500, "fadeDuration": 800 } } }',
+ "text: [ "No API uploads", "No cloud lock-in", "No telemetry", "No account required", "No internet needed", "Your data = yours" ] } } } }',
+ "animation": {
+ "type": "radialFade",
+ "duration": 1200,
+ "delay": 2200,
+ "stagger": 200,
+ "easing": "easeOutCubic",
+ "fadeInDuration": 600,
+ "holdDuration": 1000,
+ "fadeOutDuration": 800,
+ "markStyle": {
+ "font": "font.display",
+ "fontSize": 20,
+ "fontWeight": 700,
+ "color": "accentColors.textMuted",
+ "opacity": 0.7,
+ "xSymbol": { "color": "#FF3D00", "size": 28, "position": "beforeText" }
+ }
+ }
+ }
+ ]
+ },
+ {
+ "type": "visual",
+ "id": "code_privacy",
+ "description": "Bottom of screen. A subtle, darkened code editor window showing lines of code. Through the code, small padlock icons appear on each line briefly, then fade. This visually represents code being protected locally.",
+ "animation": {
+ "type": "editorOverlay",
+ "duration": 8000,
+ "delay": 3500,
+ "codeContent": [
+ "function authenticate(user, pass) {",
+ " const hash = bcrypt.hash(pass);",
+ " return verifyToken(hash);",
+ "}",
+ "",
+ "export const pipeline = [",
+ " authMiddleware,",
+ " rateLimiter,",
+ " logger,",
+ "];"
+ ],
+ "codeStyle": {
+ "font": "font.mono",
+ "fontSize": 15,
+ "color": "accentColors.textMuted",
+ "opacity": 0.3,
+ "bgColor": "accentColors.surface",
+ "bgOpacity": 0.5,
+ "lineHeight": 26
+ },
+ "padlockAnimation": {
+ "icon": "🔒",
+ "size": 16,
+ "opacity": 0.6,
+ "color": "accentColors.success",
+ "appearPerLine": { "stagger": 600, "holdDuration": 1500, "fadeDuration": 800 }
+ }
+ }
+ }
+ ],
+ "transitions": {
+ "out": {
+ "type": "fadeToBlack",
+ "duration": 800,
+ "easing": "easeInOutCubic"
+ }
+ },
+ "audio": {
+ "bgmVolume": 0.3,
+ "sfx": [
+ { "event": "shieldAppear", "time": 800, "sound": "sfx.pulse", "volume": 0.15 },
+ { "event": "xMarks", "time": 2200, "sound": "sfx.click", "volume": 0.06, "repeat": 6, "interval": 200 },
+ { "event": "padlocks", "time": 3500, "sound": "sfx.click", "volume": 0.04, "repeat": 8, "interval": 600 }
+ ]
+ }
+ },
+ {
+ "id": 9,
+ "name": "Call to Action — Start Swarming",
+ "duration": 10,
+ "background": {
+ "type": "gradient",
+ "colors": ["#05070A", "#0D0A1A", "#05070A"],
+ "direction": "radial",
+ "center": [0.5, 0.5]
+ },
+ "elements": [
+ {
+ "type": "text",
+ "id": "cta_headline",
+ "content": "Ready to swarm?",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 800,
+ "fontSize": "5vw",
+ "color": "accentColors.text",
+ "textAlign": "center",
+ "textShadow": {
+ "color": "accentColors.primary",
+ "blur": 30,
+ "opacity": 0.3,
+ "offsetX": 0,
+ "offsetY": 0
+ }
+ },
+ "position": { "x": "50%", "y": "28%", "anchor": "center-middle" },
+ "animation": {
+ "type": "scaleIn",
+ "duration": 1000,
+ "delay": 400,
+ "easing": "easeOutBack",
+ "fromScale": 0.8,
+ "toScale": 1,
+ "springOvershoot": 0.08
+ }
+ },
+ {
+ "type": "text",
+ "id": "cta_subtitle",
+ "content": "Your AI army is waiting.",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 300,
+ "fontSize": "1.8vw",
+ "color": "accentColors.textMuted",
+ "textAlign": "center"
+ },
+ "position": { "x": "50%", "y": "42%", "anchor": "center-middle" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 800,
+ "delay": 1200,
+ "easing": "easeOutCubic",
+ "fromOpacity": 0,
+ "toOpacity": 1,
+ "fromY": 15,
+ "toY": 0
+ }
+ },
+ {
+ "type": "visual",
+ "id": "cta_button",
+ "description": "Center-bottom of screen. A large, glowing button with the text 'Get Started at swarm-ai.dev'. The button has a glass-morphism style with a primary accent border and glow. It pulses gently. On hover (for interactive versions), glow intensifies.",
+ "animation": {
+ "type": "slideUpWithGlow",
+ "duration": 1000,
+ "delay": 1800,
+ "easing": "easeOutCubic",
+ "fromY": 30,
+ "toY": 0,
+ "pulse: { "enabled": true, "speed": 0.003, "amplitude": 0.05 } } } }',
+ "pulse": {
+ "enabled": true,
+ "speed": 0.003,
+ "amplitude": 0.05
+ }
+ },
+ "buttonStyle": {
+ "width": 520,
+ "height": 64,
+ "bgColor": "accentColors.surface",
+ "bgOpacity": 0.9,
+ "borderColor": "accentColors.primary",
+ "borderWidth": 1.5,
+ "borderRadius": 12,
+ "font": "font.display",
+ "fontSize": 20,
+ "fontWeight": 600,
+ "color": "accentColors.primary",
+ "padding": 20,
+ "glow": { "color": "accentColors.primary", "blur": 25, "opacity": 0.35 },
+ "shadow": { "blur": 40, "opacity": 0.2, "color": "accentColors.primary" },
+ "hoverGlowMultiplier": 2
+ }
+ },
+ {
+ "type": "text",
+ "id": "cta_social_proof",
+ "content": "Open source. Built for developers. By developers.",
+ "style": {
+ "fontFamily": "font.display",
+ "fontWeight": 400,
+ "fontSize": "1.3vw",
+ "color": "accentColors.textMuted",
+ "textAlign": "center"
+ },
+ "position": { "x": "50%", "y": "72%", "anchor": "center-middle" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 800,
+ "delay": 2400,
+ "easing": "easeOutCubic",
+ "fromOpacity": 0,
+ "toOpacity": 0.8
+ }
+ },
+ {
+ "type": "visual",
+ "id": "final_particle_burst",
+ "description": "At 2800ms, a vibrant multi-color particle burst emanates from the button. Particles in all accent colors burst outward in a spherical pattern, then settle into a gentle orbital drift around the button area.",
+ "animation": {
+ "type": "particleBurst",
+ "duration": 2000,
+ "delay": 2800,
+ "particleCount": 60,
+ "colors": [
+ "accentColors.primary",
+ "accentColors.secondary",
+ "accentColors.tertiary",
+ "accentColors.success"
+ ],
+ "velocityRange": [100, 350],
+ "lifetime": 2000,
+ "gravity": 0,
+ "settleIntoOrbit": {
+ "enabled": true,
+ "orbitRadius": 180,
+ "orbitSpeed": 0.0005,
+ "settleDelay": 2000
+ },
+ "glow": { "perParticle": true, "blur": 12, "opacity": 0.5 }
+ }
+ },
+ {
+ "type": "text",
+ "id": "cta_brand",
+ "content": "swarm-ai.dev",
+ "style": {
+ "fontFamily": "font.mono",
+ "fontWeight": 500,
+ "fontSize": "1.2vw",
+ "color": "accentColors.textMuted",
+ "textAlign": "center"
+ },
+ "position": { "x": "50%", "y": "90%", "anchor": "center-bottom" },
+ "animation": {
+ "type": "fadeIn",
+ "duration": 800,
+ "delay": 3000,
+ "easing": "easeOutCubic",
+ "fromOpacity": 0,
+ "toOpacity": 0.5
+ }
+ }
+ ],
+ "transitions": {
+ "out": {
+ "type": "finalFade",
+ "duration": 1500,
+ "easing": "easeInOutCubic",
+ "targetOpacity": 0,
+ "holdBeforeFade": 2000
+ }
+ },
+ "audio": {
+ "bgmVolume": 0.4,
+ "sfx": [
+ { "event": "buttonAppear", "time": 1800, "sound": "sfx.pop", "volume": 0.2 },
+ { "event": "particleBurst", "time": 2800, "sound": "sfx.chime", "volume": 0.3 },
+ { "event": "socialProof", "time": 2400, "sound": "sfx.click", "volume": 0.08 }
+ ]
+ }
+ }
+ ],
+ "renderPipeline": {
+ "compositing": {
+ "order": ["background", "elements_by_zIndex", "vignette", "filmStripLines", "grain", "bloom"]
+ },
+ "blurLayers": {
+ "enabled": true,
+ "layers": 3,
+ "quality": "high"
+ },
+ "motionBlur": {
+ "enabled": true,
+ "shutterAngle": 180,
+ "samples": 8
+ },
+ "colorGrading": {
+ "enabled": true,
+ "lut": "cinematic_teal_orange",
+ "contrast": 1.05,
+ "saturation": 0.95,
+ "lift": { "r": 0.01, "g": 0.01, "b": 0.02 },
+ "gamma": { "r": 1.0, "g": 1.0, "b": 1.02 }
+ },
+ "export": {
+ "format": "mp4",
+ "codec": "h264",
+ "bitrate": 20000,
+ "audioCodec": "aac",
+ "audioBitrate": 320,
+ "metadata": {
+ "title": "Swarm AI — Product Film",
+ "artist": "Swarm AI",
+ "description": "10+ AI agents. One project. Zero conflicts."
+ }
+ }
+ },
+ "interactionNotes": {
+ "hoverEffects": "Glass-morphism panels brighten on hover. Particles react subtly to cursor proximity (within 150px radius).",
+ "scrollControl": "For web delivery, scenes advance on scroll with inertial momentum. Scroll distance per scene: 100vh.",
+ "keyboardNav": "Left/Right arrows for scene navigation. Space for play/pause.",
+ "accessibility": "All text has sufficient contrast ratios. Animations respect prefers-reduced-motion. Keyframes tagged for screen reader narration."
+ }
+}

@@ -61,7 +61,8 @@ export async function runPheromoneQuery(
   const task = args.task || '';
   const openFiles = args.open_files || [];
   const gitDiff = args.git_diff || '';
-  const maxChunks = args.max_chunks || 10;
+  const raw = args.max_chunks;
+  const maxChunks = Math.min(Math.max(typeof raw === 'number' && Number.isFinite(raw) ? Math.floor(raw) : 10, 1), 100);
 
   const db = await PheromoneDatabase.create(projectPath);
   try {

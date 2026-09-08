@@ -78,7 +78,7 @@ export default function BoardStrip({
       {viewToggle}
       {viewToggle && <div className="h-4 w-px bg-white/[0.12] mx-0.5 shrink-0" />}
 
-      {items.length > 0 && (
+      {items.length > 0 ? (
         <div className="flex flex-1 min-w-0 items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-0.5">
           {items.map((it) => {
             const t = themeForKind(it.kind);
@@ -117,6 +117,8 @@ export default function BoardStrip({
             );
           })}
         </div>
+      ) : (
+        <div className="flex-1 min-w-0" />
       )}
 
       {/* + and maximize sit OUTSIDE the scroller and in normal flow */}
@@ -125,8 +127,8 @@ export default function BoardStrip({
           type="button"
           ref={addRef}
           onClick={onAdd}
-          className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-white/[0.1] bg-white/[0.04] text-zinc-300 transition-all hover:bg-white/[0.08] hover:border-swarm-gold/40 hover:text-swarm-goldHi active:scale-95 cursor-pointer"
-          title="Add component"
+          className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-swarm-gold/30 bg-swarm-gold/10 text-swarm-goldHi transition-all hover:bg-swarm-gold/20 hover:border-swarm-gold/50 hover:text-white active:scale-95 cursor-pointer shadow-xs"
+          title="Add component (+)"
           aria-label="Add component"
         >
           <Plus className="size-3.5" />

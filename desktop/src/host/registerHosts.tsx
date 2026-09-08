@@ -2,7 +2,7 @@ import { invoke } from "@tauri-apps/api/core";
 import type { ColumnId } from "@swarm/tasks";
 import { MODE_SYSTEM_PROMPTS, type ToolContext } from "@swarm/lead";
 import { setLeadHost, type CrownedSwarm } from "@swarm/lead/ui";
-import { setAgentsHost, useAgentsStore, AgentPane } from "@swarm/agents/ui";
+import { setAgentsHost, useAgentsStore, AgentPane, type GridLayout } from "@swarm/agents/ui";
 import { modelArgs } from "@swarm/agents/cli-configs";
 import { OpenVsxPane } from "@swarm/extension";
 import { extensionAgentProps } from "./extensionAgent";
@@ -111,12 +111,17 @@ function toolContextFor(wsId: string): ToolContext {
       return true;
     },
     setDefaultAgent: (cli) => useSettingsStore.getState().setDefaultAgent(cli),
-    setGridLayout: (layout) => {
-      const named = ["auto", "grid", "cols", "rows", "master"];
-      swarms().setGridLayout(
-        named.includes(layout) ? (layout as any) : (Number(layout) as any),
-      );
-    },
+  setGridLayout: (layout) => {
+    const numericOk = /^[1-4]$/.test(String(layout));
+    const validNamed = ["auto", "grid", "cols", "rows", "master",
+      "cols2", "cols3", "cols4", "grid2x2", "grid3x2", "grid4x2", "focus", "focus4"];
+    const namedOk = validNamed.includes(String(layout));
+    if (!numericOk && !namedOk) {
+      console.warn("[Host] setGridLayout: rejecting invalid layout value:", layout);
+      return;
+    }
+    swarms().setGridLayout((numericOk ? Number(layout) : layout) as GridLayout);
+  },
     listWorktrees: () =>
       (agent()?.worktrees ?? []).map((t) => ({
         id: t.id, name: t.name, branch: t.branch, path: t.path,
