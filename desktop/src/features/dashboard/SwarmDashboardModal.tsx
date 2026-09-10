@@ -26,6 +26,7 @@ import {
  ChevronRight,
  BarChart3,
  PieChart,
+ FolderOpen,
 } from "lucide-react";
 import { useAgentsStore, type Agent } from "@swarm/agents/ui";
 import { useWorkspaceStore } from "@swarm/workspace";
@@ -48,6 +49,34 @@ const ROLE_COLORS: Record<string, string> = {
  backend: "border-purple-500/40 text-purple-400 bg-purple-500/10",
  tester: "border-emerald-500/40 text-emerald-400 bg-emerald-500/10",
  security: "border-rose-500/40 text-rose-400 bg-rose-500/10",
+};
+
+const STATUS_BADGE: Record<string, { dot: string; badge: string; label: string }> = {
+ running: {
+ dot: "bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(52,211,153,0.8)]",
+ badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
+ label: "Running",
+ },
+ launching: {
+ dot: "bg-amber-400 animate-pulse shadow-[0_0_6px_rgba(251,191,36,0.8)]",
+ badge: "bg-amber-500/10 text-amber-400 border-amber-500/30",
+ label: "Launching",
+ },
+ idle: {
+ dot: "bg-zinc-500",
+ badge: "bg-zinc-500/10 text-zinc-400 border-zinc-500/30",
+ label: "Idle",
+ },
+ error: {
+ dot: "bg-rose-400 shadow-[0_0_4px_rgba(251,113,133,0.5)]",
+ badge: "bg-rose-500/10 text-rose-400 border-rose-500/30",
+ label: "Error",
+ },
+ killed: {
+ dot: "bg-red-500",
+ badge: "bg-red-500/10 text-red-400 border-red-500/30",
+ label: "Killed",
+ },
 };
 
 const LEVEL_COLORS: Record<string, string> = {
@@ -164,11 +193,8 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
 
  const handleStopAgent = async (agent: Agent) => {
  try {
- // TODO: wire to actual stop-agent Tauri command / MCP tool
- await invoke("remove_agent_pane", { agentId: agent.id });
- setAgentStatus(agent.id, "idle");
- // Delay removal so the UI can transition; in real code the backend
- // should drive this once the process actually exits.
+ await invoke("kill_terminal", { paneId: agent.id });
+ setAgentStatus(agent.id, "killed");
  setTimeout(() => removeAgent(agent.id), 1500);
  toast("success", `Stopped ${agent.customName || agent.cliName}`);
  } catch (err) {
@@ -413,6 +439,7 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
  const isError = status === "error";
  const role = (agent as any).role;
  const roleColor = role ? ROLE_COLORS[role] : null;
+ const statusBadge = STATUS_BADGE[status] ?? STATUS_BADGE.idle;
 
  return (
  <div
@@ -440,15 +467,7 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
  <div className="min-w-0">
  <div className="text-sm font-semibold text-swarm-text flex items-center gap-2 flex-wrap">
  {agent.customName || agent.cliName || "Agent"}
- <span className={`size-2 rounded-full shrink-0 ${
- isRunning
- ? "bg-emerald-400 animate-pulse"
- : isLaunching
- ? "bg-amber-400 animate-pulse"
- : isError
- ? "bg-red-400"
- : "bg-swarm-textMuted"
- }`} />
+ <span className={`size-2 rounded-full shrink-0 ${statusBadge.dot}`} />
  </div>
  <div className="text-micro font-mono text-swarm-textMuted mt-0.5">
  {agent.cli || "shell"} · {agent.id.slice(0, 10)}
@@ -462,16 +481,8 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
  {role}
  </span>
  )}
- <span className={`text-micro font-semibold uppercase px-2 py-0.5 rounded-full border ${
- isRunning
- ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
- : isLaunching
- ? "bg-amber-500/10 text-amber-400 border-amber-500/30"
- : isError
- ? "bg-red-500/10 text-red-400 border-red-500/30"
- : "bg-swarm-border/30 text-swarm-textMuted border-swarm-border/40"
- }`}>
- {status}
+ <span className={`text-micro font-semibold uppercase px-2 py-0.5 rounded-full border ${statusBadge.badge}`}>
+ {statusBadge.label}
  </span>
  </div>
  </div>

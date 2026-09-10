@@ -48,9 +48,11 @@ export interface Agent {
  permissionMode?: "bypass" | "acceptEdits" | "default" | string;
  /** Initial task prompt to auto-feed when dispatched by Lead */
  initialPrompt?: string;
+ pinned?: boolean;
+ createdAt?: number;
 }
 
-export type AgentStatus = 'launching' | 'running' | 'idle' | 'error' | 'done';
+export type AgentStatus = 'launching' | 'running' | 'idle' | 'error' | 'done' | 'killed';
 
 // Pane layout presets. The five picker presets (cols2…grid4x2) pin a column
 // count (grid* also pin rows); legacy values are kept for the Lead tool and

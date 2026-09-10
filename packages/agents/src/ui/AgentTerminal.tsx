@@ -215,10 +215,60 @@ const resetLoopsStarted = () => { loopsStarted = false; };
  };
 
   const writeToProcess = (data: string) => {
-    invoke("write_to_terminal", { paneId, data }).catch((e) =>
-      console.error(`write_to_terminal failed for ${paneId}:`, e),
-    );
+  invoke("write_to_terminal", { paneId, data }).catch((e) =>
+  console.error(`write_to_terminal failed for ${paneId}:`, e),
+  );
   };
+
+ const handleKeyboardShortcut = (arg: { ctrlKey: boolean; shiftKey: boolean; altKey: boolean; metaKey: boolean; code: string; type: string; preventDefault: () => void; stopPropagation: () => void }): boolean => {
+ // Ctrl+Shift+C — copy selected text
+ if (arg.ctrlKey && arg.shiftKey && !arg.altKey && !arg.metaKey && arg.code === "KeyC") {
+ if (arg.type === "keydown") {
+ const selection = terminal?.getSelection();
+ if (selection) {
+ navigator.clipboard.writeText(selection).catch(() => {});
+ }
+ }
+ arg.preventDefault();
+ arg.stopPropagation();
+ return false;
+ }
+
+ // Ctrl+Shift+V — paste from clipboard
+ if (arg.ctrlKey && arg.shiftKey && !arg.altKey && !arg.metaKey && arg.code === "KeyV") {
+ if (arg.type === "keydown") {
+ navigator.clipboard.readText().then((text) => {
+ if (text) writeToProcess(text);
+ }).catch(() => {});
+ }
+ arg.preventDefault();
+ arg.stopPropagation();
+ return false;
+ }
+
+ // Ctrl+D — send EOF (\x04)
+ if (arg.ctrlKey && !arg.shiftKey && !arg.altKey && !arg.metaKey && arg.code === "KeyD") {
+ if (arg.type === "keydown") {
+ writeToProcess("\x04");
+ }
+ arg.preventDefault();
+ arg.stopPropagation();
+ return false;
+ }
+
+ // Ctrl+L — clear terminal screen
+ if (arg.ctrlKey && !arg.shiftKey && !arg.altKey && !arg.metaKey && arg.code === "KeyL") {
+ if (arg.type === "keydown") {
+ terminal?.write("\x1b[2J\x1b[H");
+ terminal?.refresh(0, terminal.rows - 1);
+ }
+ arg.preventDefault();
+ arg.stopPropagation();
+ return false;
+ }
+
+ return true;
+ };
 
  const startLoops = () => {
  if (loopsStarted) return;
@@ -339,11 +389,16 @@ const resetLoopsStarted = () => { loopsStarted = false; };
  const pheromoneInstance = await getCachedPheromone(saveDir);
  const rawSessionContent = `# ${agent.cliName} Session Log\n\nDate: ${dateStr}\nAgent: ${agent.cli}\nProject: ${saveDir}\n\n## Raw Transcript\n\n\`\`\`\n${cleanTranscript || "(empty session)"}\n\`\`\`\n`;
 
- await pheromoneInstance.writeMemoryFile(
- `agents/sessions/${sessionId}.md`,
- rawSessionContent,
- { agent: agent.cli, timestamp: Date.now() }
- );
+    await pheromoneInstance.writeMemoryFile(
+      `agents/sessions/${sessionId}.md`,
+      rawSessionContent,
+      {
+        agent: agent.cli,
+        timestamp: Date.now(),
+        worktree_id: workingDir || undefined,
+        title: agent.customName || agent.cliName || agent.cli,
+      }
+    );
  console.log(`[Pheromone] Session log written: agents/sessions/${sessionId}.md`);
  } catch (e) {
  console.error(`[Pheromone] Failed to save session log for ${paneId}:`, e);
@@ -442,20 +497,40 @@ const resetLoopsStarted = () => { loopsStarted = false; };
  const openFiles = agentsHost().openFilesFor(sharedDirRef.current || spawnDir);
  const openFilesHint = openFiles.length > 0 ? ` Open files: ${openFiles.slice(0, 12).join(", ")}.` : "";
 
- if (pheromoneBridge === "mcp" || pheromoneBridge === "mcp-plugin") {
- if (agent.initialPrompt && !disposed) {
- const pText = agent.initialPrompt;
- useAgentsStore.getState().updateAgent(paneId, { initialPrompt: undefined });
- setTimeout(() => { if (!disposed) writeToProcess(pText + "\r"); }, 1200);
- }
- return;
- }
+  if (pheromoneBridge === "mcp" || pheromoneBridge === "mcp-plugin") {
+    if (agent.initialPrompt && !disposed) {
+      const pText = agent.initialPrompt;
+      const currentName = agent.customName?.trim() || "";
+      const isGeneric =
+        !currentName ||
+        currentName.toLowerCase() === "new session" ||
+        currentName.toLowerCase() === "agent session" ||
+        currentName.toLowerCase() === (agent.cliName || "").toLowerCase();
+      if (isGeneric) {
+        let clean = pText.replace(/^\/[a-zA-Z0-9_-]+\s*/, "").replace(/[\r\n]+/g, " ").trim();
+        if (clean.length > 40) clean = clean.slice(0, 37).trim() + "…";
+        if (clean) useAgentsStore.getState().updateAgent(paneId, { customName: clean });
+      }
+      setTimeout(() => { if (!disposed) writeToProcess(pText + "\r"); }, 1200);
+    }
+    return;
+  }
 
- if (agent.initialPrompt && !disposed) {
- const pText = agent.initialPrompt;
- useAgentsStore.getState().updateAgent(paneId, { initialPrompt: undefined });
- setTimeout(() => { if (!disposed) writeToProcess(pText + "\r"); }, 1200);
- }
+  if (agent.initialPrompt && !disposed) {
+    const pText = agent.initialPrompt;
+    const currentName = agent.customName?.trim() || "";
+    const isGeneric =
+      !currentName ||
+      currentName.toLowerCase() === "new session" ||
+      currentName.toLowerCase() === "agent session" ||
+      currentName.toLowerCase() === (agent.cliName || "").toLowerCase();
+    if (isGeneric) {
+      let clean = pText.replace(/^\/[a-zA-Z0-9_-]+\s*/, "").replace(/[\r\n]+/g, " ").trim();
+      if (clean.length > 40) clean = clean.slice(0, 37).trim() + "…";
+      if (clean) useAgentsStore.getState().updateAgent(paneId, { customName: clean });
+    }
+    setTimeout(() => { if (!disposed) writeToProcess(pText + "\r"); }, 1200);
+  }
 
  if (MCP_CAPABLE_CLIS.includes(agent.cli)) return;
 
@@ -516,6 +591,11 @@ const resetLoopsStarted = () => { loopsStarted = false; };
  fitAddonRef.current = fitAddon;
 
  terminal.attachCustomKeyEventHandler((arg) => {
+ // First check our extended shortcuts (Ctrl+Shift+C/V, Ctrl+D, Ctrl+L)
+ const handled = handleKeyboardShortcut(arg);
+ if (!handled) return false;
+
+ // Existing Ctrl+C handler — copy if selection, else interrupt
  if (arg.ctrlKey && !arg.altKey && !arg.metaKey && arg.code === "KeyC") {
  if (arg.type === "keydown") {
  const selection = terminal?.getSelection();

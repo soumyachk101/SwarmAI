@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
  User,
  Users,
@@ -12,11 +12,15 @@ import {
  FolderOpen,
  Play,
  Bot,
+ Code2,
+ FileCode2,
+ Shell,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { BrandGlyph, cliBrand, shellBrand } from "@swarm/board";
 import { useWorkspaceStore } from "@swarm/workspace";
 import { launchPresetSession, type PresetType } from "./presetLauncher";
+import { open } from "@tauri-apps/plugin-dialog";
 
 interface SessionLauncherProps {
  onLaunched?: () => void;
@@ -29,6 +33,15 @@ interface PresetItem {
  title: string;
  count: number;
  description: string;
+ Icon: LucideIcon;
+}
+
+interface AgentTemplate {
+ id: string;
+ title: string;
+ description: string;
+ cliId: string;
+ initialPrompt: string;
  Icon: LucideIcon;
 }
 
@@ -83,6 +96,41 @@ const AGENT_OPTIONS: AgentOption[] = [
  { id: "terminal", name: "Terminal", isTerminal: true },
 ];
 
+const AGENT_TEMPLATES: AgentTemplate[] = [
+ {
+ id: "react-dev",
+ title: "React Developer",
+ description: "Frontend specialist focused on React, TypeScript, and modern UI patterns.",
+ cliId: "codex-cli",
+ initialPrompt: "You are an expert React developer. Focus on building clean, performant React components with TypeScript. Follow best practices for state management, hooks, and component architecture. Review the current project structure and help with any React-related tasks.",
+ Icon: Code2,
+ },
+ {
+ id: "python-expert",
+ title: "Python Expert",
+ description: "Backend and scripting specialist for Python, data processing, and automation.",
+ cliId: "claude-code",
+ initialPrompt: "You are a Python expert. Help with Python development including data processing, automation scripts, API design, and best practices. Write clean, idiomatic Python code with proper error handling and documentation. Review the project structure and assist with Python-related tasks.",
+ Icon: FileCode2,
+ },
+ {
+ id: "general-assistant",
+ title: "General Assistant",
+ description: "Versatile coding assistant for general development, debugging, and architecture.",
+ cliId: "claude-code",
+ initialPrompt: "You are a versatile coding assistant. Help with general software development tasks including debugging, architecture decisions, code reviews, and implementation. Adapt to the project's tech stack and coding standards. Be thorough and explain your reasoning.",
+ Icon: Bot,
+ },
+ {
+ id: "shell-scripting",
+ title: "Shell Scripting",
+ description: "Terminal specialist for shell scripts, git operations, and system administration.",
+ cliId: "terminal",
+ initialPrompt: "",
+ Icon: Shell,
+ },
+];
+
 export default function SessionLauncher({
  onLaunched,
  activeMode = "agent",
@@ -93,28 +141,80 @@ export default function SessionLauncher({
  const [sessionCount, setSessionCount] = useState<number>(1);
  const [taskPrompt, setTaskPrompt] = useState<string>("");
  const [isLaunching, setIsLaunching] = useState<boolean>(false);
+ const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
+ const [workingDirOverride, setWorkingDirOverride] = useState<string>("");
+ const [isPickingDir, setIsPickingDir] = useState<boolean>(false);
 
  const workspaces = useWorkspaceStore((s) => s.workspaces) ?? [];
  const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId) ?? "";
  const activeWorkspace = Array.isArray(workspaces) ? workspaces.find((w) => w.id === activeWorkspaceId) : undefined;
  const rawProjectPath = activeWorkspace?.boundProjectPath || "~/Desktop/SwarmAI";
  const displayPath = rawProjectPath.replace(/^\/(Users|home)\/[^/]+/, "~");
+ const displayWorkingDir = (workingDirOverride || activeWorkspace?.boundProjectPath || "").replace(/^\/(Users|home)\/[^/]+/, "~");
+
+ // Apply template: sets CLI, prompt, and resets session count
+ const applyTemplate = (templateId: string) => {
+ setSelectedTemplateId(templateId);
+ const template = AGENT_TEMPLATES.find((t) => t.id === templateId);
+ if (!template) return;
+ setSelectedAgentId(template.cliId);
+ if (template.initialPrompt) {
+ setTaskPrompt(template.initialPrompt);
+ } else {
+ setTaskPrompt("");
+ }
+ setSelectedPreset("solo");
+ setSessionCount(1);
+ };
+
+ // When user manually changes agent or prompt, clear template selection
+ const handleAgentChange = (agentId: string) => {
+ setSelectedAgentId(agentId);
+ setSelectedTemplateId("");
+ };
+ const handlePromptChange = (val: string) => {
+ setTaskPrompt(val);
+ if (selectedTemplateId) setSelectedTemplateId("");
+ };
+
+ const effectiveTemplate = AGENT_TEMPLATES.find((t) => t.id === selectedTemplateId);
 
  const handleLaunch = () => {
  setIsLaunching(true);
  try {
+ const finalWorkingDir = workingDirOverride
+ ? workingDirOverride
+ : activeWorkspace?.boundProjectPath || null;
  launchPresetSession({
  preset: selectedPreset,
  selectedCliId: selectedAgentId,
  sessionCount,
  taskPrompt,
- workingDir: activeWorkspace?.boundProjectPath || null,
+ workingDir: finalWorkingDir,
  });
  if (onLaunched) {
  onLaunched();
  }
  } finally {
  setIsLaunching(false);
+ }
+ };
+
+ const handlePickDirectory = async () => {
+ try {
+ setIsPickingDir(true);
+ const selected = await open({
+ directory: true,
+ multiple: false,
+ title: "Select Working Directory",
+ });
+ if (selected && typeof selected === "string") {
+ setWorkingDirOverride(selected);
+ }
+ } catch (err) {
+ console.warn("[SessionLauncher] Folder picker failed:", err);
+ } finally {
+ setIsPickingDir(false);
  }
  };
 
@@ -238,6 +338,77 @@ export default function SessionLauncher({
  </div>
  </div>
 
+ {/* ── TEMPLATE Section ──────────────────────────────────────────── */}
+ <div className="flex flex-col gap-2 shrink-0">
+ <label className="text-[10.5px] font-bold tracking-wider text-slate-400 uppercase">
+ QUICK TEMPLATE
+ </label>
+ <select
+ value={selectedTemplateId}
+ onChange={(e) => applyTemplate(e.target.value)}
+ className="w-full rounded-xl border border-white/[0.08] bg-[#131622]/90 px-3.5 py-2.5 text-xs text-slate-200 focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/40 outline-none transition-all"
+ >
+ <option value="">Custom configuration</option>
+ {AGENT_TEMPLATES.map((t) => (
+ <option key={t.id} value={t.id}>
+ {t.title} — {t.description}
+ </option>
+ ))}
+ </select>
+ {effectiveTemplate && (
+ <div className="flex items-center gap-2 rounded-lg border border-blue-500/20 bg-blue-500/5 px-3 py-2 text-[11px] text-blue-300">
+ <Sparkles className="size-3 shrink-0" />
+ <span className="font-medium">{effectiveTemplate.title}</span>
+ <span className="text-slate-400 hidden sm:inline">— {effectiveTemplate.description}</span>
+ <button
+ onClick={() => applyTemplate("")}
+ className="text-[10px] text-slate-400 hover:text-slate-200 underline ml-auto shrink-0"
+ >
+ Clear
+ </button>
+ </div>
+ )}
+ </div>
+
+ {/* ── WORKING DIRECTORY Section ────────────────────────────────── */}
+ <div className="flex flex-col gap-2 shrink-0">
+ <label className="text-[10.5px] font-bold tracking-wider text-slate-400 uppercase">
+ WORKING DIRECTORY
+ </label>
+ <div className="flex items-center gap-2">
+ <div className="relative flex-1">
+ <FolderOpen className="size-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+ <input
+ type="text"
+ value={workingDirOverride || activeWorkspace?.boundProjectPath || ""}
+ onChange={(e) => setWorkingDirOverride(e.target.value)}
+ placeholder={activeWorkspace?.boundProjectPath || "~/Desktop/SwarmAI"}
+ className="w-full rounded-xl border border-white/[0.08] bg-[#131622]/90 pl-9 pr-3 py-2.5 text-xs text-slate-200 placeholder:text-slate-500 focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/40 outline-none transition-all font-mono"
+ />
+ </div>
+ <button
+ onClick={handlePickDirectory}
+ disabled={isPickingDir}
+ className="shrink-0 rounded-xl border border-white/[0.08] bg-[#131622]/90 px-3 py-2.5 text-xs text-slate-300 hover:text-white hover:border-blue-500/60 transition-all disabled:opacity-50 cursor-pointer"
+ title="Browse for working directory"
+ >
+ {isPickingDir ? "..." : "Browse"}
+ </button>
+ </div>
+ {workingDirOverride && (
+ <div className="flex items-center gap-2 rounded-lg border border-blue-500/20 bg-blue-500/5 px-3 py-2 text-[11px] text-blue-300">
+ <FolderOpen className="size-3 shrink-0" />
+ <span className="font-mono truncate">{displayWorkingDir}</span>
+ <button
+ onClick={() => setWorkingDirOverride("")}
+ className="text-[10px] text-slate-400 hover:text-slate-200 underline ml-auto shrink-0"
+ >
+ Reset
+ </button>
+ </div>
+ )}
+ </div>
+
  {/* ── AGENT Section ────────────────────────────────────────────── */}
  <div className="flex flex-col gap-2 shrink-0">
  <label className="text-[10.5px] font-bold tracking-wider text-slate-400 uppercase">
@@ -258,7 +429,7 @@ export default function SessionLauncher({
  aria-checked={active}
  aria-pressed={active}
  key={opt.id}
- onClick={() => setSelectedAgentId(opt.id)}
+ onClick={() => handleAgentChange(opt.id)}
  className={`flex items-center justify-between px-2.5 py-2 sm:px-3 sm:py-2.5 rounded-xl border text-left transition-all duration-150 ${
  active
  ? "bg-[#192038]/90 border-blue-500/80 shadow-md shadow-blue-500/10 ring-1 ring-blue-500/50"
@@ -340,7 +511,7 @@ export default function SessionLauncher({
  <textarea
  id="task-prompt"
  value={taskPrompt}
- onChange={(e) => setTaskPrompt(e.target.value)}
+ onChange={(e) => handlePromptChange(e.target.value)}
  placeholder="What should it work on?"
  rows={2}
  className="w-full resize-none rounded-xl border border-white/[0.08] bg-[#131622]/90 px-3.5 py-3 text-xs text-slate-200 placeholder:text-slate-500 focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/40 outline-none leading-relaxed transition-all shadow-inner"
