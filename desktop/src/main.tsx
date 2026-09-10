@@ -8,9 +8,11 @@ if (typeof window !== 'undefined' && !('__TAURI_INTERNALS__' in window)) {
       console.debug(`[Web Mock IPC] ${cmd}`, args);
       if (cmd === 'get_pheromone_mcp_path') throw new Error('MCP server path not available in browser mode');
       if (cmd === 'list_directory' || cmd === 'pheromone_list_memory_files') return { files: [] };
-      if (cmd === 'pheromone_ensure_structure') return { success: true, created_files: [] };
+      if (cmd === 'pheromone_ensure_structure' || cmd === 'ensure_pheromone_structure') return { success: true, created_files: [] };
       if (cmd === 'pheromone_list_sessions') return { sessions: [] };
       if (cmd === 'read_file' || cmd === 'read_text_file' || cmd === 'pheromone_read_memory_file' || cmd === 'run_command') return '';
+      if (cmd === 'kill_terminal') return { success: true };
+      if (cmd === 'is_process_alive') return true;
       return { success: true };
     },
     convertFileSrc: (src: string) => src,
