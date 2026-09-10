@@ -65,8 +65,22 @@ export class TauriPheromone {
 
   async writeMemoryFile(relativePath: string, content: string, frontmatter?: Record<string, unknown>): Promise<PheromoneWriteMemoryFileResponse> {
     const result = await invoke<PheromoneWriteMemoryFileResponse>("pheromone_write_memory_file", { req: { project_path: this.projectPath, relative_path: relativePath, content, frontmatter } });
-    try { await this.indexFile(relativePath); } catch (e) { console.warn(`[Pheromone] Failed to index ${relativePath} after write:`, e); }
+    // Only index memory files — skip session logs and handoffs to prevent search pollution
+    if (relativePath.startsWith("memory/") || (!relativePath.startsWith("agents/") && !relativePath.startsWith("tasks/"))) {
+      try { await this.indexFile(relativePath); } catch (e) { console.warn(`[Pheromone] Failed to index ${relativePath} after write:`, e); }
+    }
     return result;
+  }
+
+  async reindexAll(): Promise<void> {
+    try {
+      const listRes = await this.listMemoryFiles();
+      for (const file of listRes.files) {
+        try { await this.indexFile(file); } catch (e) { console.warn(`[Pheromone] Failed to index ${file}:`, e); }
+      }
+    } catch (e) {
+      console.warn('[Pheromone] Failed to reindex all files:', e);
+    }
   }
 
   async listMemoryFiles(): Promise<PheromoneListMemoryFilesResponse> {

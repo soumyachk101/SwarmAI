@@ -159,14 +159,15 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
  const running = agents.filter((a) => agentStatuses[a.id] === "running").length;
  const launching = agents.filter((a) => agentStatuses[a.id] === "launching").length;
  const error = agents.filter((a) => agentStatuses[a.id] === "error").length;
- const idle = total - running - launching - error;
+ const killed = agents.filter((a) => agentStatuses[a.id] === "killed").length;
+ const idle = total - running - launching - error - killed;
  const tasks = activeWorkspace?.taskCards ?? [];
  const completedTasks = tasks.filter((t) => t.column === "done").length;
 
  // Build distribution data for mini chart
- const distribution = [running, launching, idle, error];
+ const distribution = [running, launching, idle, error, killed];
 
- return { total, running, launching, error, idle, totalTasks: tasks.length, completedTasks, distribution };
+ return { total, running, launching, error, idle, killed, totalTasks: tasks.length, completedTasks, distribution };
  }, [agents, agentStatuses, activeWorkspace]);
 
  // Simulate or read recent log entries for observability
@@ -328,7 +329,7 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
  </div>
 
  {/* Global Metric Strip */}
- <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 px-6 py-3 border-b border-swarm-border/30 bg-swarm-surface/20 shrink-0">
+ <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3 px-6 py-3 border-b border-swarm-border/30 bg-swarm-surface/20 shrink-0">
  {/* Total Agents */}
  <div className="glass-inset rounded-lg p-2.5 flex items-center justify-between group hover:border-swarm-gold/30 transition-colors">
  <div>
@@ -413,6 +414,15 @@ export default function SwarmDashboardModal({ open, projectPath, onClose }: Prop
  )}
  </div>
  <CheckCircle2 className="size-4 text-cyan-400/50 group-hover:text-cyan-400 transition-colors shrink-0 ml-2" />
+ </div>
+
+ {/* Killed */}
+ <div className="glass-inset rounded-lg p-2.5 flex items-center justify-between group hover:border-red-500/30 transition-colors">
+ <div>
+ <span className="text-micro text-swarm-textMuted uppercase font-semibold block">Killed</span>
+ <div className="text-lg font-bold text-red-400">{stats.killed}</div>
+ </div>
+ <Square className="size-4 text-red-400/50 group-hover:text-red-400 transition-colors" />
  </div>
  </div>
 

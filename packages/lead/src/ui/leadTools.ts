@@ -56,8 +56,11 @@ ${host.describeScope(projectPath)}`;
           return files.length ? files.map((f: string) => `- ${f}`).join('\n') : 'No memory files.';
         }
         if (name === 'read_memory_file') {
-          const path = String(args.path || '');
-          if (!path) throw new ToolError('Missing required argument "path" for read_memory_file.');
+          const rawPath = String(args.path || '').trim();
+          if (!rawPath) throw new ToolError('Missing required argument "path" for read_memory_file.');
+          const path = rawPath.startsWith('memory/') || rawPath.startsWith('agents/') || rawPath.startsWith('tasks/')
+            ? rawPath
+            : `memory/${rawPath}`;
           const res = await pheromone.readMemoryFile(path);
           return res?.content || `(empty or missing: ${path})`;
         }
@@ -89,12 +92,15 @@ ${host.describeScope(projectPath)}`;
 
       if (name === 'write_memory') {
         if (!projectPath) throw new ToolError('No project is open.');
-        const path = String(args.path || '');
+        const rawPath = String(args.path || '').trim();
         const content = String(args.content ?? '');
-        if (!path) throw new ToolError('Missing required argument "path" for write_memory.');
+        if (!rawPath) throw new ToolError('Missing required argument "path" for write_memory.');
+        const path = rawPath.startsWith('memory/') || rawPath.startsWith('agents/') || rawPath.startsWith('tasks/')
+          ? rawPath
+          : `memory/${rawPath}`;
         const pheromone = new Pheromone(projectPath);
         await pheromone.writeMemoryFile(path, content);
-        return `Wrote ${content.length} chars to .pheromone/memory/${path}.`;
+        return `Wrote ${content.length} chars to .pheromone/${path}.`;
       }
 
       if (name === 'open_project') {

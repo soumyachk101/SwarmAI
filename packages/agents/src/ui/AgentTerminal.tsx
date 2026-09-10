@@ -81,6 +81,24 @@ interface AgentTerminalProps {
 }
 
 // ---------------------------------------------------------------------------
+// IPC helpers
+// ---------------------------------------------------------------------------
+
+async function safeInvoke<T>(command: string, args: any, retries = 2): Promise<T> {
+ for (let i = 0; i < retries; i++) {
+ try {
+ return await invoke<T>(command, args);
+ } catch (err) {
+ if (i === retries - 1) {
+ throw new Error(`IPC '${command}' failed after ${retries} attempts: ${err}`);
+ }
+ await new Promise((r) => setTimeout(r, 500 * (i + 1)));
+ }
+ }
+ throw new Error(`IPC '${command}' max retries exceeded`);
+}
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
@@ -89,14 +107,20 @@ function isMeaningfulChunk(content: string): boolean {
 }
 
 function isNotFoundError(err: unknown): boolean {
- if (typeof err === "string") return err.toLowerCase().includes("not found") || err.toLowerCase().includes("enoent");
- if (err && typeof err === "object" && "message" in err) return String((err as { message?: string }).message).toLowerCase().includes("not found");
+ if (typeof err === "string") return /\benoent\b/i.test(err) || /command not found/i.test(err);
+ if (err && typeof err === "object" && "message" in err) return /command not found/i.test(String((err as { message?: string }).message));
  return false;
 }
 
 function detectCommandNotFoundError(output: string, command: string): boolean {
  const lower = output.toLowerCase();
- return lower.includes(`${command} not found`) || lower.includes(`command not found: ${command}`) || lower.includes("command not found");
+ const cmd = command.toLowerCase();
+ // Match actual shell "command not found" patterns, not incidental text.
+ return (
+ /(^|[\s;|&])([^/]*\/)?${cmd}:\s*command not found($|[\s;|&])/i.test(lower) ||
+ lower.includes(`command not found: ${cmd}`) ||
+ /command not found: .+\(enotdir\)/i.test(lower)
+ );
 }
 
 function flattenForStdin(text: string): string {
@@ -215,9 +239,9 @@ const resetLoopsStarted = () => { loopsStarted = false; };
  };
 
   const writeToProcess = (data: string) => {
-  invoke("write_to_terminal", { paneId, data }).catch((e) =>
-  console.error(`write_to_terminal failed for ${paneId}:`, e),
-  );
+    safeInvoke("write_to_terminal", { paneId, data }).catch((e) =>
+      console.error(`write_to_terminal failed for ${paneId}:`, e),
+    );
   };
 
  const handleKeyboardShortcut = (arg: { ctrlKey: boolean; shiftKey: boolean; altKey: boolean; metaKey: boolean; code: string; type: string; preventDefault: () => void; stopPropagation: () => void }): boolean => {
@@ -467,6 +491,11 @@ const resetLoopsStarted = () => { loopsStarted = false; };
  }
  const fullArgs = [...(bypassEnabled ? (bypassFlags[command] || []) : []), ...(agent.args || [])];
 
+ let spawnAttempt = 0;
+ const MAX_SPAWN_RETRIES = 2;
+ while (spawnAttempt < MAX_SPAWN_RETRIES) {
+ try {
+ spawnAttempt++;
  await invoke("spawn_terminal", {
  paneId,
  command,
@@ -476,6 +505,15 @@ const resetLoopsStarted = () => { loopsStarted = false; };
  rows,
  cols,
  });
+ break;
+ } catch (e) {
+ if (spawnAttempt >= MAX_SPAWN_RETRIES || isNotFoundError(e)) {
+ throw e;
+ }
+ terminal?.writeln(`\x1b[33m[swarm] spawn failed, retrying... (${spawnAttempt}/${MAX_SPAWN_RETRIES})\x1b[0m`);
+ await new Promise((r) => setTimeout(r, 800 * spawnAttempt));
+ }
+ }
  markSpawned(paneId, workingDir);
 
  if (disposed || !terminal) return;

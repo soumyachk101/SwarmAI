@@ -53,13 +53,29 @@ export class Pheromone {
     const chunks = await this.memoryManager.parseMarkdownToChunks(memoryFile.content);
     const db = this.db.getDatabase();
 
+    const now = Date.now();
+
+    // Update or insert memory file record FIRST so chunks foreign key is satisfied
+    const upsertStmt = db.prepare(`
+      INSERT OR REPLACE INTO memory_files (id, path, type, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?)
+    `);
+    upsertStmt.bind([
+      relativePath,
+      relativePath,
+      memoryFile.type,
+      now,
+      now
+    ]);
+    upsertStmt.run();
+    upsertStmt.free();
+
     // Delete existing chunks for this file
     const deleteStmt = db.prepare('DELETE FROM chunks WHERE source_file = ?');
     deleteStmt.bind([relativePath]);
     deleteStmt.run();
     deleteStmt.free();
 
-    const now = Date.now();
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
       const embedding = await this.searchEngine['embedText'](chunk.text);
@@ -81,21 +97,6 @@ export class Pheromone {
       insertStmt.run();
       insertStmt.free();
     }
-
-    // Update or insert memory file record
-    const upsertStmt = db.prepare(`
-      INSERT OR REPLACE INTO memory_files (id, path, type, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?)
-    `);
-    upsertStmt.bind([
-      relativePath,
-      relativePath,
-      memoryFile.type,
-      now,
-      now
-    ]);
-    upsertStmt.run();
-    upsertStmt.free();
   }
 
   // Re-index all memory files

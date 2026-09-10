@@ -36,6 +36,8 @@ export interface WorkspaceThread {
   updatedAt?: number;
   agentId?: string;
   status?: 'active' | 'idle' | 'running' | 'done';
+  pinned?: boolean;
+  promptSnippet?: string;
 }
 
 export interface Workspace {
@@ -75,6 +77,7 @@ interface WorkspaceState {
   removeThread: (workspaceId: string, threadId: string) => void;
   renameThread: (workspaceId: string, threadId: string, title: string) => void;
   duplicateThread: (workspaceId: string, threadId: string) => WorkspaceThread | undefined;
+  togglePinThread: (workspaceId: string, threadId: string) => void;
 
   addWorkspace: (agent: Workspace) => void;
   removeWorkspace: (id: string) => void;
@@ -206,6 +209,23 @@ export const useWorkspaceStore = create<WorkspaceState>()(persist((set, get) => 
       ),
     }));
     return copy;
+  },
+
+  togglePinThread: (workspaceId, threadId) => {
+    set((state) => ({
+      workspaces: state.workspaces.map((w) =>
+        w.id === workspaceId
+          ? {
+              ...w,
+              threads: (w.threads ?? []).map((t) =>
+                t.id === threadId || t.agentId === threadId
+                  ? { ...t, pinned: !t.pinned, updatedAt: Date.now() }
+                  : t
+              ),
+            }
+          : w
+      ),
+    }));
   },
 
   addWorkspace: (agent) =>

@@ -92,6 +92,7 @@ const STATUS_DOT_CLASS: Record<AgentStatus, string> = {
   idle: "bg-swarm-textMuted",
   error: "bg-swarm-err",
   done: "bg-swarm-gold",
+  killed: "bg-swarm-err",
 };
 
 function swarmsOfWs(wsId: string) {

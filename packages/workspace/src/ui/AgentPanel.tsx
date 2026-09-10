@@ -54,6 +54,12 @@ const STATUS_COLOR: Record<AgentStatus, { bg: string; dot: string; label: string
     label: "Done",
     text: "text-blue-400",
   },
+  killed: {
+    bg: "bg-red-500/10 border-red-500/20",
+    dot: "bg-red-400",
+    label: "Killed",
+    text: "text-red-400",
+  },
 };
 
 const DEFAULT_CLIS = [

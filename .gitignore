@@ -127,6 +127,7 @@ Thumbs.db
 # Temporary / Scratch Files & Scripts
 # ==============================================================================
 *.bak
+*.BAK
 *.backup
 *.old
 *.orig
@@ -134,14 +135,22 @@ Thumbs.db
 *.temp
 patch_*.py
 fix_*.py
+_*.py
+_*.js
+_*.ts
 fix*.js
 fix*.rb
 do_fix.js
+breadcrumb.py
+capture.mjs
+record.mjs
 fixed_func.rs
 insert_launchctl.rb
 new_block.txt
 analysis-result*.json
 test-simple*.json
+test-frames/
+video-script.json
 __pycache__/
 *.pyc
 *.pyo

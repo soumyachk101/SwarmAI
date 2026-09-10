@@ -19,23 +19,34 @@ export class PheromoneDatabase {
  }
 
  static async create(projectPath: string, fsPort?: FileSystemPort): Promise<PheromoneDatabase> {
- const SQL = await initSqlJs();
- const dbPath = `${projectPath}/.pheromone/pheromone.db`;
+    const SQL = await initSqlJs();
+    const dbPath = `${projectPath}/.pheromone/pheromone.db`;
 
- let db: initSqlJs.Database;
- try {
- const u8 = await fsPort!.readFile(dbPath, 'utf-8').then((s: string) => {
- const a = new Uint8Array(s.length);
- for (let i = 0; i < s.length; i++) a[i] = s.charCodeAt(i);
- return a;
- });
- db = new SQL.Database(u8);
- } catch {
- db = new SQL.Database();
- }
+    let db: initSqlJs.Database;
+    try {
+      if (fsPort) {
+        const s = await fsPort.readFile(dbPath, 'utf-8');
+        let u8: Uint8Array;
+        try {
+          const binary = atob(s);
+          u8 = new Uint8Array(binary.length);
+          for (let i = 0; i < binary.length; i++) u8[i] = binary.charCodeAt(i);
+        } catch {
+          u8 = new Uint8Array(s.length);
+          for (let i = 0; i < s.length; i++) u8[i] = s.charCodeAt(i);
+        }
+        db = new SQL.Database(u8);
+      } else {
+        const { readFile } = await import('node:fs/promises');
+        const buf = await readFile(dbPath);
+        db = new SQL.Database(buf);
+      }
+    } catch {
+      db = new SQL.Database();
+    }
 
- return new PheromoneDatabase(projectPath, db, fsPort);
- }
+    return new PheromoneDatabase(projectPath, db, fsPort);
+  }
 
  private migrate(): void {
  const version = getSchemaVersion(this.db);
