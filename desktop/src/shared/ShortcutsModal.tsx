@@ -1,13 +1,11 @@
 "use client";
 
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import {
- Search, Command, Terminal, Bot, Zap, Settings, FolderOpen, Mic,
- PanelLeft, PanelRight, Columns3, Sparkles, Activity, Layers,
- HelpCircle, FileCode2, DollarSign, GitPullRequest, CheckCircle2,
- ShieldCheck, Trash2, Download, Blocks, LayoutGrid, ClipboardList
+ HelpCircle
 } from "lucide-react";
 import { PaletteCommand } from "@/shared/CommandPalette";
+import Modal from "@/shared/Modal";
 
 const SHORTCUTS = [
  {
@@ -63,20 +61,8 @@ const SHORTCUTS = [
 
 export default function ShortcutsModal({ onClose }: { onClose: () => void }) {
  return (
- <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/70 backdrop-blur-md animate-in fade-in duration-150"
- onClick={onClose}>
- <div
- className="w-full max-w-2xl max-h-[80vh] overflow-y-auto rounded-2xl border border-zinc-700/60 bg-zinc-950/95 shadow-2xl backdrop-blur-2xl animate-in zoom-in-95 duration-150"
- onClick={(e) => e.stopPropagation()}
- >
- <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800/60 sticky top-0 bg-zinc-950/95 z-10 backdrop-blur-xl">
- <div className="flex items-center gap-2">
- <HelpCircle size={18} className="text-amber-400" />
- <h2 className="text-sm font-semibold text-zinc-100 font-mono">Keyboard Shortcuts</h2>
- </div>
- <button onClick={onClose} className="text-zinc-400 hover:text-zinc-200 transition-colors p-1 rounded-md hover:bg-zinc-800/50">✕</button>
- </div>
- <div className="p-4 space-y-5">
+ <Modal open size="lg" onClose={onClose} title="Keyboard Shortcuts" staggerDelay={30}>
+ <div className="space-y-5">
  {SHORTCUTS.map((group) => (
  <div key={group.group}>
  <h3 className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-2 font-mono">{group.group}</h3>
@@ -86,10 +72,10 @@ export default function ShortcutsModal({ onClose }: { onClose: () => void }) {
  <span className="text-xs text-zinc-300 font-sans">{item.action}</span>
  <div className="flex items-center gap-1">
  {item.keys.map((k, ki) => (
- <React.Fragment key={ki}>
+ <span key={ki} className="flex items-center gap-1">
  <kbd className="font-mono text-[10px] text-amber-300 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded shadow-sm">{k}</kbd>
  {ki < item.keys.length - 1 && <span className="text-[10px] text-zinc-600 mx-0.5">then</span>}
- </React.Fragment>
+ </span>
  ))}
  </div>
  </div>
@@ -98,7 +84,6 @@ export default function ShortcutsModal({ onClose }: { onClose: () => void }) {
  </div>
  ))}
  </div>
- </div>
- </div>
+ </Modal>
  );
 }
