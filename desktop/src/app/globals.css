@@ -76,9 +76,13 @@
    change it triggered ran at different speeds and read as two events. These are
    NOT theme tokens; applyTheme never touches them. */
 :root {
-  --swarm-ease: cubic-bezier(0.2, 0, 0, 1);
-  --swarm-t-fast: 90ms;  /* hover, press, colour-only feedback */
-  --swarm-t-base: 150ms; /* elevation and state changes */
+ --swarm-ease: cubic-bezier(0.2, 0, 0, 1);
+ --swarm-ease-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
+ --swarm-ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+ --swarm-t-fast: 90ms; /* hover, press, colour-only feedback */
+ --swarm-t-base: 150ms; /* elevation and state changes */
+ --swarm-t-slow: 300ms; /* modals, sidebar, pane transitions */
+ --swarm-t-cinematic: 500ms; /* splash elements, orchestrated sequences */
 }
 
 html,
@@ -657,4 +661,172 @@ interactive elements specifically so form fields and icons get a clearly visible
  outline: 2px solid rgba(var(--swarm-gold), 0.6);
  outline-offset: -2px;
  border-radius: 0.5rem;
+}
+
+/* ─── Modal exit animations ─── */
+@keyframes modal-enter {
+ from { opacity: 0; transform: scale(0.94) translateY(12px); }
+ to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes modal-exit {
+ from { opacity: 1; transform: scale(1) translateY(0); }
+ to { opacity: 0; transform: scale(0.96) translateY(8px); }
+}
+@keyframes overlay-enter {
+ from { opacity: 0; }
+ to { opacity: 1; }
+}
+@keyframes overlay-exit {
+ from { opacity: 1; }
+ to { opacity: 0; }
+}
+.animate-modal-enter { animation: modal-enter var(--swarm-t-slow) var(--swarm-ease-out-expo) forwards; }
+.animate-modal-exit { animation: modal-exit var(--swarm-t-base) var(--swarm-ease) forwards; }
+.animate-overlay-enter { animation: overlay-enter var(--swarm-t-base) var(--swarm-ease) forwards; }
+.animate-overlay-exit { animation: overlay-exit var(--swarm-t-fast) var(--swarm-ease) forwards; }
+
+/* ─── Agent status ring pulse ─── */
+@keyframes agent-status-ring {
+ 0% { transform: scale(1); opacity: 0.7; }
+ 50% { transform: scale(1.8); opacity: 0; }
+ 100% { transform: scale(1); opacity: 0; }
+}
+.agent-status-ripple::after {
+ content: "";
+ position: absolute;
+ inset: -2px;
+ border-radius: 50%;
+ border: 1.5px solid currentColor;
+ animation: agent-status-ring 1.8s ease-out infinite;
+ pointer-events: none;
+}
+.agent-status-ripple-error::after {
+ border-color: rgb(var(--swarm-err));
+ animation-duration: 1.2s;
+}
+
+/* ─── Command palette staggered entrance ─── */
+@keyframes palette-row-enter {
+ from { opacity: 0; transform: translateY(6px); }
+ to { opacity: 1; transform: translateY(0); }
+}
+.palette-stagger-item {
+ animation: palette-row-enter var(--swarm-t-base) var(--swarm-ease-out-expo) both;
+}
+
+/* ─── Button hover lift ─── */
+.btn-lift {
+ transition: transform var(--swarm-t-fast) var(--swarm-ease),
+ box-shadow var(--swarm-t-base) var(--swarm-ease),
+ border-color var(--swarm-t-base) var(--swarm-ease);
+}
+.btn-lift:hover {
+ transform: translateY(-1px);
+}
+.btn-lift:active {
+ transform: translateY(0) scale(0.985);
+ transition-duration: 60ms;
+}
+
+/* ─── Theme transition ─── */
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+ transition: background-color var(--swarm-t-slow) var(--swarm-ease),
+ border-color var(--swarm-t-slow) var(--swarm-ease),
+ color var(--swarm-t-base) var(--swarm-ease),
+ box-shadow var(--swarm-t-slow) var(--swarm-ease) !important;
+}
+
+/* ─── Spring animation curve ─── */
+.spring-transition {
+ transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ─── Hover lift for cards/containers ─── */
+.hover-lift {
+ transition: transform var(--swarm-t-fast) var(--swarm-ease),
+ box-shadow var(--swarm-t-base) var(--swarm-ease),
+ border-color var(--swarm-t-base) var(--swarm-ease);
+}
+.hover-lift:hover {
+ transform: translateY(-2px);
+ box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.5);
+}
+
+/* ─── Premium shimmer for skeleton screens ─── */
+.shimmer-premium {
+ background: linear-gradient(
+ 90deg,
+ rgba(255, 255, 255, 0.03) 0%,
+ rgba(255, 255, 255, 0.06) 50%,
+ rgba(255, 255, 255, 0.03) 100%
+ );
+ background-size: 200% 100%;
+ animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ─── Animated underline for links ─── */
+.link-underline {
+ position: relative;
+}
+.link-underline::after {
+ content: '';
+ position: absolute;
+ bottom: -2px;
+ left: 0;
+ width: 0;
+ height: 1px;
+ background: rgb(var(--swarm-gold));
+ transition: width 150ms var(--swarm-ease);
+}
+.link-underline:hover::after {
+ width: 100%;
+}
+
+/* ─── Mini sparkline ─── */
+.sparkline {
+ display: inline-flex;
+ align-items: flex-end;
+ gap: 1px;
+ height: 16px;
+}
+.sparkline-bar {
+ width: 2px;
+ background: rgb(var(--swarm-gold));
+ border-radius: 1px;
+ transition: height 100ms ease;
+}
+
+/* ─── Toast progress bar ─── */
+.toast-progress-track {
+ position: absolute;
+ bottom: 0;
+ left: 0;
+ right: 0;
+ height: 2px;
+ background: rgba(255, 255, 255, 0.04);
+ border-radius: 0 0 inherit;
+ overflow: hidden;
+}
+.toast-progress-bar {
+ height: 100%;
+ border-radius: inherit;
+ transform-origin: left;
+ animation: toast-progress-shrink linear forwards;
+}
+@keyframes toast-progress-shrink {
+ from { transform: scaleX(1); }
+ to { transform: scaleX(0); }
+}
+
+/* ─── Smooth sidebar slide ─── */
+.sidebar-slide-left {
+ transition: transform var(--swarm-t-slow) var(--swarm-ease-out-expo),
+ opacity var(--swarm-t-base) var(--swarm-ease);
+}
+.sidebar-slide-right {
+ transition: transform var(--swarm-t-slow) var(--swarm-ease-out-expo),
+ opacity var(--swarm-t-base) var(--swarm-ease);
 }

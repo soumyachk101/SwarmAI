@@ -360,7 +360,7 @@ export default function HomePage() {
  <div className="flex shrink-0 items-center gap-1">
  <button
  onClick={() => setBoardOpen(!boardOpen)}
- className={`size-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+ className={`hover-lift size-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
  boardOpen
  ? "text-swarm-goldHi bg-swarm-gold/[0.18] border border-swarm-gold/40 shadow-xs"
  : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.08]"
