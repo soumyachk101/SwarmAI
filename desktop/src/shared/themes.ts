@@ -10,7 +10,8 @@ export type ThemeId =
  | "amber"
  | "arctic-aurora"
  | "rosewood-luxe"
- | "onyx-silver";
+ | "onyx-silver"
+ | "ai-minimal";
 
 export interface ThemeTokens {
  /** Space-separated RGB channels, e.g. "224 168 58" — used with rgb(var(--x) / a). */
@@ -282,6 +283,31 @@ const ONYX_SILVER: ThemeTokens = {
  err: "248 113 113", // Silver Rose (#f87171)
 };
 
+/* ─── AI Minimal — Flat, Sleek, Eye-Friendly ───
+ Research-backed palette for premium AI/sleek interfaces.
+ Cool-tinted near-black base + indigo accent = "intelligence" color.
+ Flat solid surfaces, no gradients on primary UI.
+ OLED-friendly, WCAG AAA contrast, reduced eye strain. */
+const AI_MINIMAL: ThemeTokens = {
+ canvas: "8 8 12", // Cool Void (#08080c)
+ canvasHi: "12 12 18", // Deep AI Glass (#0c0c12)
+ surface: "16 16 24", // Flat AI Surface (#101018)
+ surfaceHi: "22 22 34", // Elevated AI Panel (#161622)
+ border: "30 30 44", // Subtle Hairline (#1e1e2c)
+ borderHi: "45 45 66", // Active Hairline (#2d2d42)
+ gold: "129 140 248", // Indigo-400 (#818cf8) — primary accent
+ goldHi: "99 102 241", // Indigo-500 (#6366f1) — hover/active
+ goldDim: "79 70 229", // Indigo-600 (#4f46e5) — pressed/dimmed
+ honey: "6 182 212", // Cyan-500 (#06b6d4) — info/links only
+ amber: "168 85 247", // Violet-500 (#a855f7) — special highlights only
+ text: "232 232 240", // Cool White (#e8e8f0)
+ textDim: "160 160 180", // Cool Slate (#a0a0b4)
+ textMuted: "110 110 142", // Cool AI Gray (#6e6e8e)
+ ok: "52 211 153", // Emerald (#34d399)
+ warn: "251 191 36", // Amber (#fbbf24)
+ err: "248 113 113", // Rose (#f87171)
+};
+
 export const THEMES: ThemeDef[] = [
  {
  id: "charcoal",
@@ -367,13 +393,20 @@ export const THEMES: ThemeDef[] = [
  swatch: ["#cbd5e1", "#14171d", "#07080a"],
  tokens: ONYX_SILVER,
  },
+ {
+ id: "ai-minimal",
+ label: "AI Minimal",
+ description: "Flat, sleek, eye-friendly — indigo accent on cool near-black",
+ swatch: ["#6366f1", "#101018", "#08080c"],
+ tokens: AI_MINIMAL,
+ },
 ];
 
 export const THEME_BY_ID: Record<ThemeId, ThemeDef> = Object.fromEntries(
  THEMES.map((t) => [t.id, t]),
 ) as Record<ThemeId, ThemeDef>;
 
-export const DEFAULT_THEME_ID: ThemeId = "charcoal";
+export const DEFAULT_THEME_ID: ThemeId = "ai-minimal";
 
 const TOKEN_TO_CSS: Record<keyof ThemeTokens, string> = {
  canvas: "--swarm-canvas",
