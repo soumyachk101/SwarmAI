@@ -160,7 +160,7 @@ export default function SettingsPage({
                 key={tool.id}
                 type="button"
                 onClick={tool.action}
-                className="flex items-start gap-3 p-3 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.07] hover:border-swarm-gold/40 text-left transition-all group cursor-pointer"
+                className="hover-lift flex items-start gap-3 p-3 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.07] hover:border-swarm-gold/40 text-left transition-all group cursor-pointer"
               >
                 <div className={`p-2 rounded-lg border ${tool.color} shrink-0 mt-0.5 group-hover:scale-105 transition-transform`}>
                   <Icon size={16} />
@@ -203,12 +203,12 @@ export default function SettingsPage({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-6 backdrop-blur-md" onClick={onClose}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-6 backdrop-blur-[24px] backdrop-saturate-[1.8]" onClick={onClose}>
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Settings"
-        className="flex h-[80vh] max-h-full w-full max-w-4xl flex-col overflow-hidden rounded-2xl glass-hi border border-white/[0.14] shadow-2xl animate-scale-in"
+        className="flex h-[80vh] max-h-full w-full max-w-4xl flex-col overflow-hidden rounded-2xl glass-hi border border-white/[0.14] shadow-2xl animate-modal-enter"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-5 py-3 border-b border-swarm-border/50 flex-shrink-0 bg-white/[0.02]">
@@ -244,7 +244,7 @@ export default function SettingsPage({
                 <button
                   key={item.id}
                   onClick={() => setActiveSection(item.id)}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs transition-all text-left cursor-pointer font-medium ${
+                  className={`hover-lift w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs transition-all text-left cursor-pointer font-medium ${
                     active
                       ? "bg-swarm-gold/15 text-swarm-goldHi border border-swarm-gold/30 shadow-xs"
                       : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.05] border border-transparent"

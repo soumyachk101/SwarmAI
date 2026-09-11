@@ -302,7 +302,7 @@ export default function SessionLauncher({
  aria-checked={active}
  key={p.id}
  onClick={() => setSelectedPreset(p.id)}
- className={`group relative flex flex-col justify-between p-3 sm:p-3.5 rounded-xl border text-left transition-all duration-150 min-h-[85px] sm:min-h-[105px] ${
+ className={`hover-lift group relative flex flex-col justify-between p-3 sm:p-3.5 rounded-xl border text-left transition-all duration-150 min-h-[85px] sm:min-h-[105px] ${
  active
  ? "bg-[#161e36] border-blue-500/80 shadow-lg shadow-blue-500/10 ring-1 ring-blue-500/50"
  : "bg-[#111420]/90 border-white/[0.08] hover:border-white/[0.18] hover:bg-[#151928]"

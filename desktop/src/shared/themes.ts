@@ -417,12 +417,14 @@ export function applyTheme(id: ThemeId): void {
  const theme = THEME_BY_ID[id] ?? THEME_BY_ID[DEFAULT_THEME_ID];
  const root = document.documentElement;
  root.setAttribute("data-theme", theme.id);
+ root.classList.add("theme-transition");
  for (const [key, cssVar] of Object.entries(TOKEN_TO_CSS) as [keyof ThemeTokens, string][]) {
  const channels = theme.tokens[key];
  root.style.setProperty(cssVar, channels);
  // Hex mirrors for JS/SVG that can't use channel triplets (xterm, stroke, etc.)
  root.style.setProperty(`${cssVar}-hex`, rgbChannelsToHex(channels));
  }
+ setTimeout(() => root.classList.remove("theme-transition"), 400);
  if (typeof window !== "undefined") {
  window.dispatchEvent(new CustomEvent(THEME_CHANGE_EVENT, { detail: { id: theme.id } }));
  }
