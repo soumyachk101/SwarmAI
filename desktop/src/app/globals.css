@@ -58,11 +58,11 @@
  --swarm-surface-hi-hex: #161622;
  --swarm-border-hex: #1e1e2c;
  --swarm-border-hi-hex: #2d2d42;
- --swarm-gold-hex: #6366f1;
- --swarm-gold-hi-hex: #818cf8;
- --swarm-gold-dim-hex: #4f46e5;
- --swarm-honey-hex: #06b6d4;
- --swarm-amber-hex: #a855f7;
+ --swarm-gold-hex: #e8a838;
+ --swarm-gold-hi-hex: #f0c060;
+ --swarm-gold-dim-hex: #c07820;
+ --swarm-honey-hex: #f0c060;
+ --swarm-amber-hex: #e8a838;
  --swarm-text-hex: #e8e8f0;
  --swarm-text-dim-hex: #a0a0b4;
  --swarm-text-muted-hex: #505064;
@@ -482,7 +482,7 @@ select:focus {
 }
 
 .bridgemind-card:hover {
- border-color: rgba(218, 165, 72, 0.2);
+ border-color: rgba(var(--swarm-gold), 0.2);
  box-shadow: 0 6px 24px -4px rgba(0, 0, 0, 0.5);
 }
 

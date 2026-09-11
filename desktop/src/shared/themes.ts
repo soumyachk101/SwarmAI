@@ -283,11 +283,11 @@ const ONYX_SILVER: ThemeTokens = {
  err: "248 113 113", // Silver Rose (#f87171)
 };
 
-/* ─── AI Minimal — Flat, Sleek, Eye-Friendly ───
- Research-backed palette for premium AI/sleek interfaces.
- Cool-tinted near-black base + indigo accent = "intelligence" color.
- Flat solid surfaces, no gradients on primary UI.
- OLED-friendly, WCAG AAA contrast, reduced eye strain. */
+/* ─── AI Minimal — SwarmAI Signature Flat Sleek ───
+ Brand signature: Swarm Amber (#E8A838) — warm honeycomb gold, unique to
+ SwarmAI. Not generic indigo, not Linear's purple, not Cursor's violet.
+ Cool near-black base + ONE warm amber accent = instantly recognizable.
+ Flat solid surfaces, no gradients on primary UI. OLED-friendly, WCAG AAA. */
 const AI_MINIMAL: ThemeTokens = {
  canvas: "8 8 12", // Cool Void (#08080c)
  canvasHi: "12 12 18", // Deep AI Glass (#0c0c12)
@@ -295,11 +295,11 @@ const AI_MINIMAL: ThemeTokens = {
  surfaceHi: "22 22 34", // Elevated AI Panel (#161622)
  border: "30 30 44", // Subtle Hairline (#1e1e2c)
  borderHi: "45 45 66", // Active Hairline (#2d2d42)
- gold: "129 140 248", // Indigo-400 (#818cf8) — primary accent
- goldHi: "99 102 241", // Indigo-500 (#6366f1) — hover/active
- goldDim: "79 70 229", // Indigo-600 (#4f46e5) — pressed/dimmed
- honey: "6 182 212", // Cyan-500 (#06b6d4) — info/links only
- amber: "168 85 247", // Violet-500 (#a855f7) — special highlights only
+ gold: "232 168 56", // Swarm Amber (#e8a838) — BRAND SIGNATURE
+ goldHi: "240 192 96", // Honey Glow (#f0c060)
+ goldDim: "192 120 32", // Deep Amber (#c07820)
+ honey: "240 192 96", // Honey Glow (#f0c060)
+ amber: "232 168 56", // Swarm Amber (#e8a838)
  text: "232 232 240", // Cool White (#e8e8f0)
  textDim: "160 160 180", // Cool Slate (#a0a0b4)
  textMuted: "110 110 142", // Cool AI Gray (#6e6e8e)
@@ -395,9 +395,9 @@ export const THEMES: ThemeDef[] = [
  },
  {
  id: "ai-minimal",
- label: "AI Minimal",
- description: "Flat, sleek, eye-friendly — indigo accent on cool near-black",
- swatch: ["#6366f1", "#101018", "#08080c"],
+ label: "SwarmAI Signature",
+ description: "Cool flat dark + Swarm Amber — the platform's own color",
+ swatch: ["#e8a838", "#101018", "#08080c"],
  tokens: AI_MINIMAL,
  },
 ];
