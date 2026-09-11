@@ -119,7 +119,7 @@ export default function SettingsPage({
         title: "Extensions & Tools",
         desc: "Discover, install and manage agents and plugins from Open-VSX",
         icon: Blocks,
-        color: "text-blue-400 bg-blue-400/10 border-blue-400/20",
+        color: "text-swarm-gold bg-swarm-gold/10 border-swarm-gold/20",
         action: () => { onClose(); onOpenExtensions?.(); },
       },
       {

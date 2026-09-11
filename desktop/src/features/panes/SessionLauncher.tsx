@@ -219,16 +219,16 @@ export default function SessionLauncher({
  };
 
  return (
- <div className="@container flex h-full w-full flex-col overflow-y-auto bg-[#0b0d14] text-[#e2e8f0] scrollbar-sleek select-none">
+ <div className="@container flex h-full w-full flex-col overflow-y-auto bg-swarm-canvas text-swarm-text scrollbar-sleek select-none">
  {/* Top Segmented Mode Selector Bar */}
  <div className="flex items-center justify-center pt-3 pb-2 sm:pt-5 sm:pb-3 shrink-0">
- <div className="flex items-center rounded-xl bg-[#141824] p-1 border border-white/[0.08] shadow-lg shadow-black/20">
+ <div className="flex items-center rounded-xl bg-swarm-canvasHi p-1 border border-swarm-border shadow-lg shadow-black/20">
  <button
  onClick={() => onModeChange?.("agent")}
  className={`px-4 sm:px-5 py-1 sm:py-1.5 text-xs font-semibold rounded-lg transition-all ${
  activeMode === "agent"
- ? "bg-[#252c42] text-white shadow-md border border-white/[0.12]"
- : "text-slate-400 hover:text-slate-200"
+ ? "bg-swarm-surfaceHi text-swarm-text shadow-md border border-swarm-borderHi"
+ : "text-swarm-textMuted hover:text-swarm-textDim"
  }`}
  >
  Agent
@@ -237,8 +237,8 @@ export default function SessionLauncher({
  onClick={() => onModeChange?.("code")}
  className={`px-4 sm:px-5 py-1 sm:py-1.5 text-xs font-semibold rounded-lg transition-all ${
  activeMode === "code"
- ? "bg-[#252c42] text-white shadow-md border border-white/[0.12]"
- : "text-slate-400 hover:text-slate-200"
+ ? "bg-swarm-surfaceHi text-swarm-text shadow-md border border-swarm-borderHi"
+ : "text-swarm-textMuted hover:text-swarm-textDim"
  }`}
  >
  Code
@@ -247,8 +247,8 @@ export default function SessionLauncher({
  onClick={() => onModeChange?.("chat")}
  className={`px-4 sm:px-5 py-1 sm:py-1.5 text-xs font-semibold rounded-lg transition-all ${
  activeMode === "chat"
- ? "bg-[#252c42] text-white shadow-md border border-white/[0.12]"
- : "text-slate-400 hover:text-slate-200"
+ ? "bg-swarm-surfaceHi text-swarm-text shadow-md border border-swarm-borderHi"
+ : "text-swarm-textMuted hover:text-swarm-textDim"
  }`}
  >
  Chat
@@ -260,13 +260,13 @@ export default function SessionLauncher({
  <div className="mx-auto w-full max-w-4xl px-4 sm:px-8 pb-4 flex flex-col gap-4 sm:gap-5 flex-1">
  {/* Title Header */}
  <div className="flex items-center gap-2 text-xs sm:text-sm shrink-0">
- <span className="font-semibold text-slate-200 tracking-normal font-sans">New session</span>
- <span className="truncate text-slate-500 font-mono text-[11px] sm:text-xs">{displayPath}</span>
+ <span className="font-semibold text-swarm-textDim tracking-normal font-sans">New session</span>
+ <span className="truncate text-swarm-textMuted font-mono text-[11px] sm:text-xs">{displayPath}</span>
  </div>
 
  {/* ── PRESET Section ────────────────────────────────────────────── */}
  <div className="flex flex-col gap-2 shrink-0">
- <label className="text-[10.5px] font-bold tracking-wider text-slate-400 uppercase font-sans">
+ <label className="text-[10.5px] font-bold tracking-wider text-swarm-textMuted uppercase font-sans">
  PRESET
  </label>
  <div
@@ -304,32 +304,32 @@ export default function SessionLauncher({
  onClick={() => setSelectedPreset(p.id)}
  className={`hover-lift group relative flex flex-col justify-between p-3 sm:p-3.5 rounded-xl border text-left transition-all duration-150 min-h-[85px] sm:min-h-[105px] ${
  active
- ? "bg-[#161e36] border-blue-500/80 shadow-lg shadow-blue-500/10 ring-1 ring-blue-500/50"
- : "bg-[#111420]/90 border-white/[0.08] hover:border-white/[0.18] hover:bg-[#151928]"
+ ? "bg-swarm-surfaceHi border-swarm-gold/60 shadow-lg shadow-swarm-gold/10 ring-1 ring-swarm-gold/40"
+ : "bg-swarm-canvasHi/90 border-swarm-border hover:border-swarm-borderHi hover:bg-swarm-surface/80"
  }`}
  >
  <div className="flex items-center justify-between gap-1.5 w-full mb-1.5">
  <div className="flex items-center gap-1.5 min-w-0">
  <Icon
  className={`size-3.5 sm:size-4 shrink-0 ${
- active ? "text-blue-400" : "text-slate-400 group-hover:text-slate-200"
+ active ? "text-swarm-gold" : "text-swarm-textMuted group-hover:text-swarm-textDim"
  }`}
  />
- <span className={`text-xs sm:text-sm font-semibold truncate ${active ? "text-white" : "text-slate-200"}`}>
+ <span className={`text-xs sm:text-sm font-semibold truncate ${active ? "text-swarm-text" : "text-swarm-textDim"}`}>
  {p.title}
  </span>
  </div>
  <span
  className={`text-[10px] sm:text-xs font-mono px-1.5 py-0.5 rounded-md shrink-0 ${
  active
- ? "bg-blue-500/20 text-blue-300 font-bold"
- : "bg-white/[0.06] text-slate-400"
+ ? "bg-swarm-gold/20 text-swarm-goldHi font-bold"
+ : "bg-swarm-surfaceHi text-swarm-textMuted"
  }`}
  >
  {p.count}
  </span>
  </div>
- <p className="text-[10.5px] sm:text-[11.5px] text-slate-400 leading-snug line-clamp-2">
+ <p className="text-[10.5px] sm:text-[11.5px] text-swarm-textMuted leading-snug line-clamp-2">
  {p.description}
  </p>
  </button>
@@ -340,13 +340,13 @@ export default function SessionLauncher({
 
  {/* ── TEMPLATE Section ──────────────────────────────────────────── */}
  <div className="flex flex-col gap-2 shrink-0">
- <label className="text-[10.5px] font-bold tracking-wider text-slate-400 uppercase">
+ <label className="text-[10.5px] font-bold tracking-wider text-swarm-textMuted uppercase">
  QUICK TEMPLATE
  </label>
  <select
  value={selectedTemplateId}
  onChange={(e) => applyTemplate(e.target.value)}
- className="w-full rounded-xl border border-white/[0.08] bg-[#131622]/90 px-3.5 py-2.5 text-xs text-slate-200 focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/40 outline-none transition-all"
+ className="w-full rounded-xl border border-swarm-border bg-swarm-canvasHi/90 px-3.5 py-2.5 text-xs text-swarm-textDim focus:border-swarm-gold/60 focus:ring-1 focus:ring-swarm-gold/30 outline-none transition-all"
  >
  <option value="">Custom configuration</option>
  {AGENT_TEMPLATES.map((t) => (
@@ -356,13 +356,13 @@ export default function SessionLauncher({
  ))}
  </select>
  {effectiveTemplate && (
- <div className="flex items-center gap-2 rounded-lg border border-blue-500/20 bg-blue-500/5 px-3 py-2 text-[11px] text-blue-300">
+ <div className="flex items-center gap-2 rounded-lg border border-swarm-gold/20 bg-swarm-gold/5 px-3 py-2 text-[11px] text-swarm-goldHi">
  <Sparkles className="size-3 shrink-0" />
  <span className="font-medium">{effectiveTemplate.title}</span>
- <span className="text-slate-400 hidden sm:inline">— {effectiveTemplate.description}</span>
+ <span className="text-swarm-textMuted hidden sm:inline">— {effectiveTemplate.description}</span>
  <button
  onClick={() => applyTemplate("")}
- className="text-[10px] text-slate-400 hover:text-slate-200 underline ml-auto shrink-0"
+ className="text-[10px] text-swarm-textMuted hover:text-swarm-textMuted underline ml-auto shrink-0"
  >
  Clear
  </button>
@@ -372,36 +372,36 @@ export default function SessionLauncher({
 
  {/* ── WORKING DIRECTORY Section ────────────────────────────────── */}
  <div className="flex flex-col gap-2 shrink-0">
- <label className="text-[10.5px] font-bold tracking-wider text-slate-400 uppercase">
+ <label className="text-[10.5px] font-bold tracking-wider text-swarm-textMuted uppercase">
  WORKING DIRECTORY
  </label>
  <div className="flex items-center gap-2">
  <div className="relative flex-1">
- <FolderOpen className="size-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+ <FolderOpen className="size-3.5 text-swarm-textMuted absolute left-3 top-1/2 -translate-y-1/2" />
  <input
  type="text"
  value={workingDirOverride || activeWorkspace?.boundProjectPath || ""}
  onChange={(e) => setWorkingDirOverride(e.target.value)}
  placeholder={activeWorkspace?.boundProjectPath || "~/Desktop/SwarmAI"}
- className="w-full rounded-xl border border-white/[0.08] bg-[#131622]/90 pl-9 pr-3 py-2.5 text-xs text-slate-200 placeholder:text-slate-500 focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/40 outline-none transition-all font-mono"
+ className="w-full rounded-xl border border-swarm-border bg-swarm-canvasHi/90 pl-9 pr-3 py-2.5 text-xs text-swarm-textDim placeholder:text-swarm-textMuted focus:border-swarm-gold/60 focus:ring-1 focus:ring-swarm-gold/30 outline-none transition-all font-mono"
  />
  </div>
  <button
  onClick={handlePickDirectory}
  disabled={isPickingDir}
- className="shrink-0 rounded-xl border border-white/[0.08] bg-[#131622]/90 px-3 py-2.5 text-xs text-slate-300 hover:text-white hover:border-blue-500/60 transition-all disabled:opacity-50 cursor-pointer"
+ className="shrink-0 rounded-xl border border-swarm-border bg-swarm-canvasHi/90 px-3 py-2.5 text-xs text-swarm-textMuted hover:text-swarm-text border-swarm-border/60 hover:border-swarm-gold/40 transition-all disabled:opacity-50 cursor-pointer"
  title="Browse for working directory"
  >
  {isPickingDir ? "..." : "Browse"}
  </button>
  </div>
  {workingDirOverride && (
- <div className="flex items-center gap-2 rounded-lg border border-blue-500/20 bg-blue-500/5 px-3 py-2 text-[11px] text-blue-300">
+ <div className="flex items-center gap-2 rounded-lg border border-swarm-gold/20 bg-swarm-gold/5 px-3 py-2 text-[11px] text-swarm-goldHi">
  <FolderOpen className="size-3 shrink-0" />
  <span className="font-mono truncate">{displayWorkingDir}</span>
  <button
  onClick={() => setWorkingDirOverride("")}
- className="text-[10px] text-slate-400 hover:text-slate-200 underline ml-auto shrink-0"
+ className="text-[10px] text-swarm-textMuted hover:text-swarm-textMuted underline ml-auto shrink-0"
  >
  Reset
  </button>
@@ -411,7 +411,7 @@ export default function SessionLauncher({
 
  {/* ── AGENT Section ────────────────────────────────────────────── */}
  <div className="flex flex-col gap-2 shrink-0">
- <label className="text-[10.5px] font-bold tracking-wider text-slate-400 uppercase">
+ <label className="text-[10.5px] font-bold tracking-wider text-swarm-textMuted uppercase">
  AGENT
  </label>
  <div
@@ -432,8 +432,8 @@ export default function SessionLauncher({
  onClick={() => handleAgentChange(opt.id)}
  className={`flex items-center justify-between px-2.5 py-2 sm:px-3 sm:py-2.5 rounded-xl border text-left transition-all duration-150 ${
  active
- ? "bg-[#192038]/90 border-blue-500/80 shadow-md shadow-blue-500/10 ring-1 ring-blue-500/50"
- : "bg-[#131622]/80 border-white/[0.08] hover:border-white/[0.18] hover:bg-[#161a2b]"
+ ? "bg-swarm-surfaceHi/90 border-swarm-gold/60 shadow-md shadow-swarm-gold/10 ring-1 ring-swarm-gold/50"
+ : "bg-swarm-canvasHi border-white/[0.08] hover:border-white/[0.18] hover:bg-swarm-surfaceHi"
  }`}
  >
  <div className="flex items-center gap-2 min-w-0">
@@ -443,12 +443,12 @@ export default function SessionLauncher({
  ) : brand ? (
  <BrandGlyph brand={brand} size={14} />
  ) : (
- <Bot className="size-3.5 sm:size-4 text-slate-300" />
+ <Bot className="size-3.5 sm:size-4 text-swarm-textDim" />
  )}
  </div>
  <span
  className={`truncate text-[11px] sm:text-xs font-semibold ${
- active ? "text-white" : "text-slate-200"
+ active ? "text-swarm-text" : "text-swarm-textMuted"
  }`}
  >
  {opt.name}
@@ -456,7 +456,7 @@ export default function SessionLauncher({
  </div>
 
  {active && (
- <div className="flex size-3.5 sm:size-4 shrink-0 items-center justify-center rounded-full bg-blue-500 text-white shadow-sm ml-1">
+ <div className="flex size-3.5 sm:size-4 shrink-0 items-center justify-center rounded-full bg-swarm-gold text-swarm-canvas shadow-sm ml-1">
  <Check className="size-2 sm:size-2.5 stroke-[3]" />
  </div>
  )}
@@ -468,7 +468,7 @@ export default function SessionLauncher({
 
  {/* ── HOW MANY Section ────────────────────────────────────────── */}
  <div className="flex flex-col gap-2 shrink-0">
- <label className="text-[10.5px] font-bold tracking-wider text-slate-400 uppercase">
+ <label className="text-[10.5px] font-bold tracking-wider text-swarm-textMuted uppercase">
  HOW MANY
  </label>
  <div
@@ -486,15 +486,15 @@ export default function SessionLauncher({
  onClick={() => setSessionCount(num)}
  className={`flex size-7 sm:size-8 items-center justify-center rounded-lg text-xs font-bold transition-all ${
  active
- ? "bg-[#192038] border border-blue-500/80 text-blue-400 ring-1 ring-blue-500/40 shadow-sm"
- : "bg-[#131622] border border-white/[0.08] text-slate-400 hover:text-slate-200 hover:bg-[#181d2e]"
+ ? "bg-swarm-surfaceHi border-swarm-gold/60 text-swarm-gold ring-1 ring-swarm-gold/40 shadow-sm"
+ : "bg-swarm-canvasHi border-white/[0.08] text-swarm-textMuted hover:text-swarm-text hover:bg-swarm-surfaceHi"
  }`}
  >
  {num}
  </button>
  );
  })}
- <span className="text-xs text-slate-400 font-medium ml-1">
+ <span className="text-xs text-swarm-textMuted font-medium ml-1">
  {sessionCount === 1 ? "session" : "sessions"}
  </span>
  </div>
@@ -502,7 +502,7 @@ export default function SessionLauncher({
 
  {/* ── TASK - OPTIONAL Section ─────────────────────────────────── */}
  <div className="flex flex-col gap-2 shrink-0">
- <label className="text-[10.5px] font-bold tracking-wider text-slate-400 uppercase">
+ <label className="text-[10.5px] font-bold tracking-wider text-swarm-textMuted uppercase">
  TASK — OPTIONAL
  </label>
  <label htmlFor="task-prompt" className="sr-only">
@@ -514,7 +514,7 @@ export default function SessionLauncher({
  onChange={(e) => handlePromptChange(e.target.value)}
  placeholder="What should it work on?"
  rows={2}
- className="w-full resize-none rounded-xl border border-white/[0.08] bg-[#131622]/90 px-3.5 py-3 text-xs text-slate-200 placeholder:text-slate-500 focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/40 outline-none leading-relaxed transition-all shadow-inner"
+ className="w-full resize-none rounded-xl border border-swarm-border bg-swarm-canvasHi/90 px-3.5 py-3 text-xs text-swarm-gold placeholder:text-swarm-textMuted focus:border-swarm-gold/60 focus:ring-1 focus:ring-swarm-gold/30 outline-none leading-relaxed transition-all shadow-inner"
  onKeyDown={(e) => {
  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
  e.preventDefault();
@@ -525,16 +525,16 @@ export default function SessionLauncher({
  </div>
 
  {/* ── Launch Action Footer (Sticky) ────────────────────────────── */}
- <div className="sticky bottom-0 -mx-4 sm:-mx-8 px-4 sm:px-8 py-3 bg-[#0b0d14]/95 backdrop-blur-md border-t border-white/[0.08] mt-auto shadow-2xl z-20 flex items-center justify-between">
- <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-slate-400">
- <Sparkles className="size-3.5 text-blue-400 shrink-0" />
- <span>Press <kbd className="rounded bg-white/[0.08] px-1.5 py-0.5 text-[10px] text-slate-300 font-mono">&#8984;+Enter</kbd> to launch</span>
+ <div className="sticky bottom-0 -mx-4 sm:-mx-8 px-4 sm:px-8 py-3 bg-swarm-canvas/95 backdrop-blur-md border-t border-white/[0.08] mt-auto shadow-2xl z-20 flex items-center justify-between">
+ <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-swarm-textMuted">
+ <Sparkles className="size-3.5 text-swarm-gold shrink-0" />
+ <span>Press <kbd className="rounded bg-white/[0.08] px-1.5 py-0.5 text-[10px] text-swarm-textDim font-mono">&#8984;+Enter</kbd> to launch</span>
  </div>
 
  <button
  onClick={handleLaunch}
  disabled={isLaunching}
- className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 sm:px-6 py-2 sm:py-2.5 text-xs font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:brightness-110 hover:shadow-blue-500/30 active:scale-[0.98] disabled:opacity-50 cursor-pointer shrink-0"
+ className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-swarm-goldHi to-swarm-gold px-5 sm:px-6 py-2 sm:py-2.5 text-xs font-bold text-swarm-canvas shadow-lg shadow-swarm-gold/20 transition-all hover:brightness-110 hover:shadow-swarm-gold/30 active:scale-[0.98] disabled:opacity-50 cursor-pointer shrink-0"
  >
  <Play className="size-3.5 fill-current" />
  <span>Start Session</span>
