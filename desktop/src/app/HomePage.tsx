@@ -40,7 +40,7 @@ import {
  History,
 } from "lucide-react";
 import ThemePicker from "@/shared/ThemePicker";
-import OverflowMenu from "@/shared/OverflowMenu";
+import { BookOpen, Activity, FileDiff, Layers, Sparkles, RefreshCw, Wifi, Download } from "lucide-react";
 import CommandPalette from "@/shared/CommandPalette";
 import ShortcutsModal from "@/shared/ShortcutsModal";
 import OnboardingModal, { useOnboarding } from "@/shared/OnboardingModal";
@@ -51,9 +51,9 @@ import SwarmDashboardModal from "@/features/dashboard/SwarmDashboardModal";
 import DiffPreviewModal from "@/features/diff/DiffPreviewModal";
 import TaskTemplatesModal from "@/features/templates/TaskTemplatesModal";
 import MacWindowControls from "@/shared/MacWindowControls";
-import { BookOpen, Activity, FileDiff, Layers, Sparkles, RefreshCw, Download } from "lucide-react";
 import { AppOpeningAnimation, useSplashStore } from "@/features/splash";
 import { useUpdateStore } from "@/features/updates/useUpdateChecker";
+import OverflowMenu from "@/shared/OverflowMenu";
 
 export default function HomePage() {
  const isMac = typeof navigator !== "undefined" && (/Mac|iPod|iPhone|iPad/.test(navigator.userAgent) || navigator.platform?.includes("Mac"));
@@ -652,8 +652,8 @@ export default function HomePage() {
 
  <button
  onClick={() => setShowGitModal(true)}
- className="flex shrink-0 items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] hover:border-white/20 text-zinc-200 transition-colors cursor-pointer group shadow-xs"
- title={gitStatus ? `Git Control Hub (Branch: ${gitStatus.branch})` : "Initialize Git Repository"}
+ className="flex shrink-0 items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] hover:border-white/20 text-zinc-200 transition-all cursor-pointer group shadow-xs hover-lift"
+ title={gitStatus ? `Branch: ${gitStatus.branch} · ${gitStatus.changed} changed` : "Initialize Git Repository"}
  >
  <GitBranch size={11} className="group-hover:scale-110 transition-transform text-slate-300 shrink-0" />
  <span className="max-w-[24ch] truncate font-mono font-medium text-[11px]">{gitStatus?.branch ?? "no repo"}</span>
@@ -665,12 +665,15 @@ export default function HomePage() {
  </button>
 
  <span className="hidden md:flex items-center gap-2 text-[11px] font-mono text-zinc-400 ml-1">
- <span className="flex items-center gap-1.5 text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20 text-[10px] font-medium">
+ <span className="flex items-center gap-1.5 text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20 text-[10px] font-medium transition-all hover-lift cursor-default" title="Swarm Engine v0.1.0 · Local Memory Bridge connected">
  <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
  <span>Swarm Engine</span>
  </span>
  <span className="text-zinc-700">·</span>
- <span className="text-zinc-400 text-[10px]">Local Memory Bridge</span>
+ <span className="text-zinc-400 text-[10px] flex items-center gap-1 transition-all hover-lift cursor-default" title="Local Memory Bridge connected">
+ <Wifi size={10} className="text-emerald-500/70" />
+ <span>Local Memory Bridge</span>
+ </span>
  </span>
 
         <span className="ml-auto flex shrink-0 items-center gap-2">
@@ -707,17 +710,31 @@ export default function HomePage() {
           {erroredAgents > 0 && (
  <button
  onClick={() => setShowDashboard(true)}
- className="flex items-center gap-1.5 px-2 py-0.5 rounded-md text-rose-300 border border-rose-500/30 bg-rose-500/10 font-mono text-[10px] hover:bg-rose-500/20 transition-all cursor-pointer"
+ className="flex items-center gap-1.5 px-2 py-0.5 rounded-md text-rose-300 border border-rose-500/30 bg-rose-500/10 font-mono text-[10px] hover:bg-rose-500/20 transition-all cursor-pointer hover-lift"
  >
  {erroredAgents} failed
  </button>
  )}
  <button
  onClick={() => setShowDashboard(true)}
- className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white/[0.05] border border-white/[0.12] text-zinc-200 text-[11px] font-mono font-semibold shadow-xs hover:bg-white/[0.1] hover:border-swarm-gold/40 transition-all cursor-pointer"
+ className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white/[0.05] border border-white/[0.12] text-zinc-200 text-[11px] font-mono font-semibold shadow-xs hover:bg-white/[0.1] hover:border-swarm-gold/40 transition-all cursor-pointer hover-lift"
  title={`${busyAgents} of ${totalAgents} agents working — Click to open Swarm Dashboard`}
  >
  <span className={`size-1.5 rounded-full ${busyAgents > 0 ? "bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(52,211,153,0.8)]" : "bg-zinc-500"}`} />
+ <span className="sparkline mr-0.5">
+ {[...Array(4)].map((_, i) => (
+ <span
+ key={i}
+ className="sparkline-bar"
+ style={{
+ height: i < busyAgents ? `${6 + i * 3}px` : "3px",
+ background: i < busyAgents
+ ? "rgb(var(--swarm-ok))"
+ : "rgb(var(--swarm-text-muted) / 0.3)",
+ }}
+ />
+ ))}
+ </span>
  <span>{busyAgents}/{totalAgents} active</span>
  </button>
  </span>
